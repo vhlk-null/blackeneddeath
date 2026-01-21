@@ -1,0 +1,15 @@
+﻿namespace Archive.API.Models
+{
+    public class StreamingLink
+    {
+        public Guid Id { get; set; }
+
+        public StreamingPlatform Platform { get; set; }
+
+        public string EmbedCode { get; set; } = null!;
+
+        public Guid AddedByUserId { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+    }
+}
