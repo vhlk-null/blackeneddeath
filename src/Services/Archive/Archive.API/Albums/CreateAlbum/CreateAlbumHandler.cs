@@ -1,6 +1,7 @@
-﻿using Archive.API.Models;
-using Archive.API.Models.JoinTables;
-using BuildingBlocks.CQRS;
+﻿using BuildingBlocks.CQRS;
+using BuildingBlocks.Models;
+using BuildingBlocks.Models.JoinTables;
+using BuildingBlocks.Repositories;
 
 namespace Archive.API.Albums.CreateAlbum
 {
@@ -19,8 +20,10 @@ namespace Archive.API.Albums.CreateAlbum
 
     public record CreateAlbumResult(Guid Id);
 
-    public class CreateAlbumCommandHandler : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
+    internal class CreateAlbumCommandHandler(IRepository<ArchiveContext> repo) : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
     {
+        private readonly IRepository<ArchiveContext> repo = repo;
+
         public async Task<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
         {
             //bussiness logic to create an album

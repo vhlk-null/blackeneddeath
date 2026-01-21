@@ -1,4 +1,4 @@
-﻿using Archive.API.Models;
+﻿using BuildingBlocks.Models;
 
 namespace Archive.API.Albums.CreateAlbum
 {

@@ -1,4 +1,4 @@
-﻿namespace Archive.API.Models
+﻿namespace BuildingBlocks.Models
 {
     public class Band
     {
