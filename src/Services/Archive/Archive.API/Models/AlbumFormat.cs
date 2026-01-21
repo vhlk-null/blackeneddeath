@@ -1,4 +1,4 @@
-﻿namespace BuildingBlocks.Models
+﻿namespace Archive.API.Models
 {
     public enum AlbumFormat
     {

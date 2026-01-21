@@ -1,4 +1,4 @@
-﻿namespace BuildingBlocks.Models.JoinTables
+﻿namespace Archive.API.Models.JoinTables
 {
     public class AlbumTag
     {

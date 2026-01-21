@@ -1,9 +1,9 @@
-﻿using BuildingBlocks.Models;
-using BuildingBlocks.Models.JoinTables;
-using BuildingBlocks.Repositories.Extensions;
+﻿using Archive.API.Models;
+using Archive.API.Models.JoinTables;
+using BuildingBlocks;
 using Microsoft.EntityFrameworkCore;
 
-namespace BuildingBlocks.Repositories
+namespace Archive.API.Data
 {
     public class ArchiveContext : DbContext
     {

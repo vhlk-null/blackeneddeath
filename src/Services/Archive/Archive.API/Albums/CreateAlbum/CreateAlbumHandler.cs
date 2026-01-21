@@ -1,6 +1,7 @@
-﻿using BuildingBlocks.CQRS;
-using BuildingBlocks.Models;
-using BuildingBlocks.Models.JoinTables;
+﻿using Archive.API.Data;
+using Archive.API.Models;
+using Archive.API.Models.JoinTables;
+using BuildingBlocks.CQRS;
 using BuildingBlocks.Repositories;
 
 namespace Archive.API.Albums.CreateAlbum
@@ -26,8 +27,6 @@ namespace Archive.API.Albums.CreateAlbum
 
         public async Task<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
         {
-            //bussiness logic to create an album
-
             var album = new Album
             {
                 Id = Guid.NewGuid(),
@@ -43,6 +42,9 @@ namespace Archive.API.Albums.CreateAlbum
                     GenreId = genreId
                 }).ToList()
             };
+
+            await repo.AddAsync(album, cancellationToken);
+            await repo.SaveChangesAsync(cancellationToken);
 
             return new CreateAlbumResult(Guid.NewGuid());
         }

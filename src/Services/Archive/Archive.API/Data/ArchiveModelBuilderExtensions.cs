@@ -1,8 +1,8 @@
-﻿using BuildingBlocks.Models;
-using BuildingBlocks.Models.JoinTables;
+﻿using Archive.API.Models;
+using Archive.API.Models.JoinTables;
 using Microsoft.EntityFrameworkCore;
 
-namespace BuildingBlocks.Repositories.Extensions
+namespace BuildingBlocks
 {
     public static class ArchiveModelBuilderExtensions
     {

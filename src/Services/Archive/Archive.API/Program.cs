@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using Archive.API.Data;
+using BuildingBlocks.Repositories;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,10 @@ builder.Services.AddMediatR(config =>
     config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
 });
 
+builder.Services.AddDbContext<ArchiveContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ArchiveDb")));
+
+builder.Services.AddScoped<IRepository<ArchiveContext>, ArchiveRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
