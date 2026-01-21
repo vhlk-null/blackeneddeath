@@ -19,7 +19,7 @@ namespace Archive.API.Albums.CreateAlbum
 
     public record CreateAlbumResult(Guid Id);
 
-    internal class CreateAlbumCommandHandler : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
+    public class CreateAlbumCommandHandler : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
     {
         public async Task<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
         {

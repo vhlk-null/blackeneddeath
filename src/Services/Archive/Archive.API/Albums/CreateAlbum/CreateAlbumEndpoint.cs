@@ -1,21 +1,17 @@
 ﻿using Archive.API.Models;
-using Carter;
-using Mapster;
-using MediatR;
 
 namespace Archive.API.Albums.CreateAlbum
 {
     public record CreateAlbumRequest(
-     string Title,
-     DateTime ReleaseDate,
-     AlbumType Type,
-     AlbumFormat Format,
-     string? Label,
-     Guid? CountryId,
-     List<Guid> BandIds,
-     List<Guid> GenreIds,
-     List<Guid> TagIds,
-     IFormFile? Cover);
+    string Title,
+    DateTime ReleaseDate,
+    AlbumType Type,
+    AlbumFormat Format,
+    string? Label,
+    Guid? CountryId,
+    List<Guid> BandIds,
+    List<Guid> GenreIds,
+    List<Guid> TagIds);
 
     public record CreateAlbumResponse(Guid Id);
 
