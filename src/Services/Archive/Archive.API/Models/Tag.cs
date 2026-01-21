@@ -7,6 +7,6 @@ namespace Archive.API.Models
         public Guid Id { get; set; }
         public string Name { get; set; }
 
-        public ICollection<AlbumTag> Albums { get; set; }
+        //public ICollection<AlbumTag> Albums { get; set; }
     }
 }

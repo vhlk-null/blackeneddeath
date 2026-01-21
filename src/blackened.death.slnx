@@ -6,4 +6,7 @@
   <Folder Name="/Services/Archive/">
     <Project Path="Services/Archive/Archive.API/Archive.API.csproj" Id="63aa319d-2620-4492-af6d-edda6349fba9" />
   </Folder>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
 </Solution>

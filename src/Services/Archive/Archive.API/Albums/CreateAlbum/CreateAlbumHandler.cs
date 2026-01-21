@@ -31,14 +31,14 @@
                 Label = command.Label,
                 //CountryId = command.CountryId,
                 //CoverUrl = coverUrl,
-                Genres = command.GenreIds.Select(genreId => new AlbumGenre
-                {
-                    GenreId = genreId
-                }).ToList()
+                //Genres = command.GenreIds.Select(genreId => new AlbumGenre
+                //{
+                //    GenreId = genreId
+                //}).ToList()
             };
 
-            //await repo.AddAsync(album, cancellationToken);
-            //await repo.SaveChangesAsync(cancellationToken);
+            await repo.AddAsync(album, cancellationToken);
+            await repo.SaveChangesAsync(cancellationToken);
 
             return new CreateAlbumResult(album.Id);
         }

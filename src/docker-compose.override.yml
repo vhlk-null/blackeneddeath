@@ -1,0 +1,12 @@
+﻿services:
+  archivedb:
+    container_name: archivedb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres  # ← має співпадати
+      - POSTGRES_DB=ArchiveDb
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_archive:/var/lib/postgresql/data/

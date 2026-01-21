@@ -22,7 +22,7 @@
         // Junction tables (Many-to-Many)
         public virtual DbSet<AlbumBand> AlbumBands { get; set; }
         public virtual DbSet<AlbumGenre> AlbumGenres { get; set; }
-        public virtual DbSet<AlbumTrack> AlbumTracks { get; set; }
+        //public virtual DbSet<AlbumTrack> AlbumTracks { get; set; }
         public virtual DbSet<BandGenre> BandGenres { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
