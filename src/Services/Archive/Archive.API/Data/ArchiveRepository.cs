@@ -1,6 +1,4 @@
-﻿using BuildingBlocks.Repositories;
-
-namespace Archive.API.Data
+﻿namespace Archive.API.Data
 {
     public class ArchiveRepository : BaseGenericRepository<ArchiveContext>
     {

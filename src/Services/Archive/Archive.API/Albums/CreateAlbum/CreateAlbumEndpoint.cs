@@ -1,6 +1,4 @@
-﻿using Archive.API.Models;
-
-namespace Archive.API.Albums.CreateAlbum
+﻿namespace Archive.API.Albums.CreateAlbum
 {
     public record CreateAlbumRequest(
     string Title,

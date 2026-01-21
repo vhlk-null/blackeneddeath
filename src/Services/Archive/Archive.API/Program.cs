@@ -1,9 +1,4 @@
-﻿using Archive.API.Data;
-using BuildingBlocks.Repositories;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCarter();
 

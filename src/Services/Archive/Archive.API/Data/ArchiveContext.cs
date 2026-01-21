@@ -1,9 +1,4 @@
-﻿using Archive.API.Models;
-using Archive.API.Models.JoinTables;
-using BuildingBlocks;
-using Microsoft.EntityFrameworkCore;
-
-namespace Archive.API.Data
+﻿namespace Archive.API.Data
 {
     public class ArchiveContext : DbContext
     {

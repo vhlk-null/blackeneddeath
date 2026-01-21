@@ -1,10 +1,4 @@
-﻿using Archive.API.Data;
-using Archive.API.Models;
-using Archive.API.Models.JoinTables;
-using BuildingBlocks.CQRS;
-using BuildingBlocks.Repositories;
-
-namespace Archive.API.Albums.CreateAlbum
+﻿namespace Archive.API.Albums.CreateAlbum
 {
     public record CreateAlbumCommand(
         string Title,
@@ -17,7 +11,7 @@ namespace Archive.API.Albums.CreateAlbum
         List<Guid> GenreIds,
         List<Guid> TagIds,
         IFormFile? Cover
-    ) : ICommand<CreateAlbumResult>;
+    ) : ICommand<CreateAlbumResult>;    
 
     public record CreateAlbumResult(Guid Id);
 
@@ -43,10 +37,10 @@ namespace Archive.API.Albums.CreateAlbum
                 }).ToList()
             };
 
-            await repo.AddAsync(album, cancellationToken);
-            await repo.SaveChangesAsync(cancellationToken);
+            //await repo.AddAsync(album, cancellationToken);
+            //await repo.SaveChangesAsync(cancellationToken);
 
-            return new CreateAlbumResult(Guid.NewGuid());
+            return new CreateAlbumResult(album.Id);
         }
     }
 }
