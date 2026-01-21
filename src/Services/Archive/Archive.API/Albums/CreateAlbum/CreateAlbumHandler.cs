@@ -21,7 +21,7 @@ namespace Archive.API.Albums.CreateAlbum
 
     internal class CreateAlbumCommandHandler : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
     {
-        public Task<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
+        public async Task<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
         {
             //bussiness logic to create an album
 
@@ -41,7 +41,7 @@ namespace Archive.API.Albums.CreateAlbum
                 }).ToList()
             };
 
-            throw new NotImplementedException();
+            return new CreateAlbumResult(Guid.NewGuid());
         }
     }
 }
