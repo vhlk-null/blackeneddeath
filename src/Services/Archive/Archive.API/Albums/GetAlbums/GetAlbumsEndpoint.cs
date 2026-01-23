@@ -3,7 +3,7 @@ namespace Archive.API.Albums.GetAlbums
 {
     //public record GetAlbumsRequest();
 
-    public record GetAlbumsResponse(IEnumerable<Album> Albums);
+    public record GetAblumByIdEndpoint(IEnumerable<Album> Albums);
 
     public class GetAlbumsEndpoint : ICarterModule
     {
@@ -13,12 +13,12 @@ namespace Archive.API.Albums.GetAlbums
             {
                 var result = await sender.Send(new GetAlbumsQuery());
 
-                var response = result.Adapt<GetAlbumsResponse>();
+                var response = result.Adapt<GetAblumByIdEndpoint>();
 
                 return response;
             })
              .WithName("GetAlbums")
-             .Produces<GetAlbumsResponse>(StatusCodes.Status200OK)
+             .Produces<GetAblumByIdEndpoint>(StatusCodes.Status200OK)
              .ProducesProblem(StatusCodes.Status400BadRequest)
              .WithSummary("Get Albums")
              .WithDescription("Get Albums");

@@ -2,7 +2,7 @@
 {
     public record CreateAlbumCommand(
         string Title,
-        DateTime ReleaseDate,
+        int ReleaseDate,
         AlbumType Type,
         AlbumFormat Format,
         string? Label,

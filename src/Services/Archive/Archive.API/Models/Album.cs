@@ -6,7 +6,7 @@ namespace Archive.API.Models
     {
         public Guid Id { get; set; }
         public string Title { get; set; } = null!;
-        public DateTime ReleaseDate { get; set; }
+        public int ReleaseDate { get; set; }
         public string? CoverUrl { get; set; }
         
         public AlbumType Type { get; set; }

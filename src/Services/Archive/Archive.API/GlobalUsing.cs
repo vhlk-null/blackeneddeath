@@ -8,3 +8,4 @@ global using Mapster;
 global using MediatR;
 global using Microsoft.EntityFrameworkCore;
 global using System.Reflection;
+global using Archive.API.Exceptions;
