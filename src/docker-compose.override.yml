@@ -3,7 +3,7 @@
     container_name: archivedb
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres  # ← має співпадати
+      - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=ArchiveDb
     restart: always
     ports:

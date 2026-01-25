@@ -12,12 +12,8 @@ builder.Services.AddDbContext<ArchiveContext>(options =>
 
 builder.Services.AddScoped<IRepository<ArchiveContext>, ArchiveRepository>();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-app.UseSwagger();
-app.UseSwaggerUI();
 
 app.MapCarter();
 
