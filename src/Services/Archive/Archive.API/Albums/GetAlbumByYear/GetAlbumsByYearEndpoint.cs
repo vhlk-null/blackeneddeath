@@ -8,9 +8,9 @@ public class GetAlbumsByYearEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/albums/{releaseDate:int}", async (int ReleaseDate, ISender sender) =>
+        app.MapGet("/albums/releaseyear/{releaseDate:int}", async (int releaseDate, ISender sender) =>
         {
-            var query = new GetAlbumsByYearQuery(ReleaseDate);
+            var query = new GetAlbumsByYearQuery(releaseDate);
             var result = await sender.Send(query);
             var response = result.Adapt<GetAlbumsByYearResponse>();
             return Results.Ok(response);

@@ -15,10 +15,12 @@
 
     public record CreateAlbumResult(Guid Id);
 
-    internal class CreateAlbumCommandHandler(IRepository<ArchiveContext> repo) : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
+    internal class CreateAlbumCommandHandler(IRepository<ArchiveContext> repo, ILogger<CreateAlbumCommandHandler> logger) : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
     {
         public async Task<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
         {
+            logger.LogInformation("CreateAlbumCommandHandler.Handle called with {@Command}", command);
+
             var album = new Album
             {
                 Id = Guid.NewGuid(),
