@@ -1,4 +1,4 @@
-﻿namespace Archive.API.Albums.GetAlbumByYear;
+﻿namespace Archive.API.Albums.GetAlbumsBy.GetAlbumByYear;
 
 public record GetAlbumsByYearRequest(int ReleaseDate) : IRequest<GetAlbumsByYearResult>;
 
