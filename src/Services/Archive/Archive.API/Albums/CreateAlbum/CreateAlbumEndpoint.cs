@@ -15,7 +15,7 @@ namespace Archive.API.Albums.CreateAlbum
 
     public record CreateAlbumResponse(Guid Id);
 
-    public class CreateAlbumCommandValidator : AbstractValidator<CreateAlbumRequest>
+    public class CreateAlbumCommandValidator : AbstractValidator<CreateAlbumCommand>
     {
         public CreateAlbumCommandValidator()
         {

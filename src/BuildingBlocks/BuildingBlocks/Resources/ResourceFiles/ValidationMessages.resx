@@ -129,11 +129,11 @@
   <data name="MaxLengthIsExceeded" xml:space="preserve">
     <value>Maximum length is exceeded</value>
   </data>
-  <data name="ReleaseDateInFuture" xml:space="preserve">
-    <value>Release date cannot be in the future</value>
+  <data name="ReleaseYearInFuture" xml:space="preserve">
+    <value>Release year cannot be in the future</value>
   </data>
-  <data name="ReleaseDateRequired" xml:space="preserve">
-    <value>Release date is required</value>
+  <data name="ReleaseYearRequired" xml:space="preserve">
+    <value>Release year is required</value>
   </data>
   <data name="ReleaseYearTooOld" xml:space="preserve">
     <value>Release year must be after 1900</value>

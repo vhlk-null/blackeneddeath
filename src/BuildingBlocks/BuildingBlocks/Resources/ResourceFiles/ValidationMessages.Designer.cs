@@ -97,20 +97,20 @@ namespace BuildingBlocks.Resources.ResourceFiles {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Release date cannot be in the future.
+        ///   Looks up a localized string similar to Release year cannot be in the future.
         /// </summary>
-        internal static string ReleaseDateInFuture {
+        internal static string ReleaseYearInFuture {
             get {
-                return ResourceManager.GetString("ReleaseDateInFuture", resourceCulture);
+                return ResourceManager.GetString("ReleaseYearInFuture", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Release date is required.
+        ///   Looks up a localized string similar to Release year is required.
         /// </summary>
-        internal static string ReleaseDateRequired {
+        internal static string ReleaseYearRequired {
             get {
-                return ResourceManager.GetString("ReleaseDateRequired", resourceCulture);
+                return ResourceManager.GetString("ReleaseYearRequired", resourceCulture);
             }
         }
         
