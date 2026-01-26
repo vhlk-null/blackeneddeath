@@ -11,3 +11,4 @@ global using System.Reflection;
 global using Archive.API.Exceptions;
 global using FluentValidation;
 global using Archive.API.Extenstions;
+global using BuildingBlocks.Resources.ResourceManagement;

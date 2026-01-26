@@ -3,6 +3,14 @@
     public record DeleteAlbumCommand(Guid Id) : ICommand<DeleteAlbumResult>;
     public record DeleteAlbumResult(bool IsSuccess);
 
+    public class DeleteAlbumCommandValidator : AbstractValidator<DeleteAlbumCommand>
+    {
+        public DeleteAlbumCommandValidator()
+        {
+            RuleFor(x => x.Id).NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField);
+        }
+    }
+
     internal class DeleteAlbumCommandHandler(
         IRepository<ArchiveContext> repo,
         ILogger<DeleteAlbumCommandHandler> logger)
@@ -18,7 +26,7 @@
                 a => a.Id == command.Id,
                 cancellationToken: cancellationToken);
 
-            if (album == null)  throw new AlbumNotFoundException();
+            if (album == null) throw new AlbumNotFoundException();
 
             repo.Delete(album);
             await repo.SaveChangesAsync(cancellationToken);

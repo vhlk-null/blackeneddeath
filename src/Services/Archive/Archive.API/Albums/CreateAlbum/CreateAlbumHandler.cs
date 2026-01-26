@@ -15,6 +15,29 @@
 
     public record CreateAlbumResult(Guid Id);
 
+    public class CreateAlbumCommandValidator : AbstractValidator<CreateAlbumCommand>
+    {
+        public CreateAlbumCommandValidator()
+        {
+            RuleFor(x => x.Title)
+             .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
+             .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
+
+            RuleFor(x => x.Label)
+                .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
+             .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
+
+            RuleFor(x => x.CountryId)
+                .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
+                .WithMessage(ValidationMessages.MaxLengthIsExceeded);
+
+            RuleFor(x => x.ReleaseDate)
+                .GreaterThan(0).WithMessage(ValidationMessages.ReleaseYearRequired)
+                .GreaterThan(1900).WithMessage(ValidationMessages.ReleaseYearTooOld)
+                .LessThanOrEqualTo(DateTime.UtcNow.Year).WithMessage(ValidationMessages.ReleaseYearInFuture);
+        }
+    }
+
     internal class CreateAlbumCommandHandler(IRepository<ArchiveContext> repo, ILogger<CreateAlbumCommandHandler> logger) 
         : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
     {

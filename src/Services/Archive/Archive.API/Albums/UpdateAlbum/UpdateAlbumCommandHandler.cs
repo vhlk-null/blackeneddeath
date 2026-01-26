@@ -1,4 +1,6 @@
-﻿namespace Archive.API.Albums.UpdateAlbum
+﻿using Archive.API.Albums.CreateAlbum;
+
+namespace Archive.API.Albums.UpdateAlbum
 {
     public record UpdateAlbumCommand(Guid Id,
     string Title,
@@ -12,6 +14,29 @@
     List<Guid> TagIds) : ICommand<UpdateAlbumResult>;
 
     public record UpdateAlbumResult(bool IsSuccess);
+
+    public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
+    {
+        public UpdateAlbumCommandValidator()
+        {
+            RuleFor(x => x.Title)
+             .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
+             .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
+
+            RuleFor(x => x.Label)
+                .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
+             .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
+
+            RuleFor(x => x.CountryId)
+                .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
+                .WithMessage(ValidationMessages.MaxLengthIsExceeded);
+
+            RuleFor(x => x.ReleaseDate)
+                .GreaterThan(0).WithMessage(ValidationMessages.ReleaseYearRequired)
+                .GreaterThan(1900).WithMessage(ValidationMessages.ReleaseYearTooOld)
+                .LessThanOrEqualTo(DateTime.UtcNow.Year).WithMessage(ValidationMessages.ReleaseYearInFuture);
+        }
+    }
 
     internal class UpdateAlbumCommandHandler(IRepository<ArchiveContext> repo, ILogger<UpdateAlbumCommandHandler> logger) : ICommandHandler<UpdateAlbumCommand, UpdateAlbumResult>
     {

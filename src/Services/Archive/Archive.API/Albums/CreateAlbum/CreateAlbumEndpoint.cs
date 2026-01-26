@@ -1,6 +1,4 @@
-﻿using BuildingBlocks.Resources.ResourceManagement;
-
-namespace Archive.API.Albums.CreateAlbum
+﻿namespace Archive.API.Albums.CreateAlbum
 {
     public record CreateAlbumRequest(
     string Title,
@@ -14,29 +12,6 @@ namespace Archive.API.Albums.CreateAlbum
     List<Guid> TagIds);
 
     public record CreateAlbumResponse(Guid Id);
-
-    public class CreateAlbumCommandValidator : AbstractValidator<CreateAlbumCommand>
-    {
-        public CreateAlbumCommandValidator()
-        {
-            RuleFor(x => x.Title)
-             .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
-             .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
-
-            RuleFor(x => x.Label)
-                .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
-             .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
-
-            RuleFor(x => x.CountryId)
-                .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
-                .WithMessage(ValidationMessages.MaxLengthIsExceeded);
-
-            RuleFor(x => x.ReleaseDate)
-                .GreaterThan(0).WithMessage(ValidationMessages.ReleaseYearRequired)
-                .GreaterThan(1900).WithMessage(ValidationMessages.ReleaseYearTooOld)
-                .LessThanOrEqualTo(DateTime.UtcNow.Year).WithMessage(ValidationMessages.ReleaseYearInFuture);
-        }
-    }
 
     public class CreateAlbumEndpoint : ICarterModule
     {
