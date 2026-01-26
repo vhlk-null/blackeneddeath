@@ -26,7 +26,7 @@
                 a => a.Id == command.Id,
                 cancellationToken: cancellationToken);
 
-            if (album == null) throw new AlbumNotFoundException();
+            if (album == null) throw new AlbumNotFoundException(command.Id);
 
             repo.Delete(album);
             await repo.SaveChangesAsync(cancellationToken);

@@ -1,8 +1,10 @@
-﻿namespace Archive.API.Exceptions
+﻿using BuildingBlocks.Exceptions;
+
+namespace Archive.API.Exceptions
 {
-    public class AlbumNotFoundException : Exception
+    public class AlbumNotFoundException : NotFoundException
     {
-        public AlbumNotFoundException(): base("Album not found!")
+        public AlbumNotFoundException(Guid Id) : base("Album", Id)
         {
         }
     }

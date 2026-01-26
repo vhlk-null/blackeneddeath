@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using BuildingBlocks.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Archive.API.Exceptions
@@ -7,28 +8,48 @@ namespace Archive.API.Exceptions
     {
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
-            _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
+            _logger.LogError(exception, "Exception occurred: {Message}, Time of occurence {time}", exception.Message, DateTime.UtcNow);
 
-            var problemDetails = exception switch
+            (string Detail, string Title, int StatusCode) details = exception switch
             {
-                ValidationException validationException => new ProblemDetails
-                {
-                    Status = StatusCodes.Status400BadRequest,
-                    Title = "Validation Error",
-                    Detail = string.Join(", ", validationException.Errors.Select(e => e.ErrorMessage))
-                },
-                AlbumNotFoundException notFoundException => new ProblemDetails
-                {
-                    Status = StatusCodes.Status404NotFound,
-                    Title = "Not Found",
-                    Detail = notFoundException.Message
-                },
-                _ => new ProblemDetails
-                {
-                    Status = StatusCodes.Status500InternalServerError,
-                    Title = "Server Error",
-                    Detail = exception.Message
-                }
+                InternalServerException =>
+                (
+                exception.Message,
+                exception.GetType().Name,
+                httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError
+             ),
+                ValidationException =>
+                (
+                   exception.Message,
+                   exception.GetType().Name,
+                   httpContext.Response.StatusCode = StatusCodes.Status400BadRequest
+                ),
+                BadRequestException =>
+                (
+                   exception.Message,
+                   exception.GetType().Name,
+                   httpContext.Response.StatusCode = StatusCodes.Status400BadRequest
+                ),
+                NotFoundException =>
+                (
+                    exception.Message,
+                    exception.GetType().Name,
+                    httpContext.Response.StatusCode = StatusCodes.Status404NotFound
+                ),
+                _ => 
+                (
+                    exception.Message,
+                    exception.GetType().Name,
+                    httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError
+                )
+            };
+
+            var problemDetails = new ProblemDetails
+            {
+                Title = details.Title,
+                Detail = details.Detail,
+                Status = details.StatusCode,
+                Instance = httpContext.Request.Path
             };
 
             httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;

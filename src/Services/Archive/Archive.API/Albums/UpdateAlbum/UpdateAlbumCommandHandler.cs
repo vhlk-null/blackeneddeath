@@ -44,7 +44,7 @@ namespace Archive.API.Albums.UpdateAlbum
         {
             logger.LogInformation("UpdateAlbumCommandHandler.Handle called with {@Command}", command);
 
-            var album = await repo.GetByAsync<Album>(a => a.Id == command.Id) ?? throw new AlbumNotFoundException();
+            var album = await repo.GetByAsync<Album>(a => a.Id == command.Id) ?? throw new AlbumNotFoundException(command.Id);
 
             album.Title = command.Title;
             album.ReleaseDate = command.ReleaseDate;

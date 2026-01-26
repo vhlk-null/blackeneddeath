@@ -12,8 +12,6 @@
 
             var albums = await repo.FilterAsync<Album>(a => a.ReleaseDate == query.ReleaseDate);
 
-            if (albums == null) throw new AlbumNotFoundException();
-
             return new GetAlbumsByYearResult(albums);
         }
     }

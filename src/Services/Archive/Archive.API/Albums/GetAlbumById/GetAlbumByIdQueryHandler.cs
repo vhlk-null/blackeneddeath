@@ -12,7 +12,7 @@
 
             var album = await repo.GetByAsync<Album>(a=>a.Id == query.Id);
 
-            if(album == null) throw new AlbumNotFoundException();
+            if(album == null) throw new AlbumNotFoundException(query.Id);
 
             return new GetAlbumByIdResult(album);
         }
