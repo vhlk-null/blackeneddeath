@@ -60,7 +60,6 @@
             };
 
             await repo.AddAsync(album, cancellationToken);
-            await repo.SaveChangesAsync(cancellationToken);
 
             return new CreateAlbumResult(album.Id);
         }

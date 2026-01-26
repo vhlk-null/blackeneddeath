@@ -25,9 +25,9 @@
                 .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
              .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
 
-            RuleFor(x => x.CountryId)
-                .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
-                .WithMessage(ValidationMessages.MaxLengthIsExceeded);
+            //RuleFor(x => x.CountryId)
+            //    .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
+            //    .WithMessage(ValidationMessages.MaxLengthIsExceeded);
 
             RuleFor(x => x.ReleaseDate)
                 .GreaterThan(0).WithMessage(ValidationMessages.ReleaseYearRequired)
@@ -49,7 +49,6 @@
             album.Label = command.Label;
 
             repo.Update(album);
-            await repo.SaveChangesAsync();
 
             return new UpdateAlbumResult(true);
         }
