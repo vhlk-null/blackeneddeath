@@ -52,6 +52,13 @@ namespace Archive.API.Exceptions
                 Instance = httpContext.Request.Path
             };
 
+            problemDetails.Extensions.Add("traceId", httpContext.TraceIdentifier);
+
+            if(exception is ValidationException validationException)
+            {
+                problemDetails.Extensions.Add("ValidationErrors", validationException.Errors);
+            }
+
             httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
 
             await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);

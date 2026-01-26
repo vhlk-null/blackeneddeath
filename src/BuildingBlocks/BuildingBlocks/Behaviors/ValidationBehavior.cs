@@ -1,4 +1,8 @@
-﻿namespace Archive.API.Behaviors
+﻿using BuildingBlocks.CQRS;
+using FluentValidation;
+using MediatR;
+
+namespace Archive.API.Behaviors
 {
     public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
         : IPipelineBehavior<TRequest, TResponse>
