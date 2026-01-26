@@ -18,9 +18,14 @@ builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddDbContext<ArchiveContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ArchiveDb")));
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 app.MapCarter();
 
