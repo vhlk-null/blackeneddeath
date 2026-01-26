@@ -1,6 +1,4 @@
-﻿using Archive.API.Albums.CreateAlbum;
-
-namespace Archive.API.Albums.UpdateAlbum
+﻿namespace Archive.API.Albums.UpdateAlbum
 {
     public record UpdateAlbumCommand(Guid Id,
     string Title,
@@ -38,12 +36,10 @@ namespace Archive.API.Albums.UpdateAlbum
         }
     }
 
-    internal class UpdateAlbumCommandHandler(IRepository<ArchiveContext> repo, ILogger<UpdateAlbumCommandHandler> logger) : ICommandHandler<UpdateAlbumCommand, UpdateAlbumResult>
+    internal class UpdateAlbumCommandHandler(IRepository<ArchiveContext> repo) : ICommandHandler<UpdateAlbumCommand, UpdateAlbumResult>
     {
         public async Task<UpdateAlbumResult> Handle(UpdateAlbumCommand command, CancellationToken cancellationToken)
         {
-            logger.LogInformation("UpdateAlbumCommandHandler.Handle called with {@Command}", command);
-
             var album = await repo.GetByAsync<Album>(a => a.Id == command.Id) ?? throw new AlbumNotFoundException(command.Id);
 
             album.Title = command.Title;

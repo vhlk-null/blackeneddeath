@@ -20,8 +20,6 @@
             DeleteAlbumCommand command,
             CancellationToken cancellationToken)
         {
-            logger.LogInformation("DeleteAlbumCommandHandler.Handle called with {@Command}", command);
-
             var album = await repo.GetByAsync<Album>(
                 a => a.Id == command.Id,
                 cancellationToken: cancellationToken);

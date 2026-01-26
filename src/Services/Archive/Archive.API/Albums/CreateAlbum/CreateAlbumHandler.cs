@@ -38,13 +38,11 @@
         }
     }
 
-    internal class CreateAlbumCommandHandler(IRepository<ArchiveContext> repo, ILogger<CreateAlbumCommandHandler> logger) 
+    internal class CreateAlbumCommandHandler(IRepository<ArchiveContext> repo) 
         : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
     {
         public async Task<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
         {
-            logger.LogInformation("CreateAlbumCommandHandler.Handle called with {@Command}", command);
-
             var album = new Album
             {
                 Id = Guid.NewGuid(),

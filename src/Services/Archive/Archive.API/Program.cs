@@ -1,4 +1,5 @@
 ﻿using Archive.API.Behaviors;
+using BuildingBlocks.Behaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,9 @@ builder.Services.AddCarter();
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+
+    config.AddOpenBehavior(typeof(LogginBehavior<,>));
+    config.AddOpenBehavior(typeof(ValidationBehavior<,>));    
 });
 
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
