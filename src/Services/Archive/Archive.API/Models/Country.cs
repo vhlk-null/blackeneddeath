@@ -6,6 +6,7 @@
         public string Name { get; set; } = null!;
         public string Code { get; set; } = null!;
 
-        public ICollection<Album> Albums { get; set; }
+        public List<Band> Bands { get; set; }
+        public List<AlbumCountry> Albums { get; set; }
     }
 }

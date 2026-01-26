@@ -1,18 +1,24 @@
-﻿namespace Archive.API.Albums.GetAlbums
+﻿using BuildingBlocks.Extentions;
+
+namespace Archive.API.Albums.GetAlbums
 {
-    public record GetAlbumsQuery() : IQuery<GetAlbumResult>;
+    public record GetAlbumsQuery(int? PageNumber, int? PageSize = 10) : IQuery<PagedResult<Album>>;
 
-    public record GetAlbumResult(IEnumerable<Album> Albums);
-    public class GetAlbumsQueryHandler(IRepository<ArchiveContext> repo, ILogger<GetAlbumsQueryHandler> logger)
-        : IQueryHandler<GetAlbumsQuery, GetAlbumResult>
+    public class GetAlbumsQueryHandler(IRepository<ArchiveContext> repo) : IQueryHandler<GetAlbumsQuery, PagedResult<Album>>
     {
-        public async Task<GetAlbumResult> Handle(GetAlbumsQuery query, CancellationToken cancellationToken)
+        public async Task<PagedResult<Album>> Handle(GetAlbumsQuery query, CancellationToken cancellationToken)
         {
-            logger.LogInformation("GetAlbumsQueryHandler.Handle called with {@Query}", query);
+            var albumsQuery = repo.All<Album>()
+                .OrderByDescending(a => a.ReleaseDate)
+                .AsQueryable();
 
-            var albums = await repo.AllAsync<Album>(cancellationToken);
+            PagedResult<Album> pagedResult = await albumsQuery.ToPagedResultAsync(
+                query.PageNumber ?? 1,
+                query.PageSize ?? 10,
+                cancellationToken
+            );
 
-            return new GetAlbumResult(albums);
+            return pagedResult;
         }
     }
 }

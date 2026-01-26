@@ -33,6 +33,11 @@ namespace BuildingBlocks.Repositories
             return await Context.Set<T>().ToListAsync(cancellationToken);
         }
 
+        public IQueryable<T> All<T>() where T : class
+        {
+            return Context.Set<T>().AsQueryable();
+        }
+
         public async Task<List<T>> AllWithIncludeAsync<T>(List<Expression<Func<T, object>>> includeExpressions, CancellationToken cancellationToken = default) where T : class
         {
             IQueryable<T> set = Context.Set<T>();

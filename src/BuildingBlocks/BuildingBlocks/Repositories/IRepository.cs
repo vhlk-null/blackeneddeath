@@ -10,6 +10,7 @@ namespace BuildingBlocks.Repositories
         Task<T?> GetByWithIncludeAsync<T>(Expression<Func<T, bool>> expression, Expression<Func<T, object>> includeExpression, CancellationToken cancellationToken = default) where T : class;
         Task<List<T>> FilterAsync<T>(Expression<Func<T, bool>> expression, bool asTracked = true, CancellationToken cancellationToken = default) where T : class;
         Task<List<T>> AllAsync<T>(CancellationToken cancellationToken = default) where T : class;
+        IQueryable<T> All<T>() where T : class;
         Task<List<T>> AllWithIncludeAsync<T>(List<Expression<Func<T, object>>> includeExpressions, CancellationToken cancellationToken = default) where T : class;
 
         Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class;

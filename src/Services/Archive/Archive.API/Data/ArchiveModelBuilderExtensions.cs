@@ -35,15 +35,6 @@
                 entity.Property(e => e.Label)
                     .HasMaxLength(200)
                     .HasColumnName("label");
-
-                //entity.Property(e => e.CountryId)
-                //    .HasColumnName("country_id");
-
-                //// Relationships
-                //entity.HasOne(e => e.Country)
-                //    .WithMany(c => c.Albums)
-                //    .HasForeignKey(e => e.CountryId)
-                //    .OnDelete(DeleteBehavior.SetNull);
             });
         }
 
@@ -80,18 +71,9 @@
                 entity.Property(e => e.Status)
                     .HasColumnName("status");
 
-                //entity.Property(e => e.ImageUrl)
-                //    .HasMaxLength(500)
-                //    .HasColumnName("image_url");
-
-                //entity.Property(e => e.LogoUrl)
-                //    .HasMaxLength(500)
-                //    .HasColumnName("logo_url");
-
-                //entity.HasOne(e => e.Country)
-                //    .WithMany(c => c.Bands)
-                //    .HasForeignKey(e => e.CountryId)
-                //    .OnDelete(DeleteBehavior.SetNull);
+                entity.Property(e => e.LogoUrl)
+                    .HasMaxLength(500)
+                    .HasColumnName("logo_url");
             });
         }
 
@@ -126,46 +108,27 @@
             modelBuilder.Entity<Genre>(entity =>
             {
                 entity.ToTable("genres");
+                entity.HasKey(g => g.Id);
 
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id)
+                entity.Property(g => g.Id)
                     .HasColumnName("id")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.Name)
-                    .IsRequired()
+                entity.Property(g => g.Name)
                     .HasMaxLength(100)
-                    .HasColumnName("name");
+                    .HasColumnName("name")
+                    .IsRequired();
 
-                //entity.Property(e => e.Description)
-                //    .HasColumnType("text")
-                //    .HasColumnName("description");
+                entity.Property(g => g.ParentGenreId)
+                    .HasColumnName("parent_genre_id");
 
-                entity.HasIndex(e => e.Name)
-                    .IsUnique();
-            });
-        }
+                entity.HasOne(g => g.ParentGenre)
+                    .WithMany(g => g.SubGenres)
+                    .HasForeignKey(g => g.ParentGenreId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
-        public static void SetupTag(this ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Tag>(entity =>
-            {
-                entity.ToTable("tags");
-
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("id")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .HasColumnName("name");
-
-                entity.HasIndex(e => e.Name)
-                    .IsUnique();
+                entity.HasIndex(g => g.Name).IsUnique();
+                entity.HasIndex(g => g.ParentGenreId);
             });
         }
 
@@ -174,7 +137,6 @@
             modelBuilder.Entity<Country>(entity =>
             {
                 entity.ToTable("countries");
-
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id)
@@ -191,8 +153,7 @@
                     .HasMaxLength(2)
                     .HasColumnName("code");
 
-                entity.HasIndex(e => e.Code)
-                    .IsUnique();
+                entity.HasIndex(e => e.Code).IsUnique();
             });
         }
 
@@ -244,15 +205,15 @@
                 entity.Property(e => e.BandId)
                     .HasColumnName("band_id");
 
-                //entity.HasOne(e => e.Album)
-                //    .WithMany(a => a.Bands)
-                //    .HasForeignKey(e => e.AlbumId)
-                //    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Album)
+                    .WithMany(a => a.Bands)
+                    .HasForeignKey(e => e.AlbumId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
-                //entity.HasOne(e => e.Band)
-                //    .WithMany(b => b.Albums)
-                //    .HasForeignKey(e => e.BandId)
-                //    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Band)
+                    .WithMany(b => b.Albums)
+                    .HasForeignKey(e => e.BandId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
 
@@ -331,6 +292,34 @@
                 //    .WithMany(g => g.Bands)
                 //    .HasForeignKey(e => e.GenreId)
                 //    .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
+
+        public static void SetupAlbumCountry(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AlbumCountry>(entity =>
+            {
+                entity.ToTable("album_countries");
+
+                entity.HasKey(e => new { e.AlbumId, e.CountryId });
+
+                entity.Property(e => e.AlbumId)
+                    .HasColumnName("album_id");
+
+                entity.Property(e => e.CountryId)
+                    .HasColumnName("country_id");
+
+                entity.HasOne(e => e.Album)
+                    .WithMany(a => a.Countries)
+                    .HasForeignKey(e => e.AlbumId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Country)
+                    .WithMany(c => c.Albums)
+                    .HasForeignKey(e => e.CountryId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(e => e.CountryId);
             });
         }
     }

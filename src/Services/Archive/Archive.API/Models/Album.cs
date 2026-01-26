@@ -1,6 +1,4 @@
-﻿using Archive.API.Models.JoinTables;
-
-namespace Archive.API.Models
+﻿namespace Archive.API.Models
 {
     public class Album
     {
@@ -14,7 +12,8 @@ namespace Archive.API.Models
         public string? Label { get; set; }
 
         // Navigation properties
-        public ICollection<Country> Countries { get; set; }
+        public ICollection<AlbumBand> Bands { get; set; }
+        public ICollection<AlbumCountry> Countries { get; set; }
         public ICollection<StreamingLink> StreamingLinks { get; set; }
         public ICollection<AlbumTrack> Tracks { get; set; }
         public ICollection<AlbumGenre> Genres { get; set; }
