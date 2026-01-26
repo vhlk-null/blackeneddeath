@@ -2,7 +2,7 @@
 
 namespace Archive.API.Albums.GetAlbums
 {
-    public record GetAlbumsQuery(int? PageNumber, int? PageSize = 10) : IQuery<PagedResult<Album>>;
+    public record GetAlbumsQuery(int? PageNumber = 1, int? PageSize = 10) : IQuery<PagedResult<Album>>;
 
     public class GetAlbumsQueryHandler(IRepository<ArchiveContext> repo) : IQueryHandler<GetAlbumsQuery, PagedResult<Album>>
     {

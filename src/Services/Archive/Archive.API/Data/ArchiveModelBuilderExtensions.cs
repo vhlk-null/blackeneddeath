@@ -1,4 +1,6 @@
-﻿namespace Archive.API.Data
+﻿using Archive.API.Data.Seeds;
+
+namespace Archive.API.Data
 {
     public static class ArchiveModelBuilderExtensions
     {
@@ -35,6 +37,8 @@
                 entity.Property(e => e.Label)
                     .HasMaxLength(200)
                     .HasColumnName("label");
+
+                entity.HasData(AlbumSeed.GetAlbums());
             });
         }
 
@@ -74,6 +78,13 @@
                 entity.Property(e => e.LogoUrl)
                     .HasMaxLength(500)
                     .HasColumnName("logo_url");
+
+                entity.HasOne(e => e.Country)
+                   .WithMany(c => c.Bands)
+                   .HasForeignKey(e => e.CountryId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasData(BandSeed.GetBands());
             });
         }
 
@@ -94,12 +105,7 @@
                     .HasMaxLength(200)
                     .HasColumnName("title");
 
-                //entity.Property(e => e.DurationSeconds)
-                //    .HasColumnName("duration_seconds");
-
-                //entity.Property(e => e.Lyrics)
-                //    .HasColumnType("text")
-                //    .HasColumnName("lyrics");
+                entity.HasData(TrackSeed.GetTracks());
             });
         }
 
@@ -129,6 +135,8 @@
 
                 entity.HasIndex(g => g.Name).IsUnique();
                 entity.HasIndex(g => g.ParentGenreId);
+
+                entity.HasData(GenreSeed.GetGenres());
             });
         }
 
@@ -154,6 +162,8 @@
                     .HasColumnName("code");
 
                 entity.HasIndex(e => e.Code).IsUnique();
+
+                entity.HasData(CountrySeed.GetCountries());
             });
         }
 

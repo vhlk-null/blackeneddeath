@@ -1,5 +1,4 @@
-﻿// Data/DatabaseSeeder.cs
-using Archive.API.Data.Seeds;
+﻿using Archive.API.Data.Seeds;
 
 namespace Archive.API.Data
 {
@@ -16,7 +15,6 @@ namespace Archive.API.Data
             {
                 logger.LogInformation("Checking if database seeding is required...");
 
-                // Перевірити чи потрібно seed
                 if (await context.AlbumBands.AnyAsync())
                 {
                     logger.LogInformation("Database already seeded. Skipping...");
@@ -25,7 +23,6 @@ namespace Archive.API.Data
 
                 logger.LogInformation("Starting database seeding...");
 
-                // Seed junction tables
                 await SeedJunctionTablesAsync(context, logger);
 
                 logger.LogInformation("Database seeding completed successfully!");
