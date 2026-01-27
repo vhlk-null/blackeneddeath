@@ -4,6 +4,13 @@ namespace Archive.API.Data
 {
     public static class ArchiveModelBuilderExtensions
     {
+        private static bool _shouldSeedData = false;
+
+        public static void EnableSeeding(this ModelBuilder modelBuilder)
+        {
+            _shouldSeedData = true;
+        }
+
         public static void SetupAlbum(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Album>(entity =>
@@ -38,7 +45,10 @@ namespace Archive.API.Data
                     .HasMaxLength(200)
                     .HasColumnName("label");
 
-                entity.HasData(AlbumSeed.GetAlbums());
+                if (_shouldSeedData)
+                {
+                    entity.HasData(AlbumSeed.GetAlbums());
+                }
             });
         }
 
@@ -84,7 +94,8 @@ namespace Archive.API.Data
                    .HasForeignKey(e => e.CountryId)
                    .OnDelete(DeleteBehavior.SetNull);
 
-                entity.HasData(BandSeed.GetBands());
+                if (_shouldSeedData)
+                    entity.HasData(BandSeed.GetBands());
             });
         }
 
@@ -105,7 +116,8 @@ namespace Archive.API.Data
                     .HasMaxLength(200)
                     .HasColumnName("title");
 
-                entity.HasData(TrackSeed.GetTracks());
+                if (_shouldSeedData)
+                    entity.HasData(TrackSeed.GetTracks());
             });
         }
 
@@ -136,7 +148,8 @@ namespace Archive.API.Data
                 entity.HasIndex(g => g.Name).IsUnique();
                 entity.HasIndex(g => g.ParentGenreId);
 
-                entity.HasData(GenreSeed.GetGenres());
+                if (_shouldSeedData)
+                    entity.HasData(GenreSeed.GetGenres());
             });
         }
 
@@ -163,7 +176,8 @@ namespace Archive.API.Data
 
                 entity.HasIndex(e => e.Code).IsUnique();
 
-                entity.HasData(CountrySeed.GetCountries());
+                if (_shouldSeedData)
+                    entity.HasData(CountrySeed.GetCountries());
             });
         }
 

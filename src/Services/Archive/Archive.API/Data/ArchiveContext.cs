@@ -2,12 +2,16 @@
 {
     public class ArchiveContext : DbContext
     {
+
+        private readonly IWebHostEnvironment? _environment;
+
         public ArchiveContext()
         {
         }
 
-        public ArchiveContext(DbContextOptions<ArchiveContext> options) : base(options)
+        public ArchiveContext(DbContextOptions<ArchiveContext> options, IWebHostEnvironment environment) : base(options)
         {
+            _environment = environment;
         }
 
         // Main entities
@@ -28,6 +32,9 @@
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            if (_environment?.IsDevelopment() == true)
+                modelBuilder.EnableSeeding();
 
             modelBuilder.SetupGenre();
             modelBuilder.SetupCountry();

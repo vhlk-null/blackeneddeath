@@ -29,10 +29,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
-await DatabaseSeeder.SeedDatabaseAsync(
-    app.Services,
-    app.Services.GetRequiredService<ILogger<Program>>()
-);
+if (builder.Environment.IsDevelopment())
+    await DatabaseSeeder.SeedDatabaseAsync(app.Services, app.Services.GetRequiredService<ILogger<Program>>());
 
 app.UseExceptionHandler();
 

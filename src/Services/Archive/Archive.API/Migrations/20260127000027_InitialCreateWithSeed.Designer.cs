@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Archive.API.Migrations
 {
     [DbContext(typeof(ArchiveContext))]
-    [Migration("20260126232503_InitialCreateWithSeed")]
+    [Migration("20260127000027_InitialCreateWithSeed")]
     partial class InitialCreateWithSeed
     {
         /// <inheritdoc />
