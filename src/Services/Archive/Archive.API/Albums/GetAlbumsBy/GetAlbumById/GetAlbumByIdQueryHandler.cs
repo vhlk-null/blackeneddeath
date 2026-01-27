@@ -1,4 +1,6 @@
-﻿namespace Archive.API.Albums.GetAlbums
+﻿using Archive.API.Albums.GetAlbums;
+
+namespace Archive.API.Albums.GetAlbumsBy.GetAlbumById
 {
     public record GetAlbumByIdQuery(Guid Id) : IQuery<GetAlbumByIdResult>;
     public record GetAlbumByIdResult(AlbumDto Album);

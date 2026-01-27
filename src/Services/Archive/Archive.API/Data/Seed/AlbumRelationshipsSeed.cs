@@ -63,6 +63,36 @@ namespace Archive.API.Data.Seeds
             };
         }
 
+        // Band-Genre relationships
+        public static List<BandGenre> GetBandGenres()
+        {
+            return new List<BandGenre>
+            {
+                // Darkthrone - Black Metal, Raw Black Metal
+                new BandGenre { BandId = SeedConstants.Bands.Darkthrone, GenreId = SeedConstants.Genres.BlackMetal },
+                new BandGenre { BandId = SeedConstants.Bands.Darkthrone, GenreId = SeedConstants.Genres.RawBlackMetal },
+
+                // Burzum - Black Metal, Atmospheric Black Metal
+                new BandGenre { BandId = SeedConstants.Bands.Burzum, GenreId = SeedConstants.Genres.BlackMetal },
+                new BandGenre { BandId = SeedConstants.Bands.Burzum, GenreId = SeedConstants.Genres.AtmosphericBlackMetal },
+
+                // Emperor - Black Metal, Symphonic Black Metal
+                new BandGenre { BandId = SeedConstants.Bands.Emperor, GenreId = SeedConstants.Genres.BlackMetal },
+                new BandGenre { BandId = SeedConstants.Bands.Emperor, GenreId = SeedConstants.Genres.SymphonicBlackMetal },
+
+                // Mayhem - Black Metal
+                new BandGenre { BandId = SeedConstants.Bands.Mayhem, GenreId = SeedConstants.Genres.BlackMetal },
+
+                // Dissection - Black Metal, Melodic Black Metal
+                new BandGenre { BandId = SeedConstants.Bands.Dissection, GenreId = SeedConstants.Genres.BlackMetal },
+                new BandGenre { BandId = SeedConstants.Bands.Dissection, GenreId = SeedConstants.Genres.MelodicBlackMetal },
+
+                // Behemoth - Black Metal, Death Metal
+                new BandGenre { BandId = SeedConstants.Bands.Behemoth, GenreId = SeedConstants.Genres.BlackMetal },
+                new BandGenre { BandId = SeedConstants.Bands.Behemoth, GenreId = SeedConstants.Genres.DeathMetal }
+            };
+        }
+
         // Album-Track relationships
         public static List<AlbumTrack> GetAlbumTracks()
         {

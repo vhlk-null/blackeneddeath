@@ -27,8 +27,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHealthChecks()
     .AddNpgSql(connectionString);
 
-AlbumMappingConfig.ConfigureAlbumMappings();
-
 var app = builder.Build();
 
 // Apply migrations and seed in Development

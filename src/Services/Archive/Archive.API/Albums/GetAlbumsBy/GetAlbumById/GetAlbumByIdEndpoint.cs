@@ -1,6 +1,6 @@
 ﻿using Archive.API.Albums.GetAlbums;
 
-namespace Archive.API.Albums.GetAlbumById
+namespace Archive.API.Albums.GetAlbumsBy.GetAlbumById
 {
     public record GetAlbumByIdRequest(Guid Id) : IRequest<GetAlbumByIdResult>;
     public record GetAlbumByIdResponse(AlbumDto Album);

@@ -79,16 +79,6 @@ PostgreSQL database:
 - **Database**: ArchiveDb
 - **Credentials**: postgres/postgres
 
-### Testing Endpoints
-
-```bash
-# Health check
-curl http://localhost:6000/health
-
-# Get albums with pagination
-curl http://localhost:6000/albums?PageNumber=1&PageSize=10
-```
-
 ## Architecture Patterns
 
 ### CQRS Flow
@@ -103,8 +93,9 @@ curl http://localhost:6000/albums?PageNumber=1&PageSize=10
 ### Repository Pattern
 - Generic repository (`IRepository<TContext>`) injected into handlers
 - Context is `ArchiveContext` for all operations
-- Use `Filter<T>()` or `FilterAsync<T>()` for queries with predicates
-- Use `AddAsync<T>()`, `Update<T>()`, `Delete<T>()` for mutations
+- **Queries**: `GetByAsync<T>()`, `GetByWithIncludeAsync<T>()`, `Filter<T>()`, `FilterAsync<T>()`, `All<T>()`, `AllAsync<T>()`, `AllWithIncludeAsync<T>()`
+- **Mutations**: `AddAsync<T>()`, `AddRangeAsync<T>()`, `Update<T>()`, `UpdateRange<T>()`, `Delete<T>()`, `DeleteRange<T>()`, `DeleteAsync<T>()`
+- **Aggregates**: `CountAsync<T>()`
 - UnitOfWorkBehavior automatically calls `SaveChangesAsync()` for commands
 
 ### Entity Relationships
@@ -123,9 +114,11 @@ curl http://localhost:6000/albums?PageNumber=1&PageSize=10
 
 ### File Organization
 - **Vertical Slices**: Group by feature, not layer (e.g., `Albums/CreateAlbum/`)
-- **Naming**: `{Feature}Endpoint.cs`, `{Feature}Handler.cs`, `{Feature}Command/Query.cs`
-- **DTOs**: Defined as records in the same file as endpoints
-- **Validators**: Defined in handler files as `{Feature}CommandValidator`
+- **Nested Features**: Related features can nest (e.g., `Albums/GetAlbumsBy/GetAlbumById/`)
+- **Naming**: `{Feature}Endpoint.cs`, `{Feature}Handler.cs` or `{Feature}CommandHandler.cs`/`{Feature}QueryHandler.cs`
+- **DTOs**: Request/Response records defined in endpoint files
+- **Command/Query + Result**: Defined in handler files along with validators
+- **Validators**: `{Feature}CommandValidator` class in handler file
 
 ### Code Patterns
 - Use **records** for DTOs, Commands, Queries, Results
@@ -135,14 +128,15 @@ curl http://localhost:6000/albums?PageNumber=1&PageSize=10
 - Mapster for object mapping: `source.Adapt<DestinationType>()`
 
 ### Database Migrations
-- Migrations automatically applied on startup in Development environment (see `Program.cs:48`)
+- Migrations automatically applied on startup in Development environment (see `Program.cs`)
 - Seeding happens after migrations via `DatabaseSeeder.SeedDatabaseAsync()`
 - Connection string configured via `appsettings.json` or environment variable `ConnectionStrings__ArchiveDb`
 
 ## Important Notes
 
+- **No Test Projects**: The solution currently has no test projects
 - **Automatic Seeding**: Development environment auto-applies migrations and seeds data on startup
 - **Health Checks**: `/health` endpoint configured with PostgreSQL health check
 - **Global Exception Handling**: `GlobalExceptionHandler` provides consistent error responses
-- **Primary Constructors**: Modern C# 12 syntax used throughout for DI
+- **Primary Constructors**: C# 12 syntax used throughout for DI
 - **Minimal APIs**: Carter framework registers all `ICarterModule` implementations automatically

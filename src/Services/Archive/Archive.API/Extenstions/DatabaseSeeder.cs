@@ -136,6 +136,13 @@ namespace Archive.API.Data
                 await context.AlbumTracks.AddRangeAsync(AlbumRelationshipsSeed.GetAlbumTracks());
             }
 
+            // Band-Genre relationships
+            if (!await context.BandGenres.AnyAsync())
+            {
+                logger.LogInformation("Seeding BandGenres...");
+                await context.BandGenres.AddRangeAsync(AlbumRelationshipsSeed.GetBandGenres());
+            }
+
             // Save all junction tables
             await context.SaveChangesAsync();
             logger.LogInformation("Junction tables seeded successfully!");
