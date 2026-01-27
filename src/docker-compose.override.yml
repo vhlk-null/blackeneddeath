@@ -16,7 +16,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__ArchiveDb=Host=localhost;Port=5432;Database=ArchiveDb;Username=postgres;Password=postgres
+      - ConnectionStrings__ArchiveDb=Host=archivedb;Port=5432;Database=ArchiveDb;Username=postgres;Password=postgres
     depends_on:
       - archivedb
     ports:
