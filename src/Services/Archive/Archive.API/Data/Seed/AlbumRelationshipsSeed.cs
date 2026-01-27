@@ -1,129 +1,88 @@
-﻿namespace Archive.API.Data.Seeds
+namespace Archive.API.Data.Seeds
 {
     public static class AlbumRelationshipsSeed
     {
         // Album-Band relationships
         public static List<AlbumBand> GetAlbumBands()
         {
-            var darkthrone = Guid.Parse("b0000000-0000-0000-0000-000000000001");
-            var burzum = Guid.Parse("b0000000-0000-0000-0000-000000000002");
-            var emperor = Guid.Parse("b0000000-0000-0000-0000-000000000003");
-            var mayhem = Guid.Parse("b0000000-0000-0000-0000-000000000004");
-            var dissection = Guid.Parse("b0000000-0000-0000-0000-000000000005");
-            var behemoth = Guid.Parse("b0000000-0000-0000-0000-000000000006");
-
-            var transilvanianHunger = Guid.Parse("a0000000-0000-0000-0000-000000000001");
-            var filosofem = Guid.Parse("a0000000-0000-0000-0000-000000000002");
-            var nightsideEclipse = Guid.Parse("a0000000-0000-0000-0000-000000000003");
-            var deMysteriis = Guid.Parse("a0000000-0000-0000-0000-000000000004");
-            var stormOfLightsBane = Guid.Parse("a0000000-0000-0000-0000-000000000005");
-            var satanist = Guid.Parse("a0000000-0000-0000-0000-000000000006");
-
             return new List<AlbumBand>
             {
-                new AlbumBand { AlbumId = transilvanianHunger, BandId = darkthrone },
-                new AlbumBand { AlbumId = filosofem, BandId = burzum },
-                new AlbumBand { AlbumId = nightsideEclipse, BandId = emperor },
-                new AlbumBand { AlbumId = deMysteriis, BandId = mayhem },
-                new AlbumBand { AlbumId = stormOfLightsBane, BandId = dissection },
-                new AlbumBand { AlbumId = satanist, BandId = behemoth }
+                new AlbumBand { AlbumId = SeedConstants.Albums.TransilvanianHunger, BandId = SeedConstants.Bands.Darkthrone },
+                new AlbumBand { AlbumId = SeedConstants.Albums.Filosofem, BandId = SeedConstants.Bands.Burzum },
+                new AlbumBand { AlbumId = SeedConstants.Albums.NightsideEclipse, BandId = SeedConstants.Bands.Emperor },
+                new AlbumBand { AlbumId = SeedConstants.Albums.DeMysteriis, BandId = SeedConstants.Bands.Mayhem },
+                new AlbumBand { AlbumId = SeedConstants.Albums.StormOfLightsBane, BandId = SeedConstants.Bands.Dissection },
+                new AlbumBand { AlbumId = SeedConstants.Albums.TheSatanist, BandId = SeedConstants.Bands.Behemoth }
             };
         }
 
         // Album-Genre relationships
         public static List<AlbumGenre> GetAlbumGenres()
         {
-            var blackMetal = Guid.Parse("20000000-0000-0000-0000-000000000001");
-            var rawBlackMetal = Guid.Parse("30000000-0000-0000-0000-000000000001");
-            var atmosphericBlackMetal = Guid.Parse("30000000-0000-0000-0000-000000000003");
-            var symphonicBlackMetal = Guid.Parse("30000000-0000-0000-0000-000000000004");
-
-            var transilvanianHunger = Guid.Parse("a0000000-0000-0000-0000-000000000001");
-            var filosofem = Guid.Parse("a0000000-0000-0000-0000-000000000002");
-            var nightsideEclipse = Guid.Parse("a0000000-0000-0000-0000-000000000003");
-            var deMysteriis = Guid.Parse("a0000000-0000-0000-0000-000000000004");
-            var stormOfLightsBane = Guid.Parse("a0000000-0000-0000-0000-000000000005");
-            var satanist = Guid.Parse("a0000000-0000-0000-0000-000000000006");
-
             return new List<AlbumGenre>
             {
                 // Transilvanian Hunger - Black Metal, Raw Black Metal
-                new AlbumGenre { AlbumId = transilvanianHunger, GenreId = blackMetal },
-                new AlbumGenre { AlbumId = transilvanianHunger, GenreId = rawBlackMetal },
-                
+                new AlbumGenre { AlbumId = SeedConstants.Albums.TransilvanianHunger, GenreId = SeedConstants.Genres.BlackMetal },
+                new AlbumGenre { AlbumId = SeedConstants.Albums.TransilvanianHunger, GenreId = SeedConstants.Genres.RawBlackMetal },
+
                 // Filosofem - Black Metal, Atmospheric
-                new AlbumGenre { AlbumId = filosofem, GenreId = blackMetal },
-                new AlbumGenre { AlbumId = filosofem, GenreId = atmosphericBlackMetal },
-                
+                new AlbumGenre { AlbumId = SeedConstants.Albums.Filosofem, GenreId = SeedConstants.Genres.BlackMetal },
+                new AlbumGenre { AlbumId = SeedConstants.Albums.Filosofem, GenreId = SeedConstants.Genres.AtmosphericBlackMetal },
+
                 // In the Nightside Eclipse - Black Metal, Symphonic
-                new AlbumGenre { AlbumId = nightsideEclipse, GenreId = blackMetal },
-                new AlbumGenre { AlbumId = nightsideEclipse, GenreId = symphonicBlackMetal },
-                
+                new AlbumGenre { AlbumId = SeedConstants.Albums.NightsideEclipse, GenreId = SeedConstants.Genres.BlackMetal },
+                new AlbumGenre { AlbumId = SeedConstants.Albums.NightsideEclipse, GenreId = SeedConstants.Genres.SymphonicBlackMetal },
+
                 // De Mysteriis Dom Sathanas - Black Metal
-                new AlbumGenre { AlbumId = deMysteriis, GenreId = blackMetal },
-                
+                new AlbumGenre { AlbumId = SeedConstants.Albums.DeMysteriis, GenreId = SeedConstants.Genres.BlackMetal },
+
                 // Storm of the Light's Bane - Black Metal
-                new AlbumGenre { AlbumId = stormOfLightsBane, GenreId = blackMetal },
-                
+                new AlbumGenre { AlbumId = SeedConstants.Albums.StormOfLightsBane, GenreId = SeedConstants.Genres.BlackMetal },
+
                 // The Satanist - Black Metal
-                new AlbumGenre { AlbumId = satanist, GenreId = blackMetal }
+                new AlbumGenre { AlbumId = SeedConstants.Albums.TheSatanist, GenreId = SeedConstants.Genres.BlackMetal }
             };
         }
 
         // Album-Country relationships
         public static List<AlbumCountry> GetAlbumCountries()
         {
-            var norwayId = Guid.Parse("c0000000-0000-0000-0000-000000000001");
-            var swedenId = Guid.Parse("c0000000-0000-0000-0000-000000000002");
-            var polandId = Guid.Parse("c0000000-0000-0000-0000-000000000004");
-
-            var transilvanianHunger = Guid.Parse("a0000000-0000-0000-0000-000000000001");
-            var filosofem = Guid.Parse("a0000000-0000-0000-0000-000000000002");
-            var nightsideEclipse = Guid.Parse("a0000000-0000-0000-0000-000000000003");
-            var deMysteriis = Guid.Parse("a0000000-0000-0000-0000-000000000004");
-            var stormOfLightsBane = Guid.Parse("a0000000-0000-0000-0000-000000000005");
-            var satanist = Guid.Parse("a0000000-0000-0000-0000-000000000006");
-
             return new List<AlbumCountry>
             {
                 // Norwegian albums
-                new AlbumCountry { AlbumId = transilvanianHunger, CountryId = norwayId },
-                new AlbumCountry { AlbumId = filosofem, CountryId = norwayId },
-                new AlbumCountry { AlbumId = nightsideEclipse, CountryId = norwayId },
-                new AlbumCountry { AlbumId = deMysteriis, CountryId = norwayId },
-                
+                new AlbumCountry { AlbumId = SeedConstants.Albums.TransilvanianHunger, CountryId = SeedConstants.Countries.Norway },
+                new AlbumCountry { AlbumId = SeedConstants.Albums.Filosofem, CountryId = SeedConstants.Countries.Norway },
+                new AlbumCountry { AlbumId = SeedConstants.Albums.NightsideEclipse, CountryId = SeedConstants.Countries.Norway },
+                new AlbumCountry { AlbumId = SeedConstants.Albums.DeMysteriis, CountryId = SeedConstants.Countries.Norway },
+
                 // Swedish albums
-                new AlbumCountry { AlbumId = stormOfLightsBane, CountryId = swedenId },
-                
+                new AlbumCountry { AlbumId = SeedConstants.Albums.StormOfLightsBane, CountryId = SeedConstants.Countries.Sweden },
+
                 // Polish albums
-                new AlbumCountry { AlbumId = satanist, CountryId = polandId }
+                new AlbumCountry { AlbumId = SeedConstants.Albums.TheSatanist, CountryId = SeedConstants.Countries.Poland }
             };
         }
 
         // Album-Track relationships
         public static List<AlbumTrack> GetAlbumTracks()
         {
-            var transilvanianHunger = Guid.Parse("a0000000-0000-0000-0000-000000000001");
-            var filosofem = Guid.Parse("a0000000-0000-0000-0000-000000000002");
-            var nightsideEclipse = Guid.Parse("a0000000-0000-0000-0000-000000000003");
-
             return new List<AlbumTrack>
             {
                 // Transilvanian Hunger
-                new AlbumTrack { AlbumId = transilvanianHunger, TrackId = Guid.Parse("00000000-0000-0000-0002-000000000001") },
-                new AlbumTrack { AlbumId = transilvanianHunger, TrackId = Guid.Parse("00000000-0000-0000-0002-000000000002") },
-                new AlbumTrack { AlbumId = transilvanianHunger, TrackId = Guid.Parse("00000000-0000-0000-0002-000000000003") },
-                new AlbumTrack { AlbumId = transilvanianHunger, TrackId = Guid.Parse("00000000-0000-0000-0002-000000000004") },
-                
+                new AlbumTrack { AlbumId = SeedConstants.Albums.TransilvanianHunger, TrackId = SeedConstants.Tracks.TransilvanianHunger1 },
+                new AlbumTrack { AlbumId = SeedConstants.Albums.TransilvanianHunger, TrackId = SeedConstants.Tracks.TransilvanianHunger2 },
+                new AlbumTrack { AlbumId = SeedConstants.Albums.TransilvanianHunger, TrackId = SeedConstants.Tracks.TransilvanianHunger3 },
+                new AlbumTrack { AlbumId = SeedConstants.Albums.TransilvanianHunger, TrackId = SeedConstants.Tracks.TransilvanianHunger4 },
+
                 // Filosofem
-                new AlbumTrack { AlbumId = filosofem, TrackId = Guid.Parse("00000000-0000-0000-0002-000000000005") },
-                new AlbumTrack { AlbumId = filosofem, TrackId = Guid.Parse("00000000-0000-0000-0002-000000000006") },
-                new AlbumTrack { AlbumId = filosofem, TrackId = Guid.Parse("00000000-0000-0000-0002-000000000007") },
-                
+                new AlbumTrack { AlbumId = SeedConstants.Albums.Filosofem, TrackId = SeedConstants.Tracks.Filosofem1 },
+                new AlbumTrack { AlbumId = SeedConstants.Albums.Filosofem, TrackId = SeedConstants.Tracks.Filosofem2 },
+                new AlbumTrack { AlbumId = SeedConstants.Albums.Filosofem, TrackId = SeedConstants.Tracks.Filosofem3 },
+
                 // In the Nightside Eclipse
-                new AlbumTrack { AlbumId = nightsideEclipse, TrackId = Guid.Parse("00000000-0000-0000-0002-000000000008") },
-                new AlbumTrack { AlbumId = nightsideEclipse, TrackId = Guid.Parse("00000000-0000-0000-0002-000000000009") },
-                new AlbumTrack { AlbumId = nightsideEclipse, TrackId = Guid.Parse("0000000a-0000-0000-0002-000000000000") }
+                new AlbumTrack { AlbumId = SeedConstants.Albums.NightsideEclipse, TrackId = SeedConstants.Tracks.NightsideEclipse1 },
+                new AlbumTrack { AlbumId = SeedConstants.Albums.NightsideEclipse, TrackId = SeedConstants.Tracks.NightsideEclipse2 },
+                new AlbumTrack { AlbumId = SeedConstants.Albums.NightsideEclipse, TrackId = SeedConstants.Tracks.NightsideEclipse3 }
             };
         }
     }

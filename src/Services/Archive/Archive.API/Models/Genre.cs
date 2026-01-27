@@ -11,5 +11,6 @@
         public ICollection<Genre> SubGenres { get; set; } = null!;
 
         public ICollection<AlbumGenre> Albums { get; set; } = null!;
+        public ICollection<BandGenre> Bands { get; set; } = null!;
     }
 }

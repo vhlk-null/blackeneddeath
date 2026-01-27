@@ -4,13 +4,6 @@ namespace Archive.API.Data
 {
     public static class ArchiveModelBuilderExtensions
     {
-        private static bool _shouldSeedData = false;
-
-        public static void EnableSeeding(this ModelBuilder modelBuilder)
-        {
-            _shouldSeedData = true;
-        }
-
         public static void SetupAlbum(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Album>(entity =>
@@ -44,11 +37,6 @@ namespace Archive.API.Data
                 entity.Property(e => e.Label)
                     .HasMaxLength(200)
                     .HasColumnName("label");
-
-                if (_shouldSeedData)
-                {
-                    entity.HasData(AlbumSeed.GetAlbums());
-                }
             });
         }
 
@@ -93,9 +81,6 @@ namespace Archive.API.Data
                    .WithMany(c => c.Bands)
                    .HasForeignKey(e => e.CountryId)
                    .OnDelete(DeleteBehavior.SetNull);
-
-                if (_shouldSeedData)
-                    entity.HasData(BandSeed.GetBands());
             });
         }
 
@@ -115,9 +100,6 @@ namespace Archive.API.Data
                     .IsRequired()
                     .HasMaxLength(200)
                     .HasColumnName("title");
-
-                if (_shouldSeedData)
-                    entity.HasData(TrackSeed.GetTracks());
             });
         }
 
@@ -147,9 +129,6 @@ namespace Archive.API.Data
 
                 entity.HasIndex(g => g.Name).IsUnique();
                 entity.HasIndex(g => g.ParentGenreId);
-
-                if (_shouldSeedData)
-                    entity.HasData(GenreSeed.GetGenres());
             });
         }
 
@@ -175,9 +154,6 @@ namespace Archive.API.Data
                     .HasColumnName("code");
 
                 entity.HasIndex(e => e.Code).IsUnique();
-
-                if (_shouldSeedData)
-                    entity.HasData(CountrySeed.GetCountries());
             });
         }
 
@@ -301,15 +277,15 @@ namespace Archive.API.Data
                 entity.Property(e => e.GenreId)
                     .HasColumnName("genre_id");
 
-                //entity.HasOne(e => e.Band)
-                //    .WithMany(b => b.Genres)
-                //    .HasForeignKey(e => e.BandId)
-                //    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Band)
+                    .WithMany(b => b.Genres)
+                    .HasForeignKey(e => e.BandId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
-                //entity.HasOne(e => e.Genre)
-                //    .WithMany(g => g.Bands)
-                //    .HasForeignKey(e => e.GenreId)
-                //    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Genre)
+                    .WithMany(g => g.Bands)
+                    .HasForeignKey(e => e.GenreId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
 

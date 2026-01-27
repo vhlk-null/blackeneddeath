@@ -33,19 +33,12 @@
         {
             base.OnModelCreating(modelBuilder);
 
-            if (_environment?.IsDevelopment() == true)
-                modelBuilder.EnableSeeding();
-
             modelBuilder.SetupGenre();
             modelBuilder.SetupCountry();
             modelBuilder.SetupTrack();
-
-
             modelBuilder.SetupBand();
             modelBuilder.SetupAlbum();
             modelBuilder.SetupStreamingLink();
-
-
             modelBuilder.SetupAlbumBand();
             modelBuilder.SetupAlbumGenre();
             modelBuilder.SetupAlbumCountry();

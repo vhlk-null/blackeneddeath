@@ -1,63 +1,66 @@
-﻿public static class CountrySeed
+﻿namespace Archive.API.Data.Seeds
 {
-    public static List<Country> GetCountries()
+    public static class CountrySeed
     {
+        public static List<Country> GetCountries()
+        {
         return new List<Country>
         {
             new Country
             {
-                Id = Guid.Parse("c0000000-0000-0000-0000-000000000001"),
+                Id = SeedConstants.Countries.Norway,
                 Name = "Norway",
                 Code = "NO"
             },
             new Country
             {
-                Id = Guid.Parse("c0000000-0000-0000-0000-000000000002"),
+                Id = SeedConstants.Countries.Sweden,
                 Name = "Sweden",
                 Code = "SE"
             },
             new Country
             {
-                Id = Guid.Parse("c0000000-0000-0000-0000-000000000003"),
+                Id = SeedConstants.Countries.Finland,
                 Name = "Finland",
                 Code = "FI"
             },
             new Country
             {
-                Id = Guid.Parse("c0000000-0000-0000-0000-000000000004"),
+                Id = SeedConstants.Countries.Poland,
                 Name = "Poland",
                 Code = "PL"
             },
             new Country
             {
-                Id = Guid.Parse("c0000000-0000-0000-0000-000000000005"),
+                Id = SeedConstants.Countries.Ukraine,
                 Name = "Ukraine",
                 Code = "UA"
             },
             new Country
             {
-                Id = Guid.Parse("c0000000-0000-0000-0000-000000000006"),
+                Id = SeedConstants.Countries.UnitedStates,
                 Name = "United States",
                 Code = "US"
             },
             new Country
             {
-                Id = Guid.Parse("c0000000-0000-0000-0000-000000000007"),
+                Id = SeedConstants.Countries.UnitedKingdom,
                 Name = "United Kingdom",
                 Code = "GB"
             },
             new Country
             {
-                Id = Guid.Parse("c0000000-0000-0000-0000-000000000008"),
+                Id = SeedConstants.Countries.Germany,
                 Name = "Germany",
                 Code = "DE"
             },
             new Country
             {
-                Id = Guid.Parse("c0000000-0000-0000-0000-000000000009"),
+                Id = SeedConstants.Countries.France,
                 Name = "France",
                 Code = "FR"
             }
         };
+        }
     }
 }

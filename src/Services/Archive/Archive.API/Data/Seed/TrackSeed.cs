@@ -1,4 +1,4 @@
-﻿namespace Archive.API.Data.Seeds
+namespace Archive.API.Data.Seeds
 {
     public static class TrackSeed
     {
@@ -9,56 +9,56 @@
                 // Transilvanian Hunger tracks
                 new Track
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0002-000000000001"),
+                    Id = SeedConstants.Tracks.TransilvanianHunger1,
                     Title = "Transilvanian Hunger"
                 },
                 new Track
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0002-000000000002"),
+                    Id = SeedConstants.Tracks.TransilvanianHunger2,
                     Title = "Over Fjell og Gjennom Torner"
                 },
                 new Track
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0002-000000000003"),
+                    Id = SeedConstants.Tracks.TransilvanianHunger3,
                     Title = "Skald av Satans Sol"
                 },
                 new Track
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0002-000000000004"),
+                    Id = SeedConstants.Tracks.TransilvanianHunger4,
                     Title = "Slottet i Det Fjerne"
                 },
-                
+
                 // Filosofem tracks
                 new Track
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0002-000000000005"),
+                    Id = SeedConstants.Tracks.Filosofem1,
                     Title = "Dunkelheit"
                 },
                 new Track
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0002-000000000006"),
+                    Id = SeedConstants.Tracks.Filosofem2,
                     Title = "Jesus' Tod"
                 },
                 new Track
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0002-000000000007"),
+                    Id = SeedConstants.Tracks.Filosofem3,
                     Title = "Erblicket die Töchter des Firmaments"
                 },
-                
+
                 // In the Nightside Eclipse tracks
                 new Track
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0002-000000000008"),
+                    Id = SeedConstants.Tracks.NightsideEclipse1,
                     Title = "Into the Infinity of Thoughts"
                 },
                 new Track
                 {
-                    Id = Guid.Parse("00000000-0000-0000-0002-000000000009"),
+                    Id = SeedConstants.Tracks.NightsideEclipse2,
                     Title = "The Burning Shadows of Silence"
                 },
                 new Track
                 {
-                    Id = Guid.Parse("0000000a-0000-0000-0002-000000000000"),
+                    Id = SeedConstants.Tracks.NightsideEclipse3,
                     Title = "Cosmic Keys to My Creations & Times"
                 }
             };
