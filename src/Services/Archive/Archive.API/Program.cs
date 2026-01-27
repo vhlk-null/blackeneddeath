@@ -1,7 +1,11 @@
 ﻿using Archive.API.Behaviors;
 using BuildingBlocks.Behaviors;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
+
+string connectionString = builder.Configuration.GetConnectionString("ArchiveDb")!;
 
 builder.Services.InjectValidators();
 builder.Services.InjectServices();
@@ -20,20 +24,29 @@ builder.Services.AddMediatR(config =>
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 builder.Services.AddDbContext<ArchiveContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ArchiveDb")));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddHealthChecks()
+    .AddNpgSql(connectionString);
+
 var app = builder.Build();
 
 if (builder.Environment.IsDevelopment())
     await DatabaseSeeder.SeedDatabaseAsync(app.Services, app.Services.GetRequiredService<ILogger<Program>>());
 
-app.UseExceptionHandler();
+app.UseExceptionHandler(options => { });
 
 app.MapCarter();
+
+app.UseHealthChecks("/health",
+    new HealthCheckOptions()
+    {
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    });
 
 app.Run();
