@@ -1,0 +1,14 @@
+﻿global using Archive.API.Data;
+global using Archive.API.Models;
+global using Archive.API.Models.JoinTables;
+global using BuildingBlocks.CQRS;
+global using BuildingBlocks.Repositories;
+global using Carter;
+global using Mapster;
+global using MediatR;
+global using Microsoft.EntityFrameworkCore;
+global using System.Reflection;
+global using Archive.API.Exceptions;
+global using FluentValidation;
+global using Archive.API.Extenstions;
+global using BuildingBlocks.Resources.ResourceManagement;
