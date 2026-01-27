@@ -8,9 +8,9 @@
     {
         public async Task<GetAlbumByIdResult> Handle(GetAlbumByIdQuery query, CancellationToken cancellationToken)
         {
-            var album = await repo.GetByAsync<Album>(a=>a.Id == query.Id);
+            var album = await repo.GetByAsync<Album>(a => a.Id == query.Id);
 
-            if(album == null) throw new AlbumNotFoundException(query.Id);
+            if (album == null) throw new AlbumNotFoundException(query.Id);
 
             return new GetAlbumByIdResult(album);
         }

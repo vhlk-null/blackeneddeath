@@ -1,9 +1,8 @@
 ﻿using Archive.API.Behaviors;
-using Archive.API.Data;
+using Archive.API.Mappings;
 using BuildingBlocks.Behaviors;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +26,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHealthChecks()
     .AddNpgSql(connectionString);
+
+AlbumMappingConfig.ConfigureAlbumMappings();
 
 var app = builder.Build();
 
