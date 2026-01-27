@@ -83,16 +83,17 @@ namespace Archive.API.Migrations
                     embed_code = table.Column<string>(type: "text", nullable: false),
                     AddedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    AlbumId = table.Column<Guid>(type: "uuid", nullable: true)
+                    album_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_streaming_links", x => x.id);
                     table.ForeignKey(
-                        name: "FK_streaming_links_albums_AlbumId",
-                        column: x => x.AlbumId,
+                        name: "FK_streaming_links_albums_album_id",
+                        column: x => x.album_id,
                         principalTable: "albums",
-                        principalColumn: "id");
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -373,9 +374,9 @@ namespace Archive.API.Migrations
                 column: "parent_genre_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_streaming_links_AlbumId",
+                name: "IX_streaming_links_album_id",
                 table: "streaming_links",
-                column: "AlbumId");
+                column: "album_id");
         }
 
         /// <inheritdoc />

@@ -186,32 +186,26 @@ namespace Archive.API.Data
             modelBuilder.Entity<StreamingLink>(entity =>
             {
                 entity.ToTable("streaming_links");
-
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id)
                     .HasColumnName("id")
                     .ValueGeneratedNever();
 
-                //entity.Property(e => e.AlbumId)
-                //    .HasColumnName("album_id");
+                entity.Property(e => e.AlbumId)
+                    .HasColumnName("album_id");
 
                 entity.Property(e => e.Platform)
                     .HasColumnName("platform");
-
-                //entity.Property(e => e.Url)
-                //    .IsRequired()
-                //    .HasMaxLength(500)
-                //    .HasColumnName("url");
 
                 entity.Property(e => e.EmbedCode)
                     .HasColumnType("text")
                     .HasColumnName("embed_code");
 
-                //entity.HasOne(e => e.Album)
-                //    .WithMany(a => a.StreamingLinks)
-                //    .HasForeignKey(e => e.AlbumId)
-                //    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Album)
+                    .WithMany(a => a.StreamingLinks)
+                    .HasForeignKey(e => e.AlbumId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
 

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Archive.API.Migrations
 {
     [DbContext(typeof(ArchiveContext))]
-    [Migration("20260127000027_InitialCreateWithSeed")]
+    [Migration("20260127014042_InitialCreateWithSeed")]
     partial class InitialCreateWithSeed
     {
         /// <inheritdoc />
@@ -518,8 +518,9 @@ namespace Archive.API.Migrations
                     b.Property<Guid>("AddedByUserId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("AlbumId")
-                        .HasColumnType("uuid");
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("album_id");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -726,9 +727,13 @@ namespace Archive.API.Migrations
 
             modelBuilder.Entity("Archive.API.Models.StreamingLink", b =>
                 {
-                    b.HasOne("Archive.API.Models.Album", null)
+                    b.HasOne("Archive.API.Models.Album", "Album")
                         .WithMany("StreamingLinks")
-                        .HasForeignKey("AlbumId");
+                        .HasForeignKey("AlbumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Album");
                 });
 
             modelBuilder.Entity("Archive.API.Models.Album", b =>

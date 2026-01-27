@@ -11,5 +11,9 @@
         public Guid AddedByUserId { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public Guid AlbumId { get; set; }
+
+        public Album Album { get; set; } = null!;
     }
 }

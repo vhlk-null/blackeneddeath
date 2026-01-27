@@ -1,6 +1,4 @@
-﻿using Archive.API.Models;
-
-namespace Archive.API.Models.JoinTables
+﻿namespace Archive.API.Models.JoinTables
 {
     public class AlbumTrack
     {
