@@ -28,6 +28,13 @@ namespace BuildingBlocks.Repositories
                 : await Context.Set<T>().AsNoTracking().Where(expression).ToListAsync(cancellationToken);
         }
 
+        public IQueryable<T> Filter<T>(Expression<Func<T, bool>> expression, bool asTracked = true) where T : class
+        {
+            return asTracked
+                ? this.Context.Set<T>().Where(expression)
+                : this.Context.Set<T>().AsNoTracking().Where(expression);
+        }
+
         public async Task<List<T>> AllAsync<T>(CancellationToken cancellationToken = default) where T : class
         {
             return await Context.Set<T>().ToListAsync(cancellationToken);
