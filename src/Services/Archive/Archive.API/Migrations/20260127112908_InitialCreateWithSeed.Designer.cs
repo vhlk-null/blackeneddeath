@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Archive.API.Migrations
 {
     [DbContext(typeof(ArchiveContext))]
-    [Migration("20260127110759_RemoveSeedDataFromMigrations")]
-    partial class RemoveSeedDataFromMigrations
+    [Migration("20260127112908_InitialCreateWithSeed")]
+    partial class InitialCreateWithSeed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

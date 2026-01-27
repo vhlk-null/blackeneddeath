@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Archive.API.Migrations
 {
     [DbContext(typeof(ArchiveContext))]
-    [Migration("20260127014042_InitialCreateWithSeed")]
-    partial class InitialCreateWithSeed
+    [Migration("20260127112455_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,62 +62,6 @@ namespace Archive.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("albums", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("a0000000-0000-0000-0000-000000000001"),
-                            Format = 0,
-                            Label = "Peaceville Records",
-                            ReleaseDate = 1994,
-                            Title = "Transilvanian Hunger",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000000-0000-0000-0000-000000000002"),
-                            Format = 0,
-                            Label = "Misanthropy Records",
-                            ReleaseDate = 1996,
-                            Title = "Filosofem",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000000-0000-0000-0000-000000000003"),
-                            Format = 0,
-                            Label = "Candlelight Records",
-                            ReleaseDate = 1994,
-                            Title = "In the Nightside Eclipse",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000000-0000-0000-0000-000000000004"),
-                            Format = 0,
-                            Label = "Deathlike Silence Productions",
-                            ReleaseDate = 1994,
-                            Title = "De Mysteriis Dom Sathanas",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000000-0000-0000-0000-000000000005"),
-                            Format = 0,
-                            Label = "Nuclear Blast",
-                            ReleaseDate = 1995,
-                            Title = "Storm of the Light's Bane",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("a0000000-0000-0000-0000-000000000006"),
-                            Format = 0,
-                            Label = "Nuclear Blast",
-                            ReleaseDate = 2014,
-                            Title = "The Satanist",
-                            Type = 0
-                        });
                 });
 
             modelBuilder.Entity("Archive.API.Models.Band", b =>
@@ -162,64 +106,6 @@ namespace Archive.API.Migrations
                     b.HasIndex("CountryId");
 
                     b.ToTable("bands", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("b0000000-0000-0000-0000-000000000001"),
-                            Bio = "Norwegian black metal band formed in 1986.",
-                            CountryId = new Guid("c0000000-0000-0000-0000-000000000001"),
-                            FormedYear = 1986,
-                            Name = "Darkthrone",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("b0000000-0000-0000-0000-000000000002"),
-                            Bio = "Norwegian black metal solo project by Varg Vikernes.",
-                            CountryId = new Guid("c0000000-0000-0000-0000-000000000001"),
-                            FormedYear = 1991,
-                            Name = "Burzum",
-                            Status = 2
-                        },
-                        new
-                        {
-                            Id = new Guid("b0000000-0000-0000-0000-000000000003"),
-                            Bio = "Norwegian black metal band, pioneers of symphonic black metal.",
-                            CountryId = new Guid("c0000000-0000-0000-0000-000000000001"),
-                            DisbandedYear = 2001,
-                            FormedYear = 1991,
-                            Name = "Emperor",
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = new Guid("b0000000-0000-0000-0000-000000000004"),
-                            Bio = "Norwegian black metal band, one of the genre's founders.",
-                            CountryId = new Guid("c0000000-0000-0000-0000-000000000001"),
-                            FormedYear = 1984,
-                            Name = "Mayhem",
-                            Status = 0
-                        },
-                        new
-                        {
-                            Id = new Guid("b0000000-0000-0000-0000-000000000005"),
-                            Bio = "Swedish melodic black/death metal band.",
-                            CountryId = new Guid("c0000000-0000-0000-0000-000000000002"),
-                            DisbandedYear = 2006,
-                            FormedYear = 1989,
-                            Name = "Dissection",
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = new Guid("b0000000-0000-0000-0000-000000000006"),
-                            Bio = "Polish blackened death metal band.",
-                            CountryId = new Guid("c0000000-0000-0000-0000-000000000004"),
-                            FormedYear = 1991,
-                            Name = "Behemoth",
-                            Status = 0
-                        });
                 });
 
             modelBuilder.Entity("Archive.API.Models.Country", b =>
@@ -246,62 +132,6 @@ namespace Archive.API.Migrations
                         .IsUnique();
 
                     b.ToTable("countries", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("c0000000-0000-0000-0000-000000000001"),
-                            Code = "NO",
-                            Name = "Norway"
-                        },
-                        new
-                        {
-                            Id = new Guid("c0000000-0000-0000-0000-000000000002"),
-                            Code = "SE",
-                            Name = "Sweden"
-                        },
-                        new
-                        {
-                            Id = new Guid("c0000000-0000-0000-0000-000000000003"),
-                            Code = "FI",
-                            Name = "Finland"
-                        },
-                        new
-                        {
-                            Id = new Guid("c0000000-0000-0000-0000-000000000004"),
-                            Code = "PL",
-                            Name = "Poland"
-                        },
-                        new
-                        {
-                            Id = new Guid("c0000000-0000-0000-0000-000000000005"),
-                            Code = "UA",
-                            Name = "Ukraine"
-                        },
-                        new
-                        {
-                            Id = new Guid("c0000000-0000-0000-0000-000000000006"),
-                            Code = "US",
-                            Name = "United States"
-                        },
-                        new
-                        {
-                            Id = new Guid("c0000000-0000-0000-0000-000000000007"),
-                            Code = "GB",
-                            Name = "United Kingdom"
-                        },
-                        new
-                        {
-                            Id = new Guid("c0000000-0000-0000-0000-000000000008"),
-                            Code = "DE",
-                            Name = "Germany"
-                        },
-                        new
-                        {
-                            Id = new Guid("c0000000-0000-0000-0000-000000000009"),
-                            Code = "FR",
-                            Name = "France"
-                        });
                 });
 
             modelBuilder.Entity("Archive.API.Models.Genre", b =>
@@ -328,97 +158,6 @@ namespace Archive.API.Migrations
                     b.HasIndex("ParentGenreId");
 
                     b.ToTable("genres", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("10000000-0000-0000-0000-000000000001"),
-                            Name = "Metal"
-                        },
-                        new
-                        {
-                            Id = new Guid("20000000-0000-0000-0000-000000000001"),
-                            Name = "Black Metal",
-                            ParentGenreId = new Guid("10000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("20000000-0000-0000-0000-000000000002"),
-                            Name = "Death Metal",
-                            ParentGenreId = new Guid("10000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("20000000-0000-0000-0000-000000000003"),
-                            Name = "Doom Metal",
-                            ParentGenreId = new Guid("10000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("20000000-0000-0000-0000-000000000004"),
-                            Name = "Thrash Metal",
-                            ParentGenreId = new Guid("10000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("30000000-0000-0000-0000-000000000001"),
-                            Name = "Raw Black Metal",
-                            ParentGenreId = new Guid("20000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("30000000-0000-0000-0000-000000000002"),
-                            Name = "Melodic Black Metal",
-                            ParentGenreId = new Guid("20000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("30000000-0000-0000-0000-000000000003"),
-                            Name = "Atmospheric Black Metal",
-                            ParentGenreId = new Guid("20000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("30000000-0000-0000-0000-000000000004"),
-                            Name = "Symphonic Black Metal",
-                            ParentGenreId = new Guid("20000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("30000000-0000-0000-0000-000000000005"),
-                            Name = "Depressive Black Metal",
-                            ParentGenreId = new Guid("20000000-0000-0000-0000-000000000001")
-                        },
-                        new
-                        {
-                            Id = new Guid("30000000-0000-0000-0000-000000000006"),
-                            Name = "Melodic Death Metal",
-                            ParentGenreId = new Guid("20000000-0000-0000-0000-000000000002")
-                        },
-                        new
-                        {
-                            Id = new Guid("30000000-0000-0000-0000-000000000007"),
-                            Name = "Technical Death Metal",
-                            ParentGenreId = new Guid("20000000-0000-0000-0000-000000000002")
-                        },
-                        new
-                        {
-                            Id = new Guid("30000000-0000-0000-0000-000000000008"),
-                            Name = "Brutal Death Metal",
-                            ParentGenreId = new Guid("20000000-0000-0000-0000-000000000002")
-                        },
-                        new
-                        {
-                            Id = new Guid("30000000-0000-0000-0000-000000000009"),
-                            Name = "Funeral Doom",
-                            ParentGenreId = new Guid("20000000-0000-0000-0000-000000000003")
-                        },
-                        new
-                        {
-                            Id = new Guid("3000000a-0000-0000-0000-000000000000"),
-                            Name = "Stoner Doom",
-                            ParentGenreId = new Guid("20000000-0000-0000-0000-000000000003")
-                        });
                 });
 
             modelBuilder.Entity("Archive.API.Models.JoinTables.AlbumBand", b =>
@@ -556,58 +295,6 @@ namespace Archive.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("tracks", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0002-000000000001"),
-                            Title = "Transilvanian Hunger"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0002-000000000002"),
-                            Title = "Over Fjell og Gjennom Torner"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0002-000000000003"),
-                            Title = "Skald av Satans Sol"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0002-000000000004"),
-                            Title = "Slottet i Det Fjerne"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0002-000000000005"),
-                            Title = "Dunkelheit"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0002-000000000006"),
-                            Title = "Jesus' Tod"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0002-000000000007"),
-                            Title = "Erblicket die Töchter des Firmaments"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0002-000000000008"),
-                            Title = "Into the Infinity of Thoughts"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0002-000000000009"),
-                            Title = "The Burning Shadows of Silence"
-                        },
-                        new
-                        {
-                            Id = new Guid("0000000a-0000-0000-0002-000000000000"),
-                            Title = "Cosmic Keys to My Creations & Times"
-                        });
                 });
 
             modelBuilder.Entity("Archive.API.Models.Band", b =>
@@ -715,7 +402,7 @@ namespace Archive.API.Migrations
                         .IsRequired();
 
                     b.HasOne("Archive.API.Models.Genre", "Genre")
-                        .WithMany()
+                        .WithMany("Bands")
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -766,6 +453,8 @@ namespace Archive.API.Migrations
             modelBuilder.Entity("Archive.API.Models.Genre", b =>
                 {
                     b.Navigation("Albums");
+
+                    b.Navigation("Bands");
 
                     b.Navigation("SubGenres");
                 });
