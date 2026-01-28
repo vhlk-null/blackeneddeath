@@ -1,4 +1,6 @@
-namespace Archive.API.Data.Seeds
+using BuildingBlocks.Models.JoinTables;
+
+namespace Archive.API.Data.Seed
 {
     public static class RelationshipsSeed
     {

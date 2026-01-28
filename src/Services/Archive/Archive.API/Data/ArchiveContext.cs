@@ -1,4 +1,7 @@
-﻿namespace Archive.API.Data
+﻿using BuildingBlocks.Models;
+using BuildingBlocks.Models.JoinTables;
+
+namespace Archive.API.Data
 {
     public class ArchiveContext : DbContext
     {

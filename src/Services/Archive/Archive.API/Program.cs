@@ -1,4 +1,4 @@
-﻿using Archive.API.Behaviors;
+﻿using Archive.API.Behavior;
 using BuildingBlocks.Behaviors;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;

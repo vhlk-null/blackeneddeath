@@ -1,4 +1,6 @@
-﻿namespace Archive.API.Models
+﻿using BuildingBlocks.Models.JoinTables;
+
+namespace BuildingBlocks.Models
 {
     public class Genre
     {

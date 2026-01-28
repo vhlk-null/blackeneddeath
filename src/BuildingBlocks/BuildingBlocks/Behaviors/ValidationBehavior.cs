@@ -2,7 +2,7 @@
 using FluentValidation;
 using MediatR;
 
-namespace Archive.API.Behaviors
+namespace BuildingBlocks.Behaviors
 {
     public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
         : IPipelineBehavior<TRequest, TResponse>

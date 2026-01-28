@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Resources;
 
-namespace BuildingBlocks.Resources.ResourceManagement;
+namespace Archive.API.Resources.ResourceManagement;
 
 public static class ValidationMessages
 {

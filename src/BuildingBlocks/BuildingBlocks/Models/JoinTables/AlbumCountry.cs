@@ -1,4 +1,4 @@
-﻿namespace Archive.API.Models.JoinTables
+﻿namespace BuildingBlocks.Models.JoinTables
 {
     public class AlbumCountry
     {

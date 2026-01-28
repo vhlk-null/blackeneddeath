@@ -1,4 +1,5 @@
 ﻿using Archive.API.Albums.GetAlbums;
+using BuildingBlocks.Models;
 
 namespace Archive.API.Albums.GetAlbumsBy.GetAlbumById
 {

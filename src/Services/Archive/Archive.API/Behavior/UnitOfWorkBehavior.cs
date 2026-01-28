@@ -1,4 +1,4 @@
-﻿namespace BuildingBlocks.Behaviors
+﻿namespace Archive.API.Behavior
 {
     public class UnitOfWorkBehavior<TRequest, TResponse>(ArchiveContext repo)
     : IPipelineBehavior<TRequest, TResponse>

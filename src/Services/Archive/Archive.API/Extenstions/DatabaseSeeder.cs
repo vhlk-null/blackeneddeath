@@ -1,6 +1,6 @@
-using Archive.API.Data.Seeds;
+using Archive.API.Data.Seed;
 
-namespace Archive.API.Data
+namespace Archive.API.Extenstions
 {
     public static class DatabaseSeeder
     {

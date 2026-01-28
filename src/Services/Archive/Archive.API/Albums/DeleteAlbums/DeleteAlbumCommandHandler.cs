@@ -1,4 +1,7 @@
-﻿namespace Archive.API.Albums.DeleteAlbum
+﻿using Archive.API.Resources.ResourceManagement;
+using BuildingBlocks.Models;
+
+namespace Archive.API.Albums.DeleteAlbums
 {
     public record DeleteAlbumCommand(Guid Id) : ICommand<DeleteAlbumResult>;
     public record DeleteAlbumResult(bool IsSuccess);

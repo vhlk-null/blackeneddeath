@@ -1,4 +1,4 @@
-﻿namespace UserContent.API.UserContent.FavoriteAlbums.StoreUserFavoriteAlbums
+﻿namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
 {
     public class StoreUserFavoriteAlbumsEndpoint
     {

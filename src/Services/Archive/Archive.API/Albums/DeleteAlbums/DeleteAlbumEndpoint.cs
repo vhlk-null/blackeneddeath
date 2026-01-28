@@ -1,4 +1,4 @@
-﻿namespace Archive.API.Albums.DeleteAlbum
+﻿namespace Archive.API.Albums.DeleteAlbums
 {
     //public record DeleteAlbumRequest(Guid Id);
     public record DeleteAlbumResponse(bool IsSuccess);

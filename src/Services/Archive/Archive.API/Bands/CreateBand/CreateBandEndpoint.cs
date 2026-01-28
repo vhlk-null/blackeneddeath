@@ -1,3 +1,5 @@
+using BuildingBlocks.Models;
+
 namespace Archive.API.Bands.CreateBand
 {
     public record CreateBandRequest(

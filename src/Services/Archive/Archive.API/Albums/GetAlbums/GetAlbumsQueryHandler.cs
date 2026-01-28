@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Extentions;
+using BuildingBlocks.Models;
 
 namespace Archive.API.Albums.GetAlbums
 {

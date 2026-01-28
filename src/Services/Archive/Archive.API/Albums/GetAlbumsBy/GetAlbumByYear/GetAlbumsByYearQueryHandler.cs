@@ -1,4 +1,6 @@
-﻿namespace Archive.API.Albums.GetAlbumsBy.GetAlbumByYear
+﻿using BuildingBlocks.Models;
+
+namespace Archive.API.Albums.GetAlbumsBy.GetAlbumByYear
 {
     public record GetAlbumsByYearQuery(int ReleaseDate) : IQuery<GetAlbumsByYearResult>;
     public record GetAlbumsByYearResult(IEnumerable<Album> Albums);

@@ -1,4 +1,6 @@
-﻿namespace Archive.API.Models.JoinTables
+﻿using BuildingBlocks.Models;
+
+namespace BuildingBlocks.Models.JoinTables
 {
     public class AlbumTrack
     {

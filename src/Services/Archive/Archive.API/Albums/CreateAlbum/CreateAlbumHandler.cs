@@ -1,4 +1,7 @@
-﻿namespace Archive.API.Albums.CreateAlbum
+﻿using Archive.API.Resources.ResourceManagement;
+using BuildingBlocks.Models;
+
+namespace Archive.API.Albums.CreateAlbum
 {
     public record CreateAlbumCommand(
         string Title,

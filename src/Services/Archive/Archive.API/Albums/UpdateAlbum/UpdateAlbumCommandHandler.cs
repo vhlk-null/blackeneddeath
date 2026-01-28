@@ -1,4 +1,7 @@
-﻿namespace Archive.API.Albums.UpdateAlbum
+﻿using Archive.API.Resources.ResourceManagement;
+using BuildingBlocks.Models;
+
+namespace Archive.API.Albums.UpdateAlbum
 {
     public record UpdateAlbumCommand(Guid Id,
     string Title,

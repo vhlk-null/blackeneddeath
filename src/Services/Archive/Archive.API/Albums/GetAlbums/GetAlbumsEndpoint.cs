@@ -1,4 +1,6 @@
-﻿namespace Archive.API.Albums.GetAlbums
+﻿using BuildingBlocks.Models;
+
+namespace Archive.API.Albums.GetAlbums
 {
     public record GetAlbumsRequest(int? PageNumber, int? PageSize = 10);
 

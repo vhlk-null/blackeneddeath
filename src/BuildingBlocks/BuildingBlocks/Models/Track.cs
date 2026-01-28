@@ -1,6 +1,6 @@
-﻿using Archive.API.Models.JoinTables;
+﻿using BuildingBlocks.Models.JoinTables;
 
-namespace Archive.API.Models
+namespace BuildingBlocks.Models
 {
     public class Track
     {
