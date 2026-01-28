@@ -1,4 +1,4 @@
-﻿namespace BuildingBlocks.Constants
+﻿namespace Archive.API.Constants
 {
     public static class ValidationMessageEntryNames
     {

@@ -18,19 +18,4 @@
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Compile Update="Resources\ResourceFiles\ValidationMessages.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>ValidationMessages.resx</DependentUpon>
-	  </Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Update="Resources\ResourceFiles\ValidationMessages.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	</ItemGroup>
-
 </Project>

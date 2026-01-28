@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BuildingBlocks.Resources.ResourceFiles {
+namespace Archive.API.Resources.ResourceFiles {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace BuildingBlocks.Resources.ResourceFiles {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BuildingBlocks.Resources.ResourceFiles.ValidationMessages", typeof(ValidationMessages).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Archive.API.Resources.ResourceFiles.ValidationMessages", typeof(ValidationMessages).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
