@@ -112,35 +112,35 @@ namespace Archive.API.Data
             if (!await context.AlbumBands.AnyAsync())
             {
                 logger.LogInformation("Seeding AlbumBands...");
-                await context.AlbumBands.AddRangeAsync(AlbumRelationshipsSeed.GetAlbumBands());
+                await context.AlbumBands.AddRangeAsync(RelationshipsSeed.GetAlbumBands());
             }
 
             // Album-Genre relationships
             if (!await context.AlbumGenres.AnyAsync())
             {
                 logger.LogInformation("Seeding AlbumGenres...");
-                await context.AlbumGenres.AddRangeAsync(AlbumRelationshipsSeed.GetAlbumGenres());
+                await context.AlbumGenres.AddRangeAsync(RelationshipsSeed.GetAlbumGenres());
             }
 
             // Album-Country relationships
             if (!await context.AlbumCountries.AnyAsync())
             {
                 logger.LogInformation("Seeding AlbumCountries...");
-                await context.AlbumCountries.AddRangeAsync(AlbumRelationshipsSeed.GetAlbumCountries());
+                await context.AlbumCountries.AddRangeAsync(RelationshipsSeed.GetAlbumCountries());
             }
 
             // Album-Track relationships
             if (!await context.AlbumTracks.AnyAsync())
             {
                 logger.LogInformation("Seeding AlbumTracks...");
-                await context.AlbumTracks.AddRangeAsync(AlbumRelationshipsSeed.GetAlbumTracks());
+                await context.AlbumTracks.AddRangeAsync(RelationshipsSeed.GetAlbumTracks());
             }
 
             // Band-Genre relationships
             if (!await context.BandGenres.AnyAsync())
             {
                 logger.LogInformation("Seeding BandGenres...");
-                await context.BandGenres.AddRangeAsync(AlbumRelationshipsSeed.GetBandGenres());
+                await context.BandGenres.AddRangeAsync(RelationshipsSeed.GetBandGenres());
             }
 
             // Save all junction tables

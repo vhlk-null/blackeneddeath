@@ -1,6 +1,6 @@
 namespace Archive.API.Data.Seeds
 {
-    public static class AlbumRelationshipsSeed
+    public static class RelationshipsSeed
     {
         // Album-Band relationships
         public static List<AlbumBand> GetAlbumBands()
