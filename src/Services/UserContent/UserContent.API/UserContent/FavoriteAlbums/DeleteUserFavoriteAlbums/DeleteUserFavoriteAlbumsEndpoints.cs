@@ -8,7 +8,7 @@ namespace UserContent.API.UserContent.FavoriteAlbums.DeleteUserFavoriteAlbums
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapDelete("/favoriteAlbums/{albumId:guid}", async (Guid albumId, [FromQuery] Guid userId, ISender sender) =>
+            app.MapDelete("/favoriteAlbums", async ([FromQuery] Guid albumId, [FromQuery] Guid userId, ISender sender) =>
             {
                 var command = new DeleteFavoriteAlbumCommand(albumId, userId);
 

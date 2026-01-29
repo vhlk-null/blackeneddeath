@@ -1,5 +1,4 @@
-﻿
-using UserContent.API.UserContent.UserProfile.GetUserProfile;
+﻿using UserContent.API.UserContent.UserProfile.GetUserProfile;
 
 namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
 {
