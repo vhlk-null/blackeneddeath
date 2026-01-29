@@ -28,13 +28,20 @@ Shared infrastructure library containing:
 - **Validation Resources**: Localized validation messages via resource files
 
 ### Archive.API Service
-Main service following vertical slice architecture:
+Main service for music archive data following vertical slice architecture:
 - **Feature Folders**: Each feature (GetAlbums, CreateAlbum, etc.) contains its endpoint, handler, validators, DTOs in one folder
 - **Endpoints**: Carter modules using minimal APIs (pattern: `{Feature}Endpoint.cs`)
 - **Handlers**: MediatR handlers (pattern: `{Feature}Handler.cs` or `{Feature}QueryHandler.cs`/`{Feature}CommandHandler.cs`)
 - **Data Layer**: EF Core context (`ArchiveContext`), repository implementation (`ArchiveRepository`)
 - **Domain Models**: Located in `Models/` with join tables in `Models/JoinTables/`
 - **Global Usings**: `GlobalUsing.cs` imports common namespaces project-wide
+
+### UserContent.API Service
+Service for user-specific content (favorites, profiles) following the same vertical slice architecture:
+- **Feature Folders**: `UserContent/FavoriteAlbums/`, `UserContent/UserProfile/`
+- **Models**: `FavoriteAlbum`, `FavoriteBand`, `UserProfileInfo` in `Models/`
+- **Same patterns as Archive.API**: Carter endpoints, MediatR handlers, Mapster mapping
+- **Note**: Currently in early development (Program.cs is minimal, no database context configured yet)
 
 ## Common Development Commands
 
@@ -59,6 +66,10 @@ dotnet build blackened.death.slnx
 
 # Run Archive.API locally
 cd Services/Archive/Archive.API
+dotnet run
+
+# Run UserContent.API locally
+cd Services/UserContent/UserContent.API
 dotnet run
 
 # Run with Docker Compose (from src directory)

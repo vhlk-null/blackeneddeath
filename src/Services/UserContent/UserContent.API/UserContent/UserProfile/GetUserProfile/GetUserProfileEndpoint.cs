@@ -7,18 +7,19 @@
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/profile/{userId:guid}",
+            app.MapGet("/profile/{userId:guid}",
                 async (Guid userId, ISender sender) =>
                 {
                     var result = await sender.Send(new GetUserProfileQuery(userId));
 
                     var response = result.Adapt<GetUserProfileResponse>();
 
-                    return Results.Created($"/profile/{response.UserProfileInfo.UserId}", response);
+                    return Results.Ok(response);
                 })
             .WithName("GetUserProfile")
-            .Produces<GetUserProfileResponse>(StatusCodes.Status201Created)
+            .Produces<GetUserProfileResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Get UserProfile")
             .WithDescription("Get UserProfile");
         }
