@@ -9,7 +9,19 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_archive:/var/lib/postgresql/data/
+      - postgres_archive:/var/lib/postgresql/data/  
+      
+  usercontentdb:
+    container_name: usercontentdb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=UserContentDB
+    restart: always
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_usercontent:/var/lib/postgresql/data/
   
   archive.api:
     environment:
@@ -22,6 +34,23 @@ services:
     ports:
       - "6000:8080"
       - "6001:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  usercontent.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__UserContentDB=Host=usercontentdb;Port=5432;Database=UserContentDB;Username=postgres;Password=postgres
+    depends_on:
+      - usercontentdb
+    ports:
+      - "6010:8080"
+      - "6011:8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro

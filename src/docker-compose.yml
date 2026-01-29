@@ -2,11 +2,22 @@ services:
   archivedb:
     image: postgres:16
 
+  usercontentdb:
+    image: postgres:16
+
   archive.api:
     image: ${DOCKER_REGISTRY-}archiveapi
     build:
       context: .
       dockerfile: Services/Archive/Archive.API/Dockerfile
 
+  usercontent.api:
+    image: ${DOCKER_REGISTRY-}usercontentapi
+    build:
+      context: .
+      dockerfile: Services/UserContent/UserContent.API/Dockerfile
+
 volumes:
   postgres_archive:
+  postgres_usercontent:
+
