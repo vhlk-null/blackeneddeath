@@ -1,6 +1,6 @@
-﻿using BuildingBlocks.Models.JoinTables;
+﻿using Archive.API.Models.JoinTables;
 
-namespace BuildingBlocks.Models
+namespace Archive.API.Models
 {
     public class Country
     {

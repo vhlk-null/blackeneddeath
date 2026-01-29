@@ -1,5 +1,5 @@
-﻿using BuildingBlocks.Models;
-using BuildingBlocks.Models.JoinTables;
+﻿using Archive.API.Models;
+using Archive.API.Models.JoinTables;
 
 namespace Archive.API.Data
 {

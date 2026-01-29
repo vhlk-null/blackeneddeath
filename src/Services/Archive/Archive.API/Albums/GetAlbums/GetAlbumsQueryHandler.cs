@@ -1,5 +1,5 @@
-﻿using BuildingBlocks.Extentions;
-using BuildingBlocks.Models;
+﻿using Archive.API.Models;
+using BuildingBlocks.Extentions;
 
 namespace Archive.API.Albums.GetAlbums
 {

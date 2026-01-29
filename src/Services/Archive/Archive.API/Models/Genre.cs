@@ -1,6 +1,6 @@
-﻿using BuildingBlocks.Models.JoinTables;
+﻿using Archive.API.Models.JoinTables;
 
-namespace BuildingBlocks.Models
+namespace Archive.API.Models
 {
     public class Genre
     {
@@ -8,7 +8,7 @@ namespace BuildingBlocks.Models
         public string Name { get; set; } = null!;
 
         public Guid? ParentGenreId { get;set;  }
-        public Genre? ParentGenre { get; set; }
+        public Genre ParentGenre { get; set; }
 
         public ICollection<Genre> SubGenres { get; set; } = null!;
 

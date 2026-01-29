@@ -1,4 +1,4 @@
-using BuildingBlocks.Models.JoinTables;
+using Archive.API.Models.JoinTables;
 
 namespace Archive.API.Data.Seed
 {

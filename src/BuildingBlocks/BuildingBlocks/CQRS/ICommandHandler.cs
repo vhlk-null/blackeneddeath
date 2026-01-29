@@ -3,7 +3,7 @@
 namespace BuildingBlocks.CQRS
 {
 
-    public interface ICommandHander<in TCommand> : ICommandHandler<TCommand, Unit> 
+    public interface ICommandHandler<in TCommand> : ICommandHandler<TCommand, Unit> 
         where TCommand : ICommand<Unit>
     {
     }

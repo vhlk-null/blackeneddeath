@@ -1,5 +1,5 @@
+using Archive.API.Models;
 using Archive.API.Resources.ResourceManagement;
-using BuildingBlocks.Models;
 
 namespace Archive.API.Bands.UpdateBand
 {

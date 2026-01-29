@@ -1,5 +1,5 @@
 ﻿using Archive.API.Albums.GetAlbums;
-using BuildingBlocks.Models;
+using Archive.API.Models;
 
 namespace Archive.API.Mappings
 {

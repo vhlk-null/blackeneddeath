@@ -1,4 +1,4 @@
-﻿using BuildingBlocks.Models;
+﻿using Archive.API.Models;
 
 namespace Archive.API.Albums.GetAlbumsBy.GetAlbumByYear
 {

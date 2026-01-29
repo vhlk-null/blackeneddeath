@@ -1,5 +1,5 @@
-﻿using Archive.API.Resources.ResourceManagement;
-using BuildingBlocks.Models;
+﻿using Archive.API.Models;
+using Archive.API.Resources.ResourceManagement;
 
 namespace Archive.API.Albums.CreateAlbum
 {

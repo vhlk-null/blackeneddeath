@@ -1,5 +1,5 @@
 using Archive.API.Bands.GetBands;
-using BuildingBlocks.Models;
+using Archive.API.Models;
 
 namespace Archive.API.Bands.GetBandsBy.GetBandsByCountry
 {
