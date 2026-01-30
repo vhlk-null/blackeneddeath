@@ -9,7 +9,7 @@ namespace Archive.API.Albums.GetAlbumsBy.GetAlbumById
     internal class GetAlbumByIdQueryHandler(IRepository<ArchiveContext> repo)
         : IQueryHandler<GetAlbumByIdQuery, GetAlbumByIdResult>
     {
-        public async Task<GetAlbumByIdResult> Handle(GetAlbumByIdQuery query, CancellationToken cancellationToken)
+        public async ValueTask<GetAlbumByIdResult> Handle(GetAlbumByIdQuery query, CancellationToken cancellationToken)
         {
             var album = await repo.Filter<Album>(a => a.Id == query.Id)
                 .Include(a => a.Bands).ThenInclude(ab => ab.Band)

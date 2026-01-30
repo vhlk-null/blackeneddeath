@@ -44,7 +44,7 @@ namespace Archive.API.Albums.CreateAlbum
     internal class CreateAlbumCommandHandler(IRepository<ArchiveContext> repo) 
         : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
     {
-        public async Task<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
+        public async ValueTask<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
         {
             var album = new Album
             {

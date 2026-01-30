@@ -5,7 +5,7 @@
 
     public class AddFavoriteAlbumCommandHandler : ICommandHandler<AddAlbumToFavoriteCommand, AddAlbumToFavoriteResult>
     {
-        public async Task<AddAlbumToFavoriteResult> Handle(AddAlbumToFavoriteCommand request, CancellationToken cancellationToken)
+        public async ValueTask<AddAlbumToFavoriteResult> Handle(AddAlbumToFavoriteCommand request, CancellationToken cancellationToken)
         {
             // TODO: add album to favorite user's albums
             // TODO: update cache

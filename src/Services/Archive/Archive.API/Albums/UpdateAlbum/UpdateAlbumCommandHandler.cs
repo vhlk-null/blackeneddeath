@@ -41,7 +41,7 @@ namespace Archive.API.Albums.UpdateAlbum
 
     internal class UpdateAlbumCommandHandler(IRepository<ArchiveContext> repo) : ICommandHandler<UpdateAlbumCommand, UpdateAlbumResult>
     {
-        public async Task<UpdateAlbumResult> Handle(UpdateAlbumCommand command, CancellationToken cancellationToken)
+        public async ValueTask<UpdateAlbumResult> Handle(UpdateAlbumCommand command, CancellationToken cancellationToken)
         {
             var album = await repo.GetByAsync<Album>(a => a.Id == command.Id) ?? throw new AlbumNotFoundException(command.Id);
 

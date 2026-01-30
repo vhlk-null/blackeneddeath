@@ -1,4 +1,4 @@
-﻿using Archive.API.Behavior;
+﻿using Archive.API.Behaviors;
 using BuildingBlocks.Behaviors;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -10,13 +10,16 @@ string connectionString = builder.Configuration.GetConnectionString("ArchiveDb")
 builder.Services.InjectValidators();
 builder.Services.InjectServices();
 builder.Services.AddCarter();
-builder.Services.AddMediatR(config =>
+
+builder.Services.AddMediator((MediatorOptions options) =>
 {
-    config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-    config.AddOpenBehavior(typeof(LogginBehavior<,>));
-    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-    config.AddOpenBehavior(typeof(UnitOfWorkBehavior<,>));
+    options.ServiceLifetime = ServiceLifetime.Scoped;
 });
+
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
+
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddDbContext<ArchiveContext>(options =>
     options.UseNpgsql(connectionString));

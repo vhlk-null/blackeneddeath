@@ -1,20 +1,23 @@
-﻿namespace Archive.API.Behavior
-{
-    public class UnitOfWorkBehavior<TRequest, TResponse>(ArchiveContext repo)
-    : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : notnull
+﻿// Archive.API/Behaviors/UnitOfWorkBehavior.cs
+namespace Archive.API.Behaviors;
+
+public sealed class UnitOfWorkBehavior<TRequest, TResponse>(ArchiveContext context)
+        : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : notnull, IRequest<TResponse>
         where TResponse : notnull
-    {
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+{
+    public async ValueTask<TResponse> Handle(TRequest message, MessageHandlerDelegate<TRequest, TResponse> next, CancellationToken cancellationToken)
+    {        
+        var messageTypeName = typeof(TRequest).Name;
+
+        if (messageTypeName.Contains("Query", StringComparison.OrdinalIgnoreCase))
         {
-            if (request is IQuery<TResponse> query)
-                return await next();
-
-            var response = await next();
-
-            await repo.SaveChangesAsync(cancellationToken);
-
-            return response;
+            return await next(message, cancellationToken);
         }
+
+        var response = await next(message, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+
+        return response;
     }
 }

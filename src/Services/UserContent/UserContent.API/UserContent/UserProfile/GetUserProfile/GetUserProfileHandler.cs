@@ -5,7 +5,7 @@
     public record GetUserProfileResult(UserProfileInfo UserProfileInfo);
     public class GetUserProfileHandler : IQueryHandler<GetUserProfileQuery, GetUserProfileResult>
     {
-        public async Task<GetUserProfileResult> Handle(GetUserProfileQuery query, CancellationToken cancellationToken)
+        public async ValueTask<GetUserProfileResult> Handle(GetUserProfileQuery query, CancellationToken cancellationToken)
         {
             // TODO: get user from database
             // var userProfile = await repo.GetBy(query.UserId);

@@ -1,9 +1,8 @@
 ﻿global using Archive.API.Data;
-global using BuildingBlocks.CQRS;
 global using BuildingBlocks.Repositories;
 global using Carter;
 global using Mapster;
-global using MediatR;
+global using Mediator;
 global using Microsoft.EntityFrameworkCore;
 global using System.Reflection;
 global using Archive.API.Exceptions;

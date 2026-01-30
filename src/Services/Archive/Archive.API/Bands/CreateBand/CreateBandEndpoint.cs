@@ -1,4 +1,5 @@
 using Archive.API.Models;
+using Mediator;
 
 namespace Archive.API.Bands.CreateBand
 {

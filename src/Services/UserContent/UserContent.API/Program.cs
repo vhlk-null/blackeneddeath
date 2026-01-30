@@ -1,4 +1,4 @@
-using BuildingBlocks.Behaviors;
+﻿using BuildingBlocks.Behaviors;
 using Microsoft.EntityFrameworkCore;
 using UserContent.API.Data;
 
@@ -9,12 +9,14 @@ string connectionString = builder.Configuration.GetConnectionString("UserContent
 // Add services to the container.
 
 builder.Services.AddCarter();
-builder.Services.AddMediatR(conf =>
+
+builder.Services.AddMediator((MediatorOptions options) =>
 {
-    conf.RegisterServicesFromAssemblies(typeof(Program).Assembly);
-    conf.AddOpenBehavior(typeof(ValidationBehavior<,>));
-    conf.AddOpenBehavior(typeof(LogginBehavior<,>));
+    options.ServiceLifetime = ServiceLifetime.Scoped;
 });
+
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 builder.Services.AddDbContext<UserContentContext>(options =>
     options.UseNpgsql(connectionString));

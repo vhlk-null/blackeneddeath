@@ -40,7 +40,7 @@ namespace Archive.API.Bands.CreateBand
     internal class CreateBandCommandHandler(IRepository<ArchiveContext> repo)
         : ICommandHandler<CreateBandCommand, CreateBandResult>
     {
-        public async Task<CreateBandResult> Handle(CreateBandCommand command, CancellationToken cancellationToken)
+        public async ValueTask<CreateBandResult> Handle(CreateBandCommand command, CancellationToken cancellationToken)
         {
             var band = new Band
             {

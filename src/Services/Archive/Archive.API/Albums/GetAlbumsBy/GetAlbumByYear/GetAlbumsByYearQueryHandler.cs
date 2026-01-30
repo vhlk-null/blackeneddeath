@@ -8,7 +8,7 @@ namespace Archive.API.Albums.GetAlbumsBy.GetAlbumByYear
     internal class GetAlbumByByYearQueryHandler(IRepository<ArchiveContext> repo)
         : IQueryHandler<GetAlbumsByYearQuery, GetAlbumsByYearResult>
     {
-        public async Task<GetAlbumsByYearResult> Handle(GetAlbumsByYearQuery query, CancellationToken cancellationToken)
+        public async ValueTask<GetAlbumsByYearResult> Handle(GetAlbumsByYearQuery query, CancellationToken cancellationToken)
         {
             var albums = await repo.FilterAsync<Album>(a => a.ReleaseDate == query.ReleaseDate);
 

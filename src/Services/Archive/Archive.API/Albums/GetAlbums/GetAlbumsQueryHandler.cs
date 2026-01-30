@@ -9,7 +9,7 @@ namespace Archive.API.Albums.GetAlbums
     public class GetAlbumsQueryHandler(IRepository<ArchiveContext> repo)
         : IQueryHandler<GetAlbumsQuery, PagedResult<AlbumDto>>
     {
-        public async Task<PagedResult<AlbumDto>> Handle(
+        public async ValueTask<PagedResult<AlbumDto>> Handle(
             GetAlbumsQuery query,
             CancellationToken cancellationToken)
         {

@@ -19,7 +19,7 @@ namespace Archive.API.Bands.DeleteBand
         ILogger<DeleteBandCommandHandler> logger)
         : ICommandHandler<DeleteBandCommand, DeleteBandResult>
     {
-        public async Task<DeleteBandResult> Handle(
+        public async ValueTask<DeleteBandResult> Handle(
             DeleteBandCommand command,
             CancellationToken cancellationToken)
         {

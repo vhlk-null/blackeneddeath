@@ -9,7 +9,14 @@
       "Bash(docker-compose up:*)",
       "Bash(docker-compose logs:*)",
       "Bash(curl:*)",
-      "Bash(docker-compose restart:*)"
+      "Bash(docker-compose restart:*)",
+      "Bash(dotnet clean:*)",
+      "Bash(findstr:*)",
+      "Bash(Select-String -Path \"D:\\\\Projects\\\\blackeneddeath\\\\src\\\\Services\\\\Archive\\\\Archive.API\\\\obj\\\\Debug\\\\net10.0\\\\Mediator.SourceGenerator\\\\Mediator.SourceGenerator.IncrementalMediatorGenerator\\\\Mediator.g.cs\" -Pattern \"GetAlbumsQuery\")",
+      "Bash(Select-Object -First 5)",
+      "Bash(powershell -Command:*)",
+      "Bash(dir:*)",
+      "Bash(dotnet restore:*)"
     ],
     "deny": [],
     "ask": []

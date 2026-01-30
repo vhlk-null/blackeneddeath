@@ -5,7 +5,7 @@
 
     public class DeleteFavoriteAlbumCommandHandler : ICommandHandler<DeleteFavoriteAlbumCommand, DeleteFavoriteAlbumResult>
     {
-        public async Task<DeleteFavoriteAlbumResult> Handle(DeleteFavoriteAlbumCommand request, CancellationToken cancellationToken)
+        public async ValueTask<DeleteFavoriteAlbumResult> Handle(DeleteFavoriteAlbumCommand request, CancellationToken cancellationToken)
         {
             // TODO: delete album from user's favorite albums
             // TODO: update cache

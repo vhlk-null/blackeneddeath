@@ -19,7 +19,7 @@ namespace Archive.API.Albums.DeleteAlbums
         ILogger<DeleteAlbumCommandHandler> logger)
         : ICommandHandler<DeleteAlbumCommand, DeleteAlbumResult>
     {
-        public async Task<DeleteAlbumResult> Handle(
+        public async ValueTask<DeleteAlbumResult> Handle(
             DeleteAlbumCommand command,
             CancellationToken cancellationToken)
         {
