@@ -3,7 +3,7 @@ namespace Archive.API.Behaviors;
 
 public sealed class UnitOfWorkBehavior<TRequest, TResponse>(ArchiveContext context)
         : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : notnull, IRequest<TResponse>
+        where TRequest : notnull, IMessage
         where TResponse : notnull
 {
     public async ValueTask<TResponse> Handle(TRequest message, MessageHandlerDelegate<TRequest, TResponse> next, CancellationToken cancellationToken)

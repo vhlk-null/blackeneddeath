@@ -3,7 +3,11 @@ using BuildingBlocks.Behaviors;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
+using Archive.API.Mappings;
+
 var builder = WebApplication.CreateBuilder(args);
+
+MappingConfig.RegisterMappings();
 
 string connectionString = builder.Configuration.GetConnectionString("ArchiveDb")!;
 
