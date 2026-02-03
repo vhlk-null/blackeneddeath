@@ -10,7 +10,7 @@ namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
         {
             app.MapPost("/favoriteAlbums", async (AddAlbumToFavoriteRequest request, ISender sender) =>
             {
-                var command = request.Adapt<AddAlbumToFavoriteCommand>();
+                var command = new AddAlbumToFavoriteCommand(request.albumId, request.userId);
 
                 var result = await sender.Send(command);
 

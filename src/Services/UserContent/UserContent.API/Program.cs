@@ -1,7 +1,4 @@
 ﻿using BuildingBlocks.Behaviors;
-using BuildingBlocks.Repositories;
-using Microsoft.EntityFrameworkCore;
-using UserContent.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +17,11 @@ builder.Services.AddScoped<IRepository<UserContentContext>, UserConentRepository
 
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
 
 builder.Services.AddDbContext<UserContentContext>(options =>
     options.UseNpgsql(connectionString));
+builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<UserContentContext>());
 
 var app = builder.Build();
 

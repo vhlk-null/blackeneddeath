@@ -1,5 +1,4 @@
-﻿using Archive.API.Behaviors;
-using BuildingBlocks.Behaviors;
+﻿using BuildingBlocks.Behaviors;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
@@ -27,6 +26,7 @@ builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavi
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddDbContext<ArchiveContext>(options =>
     options.UseNpgsql(connectionString));
+builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<ArchiveContext>());
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();

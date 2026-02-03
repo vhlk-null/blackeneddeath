@@ -10,7 +10,14 @@
             // TODO: add album to favorite user's albums
             // TODO: update cache
 
-            await repo.AddAsync(request, cancellationToken);
+            var favoriteAlbum = new FavoriteAlbum()
+            {
+                UserId = request.userId,
+                AlbumId = request.albumId,
+                AlbumTitle = "test"
+            };
+
+            await repo.AddAsync(favoriteAlbum, cancellationToken);
 
             return new AddAlbumToFavoriteResult(request.userId);
         }

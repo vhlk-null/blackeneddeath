@@ -12,7 +12,7 @@ using UserContent.API.Data;
 namespace UserContent.API.Migrations
 {
     [DbContext(typeof(UserContentContext))]
-    [Migration("20260203224954_InitialCreateWithSeed")]
+    [Migration("20260203232713_InitialCreateWithSeed")]
     partial class InitialCreateWithSeed
     {
         /// <inheritdoc />

@@ -1,7 +1,9 @@
-﻿// Archive.API/Behaviors/UnitOfWorkBehavior.cs
-namespace Archive.API.Behaviors;
+﻿using Mediator;
+using Microsoft.EntityFrameworkCore;
 
-public sealed class UnitOfWorkBehavior<TRequest, TResponse>(ArchiveContext context)
+namespace BuildingBlocks.Behaviors;
+
+public sealed class UnitOfWorkBehavior<TRequest, TResponse>(DbContext context)
         : IPipelineBehavior<TRequest, TResponse>
         where TRequest : notnull, IMessage
         where TResponse : notnull

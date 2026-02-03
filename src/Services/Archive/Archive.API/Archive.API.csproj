@@ -42,4 +42,8 @@
 	    <Generator>ResXFileCodeGenerator</Generator>
 	  </EmbeddedResource>
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Behavior\" />
+	</ItemGroup>
 </Project>
