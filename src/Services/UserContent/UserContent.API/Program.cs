@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Behaviors;
+using BuildingBlocks.Repositories;
 using Microsoft.EntityFrameworkCore;
 using UserContent.API.Data;
 
@@ -14,6 +15,8 @@ builder.Services.AddMediator((MediatorOptions options) =>
 {
     options.ServiceLifetime = ServiceLifetime.Scoped;
 });
+
+builder.Services.AddScoped<IRepository<UserContentContext>, UserConentRepository>();
 
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
