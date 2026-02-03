@@ -39,8 +39,7 @@ namespace UserContent.API.Data
                 entity.Property(e => e.Bio)
                     .HasColumnType("text")
                     .HasColumnName("bio");
-
-                entity.Ignore(e => e.FavoriteGenres);
+                
                 entity.Ignore(e => e.FavoriteBandsCount);
                 entity.Ignore(e => e.FavoriteAlbumsCount);
                 entity.Ignore(e => e.ReviewsCount);

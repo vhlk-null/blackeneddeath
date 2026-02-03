@@ -9,7 +9,6 @@
         public DateTime RegisteredDate { get; set; }
         public DateTime? LastLoginDate { get; set; }
         public string? Bio { get; set; }
-        public List<string> FavoriteGenres { get; set; } = new();
         public int FavoriteBandsCount { get; set; }
         public int FavoriteAlbumsCount { get; set; }
         public int ReviewsCount { get; set; }
