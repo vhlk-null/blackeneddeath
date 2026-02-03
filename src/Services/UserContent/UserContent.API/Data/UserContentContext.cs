@@ -20,23 +20,9 @@ namespace UserContent.API.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<UserProfileInfo>(entity =>
-            {
-                entity.HasKey(e => e.UserId);
-                entity.Ignore(e => e.FavoriteGenres);
-            });
-
-            modelBuilder.Entity<FavoriteAlbum>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.HasIndex(e => new { e.UserId, e.AlbumId }).IsUnique();
-            });
-
-            modelBuilder.Entity<FavoriteBand>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-                entity.HasIndex(e => new { e.UserId, e.BandId }).IsUnique();
-            });
+            modelBuilder.SetupUserProfileInfo();
+            modelBuilder.SetupFavoriteAlbum();
+            modelBuilder.SetupFavoriteBand();
         }
     }
 }

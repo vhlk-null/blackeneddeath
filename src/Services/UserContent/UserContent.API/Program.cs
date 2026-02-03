@@ -26,6 +26,34 @@ builder.Services.AddDbContext<UserContentContext>(options =>
 
 var app = builder.Build();
 
+// Apply migrations and seed in Development
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var logger = services.GetRequiredService<ILogger<Program>>();
+
+        try
+        {
+            var context = services.GetRequiredService<UserContentContext>();
+
+            // 1. Apply migrations first (creates tables)
+            logger.LogInformation("Applying UserContent database migrations...");
+            await context.Database.MigrateAsync();
+            logger.LogInformation("UserContent database migrations applied successfully!");
+
+            // 2. Then seed the data
+            await DatabaseSeeder.SeedDatabaseAsync(services, logger);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred while migrating or seeding the UserContent database");
+            throw;
+        }
+    }
+}
+
 // Configure the HTTP request pipeline.
 
 app.MapCarter();
