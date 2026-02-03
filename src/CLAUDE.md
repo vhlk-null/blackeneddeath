@@ -11,7 +11,7 @@ This is a .NET 10.0 microservices-based application for managing a music archive
 - **.NET 10.0** - Primary framework
 - **PostgreSQL 16** - Database (via Npgsql and EF Core 10)
 - **Entity Framework Core 10.0.2** - ORM with migrations
-- **MediatR 14.0.0** - CQRS implementation
+- **Mediator 3.0.1** (`martinothamar/Mediator`) - Source-generated CQRS implementation (replaces MediatR)
 - **Carter 10.0.0** - Minimal API routing
 - **FluentValidation 12.1.1** - Request validation
 - **Mapster 7.4.0** - Object mapping
@@ -21,27 +21,31 @@ This is a .NET 10.0 microservices-based application for managing a music archive
 
 ### BuildingBlocks Project
 Shared infrastructure library containing:
-- **CQRS Abstractions**: `ICommand<TResponse>`, `IQuery<TResponse>`, `ICommandHandler<,>`, `IQueryHandler<,>`
+- **CQRS Abstractions**: `ICommand<TResponse>`, `IQuery<TResponse>`, `ICommandHandler<,>`, `IQueryHandler<,>` (wrapping `Mediator` interfaces)
 - **Repository Pattern**: Generic `IRepository<TContext>` with `BaseGenericRepository<T>` implementation
-- **MediatR Behaviors**: `LoggingBehavior<,>`, `ValidationBehavior<,>` (from BuildingBlocks)
-- **Unit of Work**: `UnitOfWorkBehavior<,>` - automatically saves changes for commands (skips queries)
-- **Validation Resources**: Localized validation messages via resource files
+- **Pipeline Behaviors**: `LoggingBehavior<,>`, `ValidationBehavior<,>` (using `Mediator.IPipelineBehavior`)
+- **Pagination**: `PagedQuery<T>`, `PagedResult<T>`, and `QueryableExtensions.ToPagedResultAsync()` in `Extentions/`
 
 ### Archive.API Service
 Main service for music archive data following vertical slice architecture:
 - **Feature Folders**: Each feature (GetAlbums, CreateAlbum, etc.) contains its endpoint, handler, validators, DTOs in one folder
 - **Endpoints**: Carter modules using minimal APIs (pattern: `{Feature}Endpoint.cs`)
-- **Handlers**: MediatR handlers (pattern: `{Feature}Handler.cs` or `{Feature}QueryHandler.cs`/`{Feature}CommandHandler.cs`)
+- **Handlers**: Mediator handlers (pattern: `{Feature}Handler.cs` or `{Feature}QueryHandler.cs`/`{Feature}CommandHandler.cs`)
 - **Data Layer**: EF Core context (`ArchiveContext`), repository implementation (`ArchiveRepository`)
+- **UnitOfWorkBehavior**: `Behavior/UnitOfWorkBehavior.cs` - automatically saves changes for commands (skips queries by name convention)
+- **Validation Resources**: Localized validation messages via resource files in `Resources/ResourceFiles/`
 - **Domain Models**: Located in `Models/` with join tables in `Models/JoinTables/`
 - **Global Usings**: `GlobalUsing.cs` imports common namespaces project-wide
 
 ### UserContent.API Service
 Service for user-specific content (favorites, profiles) following the same vertical slice architecture:
-- **Feature Folders**: `UserContent/FavoriteAlbums/`, `UserContent/UserProfile/`
+- **Feature Folders**: `UserContent/FavoriteAlbums/` (Add, Delete), `UserContent/FavoriteBands/` (empty placeholder), `UserContent/UserProfile/` (GetUserProfile)
+- **Data Layer**: EF Core context (`UserContentContext`), repository implementation (`UserConentRepository`)
 - **Models**: `FavoriteAlbum`, `FavoriteBand`, `UserProfileInfo` in `Models/`
-- **Same patterns as Archive.API**: Carter endpoints, MediatR handlers, Mapster mapping
-- **Note**: Currently in early development (Program.cs is minimal, no database context configured yet)
+- **Same patterns as Archive.API**: Carter endpoints, Mediator handlers, Mapster mapping
+- **Pipeline**: LoggingBehavior + ValidationBehavior registered (no UnitOfWorkBehavior yet)
+- **Database**: Separate PostgreSQL instance (`UserContentDB`), migrations and seed data configured
+- **Note**: FavoriteBands feature folder is scaffolded but has no handlers/endpoints yet
 
 ## Common Development Commands
 
@@ -81,29 +85,32 @@ docker-compose down
 
 ### Docker Environment
 
-The Archive.API runs on:
+Archive.API:
 - **HTTP**: localhost:6000 (mapped to container 8080)
 - **HTTPS**: localhost:6001 (mapped to container 8081)
 
-PostgreSQL database:
-- **Host**: localhost:5432 (in Docker: archivedb:5432)
-- **Database**: ArchiveDb
-- **Credentials**: postgres/postgres
+UserContent.API:
+- **HTTP**: localhost:6010 (mapped to container 8080)
+- **HTTPS**: localhost:6011 (mapped to container 8081)
+
+PostgreSQL databases:
+- **ArchiveDb**: localhost:5432 (in Docker: archivedb:5432) — credentials: postgres/postgres
+- **UserContentDB**: localhost:5433 (in Docker: usercontentdb:5432) — credentials: postgres/postgres
 
 ## Architecture Patterns
 
 ### CQRS Flow
 1. **Carter Endpoint** receives HTTP request and maps to Command/Query
-2. **MediatR** dispatches to appropriate handler through pipeline:
-   - LoggingBehavior (logs requests)
+2. **Mediator** (source-generated) dispatches to appropriate handler through pipeline:
+   - LoggingBehavior (logs requests with timing)
    - ValidationBehavior (FluentValidation)
-   - UnitOfWorkBehavior (SaveChanges for commands only)
+   - UnitOfWorkBehavior (SaveChanges for commands only — Archive.API only)
 3. **Handler** executes business logic using Repository
 4. **Response** mapped back to DTO and returned
 
 ### Repository Pattern
 - Generic repository (`IRepository<TContext>`) injected into handlers
-- Context is `ArchiveContext` for all operations
+- Archive.API uses `ArchiveContext`, UserContent.API uses `UserContentContext`
 - **Queries**: `GetByAsync<T>()`, `GetByWithIncludeAsync<T>()`, `Filter<T>()`, `FilterAsync<T>()`, `All<T>()`, `AllAsync<T>()`, `AllWithIncludeAsync<T>()`
 - **Mutations**: `AddAsync<T>()`, `AddRangeAsync<T>()`, `Update<T>()`, `UpdateRange<T>()`, `Delete<T>()`, `DeleteRange<T>()`, `DeleteAsync<T>()`
 - **Aggregates**: `CountAsync<T>()`
@@ -118,8 +125,8 @@ PostgreSQL database:
 ### Validation
 - FluentValidation validators co-located with commands in feature folders
 - Validators automatically registered via `AddValidatorsFromAssembly()`
-- Validation messages use resource files from BuildingBlocks: `ValidationMessages.{Property}`
-- ValidationBehavior in MediatR pipeline throws validation exceptions automatically
+- Validation messages use resource files from Archive.API: `ValidationMessages.{Property}`
+- ValidationBehavior in Mediator pipeline throws validation exceptions automatically
 
 ## Key Conventions
 
@@ -141,7 +148,7 @@ PostgreSQL database:
 ### Database Migrations
 - Migrations automatically applied on startup in Development environment (see `Program.cs`)
 - Seeding happens after migrations via `DatabaseSeeder.SeedDatabaseAsync()`
-- Connection string configured via `appsettings.json` or environment variable `ConnectionStrings__ArchiveDb`
+- Connection strings configured via `appsettings.json` or environment variables: `ConnectionStrings__ArchiveDb` (Archive), `ConnectionStrings__UserContentDB` (UserContent)
 
 ## Important Notes
 
