@@ -23,6 +23,9 @@ builder.Services.AddDbContext<UserContentContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<UserContentContext>());
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 // Apply migrations and seed in Development
@@ -55,6 +58,7 @@ if (app.Environment.IsDevelopment())
 
 // Configure the HTTP request pipeline.
 
+app.UseExceptionHandler(options => { });
 app.MapCarter();
 
 app.Run();

@@ -6,3 +6,4 @@ global using BuildingBlocks.Repositories;
 global using UserContent.API.Data;
 global using UserContent.API.Extenstions;
 global using Microsoft.EntityFrameworkCore;
+global using UserContent.API.Exceptions;

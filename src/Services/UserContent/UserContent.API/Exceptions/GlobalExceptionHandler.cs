@@ -1,8 +1,9 @@
-﻿using BuildingBlocks.Exceptions;
+using BuildingBlocks.Exceptions;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Archive.API.Exceptions
+namespace UserContent.API.Exceptions
 {
     public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> _logger) : IExceptionHandler
     {

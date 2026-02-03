@@ -7,10 +7,11 @@
     {
         public async ValueTask<DeleteFavoriteAlbumResult> Handle(DeleteFavoriteAlbumCommand request, CancellationToken cancellationToken)
         {
-            // TODO: delete album from user's favorite albums
-            // TODO: update cache
+            var favoriteAlbum = await repo.GetByAsync<FavoriteAlbum>(
+                fa => fa.AlbumId == request.AlbumId && fa.UserId == request.UserId)
+                ?? throw new FavoriteAlbumNotFoundException(request.AlbumId);
 
-            //await repo.DeleteAsync(request.UserId, cancellationToken);
+            repo.Delete(favoriteAlbum);
 
             return new DeleteFavoriteAlbumResult(true);
         }
