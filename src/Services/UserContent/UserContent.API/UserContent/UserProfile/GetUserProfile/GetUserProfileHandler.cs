@@ -18,10 +18,13 @@
         {
             // TODO: get user from database
 
-            var userProfile = await repo.Filter<UserProfileInfo>(a => a.UserId == query.UserId)
-                .Include(a => a.FavoriteAlbums)
-                .Include(a => a.FavoriteBands)
-                .FirstAsync();
+            var userProfile = await repo.GetWithIncludesAsync<UserProfileInfo>(
+                a => a.UserId == query.UserId, 
+                cancellationToken,
+                [
+                    a=> a.FavoriteAlbums,
+                    a=> a.FavoriteBands
+                ]);
 
             return new GetUserProfileResult(userProfile);
         }

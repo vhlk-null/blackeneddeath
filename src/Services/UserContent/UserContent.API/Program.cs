@@ -1,7 +1,4 @@
-﻿using BuildingBlocks.Behaviors;
-using BuildingBlocks.Exceptions;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 string connectionString = builder.Configuration.GetConnectionString("UserContentDB")!;
 
@@ -14,7 +11,21 @@ builder.Services.AddMediator((MediatorOptions options) =>
     options.ServiceLifetime = ServiceLifetime.Scoped;
 });
 
-builder.Services.AddScoped<IRepository<UserContentContext>, UserConentRepository>();
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
+    options.InstanceName = "UserContent:";
+});
+
+builder.Services.AddScoped<IRepository<UserContentContext>>(sp =>
+{
+    var context = sp.GetRequiredService<UserContentContext>();
+    var cache = sp.GetRequiredService<IDistributedCache>();
+
+    var baseRepo = new UserContentRepository(context) { Context = context };
+
+    return new CachedUserContentRepository(baseRepo, cache);
+});
 
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
