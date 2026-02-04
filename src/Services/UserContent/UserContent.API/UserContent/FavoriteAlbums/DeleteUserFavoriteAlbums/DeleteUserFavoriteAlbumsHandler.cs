@@ -3,6 +3,15 @@
     public record DeleteFavoriteAlbumCommand(Guid AlbumId, Guid UserId) : ICommand<DeleteFavoriteAlbumResult>;
     public record DeleteFavoriteAlbumResult(bool IsSuccess);
 
+    public class DeleteFavoriteAlbumCommandValidator : AbstractValidator<DeleteFavoriteAlbumCommand>
+    {
+        public DeleteFavoriteAlbumCommandValidator()
+        {
+            RuleFor(x => x.AlbumId).NotEmpty().WithMessage("Album ID is required.");
+            RuleFor(x => x.UserId).NotEmpty().WithMessage("User ID is required.");
+        }
+    }
+
     public class DeleteFavoriteAlbumCommandHandler(IRepository<UserContentContext> repo) : ICommandHandler<DeleteFavoriteAlbumCommand, DeleteFavoriteAlbumResult>
     {
         public async ValueTask<DeleteFavoriteAlbumResult> Handle(DeleteFavoriteAlbumCommand request, CancellationToken cancellationToken)

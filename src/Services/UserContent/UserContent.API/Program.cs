@@ -20,6 +20,8 @@ builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
 
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
 builder.Services.AddDbContext<UserContentContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<UserContentContext>());

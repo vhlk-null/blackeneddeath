@@ -3,6 +3,15 @@
     public record GetUserProfileQuery(Guid UserId) : IQuery<GetUserProfileResult>;
 
     public record GetUserProfileResult(UserProfileInfo UserProfileInfo);
+
+    public class GetUserProfileQueryValidator : AbstractValidator<GetUserProfileQuery>
+    {
+        public GetUserProfileQueryValidator()
+        {
+            RuleFor(x => x.UserId).NotEmpty().WithMessage("User ID is required.");
+        }
+    }
+
     public class GetUserProfileHandler(IRepository<UserContentContext> repo) : IQueryHandler<GetUserProfileQuery, GetUserProfileResult>
     {
         public async ValueTask<GetUserProfileResult> Handle(GetUserProfileQuery query, CancellationToken cancellationToken)

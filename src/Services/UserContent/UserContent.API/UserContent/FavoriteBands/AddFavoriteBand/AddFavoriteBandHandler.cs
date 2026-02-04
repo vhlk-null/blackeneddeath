@@ -3,6 +3,15 @@
     public record AddBandToFavoriteCommand(Guid bandId, Guid userId) : ICommand<AddBandToFavoriteResult>;
     public record AddBandToFavoriteResult(Guid userId);
 
+    public class AddBandToFavoriteCommandValidator : AbstractValidator<AddBandToFavoriteCommand>
+    {
+        public AddBandToFavoriteCommandValidator()
+        {
+            RuleFor(x => x.bandId).NotEmpty().WithMessage("Band ID is required.");
+            RuleFor(x => x.userId).NotEmpty().WithMessage("User ID is required.");
+        }
+    }
+
     public class AddFavoriteBandCommandHandler(IRepository<UserContentContext> repo) : ICommandHandler<AddBandToFavoriteCommand, AddBandToFavoriteResult>
     {
         public async ValueTask<AddBandToFavoriteResult> Handle(AddBandToFavoriteCommand request, CancellationToken cancellationToken)
