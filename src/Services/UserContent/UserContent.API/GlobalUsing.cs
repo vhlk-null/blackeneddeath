@@ -11,6 +11,7 @@ global using StackExchange.Redis;
 global using System.Linq.Expressions;
 global using System.Reflection;
 global using System.Text.Json;
+global using UserContent.API.Constants;
 global using UserContent.API.Data;
 global using UserContent.API.Exceptions;
 global using UserContent.API.Extenstions;

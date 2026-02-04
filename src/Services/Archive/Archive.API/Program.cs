@@ -1,42 +1,38 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
 
+// ===== MAPPINGS =====
 MappingConfig.RegisterMappings();
 
-string connectionString = builder.Configuration.GetConnectionString("ArchiveDb")!;
+// ===== CONFIGURATION =====
+var dbConnection = builder.Configuration.GetConnectionString(ConnectionStrings.ArchiveDatabase)
+    ?? throw new InvalidOperationException($"{ConnectionStrings.ArchiveDatabase} connection string is missing");
 
-builder.Services.InjectValidators();
-builder.Services.InjectServices();
+// ===== SERVICES =====
+builder.Services
+    .AddDatabaseServices(dbConnection)
+    .AddMediatorServices()
+    .AddValidationServices()
+    .AddHealthCheckServices(dbConnection)
+    .AddApiDocumentation();
+
 builder.Services.AddCarter();
-
-builder.Services.AddMediator((MediatorOptions options) =>
-{
-    options.ServiceLifetime = ServiceLifetime.Scoped;
-});
-
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
-
-builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-builder.Services.AddDbContext<ArchiveContext>(options =>
-    options.UseNpgsql(connectionString));
-builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<ArchiveContext>());
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddHealthChecks()
-    .AddNpgSql(connectionString);
 
+// ===== APP =====
 var app = builder.Build();
 
+// Database initialization
 await app.InitializeDatabaseAsync();
 
-app.UseExceptionHandler(options => { });
+// Exception handling middleware
+app.UseExceptionHandler();
+
+// Endpoints
 app.MapCarter();
-app.UseHealthChecks("/health",
-    new HealthCheckOptions()
-    {
-        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-    });
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.Run();
