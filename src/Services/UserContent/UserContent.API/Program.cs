@@ -1,55 +1,62 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
 
-string userContentDBConnectionString = builder.Configuration.GetConnectionString("UserContentDB")!;
-string redisConnectionString = builder.Configuration.GetConnectionString("Redis")!;
+// ===== CONFIGURATION =====
+var userContentDbConnection = builder.Configuration.GetConnectionString("UserContentDB")
+    ?? throw new InvalidOperationException("UserContentDB connection string is missing");
+var redisConnection = builder.Configuration.GetConnectionString("Redis")
+    ?? throw new InvalidOperationException("Redis connection string is missing");
 
-// Add services to the container.
+// ===== DATABASE =====
+builder.Services.AddDbContext<UserContentContext>(options =>
+    options.UseNpgsql(userContentDbConnection));
 
-builder.Services.AddCarter();
+builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<UserContentContext>());
 
-builder.Services.AddMediator((MediatorOptions options) =>
+// ===== REDIS =====
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+    ConnectionMultiplexer.Connect(redisConnection));
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = redisConnection;
+    options.InstanceName = "UserContent:";
+});
+
+// ===== REPOSITORY (with Caching Decorator) =====
+builder.Services.AddScoped<IRepository<UserContentContext>, UserContentRepository>();
+builder.Services.Decorate<IRepository<UserContentContext>, CachedUserContentRepository>();
+
+// ===== MEDIATOR =====
+builder.Services.AddMediator(options =>
 {
     options.ServiceLifetime = ServiceLifetime.Scoped;
 });
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-{
-    var configuration = redisConnectionString;
-    return ConnectionMultiplexer.Connect(configuration);
-});
-
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = redisConnectionString;
-    options.InstanceName = "UserContent:";
-});
-
-builder.Services.AddScoped<UserContentRepository>();
-builder.Services.AddScoped<IRepository<UserContentContext>>(sp =>
-{
-    var baseRepo = sp.GetRequiredService<UserContentRepository>();
-    var cache = sp.GetRequiredService<IDistributedCache>();
-    var redis = sp.GetRequiredService<IConnectionMultiplexer>();
-    return new CachedUserContentRepository(baseRepo, cache, redis);
-});
-
-builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+// ===== MEDIATOR BEHAVIORS (порядок важливий!) =====
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
 
+// ===== VALIDATION =====
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
-builder.Services.AddDbContext<UserContentContext>(options => options.UseNpgsql(userContentDBConnectionString));
-builder.Services.AddScoped<DbContext>(sp => sp.GetRequiredService<UserContentContext>());
+// ===== ENDPOINTS =====
+builder.Services.AddCarter();
 
+// ===== EXCEPTION HANDLING =====
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+// ===== BUILD & CONFIGURE APP =====
 var app = builder.Build();
 
+// Database initialization
 await app.InitializeDatabaseAsync();
 
-app.UseExceptionHandler(options => { });
+// Exception handling middleware
+app.UseExceptionHandler();
+
+// Map endpoints
 app.MapCarter();
 
 app.Run();
