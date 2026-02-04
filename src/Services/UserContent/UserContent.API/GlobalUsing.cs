@@ -7,6 +7,7 @@ global using Mapster;
 global using Mediator;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Caching.Distributed;
+global using StackExchange.Redis;
 global using System.Linq.Expressions;
 global using System.Reflection;
 global using System.Text.Json;

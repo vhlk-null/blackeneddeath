@@ -1,11 +1,4 @@
-﻿using BuildingBlocks.Behaviors;
-using BuildingBlocks.Exceptions;
-using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-
-using Archive.API.Mappings;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 MappingConfig.RegisterMappings();
 
@@ -36,33 +29,7 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// Apply migrations and seed in Development
-if (app.Environment.IsDevelopment())
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        var services = scope.ServiceProvider;
-        var logger = services.GetRequiredService<ILogger<Program>>();
-
-        try
-        {
-            var context = services.GetRequiredService<ArchiveContext>();
-
-            // 1. Apply migrations first (creates tables)
-            logger.LogInformation("Applying database migrations...");
-            await context.Database.MigrateAsync();
-            logger.LogInformation("Database migrations applied successfully!");
-
-            // 2. Then seed the junction tables
-            await DatabaseSeeder.SeedDatabaseAsync(services, logger);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while migrating or seeding the database");
-            throw;
-        }
-    }
-}
+await app.InitializeDatabaseAsync();
 
 app.UseExceptionHandler(options => { });
 app.MapCarter();
