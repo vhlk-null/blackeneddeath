@@ -33,8 +33,8 @@
       timeout: 5s
       retries: 5
 
-  distibutedcache:
-    container_name: distibutedcache
+  distributedcache:
+    container_name: distributedcache
     restart: always
     ports:
       - "6379:6379"
@@ -68,11 +68,11 @@
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__UserContentDB=Host=usercontentdb;Port=5432;Database=UserContentDB;Username=postgres;Password=postgres
-      - ConnectionStrings__Redis=distibutedcache:6379,abortConnect=false
+      - ConnectionStrings__Redis=distributedcache:6379,abortConnect=false
     depends_on:
       usercontentdb:
         condition: service_healthy
-      distibutedcache:
+      distributedcache:
         condition: service_healthy
     ports:
       - "6010:8080"

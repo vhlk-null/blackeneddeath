@@ -4,7 +4,6 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
 {
     private readonly IRepository<UserContentContext> _innerRepository;
     private readonly IDistributedCache _cache;
-    private readonly IConnectionMultiplexer _redis;
     private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(30);
 
     public CachedUserContentRepository(
@@ -14,7 +13,6 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
     {
         _innerRepository = innerRepository;
         _cache = cache;
-        _redis = redis;
     }
 
     public UserContentContext Context
@@ -122,23 +120,6 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
     private async Task InvalidateCacheForType<T>() where T : class
     {
         var pattern = $"UserContent:{typeof(T).Name}:*";
-
-        try
-        {
-            var db = _redis.GetDatabase();
-            var endpoint = _redis.GetEndPoints().FirstOrDefault();
-
-            if (endpoint != null)
-            {
-                var server = _redis.GetServer(endpoint);
-
-                await foreach (var key in server.KeysAsync(pattern: pattern))
-                {
-                    await db.KeyDeleteAsync(key);
-                }
-            }
-        }
-        catch { }
     }
 
     private static string GenerateCacheKey<T>(

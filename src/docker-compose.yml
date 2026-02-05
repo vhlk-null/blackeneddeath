@@ -5,7 +5,7 @@ services:
   usercontentdb:
     image: postgres:16
 
-  distibutedcache:
+  distributedcache:
     image: redis:7.2
 
   archive.api:

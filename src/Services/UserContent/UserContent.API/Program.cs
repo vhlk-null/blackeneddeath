@@ -11,6 +11,7 @@ var redisConnection = builder.Configuration.GetConnectionString(ConnectionString
 builder.Services
     .AddDatabaseServices(dbConnection)
     .AddRedisServices(redisConnection)
+    .AddHealthCheckServices(dbConnection, redisConnection)
     .AddRepositoryServices()
     .AddMediatorServices()
     .AddValidationServices();
@@ -26,5 +27,9 @@ await app.InitializeDatabaseAsync();
 
 app.UseExceptionHandler();
 app.MapCarter();
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.Run();

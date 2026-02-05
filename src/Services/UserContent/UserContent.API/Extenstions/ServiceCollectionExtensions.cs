@@ -20,20 +20,7 @@
             redisOptions.AbortOnConnectFail = false; 
             redisOptions.ConnectTimeout = 10000;
             redisOptions.ConnectRetry = 5;
-            redisOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
-
-            services.AddSingleton<IConnectionMultiplexer>(_ =>
-            {
-                try
-                {
-                    var connection = ConnectionMultiplexer.Connect(redisOptions);
-                    return connection;
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
-            });
+            redisOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);           
 
             services.AddStackExchangeRedisCache(options =>
             {
@@ -48,6 +35,15 @@
         {
             services.AddScoped<IRepository<UserContentContext>, UserContentRepository>();
             services.Decorate<IRepository<UserContentContext>, CachedUserContentRepository>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddHealthCheckServices(this IServiceCollection services, string dbConnection, string redisConnection)
+        {
+            services.AddHealthChecks()
+                 .AddNpgSql(dbConnection)
+                 .AddRedis(redisConnection);
 
             return services;
         }
