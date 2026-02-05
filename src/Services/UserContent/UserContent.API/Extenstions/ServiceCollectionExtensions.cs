@@ -14,16 +14,30 @@
             return services;
         }
 
-        public static IServiceCollection AddRedisServices(
-            this IServiceCollection services,
-            string connectionString)
+        public static IServiceCollection AddRedisServices(this IServiceCollection services, string connectionString)
         {
+            var redisOptions = ConfigurationOptions.Parse(connectionString);
+            redisOptions.AbortOnConnectFail = false; 
+            redisOptions.ConnectTimeout = 10000;
+            redisOptions.ConnectRetry = 5;
+            redisOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
+
             services.AddSingleton<IConnectionMultiplexer>(_ =>
-                ConnectionMultiplexer.Connect(connectionString));
+            {
+                try
+                {
+                    var connection = ConnectionMultiplexer.Connect(redisOptions);
+                    return connection;
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            });
 
             services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = connectionString;
+                options.ConfigurationOptions = redisOptions;
                 options.InstanceName = "UserContent:";
             });
 
@@ -45,7 +59,6 @@
                 options.ServiceLifetime = ServiceLifetime.Scoped;
             });
 
-            // Behaviors (порядок важливий!)
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));

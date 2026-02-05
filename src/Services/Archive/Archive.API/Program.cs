@@ -10,6 +10,7 @@ var dbConnection = builder.Configuration.GetConnectionString(ConnectionStrings.A
 // ===== SERVICES =====
 builder.Services
     .AddDatabaseServices(dbConnection)
+    .AddRepositoryServices()
     .AddMediatorServices()
     .AddValidationServices()
     .AddHealthCheckServices(dbConnection)

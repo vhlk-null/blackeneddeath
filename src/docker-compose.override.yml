@@ -1,4 +1,4 @@
-services:
+﻿services:
   archivedb:
     container_name: archivedb
     environment:
@@ -9,8 +9,13 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_archive:/var/lib/postgresql/data/  
-      
+      - postgres_archive:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   usercontentdb:
     container_name: usercontentdb
     environment:
@@ -22,7 +27,23 @@ services:
       - "5433:5432"
     volumes:
       - postgres_usercontent:/var/lib/postgresql/data/
-  
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  distibutedcache:
+    container_name: distibutedcache
+    restart: always
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   archive.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -30,7 +51,8 @@ services:
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__ArchiveDb=Host=archivedb;Port=5432;Database=ArchiveDb;Username=postgres;Password=postgres
     depends_on:
-      - archivedb
+      archivedb:
+        condition: service_healthy
     ports:
       - "6000:8080"
       - "6001:8081"
@@ -46,11 +68,15 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__UserContentDB=Host=usercontentdb;Port=5432;Database=UserContentDB;Username=postgres;Password=postgres
+      - ConnectionStrings__Redis=distibutedcache:6379,abortConnect=false
     depends_on:
-      - usercontentdb
+      usercontentdb:
+        condition: service_healthy
+      distibutedcache:
+        condition: service_healthy
     ports:
       - "6010:8080"
-      - "6011:8081"
+      - "6011:8081"   
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro

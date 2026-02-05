@@ -49,5 +49,12 @@
             services.AddEndpointsApiExplorer();
             return services;
         }
+
+        public static IServiceCollection AddRepositoryServices(this IServiceCollection services)
+        {
+            services.AddScoped<IRepository<ArchiveContext>, ArchiveRepository>();
+
+            return services;
+        }
     }
 }
