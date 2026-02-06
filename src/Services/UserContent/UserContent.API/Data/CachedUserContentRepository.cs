@@ -1,9 +1,13 @@
 ﻿namespace UserContent.API.Data;
 
+using System.Security.Cryptography;
+using System.Text;
+
 public class CachedUserContentRepository : IRepository<UserContentContext>
 {
     private readonly IRepository<UserContentContext> _innerRepository;
     private readonly IDistributedCache _cache;
+    private readonly IConnectionMultiplexer _redis;
     private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(30);
 
     public CachedUserContentRepository(
@@ -13,6 +17,7 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
     {
         _innerRepository = innerRepository;
         _cache = cache;
+        _redis = redis;
     }
 
     public UserContentContext Context
@@ -26,7 +31,8 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         CancellationToken cancellationToken = default,
         params Expression<Func<T, object>>[] includes) where T : class
     {
-        var cacheKey = GenerateCacheKey<T>(nameof(GetWithIncludesAsync), filter, includes);
+        var userId = ExtractUserIdFromExpression(filter);
+        var cacheKey = GenerateCacheKey<T>(nameof(GetWithIncludesAsync), userId, filter, includes);
 
         var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
         if (cached != null)
@@ -53,7 +59,8 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         if (asTracked)
             return await _innerRepository.GetByAsync(expression, asTracked, cancellationToken);
 
-        var cacheKey = GenerateCacheKey<T>(nameof(GetByAsync), expression);
+        var userId = ExtractUserIdFromExpression(expression);
+        var cacheKey = GenerateCacheKey<T>(nameof(GetByAsync), userId, expression);
 
         var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
         if (cached != null)
@@ -80,7 +87,8 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         if (asTracked)
             return await _innerRepository.FilterAsync(expression, asTracked, cancellationToken);
 
-        var cacheKey = GenerateCacheKey<T>(nameof(FilterAsync), expression);
+        var userId = ExtractUserIdFromExpression(expression);
+        var cacheKey = GenerateCacheKey<T>(nameof(FilterAsync), userId, expression);
 
         var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
         if (cached != null)
@@ -102,36 +110,109 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
     public async Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
     {
         await _innerRepository.AddAsync(entity, cancellationToken);
-        await InvalidateCacheForType<T>();
+        var userId = ExtractUserIdFromEntity(entity);
+        await InvalidateCacheForType<T>(userId);
     }
 
     public void Update<T>(T entity) where T : class
     {
         _innerRepository.Update(entity);
-        InvalidateCacheForType<T>().GetAwaiter().GetResult();
+        var userId = ExtractUserIdFromEntity(entity);
+        InvalidateCacheForType<T>(userId).GetAwaiter().GetResult();
     }
 
     public void Delete<T>(T entity) where T : class
     {
         _innerRepository.Delete(entity);
-        InvalidateCacheForType<T>().GetAwaiter().GetResult();
+        var userId = ExtractUserIdFromEntity(entity);
+        InvalidateCacheForType<T>(userId).GetAwaiter().GetResult();
     }
 
-    private async Task InvalidateCacheForType<T>() where T : class
+    private async Task InvalidateCacheForType<T>(Guid? userId = null) where T : class
     {
-        var pattern = $"UserContent:{typeof(T).Name}:*";
+        var typeName = typeof(T).Name;
+        var pattern = userId.HasValue
+            ? $"UserContent:{userId.Value}:{typeName}:*"
+            : $"UserContent:*:{typeName}:*";
+
+        var server = _redis.GetServers().First();
+        var keys = server.Keys(pattern: pattern).ToArray();
+
+        if (keys.Length > 0)
+        {
+            var db = _redis.GetDatabase();
+            await db.KeyDeleteAsync(keys);
+        }
+    }
+
+    private static Guid? ExtractUserIdFromExpression(Expression expression)
+    {
+        if (expression is LambdaExpression lambda)
+            return ExtractUserIdFromExpression(lambda.Body);
+
+        if (expression is BinaryExpression binary)
+        {
+            if (binary.NodeType is ExpressionType.AndAlso or ExpressionType.OrElse)
+                return ExtractUserIdFromExpression(binary.Left)
+                    ?? ExtractUserIdFromExpression(binary.Right);
+
+            if (binary.NodeType == ExpressionType.Equal)
+            {
+                if (IsUserIdMember(binary.Left) && TryGetGuidValue(binary.Right, out var id))
+                    return id;
+                if (IsUserIdMember(binary.Right) && TryGetGuidValue(binary.Left, out id))
+                    return id;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool IsUserIdMember(Expression expression)
+        => expression is MemberExpression member && member.Member.Name == "UserId";
+
+    private static bool TryGetGuidValue(Expression expression, out Guid value)
+    {
+        try
+        {
+            var lambda = Expression.Lambda<Func<Guid>>(Expression.Convert(expression, typeof(Guid)));
+            value = lambda.Compile()();
+            return true;
+        }
+        catch
+        {
+            value = Guid.Empty;
+            return false;
+        }
+    }
+
+    private static Guid? ExtractUserIdFromEntity<T>(T entity) where T : class
+    {
+        var prop = typeof(T).GetProperty("UserId");
+        if (prop?.PropertyType == typeof(Guid))
+            return (Guid)prop.GetValue(entity)!;
+        return null;
     }
 
     private static string GenerateCacheKey<T>(
         string operation,
+        Guid? userId,
         Expression filter,
         params Expression[] includes) where T : class
     {
         var typeName = typeof(T).Name;
         var filterString = filter.ToString();
         var includesString = string.Join(",", includes.Select(i => i.ToString()));
-        var hash = $"{filterString}:{includesString}".GetHashCode();
-        return $"UserContent:{typeName}:{operation}:{hash}";
+        var rawKey = $"{filterString}:{includesString}";
+        var hash = ComputeDeterministicHash(rawKey);
+        var userSegment = userId.HasValue ? userId.Value.ToString() : "shared";
+        return $"UserContent:{userSegment}:{typeName}:{operation}:{hash}";
+    }
+
+    private static string ComputeDeterministicHash(string input)
+    {
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(input));
+        return Convert.ToHexString(bytes)[..16];
     }
 
     public Task<T?> GetByWithIncludeAsync<T>(
