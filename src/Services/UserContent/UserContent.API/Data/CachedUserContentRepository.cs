@@ -245,12 +245,43 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         params Expression[] includes) where T : class
     {
         var typeName = typeof(T).Name;
-        var filterString = filter.ToString();
-        var includesString = string.Join(",", includes.Select(i => i.ToString()));
+        var resolver = new ClosureValueResolvingVisitor();
+        var filterString = resolver.Visit(filter).ToString();
+        var includesString = string.Join(",", includes.Select(i => resolver.Visit(i).ToString()));
         var rawKey = $"{typeName}:{filterString}:{includesString}";
         var hash = ComputeDeterministicHash(rawKey);
         var userSegment = userId.HasValue ? userId.Value.ToString() : "shared";
-        return $"{userSegment}:{typeName}:{operation}:{hash}";
+        return $"{typeName}:{operation}:{userSegment}:{hash}";
+    }
+
+    private sealed class ClosureValueResolvingVisitor : ExpressionVisitor
+    {
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            if (node.Expression is ConstantExpression or MemberExpression
+                && !IsParameterAccess(node))
+            {
+                try
+                {
+                    var value = Expression.Lambda(node).Compile().DynamicInvoke();
+                    return Expression.Constant(value, node.Type);
+                }
+                catch
+                {
+                    return base.VisitMember(node);
+                }
+            }
+
+            return base.VisitMember(node);
+        }
+
+        private static bool IsParameterAccess(Expression expression)
+            => expression switch
+            {
+                ParameterExpression => true,
+                MemberExpression m => IsParameterAccess(m.Expression!),
+                _ => false,
+            };
     }
 
     private static string ComputeDeterministicHash(string input)
