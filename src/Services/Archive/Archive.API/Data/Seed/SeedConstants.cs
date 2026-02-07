@@ -1,4 +1,4 @@
-namespace Archive.API.Data.Seeds
+namespace Archive.API.Data.Seed
 {
     public static class SeedConstants
     {

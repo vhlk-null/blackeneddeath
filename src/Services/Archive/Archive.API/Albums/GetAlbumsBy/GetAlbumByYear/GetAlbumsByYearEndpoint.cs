@@ -1,4 +1,7 @@
-﻿namespace Archive.API.Albums.GetAlbumsBy.GetAlbumByYear;
+﻿using Archive.API.Models;
+using Mediator;
+
+namespace Archive.API.Albums.GetAlbumsBy.GetAlbumByYear;
 
 public record GetAlbumsByYearRequest(int ReleaseDate) : IRequest<GetAlbumsByYearResult>;
 

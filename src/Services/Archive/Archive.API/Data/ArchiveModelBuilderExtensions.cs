@@ -1,4 +1,5 @@
-﻿using Archive.API.Data.Seeds;
+﻿using Archive.API.Models;
+using Archive.API.Models.JoinTables;
 
 namespace Archive.API.Data
 {

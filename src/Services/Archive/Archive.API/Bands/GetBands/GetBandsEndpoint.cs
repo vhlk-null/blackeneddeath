@@ -1,3 +1,5 @@
+using Archive.API.Models;
+
 namespace Archive.API.Bands.GetBands
 {
     public record GetBandsRequest(int? PageNumber, int? PageSize = 10);

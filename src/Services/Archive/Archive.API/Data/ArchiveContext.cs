@@ -1,17 +1,16 @@
-﻿namespace Archive.API.Data
+﻿using Archive.API.Models;
+using Archive.API.Models.JoinTables;
+
+namespace Archive.API.Data
 {
     public class ArchiveContext : DbContext
     {
-
-        private readonly IWebHostEnvironment? _environment;
-
         public ArchiveContext()
         {
         }
 
-        public ArchiveContext(DbContextOptions<ArchiveContext> options, IWebHostEnvironment environment) : base(options)
+        public ArchiveContext(DbContextOptions<ArchiveContext> options) : base(options)
         {
-            _environment = environment;
         }
 
         // Main entities

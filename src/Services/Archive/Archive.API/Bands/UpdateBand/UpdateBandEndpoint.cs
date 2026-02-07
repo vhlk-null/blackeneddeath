@@ -1,3 +1,5 @@
+using Archive.API.Models;
+
 namespace Archive.API.Bands.UpdateBand
 {
     public record UpdateBandRequest(

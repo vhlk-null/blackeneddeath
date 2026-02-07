@@ -1,29 +1,31 @@
-﻿using BuildingBlocks.CQRS;
-using FluentValidation;
-using MediatR;
+﻿using FluentValidation;
+using Mediator;
 
-namespace Archive.API.Behaviors
+namespace BuildingBlocks.Behaviors;
+
+public sealed class ValidationBehavior<TMessage, TResponse>(IEnumerable<IValidator<TMessage>> validators)
+    : IPipelineBehavior<TMessage, TResponse>
+    where TMessage : IMessage
 {
-    public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
-        : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : ICommand<TResponse>
+
+    public async ValueTask<TResponse> Handle(TMessage message, MessageHandlerDelegate<TMessage, TResponse> next, CancellationToken cancellationToken)
     {
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
-        {
-            if (!validators.Any()) return await next();
+        if (!validators.Any())
+            return await next(message, cancellationToken);
 
-            var context = new ValidationContext<TRequest>(request);
+        var context = new ValidationContext<TMessage>(message);
 
-            var validationResults = await Task.WhenAll(validators.Select(x => x.ValidateAsync(context, cancellationToken)));
+        var validationResults = await Task.WhenAll(
+            validators.Select(v => v.ValidateAsync(context, cancellationToken)));
 
-            var failures = validationResults
-                .SelectMany(a => a.Errors)
-                .Where(f => f != null)
-                .ToList();
+        var failures = validationResults
+            .Where(r => r.Errors.Any())
+            .SelectMany(r => r.Errors)
+            .ToList();
 
-            if (failures.Any()) throw new ValidationException(failures);
+        if (failures.Any())
+            throw new ValidationException(failures);
 
-            return await next();
-        }
+        return await next(message, cancellationToken);
     }
 }

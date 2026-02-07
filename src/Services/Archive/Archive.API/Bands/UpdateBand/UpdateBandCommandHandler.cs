@@ -1,3 +1,6 @@
+using Archive.API.Models;
+using Archive.API.Resources.ResourceManagement;
+
 namespace Archive.API.Bands.UpdateBand
 {
     public record UpdateBandCommand(
@@ -36,7 +39,7 @@ namespace Archive.API.Bands.UpdateBand
 
     internal class UpdateBandCommandHandler(IRepository<ArchiveContext> repo) : ICommandHandler<UpdateBandCommand, UpdateBandResult>
     {
-        public async Task<UpdateBandResult> Handle(UpdateBandCommand command, CancellationToken cancellationToken)
+        public async ValueTask<UpdateBandResult> Handle(UpdateBandCommand command, CancellationToken cancellationToken)
         {
             var band = await repo.GetByAsync<Band>(b => b.Id == command.Id, cancellationToken: cancellationToken)
                 ?? throw new BandNotFoundException(command.Id);

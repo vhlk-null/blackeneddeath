@@ -1,4 +1,7 @@
-﻿namespace Archive.API.Albums.DeleteAlbum
+﻿using Archive.API.Models;
+using Archive.API.Resources.ResourceManagement;
+
+namespace Archive.API.Albums.DeleteAlbums
 {
     public record DeleteAlbumCommand(Guid Id) : ICommand<DeleteAlbumResult>;
     public record DeleteAlbumResult(bool IsSuccess);
@@ -16,7 +19,7 @@
         ILogger<DeleteAlbumCommandHandler> logger)
         : ICommandHandler<DeleteAlbumCommand, DeleteAlbumResult>
     {
-        public async Task<DeleteAlbumResult> Handle(
+        public async ValueTask<DeleteAlbumResult> Handle(
             DeleteAlbumCommand command,
             CancellationToken cancellationToken)
         {

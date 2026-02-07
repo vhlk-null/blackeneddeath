@@ -1,4 +1,6 @@
-﻿namespace Archive.API.Models
+﻿using Archive.API.Models.JoinTables;
+
+namespace Archive.API.Models
 {
     public class Genre
     {
@@ -6,7 +8,7 @@
         public string Name { get; set; } = null!;
 
         public Guid? ParentGenreId { get;set;  }
-        public Genre? ParentGenre { get; set; }
+        public Genre ParentGenre { get; set; }
 
         public ICollection<Genre> SubGenres { get; set; } = null!;
 

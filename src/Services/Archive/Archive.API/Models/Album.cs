@@ -1,4 +1,6 @@
-﻿namespace Archive.API.Models
+﻿using Archive.API.Models.JoinTables;
+
+namespace Archive.API.Models
 {
     public class Album
     {

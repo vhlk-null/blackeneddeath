@@ -1,4 +1,5 @@
 using Archive.API.Bands.GetBands;
+using Archive.API.Models;
 
 namespace Archive.API.Bands.GetBandsBy.GetBandsByCountry
 {
@@ -8,7 +9,7 @@ namespace Archive.API.Bands.GetBandsBy.GetBandsByCountry
     internal class GetBandsByCountryQueryHandler(IRepository<ArchiveContext> repo)
         : IQueryHandler<GetBandsByCountryQuery, GetBandsByCountryResult>
     {
-        public async Task<GetBandsByCountryResult> Handle(GetBandsByCountryQuery query, CancellationToken cancellationToken)
+        public async ValueTask<GetBandsByCountryResult> Handle(GetBandsByCountryQuery query, CancellationToken cancellationToken)
         {
             var bands = await repo.Filter<Band>(b => b.CountryId == query.CountryId)
                 .Include(b => b.Country)

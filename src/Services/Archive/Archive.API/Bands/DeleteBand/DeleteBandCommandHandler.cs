@@ -1,3 +1,6 @@
+using Archive.API.Models;
+using Archive.API.Resources.ResourceManagement;
+
 namespace Archive.API.Bands.DeleteBand
 {
     public record DeleteBandCommand(Guid Id) : ICommand<DeleteBandResult>;
@@ -16,7 +19,7 @@ namespace Archive.API.Bands.DeleteBand
         ILogger<DeleteBandCommandHandler> logger)
         : ICommandHandler<DeleteBandCommand, DeleteBandResult>
     {
-        public async Task<DeleteBandResult> Handle(
+        public async ValueTask<DeleteBandResult> Handle(
             DeleteBandCommand command,
             CancellationToken cancellationToken)
         {

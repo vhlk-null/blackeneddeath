@@ -1,4 +1,7 @@
-﻿namespace Archive.API.Albums.CreateAlbum
+﻿using Archive.API.Models;
+using Archive.API.Resources.ResourceManagement;
+
+namespace Archive.API.Albums.CreateAlbum
 {
     public record CreateAlbumCommand(
         string Title,
@@ -41,7 +44,7 @@
     internal class CreateAlbumCommandHandler(IRepository<ArchiveContext> repo) 
         : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
     {
-        public async Task<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
+        public async ValueTask<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
         {
             var album = new Album
             {

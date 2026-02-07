@@ -1,4 +1,6 @@
-namespace Archive.API.Data.Seeds
+using Archive.API.Models;
+
+namespace Archive.API.Data.Seed
 {
     public static class AlbumSeed
     {

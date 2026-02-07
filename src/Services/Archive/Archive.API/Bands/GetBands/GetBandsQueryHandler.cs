@@ -1,3 +1,4 @@
+using Archive.API.Models;
 using BuildingBlocks.Extentions;
 
 namespace Archive.API.Bands.GetBands
@@ -8,7 +9,7 @@ namespace Archive.API.Bands.GetBands
     public class GetBandsQueryHandler(IRepository<ArchiveContext> repo)
         : IQueryHandler<GetBandsQuery, PagedResult<BandDto>>
     {
-        public async Task<PagedResult<BandDto>> Handle(
+        public async ValueTask<PagedResult<BandDto>> Handle(
             GetBandsQuery query,
             CancellationToken cancellationToken)
         {
