@@ -1,15 +1,12 @@
 ﻿namespace UserContent.API.Data;
 
-using System.Security.Cryptography;
-using System.Text;
-
 public class CachedUserContentRepository : IRepository<UserContentContext>
 {
     private readonly IRepository<UserContentContext> _innerRepository;
     private readonly IDistributedCache _cache;
     private readonly IConnectionMultiplexer _redis;
     private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(30);
-
+  
     public CachedUserContentRepository(
         IRepository<UserContentContext> innerRepository,
         IDistributedCache cache,
@@ -130,10 +127,9 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
 
     private async Task InvalidateCacheForType<T>(Guid? userId = null) where T : class
     {
-        var typeName = typeof(T).Name;
         var pattern = userId.HasValue
-            ? $"UserContent:{userId.Value}:{typeName}:*"
-            : $"UserContent:*:{typeName}:*";
+            ? $"UserContent:{userId.Value}:*"
+            : $"UserContent:*:*";
 
         var server = _redis.GetServers().First();
         var keys = server.Keys(pattern: pattern).ToArray();
@@ -201,12 +197,11 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         params Expression[] includes) where T : class
     {
         var typeName = typeof(T).Name;
-        var filterString = filter.ToString();
         var includesString = string.Join(",", includes.Select(i => i.ToString()));
-        var rawKey = $"{filterString}:{includesString}";
+        var rawKey = $"{typeName}:{includesString}";
         var hash = ComputeDeterministicHash(rawKey);
         var userSegment = userId.HasValue ? userId.Value.ToString() : "shared";
-        return $"UserContent:{userSegment}:{typeName}:{operation}:{hash}";
+        return $"{userSegment}:{typeName}:{operation}:{hash}";
     }
 
     private static string ComputeDeterministicHash(string input)
@@ -253,6 +248,10 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
     public Task<int> CountAsync<T>(CancellationToken cancellationToken = default) where T : class
         => _innerRepository.CountAsync<T>(cancellationToken);
 
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        => _innerRepository.SaveChangesAsync(cancellationToken);
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var result = await _innerRepository.SaveChangesAsync(cancellationToken);
+
+        return result;
+    }   
 }

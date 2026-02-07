@@ -18,3 +18,5 @@ global using UserContent.API.Data;
 global using UserContent.API.Exceptions;
 global using UserContent.API.Extenstions;
 global using UserContent.API.Models;
+global using System.Security.Cryptography;
+global using System.Text;

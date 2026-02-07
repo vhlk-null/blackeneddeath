@@ -16,7 +16,8 @@
       "Bash(Select-Object -First 5)",
       "Bash(powershell -Command:*)",
       "Bash(dir:*)",
-      "Bash(dotnet restore:*)"
+      "Bash(dotnet restore:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

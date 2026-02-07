@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace UserContent.API.Data
+﻿namespace UserContent.API.Data
 {
     public class UserContentContext : DbContext
     {

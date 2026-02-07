@@ -1,6 +1,6 @@
 ﻿namespace UserContent.API.UserContent.FavoriteAlbums.DeleteUserFavoriteAlbums
 {
-    public record DeleteFavoriteAlbumCommand(Guid AlbumId, Guid UserId) : ICommand<DeleteFavoriteAlbumResult>;
+    public record DeleteFavoriteAlbumCommand(Guid UserId, Guid AlbumId) : ICommand<DeleteFavoriteAlbumResult>;
     public record DeleteFavoriteAlbumResult(bool IsSuccess);
 
     public class DeleteFavoriteAlbumCommandValidator : AbstractValidator<DeleteFavoriteAlbumCommand>

@@ -17,10 +17,13 @@
         public static IServiceCollection AddRedisServices(this IServiceCollection services, string connectionString)
         {
             var redisOptions = ConfigurationOptions.Parse(connectionString);
-            redisOptions.AbortOnConnectFail = false; 
+            redisOptions.AbortOnConnectFail = false;
             redisOptions.ConnectTimeout = 10000;
             redisOptions.ConnectRetry = 5;
-            redisOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);           
+            redisOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
+
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+                ConnectionMultiplexer.Connect(redisOptions));
 
             services.AddStackExchangeRedisCache(options =>
             {
