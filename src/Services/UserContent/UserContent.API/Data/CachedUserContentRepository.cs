@@ -6,7 +6,11 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
     private readonly IDistributedCache _cache;
     private readonly IConnectionMultiplexer _redis;
     private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(30);
-  
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        ReferenceHandler = ReferenceHandler.IgnoreCycles
+    };
+
     public CachedUserContentRepository(
         IRepository<UserContentContext> innerRepository,
         IDistributedCache cache,
@@ -33,15 +37,15 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
 
         var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
         if (cached != null)
-            return JsonSerializer.Deserialize<T>(cached);
+            return JsonSerializer.Deserialize<T>(cached, JsonOptions);
 
         var result = await _innerRepository.GetWithIncludesAsync(filter, cancellationToken, includes);
 
         if (result != null)
         {
             await _cache.SetStringAsync(
-                cacheKey, JsonSerializer.Serialize(result), 
-                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration},
+                cacheKey, JsonSerializer.Serialize(result, JsonOptions),
+                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
                 cancellationToken);
         }
 
@@ -61,14 +65,14 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
 
         var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
         if (cached != null)
-            return JsonSerializer.Deserialize<T>(cached);
+            return JsonSerializer.Deserialize<T>(cached, JsonOptions);
 
         var result = await _innerRepository.GetByAsync(expression, asTracked, cancellationToken);
 
         if (result != null)
         {
             await _cache.SetStringAsync(
-                cacheKey, JsonSerializer.Serialize(result),
+                cacheKey, JsonSerializer.Serialize(result, JsonOptions),
                 new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
                 cancellationToken);
         }
@@ -89,47 +93,72 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
 
         var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
         if (cached != null)
-            return JsonSerializer.Deserialize<List<T>>(cached)!;
+            return JsonSerializer.Deserialize<List<T>>(cached, JsonOptions)!;
 
         var result = await _innerRepository.FilterAsync(expression, asTracked, cancellationToken);
 
-        if (result.Any())
-        {
-            await _cache.SetStringAsync(
-                cacheKey, JsonSerializer.Serialize(result),
-                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
-                cancellationToken);
-        }
+        await _cache.SetStringAsync(
+            cacheKey, JsonSerializer.Serialize(result, JsonOptions),
+            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
+            cancellationToken);
 
         return result;
     }
-   
+
     public async Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
     {
         await _innerRepository.AddAsync(entity, cancellationToken);
         var userId = ExtractUserIdFromEntity(entity);
-        await InvalidateCacheForType<T>(userId);
+        await InvalidateCacheForTypeAsync<T>(userId);
+    }
+
+    public async Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default) where T : class
+    {
+        await _innerRepository.AddRangeAsync(entities, cancellationToken);
+        var userId = ExtractUserIdFromEntity(entities.FirstOrDefault());
+        await InvalidateCacheForTypeAsync<T>(userId);
     }
 
     public void Update<T>(T entity) where T : class
     {
         _innerRepository.Update(entity);
         var userId = ExtractUserIdFromEntity(entity);
-        InvalidateCacheForType<T>(userId).GetAwaiter().GetResult();
+        InvalidateCacheForType<T>(userId);
+    }
+
+    public void UpdateRange<T>(IEnumerable<T> entities) where T : class
+    {
+        _innerRepository.UpdateRange(entities);
+        var userId = ExtractUserIdFromEntity(entities.FirstOrDefault());
+        InvalidateCacheForType<T>(userId);
     }
 
     public void Delete<T>(T entity) where T : class
     {
         _innerRepository.Delete(entity);
         var userId = ExtractUserIdFromEntity(entity);
-        InvalidateCacheForType<T>(userId).GetAwaiter().GetResult();
+        InvalidateCacheForType<T>(userId);
     }
 
-    private async Task InvalidateCacheForType<T>(Guid? userId = null) where T : class
+    public void DeleteRange<T>(IEnumerable<T> entities) where T : class
+    {
+        _innerRepository.DeleteRange(entities);
+        var userId = ExtractUserIdFromEntity(entities.FirstOrDefault());
+        InvalidateCacheForType<T>(userId);
+    }
+
+    public async Task DeleteAsync<T>(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default) where T : class
+    {
+        await _innerRepository.DeleteAsync(expression, cancellationToken);
+        var userId = ExtractUserIdFromExpression(expression);
+        await InvalidateCacheForTypeAsync<T>(userId);
+    }
+
+    private async Task InvalidateCacheForTypeAsync<T>(Guid? userId = null) where T : class
     {
         var pattern = userId.HasValue
             ? $"UserContent:{userId.Value}:*"
-            : $"UserContent:*:*";
+            : $"UserContent:*";
 
         var server = _redis.GetServers().First();
         var keys = server.Keys(pattern: pattern).ToArray();
@@ -138,6 +167,22 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         {
             var db = _redis.GetDatabase();
             await db.KeyDeleteAsync(keys);
+        }
+    }
+
+    private void InvalidateCacheForType<T>(Guid? userId = null) where T : class
+    {
+        var pattern = userId.HasValue
+            ? $"UserContent:{userId.Value}:*"
+            : $"UserContent:*";
+
+        var server = _redis.GetServers().First();
+        var keys = server.Keys(pattern: pattern).ToArray();
+
+        if (keys.Length > 0)
+        {
+            var db = _redis.GetDatabase();
+            db.KeyDelete(keys);
         }
     }
 
@@ -182,8 +227,11 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         }
     }
 
-    private static Guid? ExtractUserIdFromEntity<T>(T entity) where T : class
+    private static Guid? ExtractUserIdFromEntity<T>(T? entity) where T : class
     {
+        if (entity is null)
+            return null;
+
         var prop = typeof(T).GetProperty("UserId");
         if (prop?.PropertyType == typeof(Guid))
             return (Guid)prop.GetValue(entity)!;
@@ -197,8 +245,9 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         params Expression[] includes) where T : class
     {
         var typeName = typeof(T).Name;
+        var filterString = filter.ToString();
         var includesString = string.Join(",", includes.Select(i => i.ToString()));
-        var rawKey = $"{typeName}:{includesString}";
+        var rawKey = $"{typeName}:{filterString}:{includesString}";
         var hash = ComputeDeterministicHash(rawKey);
         var userSegment = userId.HasValue ? userId.Value.ToString() : "shared";
         return $"{userSegment}:{typeName}:{operation}:{hash}";
@@ -230,18 +279,6 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         CancellationToken cancellationToken = default) where T : class
         => _innerRepository.AllWithIncludeAsync(includeExpressions, cancellationToken);
 
-    public Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default) where T : class
-        => _innerRepository.AddRangeAsync(entities, cancellationToken);
-
-    public void UpdateRange<T>(IEnumerable<T> entities) where T : class
-        => _innerRepository.UpdateRange(entities);
-
-    public void DeleteRange<T>(IEnumerable<T> entities) where T : class
-        => _innerRepository.DeleteRange(entities);
-
-    public Task DeleteAsync<T>(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default) where T : class
-        => _innerRepository.DeleteAsync(expression, cancellationToken);
-
     public Task<int> CountAsync<T>(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default) where T : class
         => _innerRepository.CountAsync(expression, cancellationToken);
 
@@ -253,5 +290,5 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         var result = await _innerRepository.SaveChangesAsync(cancellationToken);
 
         return result;
-    }   
+    }
 }
