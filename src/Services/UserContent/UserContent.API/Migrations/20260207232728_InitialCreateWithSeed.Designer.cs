@@ -12,7 +12,7 @@ using UserContent.API.Data;
 namespace UserContent.API.Migrations
 {
     [DbContext(typeof(UserContentContext))]
-    [Migration("20260203232713_InitialCreateWithSeed")]
+    [Migration("20260207232728_InitialCreateWithSeed")]
     partial class InitialCreateWithSeed
     {
         /// <inheritdoc />
@@ -38,21 +38,6 @@ namespace UserContent.API.Migrations
                     b.Property<Guid>("AlbumId")
                         .HasColumnType("uuid")
                         .HasColumnName("album_id");
-
-                    b.Property<string>("AlbumTitle")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("album_title");
-
-                    b.Property<string>("CoverUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("cover_url");
-
-                    b.Property<int?>("ReleaseYear")
-                        .HasColumnType("integer")
-                        .HasColumnName("release_year");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -88,26 +73,11 @@ namespace UserContent.API.Migrations
 
                     b.Property<Guid>("BandId")
                         .HasColumnType("uuid")
-                        .HasColumnName("band_id");
-
-                    b.Property<string>("BandName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("band_name");
-
-                    b.Property<int?>("FormedYear")
-                        .HasColumnType("integer")
                         .HasColumnName("formed_year");
 
                     b.Property<bool>("IsFollowing")
                         .HasColumnType("boolean")
                         .HasColumnName("is_following");
-
-                    b.Property<string>("LogoUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("logo_url");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")

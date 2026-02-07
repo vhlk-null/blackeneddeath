@@ -22,8 +22,7 @@
             var favoriteAlbum = new FavoriteAlbum()
             {
                 UserId = request.userId,
-                AlbumId = request.albumId,
-                AlbumTitle = "test"
+                AlbumId = request.albumId
             };
 
             await repo.AddAsync(favoriteAlbum, cancellationToken);

@@ -19,8 +19,7 @@
             var favoriteBand = new FavoriteBand()
             {
                 UserId = request.userId,
-                BandId = request.bandId,
-                BandName = "test"
+                BandId = request.bandId
             };
 
             await repo.AddAsync(favoriteBand, cancellationToken);

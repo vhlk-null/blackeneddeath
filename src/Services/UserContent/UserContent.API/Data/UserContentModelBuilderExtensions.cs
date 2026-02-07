@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace UserContent.API.Data
 {
     public static class UserContentModelBuilderExtensions
@@ -77,18 +75,6 @@ namespace UserContent.API.Data
                 entity.Property(e => e.AlbumId)
                     .HasColumnName("album_id");
 
-                entity.Property(e => e.AlbumTitle)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("album_title");
-
-                entity.Property(e => e.CoverUrl)
-                    .HasMaxLength(500)
-                    .HasColumnName("cover_url");
-
-                entity.Property(e => e.ReleaseYear)
-                    .HasColumnName("release_year");
-
                 entity.Property(e => e.AddedDate)
                     .HasColumnName("added_date");
 
@@ -120,18 +106,7 @@ namespace UserContent.API.Data
                     .HasColumnName("user_id");
 
                 entity.Property(e => e.BandId)
-                    .HasColumnName("band_id");
-
-                entity.Property(e => e.BandName)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("band_name");
-
-                entity.Property(e => e.LogoUrl)
-                    .HasMaxLength(500)
-                    .HasColumnName("logo_url");
-
-                entity.Property(e => e.FormedYear)
+                    .HasColumnName("band_id")
                     .HasColumnName("formed_year");
 
                 entity.Property(e => e.AddedDate)
