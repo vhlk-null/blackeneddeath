@@ -2,15 +2,15 @@
 {
     public class UnitOfWorkBehavior<TRequest, TResponse>(ArchiveContext repo)
     : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : notnull
+        where TRequest : notnull, IMessage
         where TResponse : notnull
     {
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async ValueTask<TResponse> Handle(TRequest message, MessageHandlerDelegate<TRequest, TResponse> next, CancellationToken cancellationToken)
         {
-            if (request is IQuery<TResponse> query)
-                return await next();
+            if (message is IQuery<TResponse> query)
+                return await next(message, cancellationToken);
 
-            var response = await next();
+            var response = await next(message, cancellationToken);
 
             await repo.SaveChangesAsync(cancellationToken);
 
