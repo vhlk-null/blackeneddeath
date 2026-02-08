@@ -43,12 +43,12 @@ namespace UserContent.API.Data
                 entity.Ignore(e => e.ReviewsCount);
 
                 entity.HasMany(e => e.FavoriteBands)
-                    .WithOne()
+                    .WithOne(e => e.User)
                     .HasForeignKey(e => e.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasMany(e => e.FavoriteAlbums)
-                    .WithOne()
+                    .WithOne(e => e.User)
                     .HasForeignKey(e => e.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
 
@@ -74,6 +74,18 @@ namespace UserContent.API.Data
 
                 entity.Property(e => e.AlbumId)
                     .HasColumnName("album_id");
+
+                entity.Property(e => e.AlbumTitle)
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .HasColumnName("album_title");
+
+                entity.Property(e => e.CoverUrl)
+                    .HasMaxLength(500)
+                    .HasColumnName("cover_url");
+
+                entity.Property(e => e.ReleaseDate)
+                    .HasColumnName("release_date");
 
                 entity.Property(e => e.AddedDate)
                     .HasColumnName("added_date");
@@ -106,8 +118,16 @@ namespace UserContent.API.Data
                     .HasColumnName("user_id");
 
                 entity.Property(e => e.BandId)
-                    .HasColumnName("band_id")
-                    .HasColumnName("formed_year");
+                    .HasColumnName("band_id");
+
+                entity.Property(e => e.BandName)
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .HasColumnName("band_name");
+
+                entity.Property(e => e.LogoUrl)
+                    .HasMaxLength(500)
+                    .HasColumnName("logo_url");
 
                 entity.Property(e => e.AddedDate)
                     .HasColumnName("added_date");

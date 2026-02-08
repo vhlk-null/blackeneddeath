@@ -12,7 +12,7 @@ using UserContent.API.Data;
 namespace UserContent.API.Migrations
 {
     [DbContext(typeof(UserContentContext))]
-    [Migration("20260207232728_InitialCreateWithSeed")]
+    [Migration("20260208224250_InitialCreateWithSeed")]
     partial class InitialCreateWithSeed
     {
         /// <inheritdoc />
@@ -38,6 +38,21 @@ namespace UserContent.API.Migrations
                     b.Property<Guid>("AlbumId")
                         .HasColumnType("uuid")
                         .HasColumnName("album_id");
+
+                    b.Property<string>("AlbumTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("album_title");
+
+                    b.Property<string>("CoverUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("cover_url");
+
+                    b.Property<int>("ReleaseDate")
+                        .HasColumnType("integer")
+                        .HasColumnName("release_date");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -73,11 +88,25 @@ namespace UserContent.API.Migrations
 
                     b.Property<Guid>("BandId")
                         .HasColumnType("uuid")
-                        .HasColumnName("formed_year");
+                        .HasColumnName("band_id");
+
+                    b.Property<string>("BandName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("band_name");
 
                     b.Property<bool>("IsFollowing")
                         .HasColumnType("boolean")
                         .HasColumnName("is_following");
+
+                    b.Property<string>("LogoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("logo_url");
+
+                    b.Property<int>("ReleaseDate")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -141,20 +170,24 @@ namespace UserContent.API.Migrations
 
             modelBuilder.Entity("UserContent.API.Models.FavoriteAlbum", b =>
                 {
-                    b.HasOne("UserContent.API.Models.UserProfileInfo", null)
+                    b.HasOne("UserContent.API.Models.UserProfileInfo", "User")
                         .WithMany("FavoriteAlbums")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("UserContent.API.Models.FavoriteBand", b =>
                 {
-                    b.HasOne("UserContent.API.Models.UserProfileInfo", null)
+                    b.HasOne("UserContent.API.Models.UserProfileInfo", "User")
                         .WithMany("FavoriteBands")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("UserContent.API.Models.UserProfileInfo", b =>

@@ -17,12 +17,17 @@
         public async ValueTask<AddAlbumToFavoriteResult> Handle(AddAlbumToFavoriteCommand request, CancellationToken cancellationToken)
         {
             // TODO: add album to favorite user's albums
+            // TODO: add - fetch from Archive.API data about albums via gRPC call
             // TODO: update cache
 
             var favoriteAlbum = new FavoriteAlbum()
             {
                 UserId = request.userId,
-                AlbumId = request.albumId
+                AlbumId = request.albumId,
+                AlbumTitle = string.Empty,
+                CoverUrl = string.Empty,
+                ReleaseDate = 1997,
+                AddedDate = DateTime.UtcNow
             };
 
             await repo.AddAsync(favoriteAlbum, cancellationToken);

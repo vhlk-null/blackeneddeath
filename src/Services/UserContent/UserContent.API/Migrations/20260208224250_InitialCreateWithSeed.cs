@@ -35,6 +35,9 @@ namespace UserContent.API.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     album_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    album_title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    cover_url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    release_date = table.Column<int>(type: "integer", nullable: false),
                     added_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     user_rating = table.Column<int>(type: "integer", nullable: true),
                     user_review = table.Column<string>(type: "text", nullable: true)
@@ -56,8 +59,11 @@ namespace UserContent.API.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    formed_year = table.Column<Guid>(type: "uuid", nullable: false),
+                    band_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    band_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    logo_url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     added_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ReleaseDate = table.Column<int>(type: "integer", nullable: false),
                     is_following = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -88,9 +94,9 @@ namespace UserContent.API.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_favorite_bands_user_id_formed_year",
+                name: "IX_favorite_bands_user_id_band_id",
                 table: "favorite_bands",
-                columns: new[] { "user_id", "formed_year" },
+                columns: new[] { "user_id", "band_id" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
