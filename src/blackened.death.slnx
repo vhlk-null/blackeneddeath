@@ -9,6 +9,9 @@
   <Folder Name="/Services/UserContent/">
     <Project Path="Services/UserContent/UserContent.API/UserContent.API.csproj" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Packages.props" />
+  </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>

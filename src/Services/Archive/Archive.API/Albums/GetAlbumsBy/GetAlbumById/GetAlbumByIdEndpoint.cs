@@ -1,9 +1,8 @@
 ﻿using Archive.API.Albums.GetAlbums;
-using Mediator;
 
 namespace Archive.API.Albums.GetAlbumsBy.GetAlbumById
 {
-    public record GetAlbumByIdRequest(Guid Id) : IRequest<GetAlbumByIdResult>;
+    //public record GetAlbumByIdRequest(Guid Id) : IRequest<GetAlbumByIdResult>;
     public record GetAlbumByIdResponse(AlbumDto Album);
 
     public class GetAlbumByIdEndpoint : ICarterModule
