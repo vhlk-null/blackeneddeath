@@ -8,12 +8,6 @@
 		<DockerfileContext>..\..\..</DockerfileContext>
 		<DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
 	</PropertyGroup>
-	<ItemGroup>
-	  <Compile Remove="Protos\**" />
-	  <Content Remove="Protos\**" />
-	  <EmbeddedResource Remove="Protos\**" />
-	  <None Remove="Protos\**" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<!-- Versions managed centrally -->
@@ -49,5 +43,13 @@
 			<LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>
 			<Generator>ResXFileCodeGenerator</Generator>
 		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="gRPC\Protos\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="gRPC\Protos\archive.proto" GrpcServices="Server" />
 	</ItemGroup>
 </Project>
