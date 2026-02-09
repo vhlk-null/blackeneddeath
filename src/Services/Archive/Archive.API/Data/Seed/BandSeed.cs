@@ -14,6 +14,7 @@ namespace Archive.API.Data.Seed
                     Name = "Darkthrone",
                     Bio = "Norwegian black metal band formed in 1986.",
                     CountryId = SeedConstants.Countries.Norway,
+                    LogoUrl = "https://example.com/logos/darkthrone.png",
                     FormedYear = 1986,
                     Status = BandStatus.Active
                 },
@@ -23,6 +24,7 @@ namespace Archive.API.Data.Seed
                     Name = "Burzum",
                     Bio = "Norwegian black metal solo project by Varg Vikernes.",
                     CountryId = SeedConstants.Countries.Norway,
+                    LogoUrl = "https://example.com/logos/burzum.png",
                     FormedYear = 1991,
                     Status = BandStatus.OnHold
                 },
@@ -32,6 +34,7 @@ namespace Archive.API.Data.Seed
                     Name = "Emperor",
                     Bio = "Norwegian black metal band, pioneers of symphonic black metal.",
                     CountryId = SeedConstants.Countries.Norway,
+                    LogoUrl = "https://example.com/logos/emperor.png",
                     FormedYear = 1991,
                     DisbandedYear = 2001,
                     Status = BandStatus.SplitUp
@@ -42,6 +45,7 @@ namespace Archive.API.Data.Seed
                     Name = "Mayhem",
                     Bio = "Norwegian black metal band, one of the genre's founders.",
                     CountryId = SeedConstants.Countries.Norway,
+                    LogoUrl = "https://example.com/logos/mayhem.png",
                     FormedYear = 1984,
                     Status = BandStatus.Active
                 },
@@ -51,6 +55,7 @@ namespace Archive.API.Data.Seed
                     Name = "Dissection",
                     Bio = "Swedish melodic black/death metal band.",
                     CountryId = SeedConstants.Countries.Sweden,
+                    LogoUrl = "https://example.com/logos/dissection.png",
                     FormedYear = 1989,
                     DisbandedYear = 2006,
                     Status = BandStatus.SplitUp
@@ -61,6 +66,7 @@ namespace Archive.API.Data.Seed
                     Name = "Behemoth",
                     Bio = "Polish blackened death metal band.",
                     CountryId = SeedConstants.Countries.Poland,
+                    LogoUrl = "https://example.com/logos/behemoth.png",
                     FormedYear = 1991,
                     Status = BandStatus.Active
                 }

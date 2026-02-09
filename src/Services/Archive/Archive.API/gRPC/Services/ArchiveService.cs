@@ -1,20 +1,27 @@
-﻿using Archive.Grpc;
+﻿using Archive.API.Models;
+using Archive.Grpc;
 using Grpc.Core;
 
 namespace Archive.API.gRPC.Services
 {
-    public class ArchiveService : ArchiveProtoService.ArchiveProtoServiceBase
+    public class ArchiveService(IRepository<ArchiveContext> repo) : ArchiveProtoService.ArchiveProtoServiceBase
     {
-        private readonly ILogger<ArchiveService> _logger;
-
-        public ArchiveService(ILogger<ArchiveService> logger)
+        public override async Task<GetAlbumResponse> GetAlbumById(GetAlbumRequest request, ServerCallContext context)
         {
-            _logger = logger;
+            var album = await repo.GetByAsync<Album>(a => a.Id == Guid.Parse(request.Id));
+
+            var albumModel = album.Adapt<GetAlbumResponse>();
+
+            return albumModel;
         }
 
-        public override Task<CheckAlbumExistsResponse> CheckAlbumExists(CheckAlbumExistsRequest request, ServerCallContext context)
+        public override async Task<GetBandResponse> GetBandById(GetBandRequest request, ServerCallContext context)
         {
-            return base.CheckAlbumExists(request, context);
+            var band = await repo.GetByAsync<Band>(a => a.Id == Guid.Parse(request.Id));
+
+            var bandModel = band.Adapt<GetBandResponse>();
+
+            return bandModel;
         }
     }
 }
