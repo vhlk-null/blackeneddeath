@@ -47,8 +47,12 @@
   archive.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
+      - Kestrel__Endpoints__Http__Url=http://*:8080
+      - Kestrel__Endpoints__Http__Protocols=Http1AndHttp2
+      - Kestrel__Endpoints__Https__Url=https://*:8081
+      - Kestrel__Endpoints__Https__Protocols=Http1AndHttp2
+      - Kestrel__Endpoints__Grpc__Url=http://*:8082
+      - Kestrel__Endpoints__Grpc__Protocols=Http2
       - ConnectionStrings__ArchiveDb=Host=archivedb;Port=5432;Database=ArchiveDb;Username=postgres;Password=postgres
     depends_on:
       archivedb:
@@ -56,6 +60,7 @@
     ports:
       - "6000:8080"
       - "6001:8081"
+      - "6002:8082"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro

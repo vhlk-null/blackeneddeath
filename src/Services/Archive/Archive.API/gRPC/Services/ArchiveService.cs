@@ -10,14 +10,19 @@ namespace Archive.API.gRPC.Services
         {
             var album = await repo.GetByAsync<Album>(a => a.Id == Guid.Parse(request.Id));
 
-            var albumModel = album.Adapt<GetAlbumResponse>();
+            if (album == null)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request objectd."));
 
+            var albumModel = album.Adapt<GetAlbumResponse>();
             return albumModel;
         }
 
         public override async Task<GetBandResponse> GetBandById(GetBandRequest request, ServerCallContext context)
         {
             var band = await repo.GetByAsync<Band>(a => a.Id == Guid.Parse(request.Id));
+
+            if (band == null)
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request objectd."));
 
             var bandModel = band.Adapt<GetBandResponse>();
 
