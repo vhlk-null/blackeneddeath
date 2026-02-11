@@ -1,4 +1,4 @@
-namespace UserContent.API.Extenstions
+namespace UserContent.API.Extensions
 {
     public static class DatabaseInitializerExtensions
     {

@@ -1,7 +1,7 @@
 using UserContent.API.Data;
 using UserContent.API.Data.Seed;
 
-namespace UserContent.API.Extenstions
+namespace UserContent.API.Extensions
 {
     public static class DatabaseSeeder
     {

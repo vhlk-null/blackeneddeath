@@ -18,9 +18,16 @@ namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
     {
         public async ValueTask<AddAlbumToFavoriteResult> Handle(AddAlbumToFavoriteCommand request, CancellationToken cancellationToken)
         {
-            var albumResponse = protoServiceClient.GetAlbumById(new GetAlbumRequest() { Id = request.albumId.ToString() }, cancellationToken : cancellationToken);
-            
-            var album = albumResponse.Adapt<Album>();
+            var album = await repo.GetByAsync<Album>(a => a.AlbumId == request.albumId, cancellationToken: cancellationToken);
+
+            if (album is null)
+            {
+                var albumResponse = protoServiceClient.GetAlbumById(new GetAlbumRequest() { Id = request.albumId.ToString() }, cancellationToken: cancellationToken);
+                
+                album = albumResponse.Adapt<Album>();
+                
+                await repo.AddAsync(album, cancellationToken);
+            }
 
             var favoriteAlbum = new FavoriteAlbum()
             {

@@ -1,6 +1,6 @@
 ﻿using Archive.Grpc;
 
-namespace UserContent.API.Extenstions
+namespace UserContent.API.Extensions
 {
     public static class ServiceCollectionExtensions
     {

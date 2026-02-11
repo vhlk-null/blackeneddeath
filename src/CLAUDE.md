@@ -46,12 +46,13 @@ dotnet ef migrations remove
 |------------------|-----------|----------------|-----------|
 | Archive.API HTTP | 6000      | 8080           | HTTP/1+2  |
 | Archive.API HTTPS| 6001      | 8081           | HTTP/1+2  |
-| Archive.API gRPC | 6002      | 8082           | HTTP/2    |
 | UserContent HTTP | 6010      | 8080           | HTTP      |
 | UserContent HTTPS| 6011      | 8081           | HTTPS     |
 | ArchiveDb        | 5432      | 5432           | PostgreSQL|
 | UserContentDB    | 5433      | 5432           | PostgreSQL|
 | Redis            | 6379      | 6379           | Redis     |
+
+Archive.API serves both REST and gRPC on the same ports (HTTP/1+2 via Kestrel `EndpointDefaults`). No separate gRPC port.
 
 Database credentials: `postgres/postgres` for both databases.
 
@@ -88,6 +89,8 @@ Same vertical slice pattern. Feature folders under `UserContent/` (FavoriteAlbum
 
 Acts as **gRPC client** — references Archive.API's proto file to validate albums/bands exist before adding to favorites. The `.csproj` links the proto with `GrpcServices="Client"`.
 
+**Data model**: Many-to-many between `UserProfileInfo` ↔ `Album` (via `FavoriteAlbum` join table) and `UserProfileInfo` ↔ `Band` (via `FavoriteBand` join table). `Album` and `Band` are local entities mirroring Archive.API data. Join tables use composite PKs `(UserId, AlbumId/BandId)` with payload columns (AddedDate, UserRating, etc.). Bidirectional navigation properties on all entities.
+
 **Caching**: Decorator pattern via Scrutor — `CachedUserContentRepository` wraps `UserContentRepository`. Reads cached 30 min via Redis. Mutations invalidate all cache keys for the entity type using Redis `KEYS` pattern scan.
 
 ## Architecture Patterns
@@ -107,7 +110,7 @@ All NuGet versions are centrally managed. To add a package:
 Both services use `DatabaseInitializerExtensions.InitializeDatabaseAsync()` — applies EF migrations then seeds data via `DatabaseSeeder`. Only runs in Development environment. Seeding checks for existing data and uses transactions.
 
 ### Inter-Service Communication
-UserContent.API → Archive.API via gRPC. When adding a favorite album/band, UserContent.API calls Archive.API's gRPC service to verify the entity exists, then maps the response to a local model.
+UserContent.API → Archive.API via gRPC on the same port as REST (HTTP/2 content-type negotiation). When adding a favorite album/band, UserContent.API calls Archive.API's gRPC service to verify the entity exists, then maps the response to a local model.
 
 ## Key Conventions
 
@@ -122,3 +125,5 @@ UserContent.API → Archive.API via gRPC. When adding a favorite album/band, Use
 - **BuildingBlocks folder typo**: `Extentions/` (different typo) — also follow as-is
 - **Validation messages**: Archive.API uses `.resx` resource files (`Resources/ResourceFiles/ValidationMessages`); UserContent.API uses inline strings
 - **Exception types**: Each service defines its own (e.g., `AlbumNotFoundException`, `FavoriteAlbumNotFoundException`), inheriting from BuildingBlocks base exceptions
+- **Join tables**: Use composite PKs (no surrogate `Id`), bidirectional nav props, configured via `HasOne().WithMany().HasForeignKey()` in `UserContentModelBuilderExtensions`
+- **EF column naming**: All columns use explicit snake_case `HasColumnName()` — never rely on EF conventions
