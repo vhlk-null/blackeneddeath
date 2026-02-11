@@ -10,27 +10,6 @@ namespace UserContent.API.Data.Seed
             public static readonly Guid BlastBeatLover = Guid.Parse("d0000000-0000-0000-0000-000000000003");
         }
 
-        // Favorite Albums
-        public static class FavoriteAlbums
-        {
-            public static readonly Guid MetalHead666_TransilvanianHunger = Guid.Parse("e0000000-0000-0000-0000-000000000001");
-            public static readonly Guid MetalHead666_Filosofem = Guid.Parse("e0000000-0000-0000-0000-000000000002");
-            public static readonly Guid DarkSoulFan_NightsideEclipse = Guid.Parse("e0000000-0000-0000-0000-000000000003");
-            public static readonly Guid DarkSoulFan_DeMysteriis = Guid.Parse("e0000000-0000-0000-0000-000000000004");
-            public static readonly Guid BlastBeatLover_TheSatanist = Guid.Parse("e0000000-0000-0000-0000-000000000005");
-        }
-
-        // Favorite Bands
-        public static class FavoriteBands
-        {
-            public static readonly Guid MetalHead666_Darkthrone = Guid.Parse("f0000000-0000-0000-0000-000000000001");
-            public static readonly Guid MetalHead666_Burzum = Guid.Parse("f0000000-0000-0000-0000-000000000002");
-            public static readonly Guid DarkSoulFan_Emperor = Guid.Parse("f0000000-0000-0000-0000-000000000003");
-            public static readonly Guid DarkSoulFan_Mayhem = Guid.Parse("f0000000-0000-0000-0000-000000000004");
-            public static readonly Guid BlastBeatLover_Behemoth = Guid.Parse("f0000000-0000-0000-0000-000000000005");
-            public static readonly Guid BlastBeatLover_Dissection = Guid.Parse("f0000000-0000-0000-0000-000000000006");
-        }
-
         // Reference to Archive.API album IDs (must match Archive seed data)
         public static class ArchiveAlbums
         {

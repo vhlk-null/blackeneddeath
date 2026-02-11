@@ -69,6 +69,7 @@
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__UserContentDB=Host=usercontentdb;Port=5432;Database=UserContentDB;Username=postgres;Password=postgres
       - ConnectionStrings__Redis=distributedcache:6379,abortConnect=false
+      - GrpcSettings__ArchiveUrl=http://archive.api:8080
     depends_on:
       usercontentdb:
         condition: service_healthy

@@ -16,7 +16,7 @@ namespace Archive.API.Data.Seed
                     Type = AlbumType.FullLength,
                     Format = AlbumFormat.CD,
                     Label = "Peaceville Records",
-                    CoverUrl = null
+                    CoverUrl = "https://example.com/covers/transilvanian-hunger.jpg"
                 },
                 new Album
                 {
@@ -26,7 +26,7 @@ namespace Archive.API.Data.Seed
                     Type = AlbumType.FullLength,
                     Format = AlbumFormat.CD,
                     Label = "Misanthropy Records",
-                    CoverUrl = null
+                    CoverUrl = "https://example.com/covers/filosofem.jpg"
                 },
                 new Album
                 {
@@ -36,7 +36,7 @@ namespace Archive.API.Data.Seed
                     Type = AlbumType.FullLength,
                     Format = AlbumFormat.CD,
                     Label = "Candlelight Records",
-                    CoverUrl = null
+                    CoverUrl = "https://example.com/covers/in-the-nightside-eclipse.jpg"
                 },
                 new Album
                 {
@@ -46,7 +46,7 @@ namespace Archive.API.Data.Seed
                     Type = AlbumType.FullLength,
                     Format = AlbumFormat.CD,
                     Label = "Deathlike Silence Productions",
-                    CoverUrl = null
+                    CoverUrl = "https://example.com/covers/de-mysteriis-dom-sathanas.jpg"
                 },
                 new Album
                 {
@@ -56,7 +56,7 @@ namespace Archive.API.Data.Seed
                     Type = AlbumType.FullLength,
                     Format = AlbumFormat.CD,
                     Label = "Nuclear Blast",
-                    CoverUrl = null
+                    CoverUrl = "https://example.com/covers/storm-of-the-lights-bane.jpg"
                 },
                 new Album
                 {
@@ -66,7 +66,7 @@ namespace Archive.API.Data.Seed
                     Type = AlbumType.FullLength,
                     Format = AlbumFormat.CD,
                     Label = "Nuclear Blast",
-                    CoverUrl = null
+                    CoverUrl = "https://example.com/covers/the-satanist.jpg"
                 }
             };
         }

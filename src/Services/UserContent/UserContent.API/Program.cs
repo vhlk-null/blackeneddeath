@@ -7,6 +7,9 @@ var dbConnection = builder.Configuration.GetConnectionString(ConnectionStrings.U
 var redisConnection = builder.Configuration.GetConnectionString(ConnectionStrings.Redis) 
     ?? throw new InvalidOperationException($"{ConnectionStrings.Redis} is missing");
 
+var gRpcConnection = builder.Configuration[ConnectionStrings.GrpcSettings]
+                      ?? throw new InvalidOperationException($"{ConnectionStrings.GrpcSettings} is missing");
+
 // ===== SERVICES =====
 builder.Services
     .AddDatabaseServices(dbConnection)
@@ -14,6 +17,7 @@ builder.Services
     .AddHealthCheckServices(dbConnection, redisConnection)
     .AddRepositoryServices()
     .AddMediatorServices()
+    .AddGrpcServices(gRpcConnection)
     .AddValidationServices();
 
 builder.Services.AddCarter();

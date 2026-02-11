@@ -12,6 +12,7 @@ builder.Services
     .AddDatabaseServices(dbConnection)
     .AddRepositoryServices()
     .AddMediatorServices()
+    .AddGrpcServices()
     .AddValidationServices()
     .AddHealthCheckServices(dbConnection)
     .AddApiDocumentation();
@@ -31,6 +32,7 @@ app.UseExceptionHandler();
 
 // Endpoints
 app.MapCarter();
+app.MapGrpcService<ArchiveService>();
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse

@@ -1,6 +1,4 @@
-﻿using BuildingBlocks.Exceptions;
-
-namespace UserContent.API.Exceptions
+﻿namespace UserContent.API.Exceptions
 {
     public class FavoriteAlbumNotFoundException : NotFoundException
     {

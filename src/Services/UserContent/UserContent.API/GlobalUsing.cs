@@ -17,7 +17,7 @@ global using System.Text.Json.Serialization;
 global using UserContent.API.Constants;
 global using UserContent.API.Data;
 global using UserContent.API.Exceptions;
-global using UserContent.API.Extenstions;
+global using UserContent.API.Extensions;
 global using UserContent.API.Models;
 global using System.Security.Cryptography;
 global using System.Text;

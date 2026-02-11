@@ -29,7 +29,7 @@
         }
 
         public static IServiceCollection AddValidationServices(this IServiceCollection services)
-        {            
+        {
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             return services;
         }
@@ -54,6 +54,13 @@
         {
             services.AddScoped<IRepository<ArchiveContext>, ArchiveRepository>();
 
+            return services;
+        }
+
+
+        public static IServiceCollection AddGrpcServices(this IServiceCollection services)
+        {
+            services.AddGrpc();
             return services;
         }
     }

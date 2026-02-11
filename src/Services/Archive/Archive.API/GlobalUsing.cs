@@ -1,6 +1,7 @@
 ﻿global using Archive.API.Data;
 global using Archive.API.Exceptions;
 global using Archive.API.Extenstions;
+global using Archive.API.gRPC.Services;
 global using Archive.API.Mappings;
 global using BuildingBlocks.Behaviors;
 global using BuildingBlocks.Exceptions;

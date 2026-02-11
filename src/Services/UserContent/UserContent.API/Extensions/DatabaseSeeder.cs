@@ -1,7 +1,7 @@
 using UserContent.API.Data;
 using UserContent.API.Data.Seed;
 
-namespace UserContent.API.Extenstions
+namespace UserContent.API.Extensions
 {
     public static class DatabaseSeeder
     {
@@ -50,15 +50,15 @@ namespace UserContent.API.Extenstions
         private static async Task<bool> IsAlreadySeededAsync(UserContentContext context)
         {
             var hasUserProfiles = await context.UserProfiles.AnyAsync();
-            var hasFavoriteAlbums = await context.FavoriteAlbums.AnyAsync();
-            var hasFavoriteBands = await context.FavoriteBands.AnyAsync();
+            var hasAlbums = await context.Albums.AnyAsync();
+            var hasBands = await context.Bands.AnyAsync();
 
-            return hasUserProfiles && hasFavoriteAlbums && hasFavoriteBands;
+            return hasUserProfiles && hasAlbums && hasBands;
         }
 
         private static async Task SeedEntitiesAsync(UserContentContext context, ILogger logger)
         {
-            // Seed in dependency order: UserProfiles first (parent), then favorites
+            // Seed in dependency order: UserProfiles, Albums, Bands first, then join tables
 
             if (!await context.UserProfiles.AnyAsync())
             {
@@ -66,6 +66,22 @@ namespace UserContent.API.Extenstions
                 await context.UserProfiles.AddRangeAsync(UserProfileSeed.GetUserProfiles());
                 await context.SaveChangesAsync();
                 logger.LogInformation("UserProfiles seeded successfully!");
+            }
+
+            if (!await context.Albums.AnyAsync())
+            {
+                logger.LogInformation("Seeding Albums...");
+                await context.Albums.AddRangeAsync(AlbumSeed.GetAlbums());
+                await context.SaveChangesAsync();
+                logger.LogInformation("Albums seeded successfully!");
+            }
+
+            if (!await context.Bands.AnyAsync())
+            {
+                logger.LogInformation("Seeding Bands...");
+                await context.Bands.AddRangeAsync(BandSeed.GetBands());
+                await context.SaveChangesAsync();
+                logger.LogInformation("Bands seeded successfully!");
             }
 
             if (!await context.FavoriteAlbums.AnyAsync())
