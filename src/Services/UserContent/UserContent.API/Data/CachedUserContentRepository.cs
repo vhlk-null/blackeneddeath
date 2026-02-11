@@ -5,6 +5,7 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
     private readonly IRepository<UserContentContext> _innerRepository;
     private readonly IDistributedCache _cache;
     private readonly IConnectionMultiplexer _redis;
+    private readonly ILogger<CachedUserContentRepository> _logger;
     private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(30);
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -14,11 +15,13 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
     public CachedUserContentRepository(
         IRepository<UserContentContext> innerRepository,
         IDistributedCache cache,
-        IConnectionMultiplexer redis)
+        IConnectionMultiplexer redis,
+        ILogger<CachedUserContentRepository> logger)
     {
         _innerRepository = innerRepository;
         _cache = cache;
         _redis = redis;
+        _logger = logger;
     }
 
     public UserContentContext Context
@@ -35,18 +38,32 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         var userId = ExtractUserIdFromExpression(filter);
         var cacheKey = GenerateCacheKey<T>(nameof(GetWithIncludesAsync), userId, filter, includes);
 
-        var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
-        if (cached != null)
-            return JsonSerializer.Deserialize<T>(cached, JsonOptions);
+        try
+        {
+            var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
+            if (cached != null)
+                return JsonSerializer.Deserialize<T>(cached, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Cache read failed for key {CacheKey}", cacheKey);
+        }
 
         var result = await _innerRepository.GetWithIncludesAsync(filter, cancellationToken, includes);
 
         if (result != null)
         {
-            await _cache.SetStringAsync(
-                cacheKey, JsonSerializer.Serialize(result, JsonOptions),
-                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
-                cancellationToken);
+            try
+            {
+                await _cache.SetStringAsync(
+                    cacheKey, JsonSerializer.Serialize(result, JsonOptions),
+                    new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
+                    cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Cache write failed for key {CacheKey}", cacheKey);
+            }
         }
 
         return result;
@@ -63,18 +80,32 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         var userId = ExtractUserIdFromExpression(expression);
         var cacheKey = GenerateCacheKey<T>(nameof(GetByAsync), userId, expression);
 
-        var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
-        if (cached != null)
-            return JsonSerializer.Deserialize<T>(cached, JsonOptions);
+        try
+        {
+            var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
+            if (cached != null)
+                return JsonSerializer.Deserialize<T>(cached, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Cache read failed for key {CacheKey}", cacheKey);
+        }
 
         var result = await _innerRepository.GetByAsync(expression, asTracked, cancellationToken);
 
         if (result != null)
         {
-            await _cache.SetStringAsync(
-                cacheKey, JsonSerializer.Serialize(result, JsonOptions),
-                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
-                cancellationToken);
+            try
+            {
+                await _cache.SetStringAsync(
+                    cacheKey, JsonSerializer.Serialize(result, JsonOptions),
+                    new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
+                    cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Cache write failed for key {CacheKey}", cacheKey);
+            }
         }
 
         return result;
@@ -91,16 +122,30 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         var userId = ExtractUserIdFromExpression(expression);
         var cacheKey = GenerateCacheKey<T>(nameof(FilterAsync), userId, expression);
 
-        var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
-        if (cached != null)
-            return JsonSerializer.Deserialize<List<T>>(cached, JsonOptions)!;
+        try
+        {
+            var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
+            if (cached != null)
+                return JsonSerializer.Deserialize<List<T>>(cached, JsonOptions)!;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Cache read failed for key {CacheKey}", cacheKey);
+        }
 
         var result = await _innerRepository.FilterAsync(expression, asTracked, cancellationToken);
 
-        await _cache.SetStringAsync(
-            cacheKey, JsonSerializer.Serialize(result, JsonOptions),
-            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
-            cancellationToken);
+        try
+        {
+            await _cache.SetStringAsync(
+                cacheKey, JsonSerializer.Serialize(result, JsonOptions),
+                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Cache write failed for key {CacheKey}", cacheKey);
+        }
 
         return result;
     }
@@ -251,7 +296,7 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         var rawKey = $"{typeName}:{filterString}:{includesString}";
         var hash = ComputeDeterministicHash(rawKey);
         var userSegment = userId.HasValue ? userId.Value.ToString() : "shared";
-        return $"{typeName}:{operation}:{userSegment}:{hash}";
+        return $"{userSegment}:{typeName}:{operation}:{hash}";
     }
 
     private sealed class ClosureValueResolvingVisitor : ExpressionVisitor

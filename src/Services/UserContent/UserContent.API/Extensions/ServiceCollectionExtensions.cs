@@ -33,12 +33,12 @@ namespace UserContent.API.Extensions
             redisOptions.ConnectRetry = 5;
             redisOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
 
-            services.AddSingleton<IConnectionMultiplexer>(sp =>
-                ConnectionMultiplexer.Connect(redisOptions));
+            var multiplexer = ConnectionMultiplexer.Connect(redisOptions);
+            services.AddSingleton<IConnectionMultiplexer>(multiplexer);
 
             services.AddStackExchangeRedisCache(options =>
             {
-                options.ConfigurationOptions = redisOptions;
+                options.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(multiplexer);
                 options.InstanceName = "UserContent:";
             });
 
