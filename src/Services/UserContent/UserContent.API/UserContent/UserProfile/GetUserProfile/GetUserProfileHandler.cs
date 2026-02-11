@@ -16,14 +16,12 @@
     {
         public async ValueTask<GetUserProfileResult> Handle(GetUserProfileQuery query, CancellationToken cancellationToken)
         {
-            // TODO: get user from database
-
             var userProfile = await repo.GetWithIncludesAsync<UserProfileInfo>(
-                a => a.UserId == query.UserId, 
+                a => a.UserId == query.UserId,
                 cancellationToken,
                 [
-                    a=> a.FavoriteAlbums,
-                    a=> a.FavoriteBands
+                    a => a.FavoriteAlbums,
+                    a => a.FavoriteBands
                 ]);
 
             return new GetUserProfileResult(userProfile);

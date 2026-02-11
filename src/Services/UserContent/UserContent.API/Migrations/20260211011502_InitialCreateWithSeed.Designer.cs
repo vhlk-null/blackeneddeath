@@ -12,7 +12,7 @@ using UserContent.API.Data;
 namespace UserContent.API.Migrations
 {
     [DbContext(typeof(UserContentContext))]
-    [Migration("20260208224250_InitialCreateWithSeed")]
+    [Migration("20260211011502_InitialCreateWithSeed")]
     partial class InitialCreateWithSeed
     {
         /// <inheritdoc />
@@ -25,16 +25,8 @@ namespace UserContent.API.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("UserContent.API.Models.FavoriteAlbum", b =>
+            modelBuilder.Entity("UserContent.API.Models.Album", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("AddedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("added_date");
-
                     b.Property<Guid>("AlbumId")
                         .HasColumnType("uuid")
                         .HasColumnName("album_id");
@@ -54,38 +46,13 @@ namespace UserContent.API.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("release_date");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                    b.HasKey("AlbumId");
 
-                    b.Property<int?>("UserRating")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_rating");
-
-                    b.Property<string>("UserReview")
-                        .HasColumnType("text")
-                        .HasColumnName("user_review");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("UserId", "AlbumId")
-                        .IsUnique();
-
-                    b.ToTable("favorite_albums", (string)null);
+                    b.ToTable("albums", (string)null);
                 });
 
-            modelBuilder.Entity("UserContent.API.Models.FavoriteBand", b =>
+            modelBuilder.Entity("UserContent.API.Models.Band", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("AddedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("added_date");
-
                     b.Property<Guid>("BandId")
                         .HasColumnType("uuid")
                         .HasColumnName("band_id");
@@ -96,28 +63,70 @@ namespace UserContent.API.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("band_name");
 
-                    b.Property<bool>("IsFollowing")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_following");
-
                     b.Property<string>("LogoUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
                         .HasColumnName("logo_url");
 
                     b.Property<int>("ReleaseDate")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("release_date");
 
+                    b.HasKey("BandId");
+
+                    b.ToTable("bands", (string)null);
+                });
+
+            modelBuilder.Entity("UserContent.API.Models.FavoriteAlbum", b =>
+                {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.HasKey("Id");
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("album_id");
 
-                    b.HasIndex("UserId");
+                    b.Property<DateTime>("AddedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("added_date");
 
-                    b.HasIndex("UserId", "BandId")
-                        .IsUnique();
+                    b.Property<int?>("UserRating")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_rating");
+
+                    b.Property<string>("UserReview")
+                        .HasColumnType("text")
+                        .HasColumnName("user_review");
+
+                    b.HasKey("UserId", "AlbumId");
+
+                    b.HasIndex("AlbumId");
+
+                    b.ToTable("favorite_albums", (string)null);
+                });
+
+            modelBuilder.Entity("UserContent.API.Models.FavoriteBand", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<Guid>("BandId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("band_id");
+
+                    b.Property<DateTime>("AddedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("added_date");
+
+                    b.Property<bool>("IsFollowing")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_following");
+
+                    b.HasKey("UserId", "BandId");
+
+                    b.HasIndex("BandId");
 
                     b.ToTable("favorite_bands", (string)null);
                 });
@@ -170,24 +179,50 @@ namespace UserContent.API.Migrations
 
             modelBuilder.Entity("UserContent.API.Models.FavoriteAlbum", b =>
                 {
+                    b.HasOne("UserContent.API.Models.Album", "Album")
+                        .WithMany("FavoriteAlbums")
+                        .HasForeignKey("AlbumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("UserContent.API.Models.UserProfileInfo", "User")
                         .WithMany("FavoriteAlbums")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Album");
+
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("UserContent.API.Models.FavoriteBand", b =>
                 {
+                    b.HasOne("UserContent.API.Models.Band", "Band")
+                        .WithMany("FavoriteBands")
+                        .HasForeignKey("BandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("UserContent.API.Models.UserProfileInfo", "User")
                         .WithMany("FavoriteBands")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Band");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("UserContent.API.Models.Album", b =>
+                {
+                    b.Navigation("FavoriteAlbums");
+                });
+
+            modelBuilder.Entity("UserContent.API.Models.Band", b =>
+                {
+                    b.Navigation("FavoriteBands");
                 });
 
             modelBuilder.Entity("UserContent.API.Models.UserProfileInfo", b =>

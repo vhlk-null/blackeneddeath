@@ -12,6 +12,34 @@ namespace UserContent.API.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "albums",
+                columns: table => new
+                {
+                    album_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    album_title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    cover_url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    release_date = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_albums", x => x.album_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "bands",
+                columns: table => new
+                {
+                    band_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    band_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    logo_url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    release_date = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_bands", x => x.band_id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "user_profiles",
                 columns: table => new
                 {
@@ -32,19 +60,21 @@ namespace UserContent.API.Migrations
                 name: "favorite_albums",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     album_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    album_title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    cover_url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    release_date = table.Column<int>(type: "integer", nullable: false),
                     added_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     user_rating = table.Column<int>(type: "integer", nullable: true),
                     user_review = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_favorite_albums", x => x.id);
+                    table.PrimaryKey("PK_favorite_albums", x => new { x.user_id, x.album_id });
+                    table.ForeignKey(
+                        name: "FK_favorite_albums_albums_album_id",
+                        column: x => x.album_id,
+                        principalTable: "albums",
+                        principalColumn: "album_id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_favorite_albums_user_profiles_user_id",
                         column: x => x.user_id,
@@ -57,18 +87,20 @@ namespace UserContent.API.Migrations
                 name: "favorite_bands",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     band_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    band_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    logo_url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     added_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ReleaseDate = table.Column<int>(type: "integer", nullable: false),
                     is_following = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_favorite_bands", x => x.id);
+                    table.PrimaryKey("PK_favorite_bands", x => new { x.user_id, x.band_id });
+                    table.ForeignKey(
+                        name: "FK_favorite_bands_bands_band_id",
+                        column: x => x.band_id,
+                        principalTable: "bands",
+                        principalColumn: "band_id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_favorite_bands_user_profiles_user_id",
                         column: x => x.user_id,
@@ -78,26 +110,14 @@ namespace UserContent.API.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_favorite_albums_user_id",
+                name: "IX_favorite_albums_album_id",
                 table: "favorite_albums",
-                column: "user_id");
+                column: "album_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_favorite_albums_user_id_album_id",
-                table: "favorite_albums",
-                columns: new[] { "user_id", "album_id" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_favorite_bands_user_id",
+                name: "IX_favorite_bands_band_id",
                 table: "favorite_bands",
-                column: "user_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_favorite_bands_user_id_band_id",
-                table: "favorite_bands",
-                columns: new[] { "user_id", "band_id" },
-                unique: true);
+                column: "band_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_user_profiles_email",
@@ -120,6 +140,12 @@ namespace UserContent.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "favorite_bands");
+
+            migrationBuilder.DropTable(
+                name: "albums");
+
+            migrationBuilder.DropTable(
+                name: "bands");
 
             migrationBuilder.DropTable(
                 name: "user_profiles");

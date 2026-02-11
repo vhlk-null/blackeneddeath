@@ -37,43 +37,27 @@ namespace UserContent.API.Data
                 entity.Property(e => e.Bio)
                     .HasColumnType("text")
                     .HasColumnName("bio");
-                
+
                 entity.Ignore(e => e.FavoriteBandsCount);
                 entity.Ignore(e => e.FavoriteAlbumsCount);
                 entity.Ignore(e => e.ReviewsCount);
-
-                entity.HasMany(e => e.FavoriteBands)
-                    .WithOne(e => e.User)
-                    .HasForeignKey(e => e.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasMany(e => e.FavoriteAlbums)
-                    .WithOne(e => e.User)
-                    .HasForeignKey(e => e.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasIndex(e => e.Username).IsUnique();
                 entity.HasIndex(e => e.Email).IsUnique();
             });
         }
 
-        public static void SetupFavoriteAlbum(this ModelBuilder modelBuilder)
+        public static void SetupAlbum(this ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<FavoriteAlbum>(entity =>
+            modelBuilder.Entity<Album>(entity =>
             {
-                entity.ToTable("favorite_albums");
+                entity.ToTable("albums");
 
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("id")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.UserId)
-                    .HasColumnName("user_id");
+                entity.HasKey(e => e.AlbumId);
 
                 entity.Property(e => e.AlbumId)
-                    .HasColumnName("album_id");
+                    .HasColumnName("album_id")
+                    .ValueGeneratedNever();
 
                 entity.Property(e => e.AlbumTitle)
                     .IsRequired()
@@ -86,6 +70,48 @@ namespace UserContent.API.Data
 
                 entity.Property(e => e.ReleaseDate)
                     .HasColumnName("release_date");
+            });
+        }
+
+        public static void SetupBand(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Band>(entity =>
+            {
+                entity.ToTable("bands");
+
+                entity.HasKey(e => e.BandId);
+
+                entity.Property(e => e.BandId)
+                    .HasColumnName("band_id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.BandName)
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .HasColumnName("band_name");
+
+                entity.Property(e => e.LogoUrl)
+                    .HasMaxLength(500)
+                    .HasColumnName("logo_url");
+
+                entity.Property(e => e.ReleaseDate)
+                    .HasColumnName("release_date");
+            });
+        }
+
+        public static void SetupFavoriteAlbum(this ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<FavoriteAlbum>(entity =>
+            {
+                entity.ToTable("favorite_albums");
+
+                entity.HasKey(e => new { e.UserId, e.AlbumId });
+
+                entity.Property(e => e.UserId)
+                    .HasColumnName("user_id");
+
+                entity.Property(e => e.AlbumId)
+                    .HasColumnName("album_id");
 
                 entity.Property(e => e.AddedDate)
                     .HasColumnName("added_date");
@@ -97,8 +123,15 @@ namespace UserContent.API.Data
                     .HasColumnType("text")
                     .HasColumnName("user_review");
 
-                entity.HasIndex(e => new { e.UserId, e.AlbumId }).IsUnique();
-                entity.HasIndex(e => e.UserId);
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.FavoriteAlbums)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Album)
+                    .WithMany(a => a.FavoriteAlbums)
+                    .HasForeignKey(e => e.AlbumId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
 
@@ -108,11 +141,7 @@ namespace UserContent.API.Data
             {
                 entity.ToTable("favorite_bands");
 
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("id")
-                    .ValueGeneratedNever();
+                entity.HasKey(e => new { e.UserId, e.BandId });
 
                 entity.Property(e => e.UserId)
                     .HasColumnName("user_id");
@@ -120,23 +149,21 @@ namespace UserContent.API.Data
                 entity.Property(e => e.BandId)
                     .HasColumnName("band_id");
 
-                entity.Property(e => e.BandName)
-                    .IsRequired()
-                    .HasMaxLength(200)
-                    .HasColumnName("band_name");
-
-                entity.Property(e => e.LogoUrl)
-                    .HasMaxLength(500)
-                    .HasColumnName("logo_url");
-
                 entity.Property(e => e.AddedDate)
                     .HasColumnName("added_date");
 
                 entity.Property(e => e.IsFollowing)
                     .HasColumnName("is_following");
 
-                entity.HasIndex(e => new { e.UserId, e.BandId }).IsUnique();
-                entity.HasIndex(e => e.UserId);
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.FavoriteBands)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Band)
+                    .WithMany(b => b.FavoriteBands)
+                    .HasForeignKey(e => e.BandId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

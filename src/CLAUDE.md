@@ -4,178 +4,121 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a .NET 10.0 microservices-based application for managing a music archive (albums, bands, tracks, genres). The solution follows Clean Architecture principles with CQRS pattern and vertical slice architecture.
+.NET 10.0 microservices application for managing a music archive (albums, bands, tracks, genres). Uses Clean Architecture with CQRS pattern and vertical slice architecture.
 
 ## Technology Stack
 
-- **.NET 10.0** - Primary framework
-- **PostgreSQL 16** - Database (via Npgsql and EF Core 10)
-- **Entity Framework Core 10.0.2** - ORM with migrations
-- **Redis 7** - Distributed caching (UserContent.API)
-- **Mediator 3.0.1** (`martinothamar/Mediator`) - Source-generated CQRS implementation (replaces MediatR)
-- **Carter 10.0.0** - Minimal API routing
-- **FluentValidation 12.1.1** - Request validation
-- **Mapster 7.4.0** - Object mapping (Archive.API uses explicit `MappingConfig`)
-- **StackExchange.Redis** - Redis client for caching and cache invalidation
-- **Docker & Docker Compose** - Containerization
-
-## Solution Structure
-
-### BuildingBlocks Project
-Shared infrastructure library containing:
-- **CQRS Abstractions**: `ICommand<TResponse>`, `IQuery<TResponse>`, `ICommandHandler<,>`, `IQueryHandler<,>` (wrapping `Mediator` interfaces)
-- **Repository Pattern**: Generic `IRepository<TContext>` with `BaseGenericRepository<T>` implementation
-- **Pipeline Behaviors**: `LoggingBehavior<,>`, `ValidationBehavior<,>`, `UnitOfWorkBehavior<,>` (using `Mediator.IPipelineBehavior`)
-- **Pagination**: `PagedQuery<T>`, `PagedResult<T>`, and `QueryableExtensions.ToPagedResultAsync()` in `Extentions/`
-- **Global Exception Handling**: `GlobalExceptionHandler` in `Exceptions/`
-
-### Archive.API Service
-Main service for music archive data following vertical slice architecture:
-- **Feature Folders**: Each feature (GetAlbums, CreateAlbum, etc.) contains its endpoint, handler, validators, DTOs in one folder
-- **Endpoints**: Carter modules using minimal APIs (pattern: `{Feature}Endpoint.cs`)
-- **Handlers**: Mediator handlers (pattern: `{Feature}Handler.cs` or `{Feature}QueryHandler.cs`/`{Feature}CommandHandler.cs`)
-- **Data Layer**: EF Core context (`ArchiveContext`), repository implementation (`ArchiveRepository`)
-- **DI Extensions**: `ServiceCollectionDIExtensions` with `InjectValidators()` and `InjectServices()` methods
-- **Mapping Config**: `Mappings/MappingConfig.cs` — explicit Mapster type mapping registered in `Program.cs`
-- **Validation Resources**: Localized validation messages via resource files in `Resources/ResourceFiles/`
-- **Domain Models**: Located in `Models/` with join tables in `Models/JoinTables/`
-- **Health Checks**: `/health` endpoint with PostgreSQL health check
-- **Global Usings**: `GlobalUsing.cs` imports common namespaces project-wide
-
-### UserContent.API Service
-Service for user-specific content (favorites, profiles) following the same vertical slice architecture:
-- **Feature Folders**: `UserContent/FavoriteAlbums/` (Add, Delete), `UserContent/FavoriteBands/` (Add, Delete), `UserContent/UserProfile/` (GetUserProfile)
-- **Data Layer**: EF Core context (`UserContentContext`), repository implementations (`UserContentRepository`, `CachedUserContentRepository`)
-- **Caching**: Redis-backed decorator pattern — `CachedUserContentRepository` wraps `UserContentRepository` (see Caching section below)
-- **Models**: `FavoriteAlbum`, `FavoriteBand`, `UserProfileInfo` in `Models/`
-- **Same patterns as Archive.API**: Carter endpoints, Mediator handlers, Mapster mapping
-- **Pipeline**: LoggingBehavior + ValidationBehavior + UnitOfWorkBehavior
-- **Database**: Separate PostgreSQL instance (`UserContentDB`), migrations and seed data configured
-- **No Health Checks**: Unlike Archive.API, no `/health` endpoint configured
+- **.NET 10.0** with Central Package Management (`Directory.Packages.props`)
+- **PostgreSQL 16** via Npgsql + EF Core 10
+- **Redis 7** — distributed caching (UserContent.API only)
+- **Mediator 3.0.1** (`martinothamar/Mediator`) — source-generated CQRS (not MediatR)
+- **Carter 10.0.0** — minimal API routing
+- **FluentValidation 12.1.1** — request validation
+- **Mapster 7.4.0** — object mapping (`source.Adapt<T>()`)
+- **Scrutor** — decorator pattern for DI (used in UserContent.API for cached repository)
+- **gRPC** — inter-service communication (Archive.API = server, UserContent.API = client)
+- **Docker Compose** — containerization
 
 ## Common Development Commands
 
-### Database Operations
-
 ```bash
-# Add a new migration (from the respective service directory)
-dotnet ef migrations add MigrationName
-
-# Apply migrations
-dotnet ef database update
-
-# Remove last migration (if not applied)
-dotnet ef migrations remove
-```
-
-### Build and Run
-
-```bash
-# Build the solution
+# Build the entire solution
 dotnet build blackened.death.slnx
 
-# Run Archive.API locally
-cd Services/Archive/Archive.API
-dotnet run
-
-# Run UserContent.API locally
-cd Services/UserContent/UserContent.API
-dotnet run
+# Run a specific service locally
+dotnet run --project Services/Archive/Archive.API
+dotnet run --project Services/UserContent/UserContent.API
 
 # Run with Docker Compose (from src directory)
 docker-compose up --build
 
-# Stop Docker Compose
-docker-compose down
+# EF Core migrations (run from the respective service directory)
+dotnet ef migrations add MigrationName
+dotnet ef database update
+dotnet ef migrations remove
 ```
 
-### Docker Environment
+**No test projects exist yet.** Testing packages (xunit, FluentAssertions, Moq, Testcontainers) are pre-configured in `Directory.Packages.props` but commented out.
 
-Archive.API:
-- **HTTP**: localhost:6000 (mapped to container 8080)
-- **HTTPS**: localhost:6001 (mapped to container 8081)
+## Docker Environment
 
-UserContent.API:
-- **HTTP**: localhost:6010 (mapped to container 8080)
-- **HTTPS**: localhost:6011 (mapped to container 8081)
+| Service          | Host Port | Container Port | Protocol  |
+|------------------|-----------|----------------|-----------|
+| Archive.API HTTP | 6000      | 8080           | HTTP/1+2  |
+| Archive.API HTTPS| 6001      | 8081           | HTTP/1+2  |
+| Archive.API gRPC | 6002      | 8082           | HTTP/2    |
+| UserContent HTTP | 6010      | 8080           | HTTP      |
+| UserContent HTTPS| 6011      | 8081           | HTTPS     |
+| ArchiveDb        | 5432      | 5432           | PostgreSQL|
+| UserContentDB    | 5433      | 5432           | PostgreSQL|
+| Redis            | 6379      | 6379           | Redis     |
 
-PostgreSQL databases:
-- **ArchiveDb**: localhost:5432 (in Docker: archivedb:5432) — credentials: postgres/postgres
-- **UserContentDB**: localhost:5433 (in Docker: usercontentdb:5432) — credentials: postgres/postgres
+Database credentials: `postgres/postgres` for both databases.
 
-Redis:
-- **Redis**: localhost:6379 — used by UserContent.API for distributed caching
+## Solution Structure
+
+```
+blackened.death.slnx          # XML-format solution file (.slnx)
+Directory.Packages.props      # Central Package Management — ALL package versions here
+BuildingBlocks/               # Shared library (CQRS, Repository, Behaviors, Exceptions)
+Services/
+  Archive/Archive.API/        # Music archive CRUD + gRPC server
+  UserContent/UserContent.API/ # User favorites/profiles + gRPC client
+```
+
+### BuildingBlocks (shared library)
+
+- **CQRS**: `ICommand<T>`, `IQuery<T>`, `ICommandHandler<,>`, `IQueryHandler<,>` — thin wrappers over `Mediator.IRequest`
+- **Repository**: Generic `IRepository<TContext>` with `BaseGenericRepository<T>` implementation
+- **Pipeline Behaviors**: `LoggingBehavior` → `ValidationBehavior` → `UnitOfWorkBehavior` (auto-saves for commands)
+- **Pagination**: `PagedQuery<T>`, `PagedResult<T>`, `QueryableExtensions.ToPagedResultAsync()` in `Extentions/`
+- **Exceptions**: `GlobalExceptionHandler`, `NotFoundException`, `BadRequestException`, `InternalServerException`
+
+### Archive.API
+
+Vertical slice feature folders: `Albums/CreateAlbum/`, `Bands/GetBands/`, etc. Each feature contains its endpoint, handler, validator, and DTOs in one folder. Nested features for related queries (e.g., `Albums/GetAlbumsBy/GetAlbumById/`).
+
+Also serves as **gRPC server** — proto at `gRPC/Protos/archive.proto`, service implementation at `gRPC/Services/ArchiveService.cs`. Exposes `GetBandById` and `GetAlbumById` RPCs.
+
+Uses `Mappings/MappingConfig.cs` for explicit Mapster type mappings (registered in `Program.cs`).
+
+### UserContent.API
+
+Same vertical slice pattern. Feature folders under `UserContent/` (FavoriteAlbums, FavoriteBands, UserProfile).
+
+Acts as **gRPC client** — references Archive.API's proto file to validate albums/bands exist before adding to favorites. The `.csproj` links the proto with `GrpcServices="Client"`.
+
+**Caching**: Decorator pattern via Scrutor — `CachedUserContentRepository` wraps `UserContentRepository`. Reads cached 30 min via Redis. Mutations invalidate all cache keys for the entity type using Redis `KEYS` pattern scan.
 
 ## Architecture Patterns
 
 ### CQRS Flow
-1. **Carter Endpoint** receives HTTP request and maps to Command/Query
-2. **Mediator** (source-generated) dispatches to appropriate handler through pipeline:
-   - LoggingBehavior (logs requests with timing)
-   - ValidationBehavior (FluentValidation)
-   - UnitOfWorkBehavior (SaveChanges for commands only)
-3. **Handler** executes business logic using Repository
-4. **Response** mapped back to DTO and returned
+1. **Carter Endpoint** → maps HTTP request to Command/Query via `Adapt<T>()`
+2. **Mediator pipeline**: LoggingBehavior → ValidationBehavior → UnitOfWorkBehavior
+3. **Handler** executes logic via `IRepository<TContext>`
+4. **UnitOfWorkBehavior** auto-calls `SaveChangesAsync()` for commands only
 
-### Repository Pattern
-- Generic repository (`IRepository<TContext>`) injected into handlers
-- Archive.API uses `ArchiveContext`, UserContent.API uses `UserContentContext`
-- **Queries**: `GetByAsync<T>()`, `GetByWithIncludeAsync<T>()`, `GetWithIncludesAsync<T>()`, `Filter<T>()`, `FilterAsync<T>()`, `All<T>()`, `AllAsync<T>()`, `AllWithIncludeAsync<T>()`
-- **Mutations**: `AddAsync<T>()`, `AddRangeAsync<T>()`, `Update<T>()`, `UpdateRange<T>()`, `Delete<T>()`, `DeleteRange<T>()`, `DeleteAsync<T>()`
-- **Aggregates**: `CountAsync<T>()`
-- UnitOfWorkBehavior automatically calls `SaveChangesAsync()` for commands
-
-### Caching (UserContent.API)
-- **Decorator pattern**: `CachedUserContentRepository` wraps `UserContentRepository`
-- Registered manually in `Program.cs`: inner `UserContentRepository` + outer `CachedUserContentRepository` as `IRepository<UserContentContext>`
-- Read operations (`GetByAsync`, `FilterAsync`, `GetWithIncludesAsync`) are cached for 30 minutes via `IDistributedCache` (Redis)
-- Tracked queries (`asTracked = true`) bypass cache to preserve EF change tracking
-- **Cache invalidation**: Mutations (`AddAsync`, `Update`, `Delete`) invalidate all cache keys for that entity type using Redis `KEYS` pattern scan (`UserContent:{TypeName}:*`)
-- Cache keys: `UserContent:{TypeName}:{Operation}:{Hash}` where hash is derived from filter/include expressions
-
-### Entity Relationships
-- **Many-to-Many**: Explicit join table entities (e.g., `AlbumBand`, `AlbumGenre`, `AlbumTrack`)
-- **One-to-Many**: StreamingLink has FK to Album
-- Model configuration via extension methods in `ArchiveModelBuilderExtensions.cs`
-- Seeding configured per entity in `Data/Seed/` folder
-
-### Validation
-- FluentValidation validators co-located with commands in feature folders
-- Validators automatically registered via `AddValidatorsFromAssembly()`
-- Validation messages use resource files from Archive.API: `ValidationMessages.{Property}`
-- ValidationBehavior in Mediator pipeline throws validation exceptions automatically
+### Adding a New Package
+All NuGet versions are centrally managed. To add a package:
+1. Add `<PackageVersion>` to `Directory.Packages.props` (with version)
+2. Add `<PackageReference>` to the service `.csproj` (without version)
 
 ### Database Initialization
-- Both services use `DatabaseInitializerExtensions.InitializeDatabaseAsync()` extension method on `WebApplication`
-- Only runs in Development environment: applies EF migrations then calls `DatabaseSeeder.SeedDatabaseAsync()`
-- `DatabaseSeeder` (in `Extenstions/`) checks if data exists before seeding, uses transactions for atomicity
+Both services use `DatabaseInitializerExtensions.InitializeDatabaseAsync()` — applies EF migrations then seeds data via `DatabaseSeeder`. Only runs in Development environment. Seeding checks for existing data and uses transactions.
+
+### Inter-Service Communication
+UserContent.API → Archive.API via gRPC. When adding a favorite album/band, UserContent.API calls Archive.API's gRPC service to verify the entity exists, then maps the response to a local model.
 
 ## Key Conventions
 
-### File Organization
-- **Vertical Slices**: Group by feature, not layer (e.g., `Albums/CreateAlbum/`)
-- **Nested Features**: Related features can nest (e.g., `Albums/GetAlbumsBy/GetAlbumById/`)
-- **Naming**: `{Feature}Endpoint.cs`, `{Feature}Handler.cs` or `{Feature}CommandHandler.cs`/`{Feature}QueryHandler.cs`
-- **DTOs**: Request/Response records defined in endpoint files
-- **Command/Query + Result**: Defined in handler files along with validators
-- **Validators**: `{Feature}CommandValidator` class in handler file
-
-### Code Patterns
-- Use **records** for DTOs, Commands, Queries, Results
-- Use **primary constructors** for dependency injection (e.g., `class Handler(IRepository<ArchiveContext> repo)`)
-- Commands implement `ICommand<TResult>`, Queries implement `IQuery<TResult>`
-- Handlers use `ICommandHandler<,>` or `IQueryHandler<,>`
-- Mapster for object mapping: `source.Adapt<DestinationType>()`
-
-### Connection Strings
-- Configured via `appsettings.json` or environment variables
-- Archive: `ConnectionStrings__ArchiveDb`
-- UserContent: `ConnectionStrings__UserContentDB`
-- Redis: `ConnectionStrings__Redis`
-
-## Important Notes
-
-- **No Test Projects**: The solution currently has no test projects
-- **Global Exception Handling**: `GlobalExceptionHandler` (in BuildingBlocks) provides consistent error responses; services have their own exception types (e.g., `FavoriteAlbumNotFoundException`)
-- **Primary Constructors**: C# 12 syntax used throughout for DI
-- **Minimal APIs**: Carter framework registers all `ICarterModule` implementations automatically
+- **Vertical slices**: Group by feature, not layer. Each feature folder = endpoint + handler + validator + DTOs
+- **Records** for DTOs, Commands, Queries, Results
+- **Primary constructors** for DI: `class Handler(IRepository<ArchiveContext> repo)`
+- **Naming**: `{Feature}Endpoint.cs`, `{Feature}Handler.cs` (or `{Feature}CommandHandler.cs`/`{Feature}QueryHandler.cs`)
+- **DTOs** (Request/Response records) defined in endpoint files; Command/Query + Result + Validator defined in handler files
+- **GlobalUsing.cs** in each service project imports common namespaces
+- **Service DI** organized as extension methods in `Extenstions/ServiceCollection*.cs`
+- **Folder name typo**: `Extenstions/` (not `Extensions/`) is used in both service projects — follow this existing convention, do not rename
+- **BuildingBlocks folder typo**: `Extentions/` (different typo) — also follow as-is
+- **Validation messages**: Archive.API uses `.resx` resource files (`Resources/ResourceFiles/ValidationMessages`); UserContent.API uses inline strings
+- **Exception types**: Each service defines its own (e.g., `AlbumNotFoundException`, `FavoriteAlbumNotFoundException`), inheriting from BuildingBlocks base exceptions

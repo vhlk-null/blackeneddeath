@@ -1,4 +1,6 @@
-﻿namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
+﻿using Archive.Grpc;
+
+namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
 {
     public record AddAlbumToFavoriteCommand(Guid albumId, Guid userId) : ICommand<AddAlbumToFavoriteResult>;
     public record AddAlbumToFavoriteResult(Guid userId);
@@ -12,22 +14,18 @@
         }
     }
 
-    public class AddFavoriteAlbumCommandHandler(IRepository<UserContentContext> repo) : ICommandHandler<AddAlbumToFavoriteCommand, AddAlbumToFavoriteResult>
+    public class AddFavoriteAlbumCommandHandler(IRepository<UserContentContext> repo, ArchiveProtoService.ArchiveProtoServiceClient protoServiceClient) : ICommandHandler<AddAlbumToFavoriteCommand, AddAlbumToFavoriteResult>
     {
         public async ValueTask<AddAlbumToFavoriteResult> Handle(AddAlbumToFavoriteCommand request, CancellationToken cancellationToken)
         {
-            // TODO: add album to favorite user's albums
-            // TODO: add - fetch from Archive.API data about albums via gRPC call
-            // TODO: update cache
+            var albumResponse = protoServiceClient.GetAlbumById(new GetAlbumRequest() { Id = request.albumId.ToString() }, cancellationToken : cancellationToken);
+            
+            var album = albumResponse.Adapt<Album>();
 
             var favoriteAlbum = new FavoriteAlbum()
             {
-                UserId = request.userId,
-                AlbumId = request.albumId,
-                AlbumTitle = string.Empty,
-                CoverUrl = string.Empty,
-                ReleaseDate = 1997,
-                AddedDate = DateTime.UtcNow
+                Album = album,
+                UserId = request.userId
             };
 
             await repo.AddAsync(favoriteAlbum, cancellationToken);

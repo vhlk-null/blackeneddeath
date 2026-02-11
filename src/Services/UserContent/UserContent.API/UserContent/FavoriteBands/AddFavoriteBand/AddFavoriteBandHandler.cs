@@ -20,8 +20,6 @@
             {
                 UserId = request.userId,
                 BandId = request.bandId,
-                BandName = string.Empty,
-                LogoUrl = string.Empty,
                 AddedDate = DateTime.UtcNow
             };
 

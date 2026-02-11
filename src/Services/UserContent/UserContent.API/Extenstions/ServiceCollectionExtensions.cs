@@ -1,4 +1,6 @@
-﻿namespace UserContent.API.Extenstions
+﻿using Archive.Grpc;
+
+namespace UserContent.API.Extenstions
 {
     public static class ServiceCollectionExtensions
     {
@@ -11,6 +13,15 @@
 
             services.AddScoped<DbContext>(sp => sp.GetRequiredService<UserContentContext>());
 
+            return services;
+        }
+
+        public static IServiceCollection AddGrpcServices(this IServiceCollection services, string connectionString)
+        {
+            services.AddGrpcClient<ArchiveProtoService.ArchiveProtoServiceClient>(options =>
+            {
+                options.Address = new Uri(connectionString);
+            });
             return services;
         }
 

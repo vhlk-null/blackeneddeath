@@ -4,10 +4,14 @@
   </Folder>
   <Folder Name="/Services/" />
   <Folder Name="/Services/Archive/">
-    <Project Path="Services/Archive/Archive.API/Archive.API.csproj" Id="63aa319d-2620-4492-af6d-edda6349fba9" />
+    <Project Path="Services/Archive/Archive.API/Archive.API.csproj" Id="63aa319d-2620-4492-af6d-edda6349fba9">
+      <Deploy Solution="Debug|*" />
+    </Project>
   </Folder>
   <Folder Name="/Services/UserContent/">
-    <Project Path="Services/UserContent/UserContent.API/UserContent.API.csproj" />
+    <Project Path="Services/UserContent/UserContent.API/UserContent.API.csproj">
+      <Deploy Solution="Debug|*" />
+    </Project>
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="Directory.Packages.props" />
