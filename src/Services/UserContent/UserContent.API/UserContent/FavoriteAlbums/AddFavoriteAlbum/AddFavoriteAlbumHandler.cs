@@ -31,7 +31,7 @@ namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
 
             var favoriteAlbum = new FavoriteAlbum()
             {
-                Album = album,
+                AlbumId = album.AlbumId,
                 UserId = request.userId
             };
 

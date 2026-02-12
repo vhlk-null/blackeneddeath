@@ -1,30 +1,22 @@
 ﻿namespace UserContent.API.Data;
 
-public class CachedUserContentRepository : IRepository<UserContentContext>
+public class CachedUserContentRepository(
+    IRepository<UserContentContext> innerRepository,
+    IDistributedCache cache,
+    IConnectionMultiplexer redis,
+    ILogger<CachedUserContentRepository> logger)
+    : IRepository<UserContentContext>
 {
-    private readonly IRepository<UserContentContext> _innerRepository;
-    private readonly IDistributedCache _cache;
-    private readonly IConnectionMultiplexer _redis;
     private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(30);
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.IgnoreCycles
     };
 
-    public CachedUserContentRepository(
-        IRepository<UserContentContext> innerRepository,
-        IDistributedCache cache,
-        IConnectionMultiplexer redis)
-    {
-        _innerRepository = innerRepository;
-        _cache = cache;
-        _redis = redis;
-    }
-
     public UserContentContext Context
     {
-        get => _innerRepository.Context;
-        set => _innerRepository.Context = value;
+        get => innerRepository.Context;
+        set => innerRepository.Context = value;
     }
 
     public async Task<T?> GetWithIncludesAsync<T>(
@@ -35,18 +27,70 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         var userId = ExtractUserIdFromExpression(filter);
         var cacheKey = GenerateCacheKey<T>(nameof(GetWithIncludesAsync), userId, filter, includes);
 
-        var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
-        if (cached != null)
-            return JsonSerializer.Deserialize<T>(cached, JsonOptions);
-
-        var result = await _innerRepository.GetWithIncludesAsync(filter, cancellationToken, includes);
-
-        if (result != null)
+        try
         {
-            await _cache.SetStringAsync(
+            var cached = await cache.GetStringAsync(cacheKey, cancellationToken);
+            if (cached != null)
+                return JsonSerializer.Deserialize<T>(cached, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Cache read failed for key {CacheKey}", cacheKey);
+        }
+
+        var result = await innerRepository.GetWithIncludesAsync(filter, cancellationToken, includes);
+
+        if (result == null) return result;
+        {
+            try
+            {
+                await cache.SetStringAsync(
+                    cacheKey, JsonSerializer.Serialize(result, JsonOptions),
+                    new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
+                    cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Cache write failed for key {CacheKey}", cacheKey);
+            }
+        }
+
+        return result;
+    }
+
+    public async Task<T?> GetWithIncludesAsync<T>(
+        Expression<Func<T, bool>> filter,
+        Func<IQueryable<T>, IQueryable<T>> includeBuilder,
+        CancellationToken cancellationToken = default) where T : class
+    {
+        var userId = ExtractUserIdFromExpression(filter);
+        var cacheKey = GenerateCacheKey<T>(nameof(GetWithIncludesAsync), userId, filter);
+
+        try
+        {
+            var cached = await cache.GetStringAsync(cacheKey, cancellationToken);
+            if (cached != null)
+                return JsonSerializer.Deserialize<T>(cached, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Cache read failed for key {CacheKey}", cacheKey);
+        }
+
+        var result = await innerRepository.GetWithIncludesAsync(filter, includeBuilder, cancellationToken);
+
+        if (result == null) return result;
+
+        try
+        {
+            await cache.SetStringAsync(
                 cacheKey, JsonSerializer.Serialize(result, JsonOptions),
                 new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
                 cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Cache write failed for key {CacheKey}", cacheKey);
         }
 
         return result;
@@ -58,23 +102,36 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         CancellationToken cancellationToken = default) where T : class
     {
         if (asTracked)
-            return await _innerRepository.GetByAsync(expression, asTracked, cancellationToken);
+            return await innerRepository.GetByAsync(expression, asTracked, cancellationToken);
 
         var userId = ExtractUserIdFromExpression(expression);
         var cacheKey = GenerateCacheKey<T>(nameof(GetByAsync), userId, expression);
 
-        var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
-        if (cached != null)
-            return JsonSerializer.Deserialize<T>(cached, JsonOptions);
-
-        var result = await _innerRepository.GetByAsync(expression, asTracked, cancellationToken);
-
-        if (result != null)
+        try
         {
-            await _cache.SetStringAsync(
+            var cached = await cache.GetStringAsync(cacheKey, cancellationToken);
+            if (cached != null)
+                return JsonSerializer.Deserialize<T>(cached, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Cache read failed for key {CacheKey}", cacheKey);
+        }
+
+        var result = await innerRepository.GetByAsync(expression, asTracked, cancellationToken);
+
+        if (result == null) return result;
+        
+        try
+        {
+            await cache.SetStringAsync(
                 cacheKey, JsonSerializer.Serialize(result, JsonOptions),
                 new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
                 cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Cache write failed for key {CacheKey}", cacheKey);
         }
 
         return result;
@@ -86,70 +143,84 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         CancellationToken cancellationToken = default) where T : class
     {
         if (asTracked)
-            return await _innerRepository.FilterAsync(expression, asTracked, cancellationToken);
+            return await innerRepository.FilterAsync(expression, asTracked, cancellationToken);
 
         var userId = ExtractUserIdFromExpression(expression);
         var cacheKey = GenerateCacheKey<T>(nameof(FilterAsync), userId, expression);
 
-        var cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
-        if (cached != null)
-            return JsonSerializer.Deserialize<List<T>>(cached, JsonOptions)!;
+        try
+        {
+            var cached = await cache.GetStringAsync(cacheKey, cancellationToken);
+            if (cached != null)
+                return JsonSerializer.Deserialize<List<T>>(cached, JsonOptions)!;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Cache read failed for key {CacheKey}", cacheKey);
+        }
 
-        var result = await _innerRepository.FilterAsync(expression, asTracked, cancellationToken);
+        var result = await innerRepository.FilterAsync(expression, asTracked, cancellationToken);
 
-        await _cache.SetStringAsync(
-            cacheKey, JsonSerializer.Serialize(result, JsonOptions),
-            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
-            cancellationToken);
+        try
+        {
+            await cache.SetStringAsync(
+                cacheKey, JsonSerializer.Serialize(result, JsonOptions),
+                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = DefaultCacheDuration },
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Cache write failed for key {CacheKey}", cacheKey);
+        }
 
         return result;
     }
 
     public async Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
     {
-        await _innerRepository.AddAsync(entity, cancellationToken);
+        await innerRepository.AddAsync(entity, cancellationToken);
         var userId = ExtractUserIdFromEntity(entity);
         await InvalidateCacheForTypeAsync<T>(userId);
     }
 
     public async Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default) where T : class
     {
-        await _innerRepository.AddRangeAsync(entities, cancellationToken);
+        await innerRepository.AddRangeAsync(entities, cancellationToken);
         var userId = ExtractUserIdFromEntity(entities.FirstOrDefault());
         await InvalidateCacheForTypeAsync<T>(userId);
     }
 
     public void Update<T>(T entity) where T : class
     {
-        _innerRepository.Update(entity);
+        innerRepository.Update(entity);
         var userId = ExtractUserIdFromEntity(entity);
         InvalidateCacheForType<T>(userId);
     }
 
     public void UpdateRange<T>(IEnumerable<T> entities) where T : class
     {
-        _innerRepository.UpdateRange(entities);
+        innerRepository.UpdateRange(entities);
         var userId = ExtractUserIdFromEntity(entities.FirstOrDefault());
         InvalidateCacheForType<T>(userId);
     }
 
     public void Delete<T>(T entity) where T : class
     {
-        _innerRepository.Delete(entity);
+        innerRepository.Delete(entity);
         var userId = ExtractUserIdFromEntity(entity);
         InvalidateCacheForType<T>(userId);
     }
 
     public void DeleteRange<T>(IEnumerable<T> entities) where T : class
     {
-        _innerRepository.DeleteRange(entities);
+        innerRepository.DeleteRange(entities);
         var userId = ExtractUserIdFromEntity(entities.FirstOrDefault());
         InvalidateCacheForType<T>(userId);
     }
 
     public async Task DeleteAsync<T>(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default) where T : class
     {
-        await _innerRepository.DeleteAsync(expression, cancellationToken);
+        await innerRepository.DeleteAsync(expression, cancellationToken);
         var userId = ExtractUserIdFromExpression(expression);
         await InvalidateCacheForTypeAsync<T>(userId);
     }
@@ -160,12 +231,12 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
             ? $"UserContent:{userId.Value}:*"
             : $"UserContent:*";
 
-        var server = _redis.GetServers().First();
+        var server = redis.GetServers().First();
         var keys = server.Keys(pattern: pattern).ToArray();
 
         if (keys.Length > 0)
         {
-            var db = _redis.GetDatabase();
+            var db = redis.GetDatabase();
             await db.KeyDeleteAsync(keys);
         }
     }
@@ -176,33 +247,33 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
             ? $"UserContent:{userId.Value}:*"
             : $"UserContent:*";
 
-        var server = _redis.GetServers().First();
+        var server = redis.GetServers().First();
         var keys = server.Keys(pattern: pattern).ToArray();
 
-        if (keys.Length > 0)
-        {
-            var db = _redis.GetDatabase();
-            db.KeyDelete(keys);
-        }
+        if (keys.Length <= 0) return;
+        
+        var db = redis.GetDatabase();
+        db.KeyDelete(keys);
     }
 
     private static Guid? ExtractUserIdFromExpression(Expression expression)
     {
-        if (expression is LambdaExpression lambda)
-            return ExtractUserIdFromExpression(lambda.Body);
-
-        if (expression is BinaryExpression binary)
+        switch (expression)
         {
-            if (binary.NodeType is ExpressionType.AndAlso or ExpressionType.OrElse)
+            case LambdaExpression lambda:
+                return ExtractUserIdFromExpression(lambda.Body);
+            case BinaryExpression { NodeType: ExpressionType.AndAlso or ExpressionType.OrElse } binary:
                 return ExtractUserIdFromExpression(binary.Left)
-                    ?? ExtractUserIdFromExpression(binary.Right);
-
-            if (binary.NodeType == ExpressionType.Equal)
+                       ?? ExtractUserIdFromExpression(binary.Right);
+            case BinaryExpression binary:
             {
-                if (IsUserIdMember(binary.Left) && TryGetGuidValue(binary.Right, out var id))
-                    return id;
-                if (IsUserIdMember(binary.Right) && TryGetGuidValue(binary.Left, out id))
-                    return id;
+                if (binary.NodeType == ExpressionType.Equal)
+                {
+                    if ((IsUserIdMember(binary.Left) && TryGetGuidValue(binary.Right, out var id)) || (IsUserIdMember(binary.Right) && TryGetGuidValue(binary.Left, out id)))
+                        return id;
+                }
+
+                break;
             }
         }
 
@@ -251,28 +322,24 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         var rawKey = $"{typeName}:{filterString}:{includesString}";
         var hash = ComputeDeterministicHash(rawKey);
         var userSegment = userId.HasValue ? userId.Value.ToString() : "shared";
-        return $"{typeName}:{operation}:{userSegment}:{hash}";
+        return $"{userSegment}:{typeName}:{operation}:{hash}";
     }
 
     private sealed class ClosureValueResolvingVisitor : ExpressionVisitor
     {
         protected override Expression VisitMember(MemberExpression node)
         {
-            if (node.Expression is ConstantExpression or MemberExpression
-                && !IsParameterAccess(node))
+            if (node.Expression is not (ConstantExpression or MemberExpression)
+                || IsParameterAccess(node)) return base.VisitMember(node);
+            try
             {
-                try
-                {
-                    var value = Expression.Lambda(node).Compile().DynamicInvoke();
-                    return Expression.Constant(value, node.Type);
-                }
-                catch
-                {
-                    return base.VisitMember(node);
-                }
+                var value = Expression.Lambda(node).Compile().DynamicInvoke();
+                return Expression.Constant(value, node.Type);
             }
-
-            return base.VisitMember(node);
+            catch
+            {
+                return base.VisitMember(node);
+            }
         }
 
         private static bool IsParameterAccess(Expression expression)
@@ -294,31 +361,31 @@ public class CachedUserContentRepository : IRepository<UserContentContext>
         Expression<Func<T, bool>> expression,
         Expression<Func<T, object>> includeExpression,
         CancellationToken cancellationToken = default) where T : class
-        => _innerRepository.GetByWithIncludeAsync(expression, includeExpression, cancellationToken);
+        => innerRepository.GetByWithIncludeAsync(expression, includeExpression, cancellationToken);
 
     public IQueryable<T> Filter<T>(Expression<Func<T, bool>> expression, bool asTracked = true) where T : class
-        => _innerRepository.Filter(expression, asTracked);
+        => innerRepository.Filter(expression, asTracked);
 
     public Task<List<T>> AllAsync<T>(CancellationToken cancellationToken = default) where T : class
-        => _innerRepository.AllAsync<T>(cancellationToken);
+        => innerRepository.AllAsync<T>(cancellationToken);
 
     public IQueryable<T> All<T>() where T : class
-        => _innerRepository.All<T>();
+        => innerRepository.All<T>();
 
     public Task<List<T>> AllWithIncludeAsync<T>(
         List<Expression<Func<T, object>>> includeExpressions,
         CancellationToken cancellationToken = default) where T : class
-        => _innerRepository.AllWithIncludeAsync(includeExpressions, cancellationToken);
+        => innerRepository.AllWithIncludeAsync(includeExpressions, cancellationToken);
 
     public Task<int> CountAsync<T>(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default) where T : class
-        => _innerRepository.CountAsync(expression, cancellationToken);
+        => innerRepository.CountAsync(expression, cancellationToken);
 
     public Task<int> CountAsync<T>(CancellationToken cancellationToken = default) where T : class
-        => _innerRepository.CountAsync<T>(cancellationToken);
+        => innerRepository.CountAsync<T>(cancellationToken);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var result = await _innerRepository.SaveChangesAsync(cancellationToken);
+        var result = await innerRepository.SaveChangesAsync(cancellationToken);
 
         return result;
     }

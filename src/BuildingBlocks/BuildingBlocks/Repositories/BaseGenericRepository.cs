@@ -31,6 +31,12 @@ namespace BuildingBlocks.Repositories
             return await query.FirstOrDefaultAsync(filter, cancellationToken);
         }
 
+        public async Task<T?> GetWithIncludesAsync<T>(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IQueryable<T>> includeBuilder, CancellationToken cancellationToken = default) where T : class
+        {
+            var query = includeBuilder(Context.Set<T>().AsNoTracking());
+            return await query.FirstOrDefaultAsync(filter, cancellationToken);
+        }
+
         public async Task<List<T>> FilterAsync<T>(Expression<Func<T, bool>> expression, bool asTracked = true, CancellationToken cancellationToken = default) where T : class
         {
             return asTracked

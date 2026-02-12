@@ -2,13 +2,13 @@
 
 // ===== CONFIGURATION =====
 var dbConnection = builder.Configuration.GetConnectionString(ConnectionStrings.UserContentDatabase)
-    ?? throw new InvalidOperationException($"{ConnectionStrings.UserContentDatabase} is missing");
+                   ?? throw new InvalidOperationException($"{ConnectionStrings.UserContentDatabase} is missing");
 
-var redisConnection = builder.Configuration.GetConnectionString(ConnectionStrings.Redis) 
-    ?? throw new InvalidOperationException($"{ConnectionStrings.Redis} is missing");
+var redisConnection = builder.Configuration.GetConnectionString(ConnectionStrings.Redis)
+                      ?? throw new InvalidOperationException($"{ConnectionStrings.Redis} is missing");
 
 var gRpcConnection = builder.Configuration[ConnectionStrings.GrpcSettings]
-                      ?? throw new InvalidOperationException($"{ConnectionStrings.GrpcSettings} is missing");
+                     ?? throw new InvalidOperationException($"{ConnectionStrings.GrpcSettings} is missing");
 
 // ===== SERVICES =====
 builder.Services
@@ -20,6 +20,12 @@ builder.Services
     .AddGrpcServices(gRpcConnection)
     .AddValidationServices();
 
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
+
+UserContent.API.Mappings.MappingConfig.RegisterMappings();
 builder.Services.AddCarter();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
