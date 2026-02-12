@@ -12,9 +12,7 @@
                 {
                     var result = await sender.Send(new GetUserProfileQuery(userId));
 
-                    var response = result.Adapt<GetUserProfileResponse>();
-
-                    return Results.Ok(response);
+                    return Results.Ok(result);
                 })
             .WithName("GetUserProfile")
             .Produces<GetUserProfileResponse>(StatusCodes.Status200OK)

@@ -20,6 +20,11 @@ builder.Services
     .AddGrpcServices(gRpcConnection)
     .AddValidationServices();
 
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
+
 builder.Services.AddCarter();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
