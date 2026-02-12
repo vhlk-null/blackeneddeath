@@ -53,16 +53,16 @@ namespace UserContent.API.Data
             {
                 entity.ToTable("albums");
 
-                entity.HasKey(e => e.AlbumId);
+                entity.HasKey(e => e.Id);
 
-                entity.Property(e => e.AlbumId)
-                    .HasColumnName("album_id")
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.AlbumTitle)
+                entity.Property(e => e.Title)
                     .IsRequired()
                     .HasMaxLength(200)
-                    .HasColumnName("album_title");
+                    .HasColumnName("title");
 
                 entity.Property(e => e.CoverUrl)
                     .HasMaxLength(500)

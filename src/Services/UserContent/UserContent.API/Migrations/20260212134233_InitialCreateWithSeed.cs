@@ -15,14 +15,14 @@ namespace UserContent.API.Migrations
                 name: "albums",
                 columns: table => new
                 {
-                    album_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    album_title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     cover_url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     release_date = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_albums", x => x.album_id);
+                    table.PrimaryKey("PK_albums", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -73,7 +73,7 @@ namespace UserContent.API.Migrations
                         name: "FK_favorite_albums_albums_album_id",
                         column: x => x.album_id,
                         principalTable: "albums",
-                        principalColumn: "album_id",
+                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_favorite_albums_user_profiles_user_id",

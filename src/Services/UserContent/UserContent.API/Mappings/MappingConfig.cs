@@ -13,7 +13,7 @@ namespace UserContent.API.Mappings
         private static void ConfigureFavoriteAlbumMappings()
         {
             TypeAdapterConfig<FavoriteAlbum, FavoriteAlbumDto>.NewConfig()
-                .Map(dest => dest.AlbumTitle, src => src.Album.AlbumTitle)
+                .Map(dest => dest.AlbumTitle, src => src.Album.Title)
                 .Map(dest => dest.CoverUrl, src => src.Album.CoverUrl)
                 .Map(dest => dest.ReleaseDate, src => src.Album.ReleaseDate);
         }

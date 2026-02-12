@@ -18,7 +18,7 @@ namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
     {
         public async ValueTask<AddAlbumToFavoriteResult> Handle(AddAlbumToFavoriteCommand request, CancellationToken cancellationToken)
         {
-            var album = await repo.GetByAsync<Album>(a => a.AlbumId == request.albumId, cancellationToken: cancellationToken);
+            var album = await repo.GetByAsync<Album>(a => a.Id == request.albumId, cancellationToken: cancellationToken);
 
             if (album is null)
             {
@@ -31,9 +31,9 @@ namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
 
             var favoriteAlbum = new FavoriteAlbum()
             {
-                AlbumId = album.AlbumId,
+                AlbumId = album.Id,
                 UserId = request.userId,
-                AddedDate = DateTime.Now
+                AddedDate = DateTime.UtcNow
             };
 
             await repo.AddAsync(favoriteAlbum, cancellationToken);

@@ -24,15 +24,9 @@ namespace UserContent.API.Migrations
 
             modelBuilder.Entity("UserContent.API.Models.Album", b =>
                 {
-                    b.Property<Guid>("AlbumId")
+                    b.Property<Guid>("Id")
                         .HasColumnType("uuid")
-                        .HasColumnName("album_id");
-
-                    b.Property<string>("AlbumTitle")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasColumnName("album_title");
+                        .HasColumnName("id");
 
                     b.Property<string>("CoverUrl")
                         .HasMaxLength(500)
@@ -43,7 +37,13 @@ namespace UserContent.API.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("release_date");
 
-                    b.HasKey("AlbumId");
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
+
+                    b.HasKey("Id");
 
                     b.ToTable("albums", (string)null);
                 });
