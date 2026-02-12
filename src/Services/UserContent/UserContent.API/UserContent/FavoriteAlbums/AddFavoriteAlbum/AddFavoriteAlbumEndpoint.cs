@@ -2,21 +2,21 @@
 
 namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
 {
-    public record AddAlbumToFavoriteRequest(Guid albumId, Guid userId);
-    public record AddAlbumToFavoriteResponse(Guid userId);
+    public record AddAlbumToFavoriteRequest(Guid AlbumId, Guid UserId);
+    public record AddAlbumToFavoriteResponse(Guid UserId);
     public class StoreUserFavoriteAlbumsEndpoint : ICarterModule
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             app.MapPost("/favoriteAlbums", async (AddAlbumToFavoriteRequest request, ISender sender) =>
             {
-                var command = new AddAlbumToFavoriteCommand(request.albumId, request.userId);
+                var command = new AddAlbumToFavoriteCommand(request.AlbumId, request.UserId);
 
                 var result = await sender.Send(command);
 
                 var response = result.Adapt<AddAlbumToFavoriteResponse>();
 
-                return Results.Created($"/favoriteAlbums/{response.userId}", response);
+                return Results.Created($"/favoriteAlbums/{response.UserId}", response);
 
             })
             .WithName("AddAlbumToFavorite")

@@ -17,7 +17,7 @@
         public async ValueTask<DeleteFavoriteBandResult> Handle(DeleteFavoriteBandCommand request, CancellationToken cancellationToken)
         {
             var favoriteBand = await repo.GetByAsync<FavoriteBand>(
-                fb => fb.BandId == request.BandId && fb.UserId == request.UserId)
+                fb => fb.BandId == request.BandId && fb.UserId == request.UserId, cancellationToken: cancellationToken)
                 ?? throw new FavoriteBandNotFoundException(request.BandId);
 
             repo.Delete(favoriteBand);

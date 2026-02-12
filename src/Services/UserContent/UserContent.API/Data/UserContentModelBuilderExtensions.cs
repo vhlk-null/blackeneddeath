@@ -131,7 +131,7 @@ namespace UserContent.API.Data
                 entity.HasOne(e => e.Album)
                     .WithMany(a => a.FavoriteAlbums)
                     .HasForeignKey(e => e.AlbumId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
 
@@ -163,7 +163,7 @@ namespace UserContent.API.Data
                 entity.HasOne(e => e.Band)
                     .WithMany(b => b.FavoriteBands)
                     .HasForeignKey(e => e.BandId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }
