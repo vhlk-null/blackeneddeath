@@ -32,7 +32,8 @@ namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
             var favoriteAlbum = new FavoriteAlbum()
             {
                 AlbumId = album.AlbumId,
-                UserId = request.userId
+                UserId = request.userId,
+                AddedDate = DateTime.Now
             };
 
             await repo.AddAsync(favoriteAlbum, cancellationToken);
