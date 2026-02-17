@@ -8,42 +8,42 @@ namespace UserContent.API.Data.Seed
             {
                 new Band
                 {
-                    BandId = SeedConstants.ArchiveBands.Darkthrone,
+                    BandId = SeedConstants.LibraryBands.Darkthrone,
                     BandName = "Darkthrone",
                     LogoUrl = "https://example.com/logos/darkthrone.png",
                     ReleaseDate = 1997
                 },
                 new Band
                 {
-                    BandId = SeedConstants.ArchiveBands.Burzum,
+                    BandId = SeedConstants.LibraryBands.Burzum,
                     BandName = "Burzum",
                     LogoUrl = "https://example.com/logos/burzum.png",
                     ReleaseDate = 1997
                 },
                 new Band
                 {
-                    BandId = SeedConstants.ArchiveBands.Emperor,
+                    BandId = SeedConstants.LibraryBands.Emperor,
                     BandName = "Emperor",
                     LogoUrl = "https://example.com/logos/emperor.png",
                     ReleaseDate = 1997
                 },
                 new Band
                 {
-                    BandId = SeedConstants.ArchiveBands.Mayhem,
+                    BandId = SeedConstants.LibraryBands.Mayhem,
                     BandName = "Mayhem",
                     LogoUrl = "https://example.com/logos/mayhem.png",
                     ReleaseDate = 1997
                 },
                 new Band
                 {
-                    BandId = SeedConstants.ArchiveBands.Behemoth,
+                    BandId = SeedConstants.LibraryBands.Behemoth,
                     BandName = "Behemoth",
                     LogoUrl = "https://example.com/logos/behemoth.png",
                     ReleaseDate = 1997
                 },
                 new Band
                 {
-                    BandId = SeedConstants.ArchiveBands.Dissection,
+                    BandId = SeedConstants.LibraryBands.Dissection,
                     BandName = "Dissection",
                     LogoUrl = "https://example.com/logos/dissection.png",
                     ReleaseDate = 1997

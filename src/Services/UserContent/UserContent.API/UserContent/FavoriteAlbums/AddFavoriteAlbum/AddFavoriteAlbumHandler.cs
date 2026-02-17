@@ -1,4 +1,4 @@
-﻿using Archive.Grpc;
+﻿using Library.Grpc;
 
 namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
 {
@@ -14,7 +14,7 @@ namespace UserContent.API.UserContent.FavoriteAlbums.AddFavoriteAlbum
         }
     }
 
-    public class AddFavoriteAlbumCommandHandler(IRepository<UserContentContext> repo, ArchiveProtoService.ArchiveProtoServiceClient protoServiceClient) : ICommandHandler<AddAlbumToFavoriteCommand, AddAlbumToFavoriteResult>
+    public class AddFavoriteAlbumCommandHandler(IRepository<UserContentContext> repo, LibraryProtoService.LibraryProtoServiceClient protoServiceClient) : ICommandHandler<AddAlbumToFavoriteCommand, AddAlbumToFavoriteResult>
     {
         public async ValueTask<AddAlbumToFavoriteResult> Handle(AddAlbumToFavoriteCommand request, CancellationToken cancellationToken)
         {

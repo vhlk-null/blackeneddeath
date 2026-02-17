@@ -3,10 +3,8 @@
     <Project Path="BuildingBlocks/BuildingBlocks/BuildingBlocks.csproj" Id="360266db-31f0-4e2f-9490-f5622bdc9f17" />
   </Folder>
   <Folder Name="/Services/" />
-  <Folder Name="/Services/Archive/">
-    <Project Path="Services/Archive/Archive.API/Archive.API.csproj" Id="63aa319d-2620-4492-af6d-edda6349fba9">
-      <Deploy Solution="Debug|*" />
-    </Project>
+  <Folder Name="/Services/Library/">
+    <Project Path="Services/Library/Library.API/Library.API.csproj" />
   </Folder>
   <Folder Name="/Services/UserContent/">
     <Project Path="Services/UserContent/UserContent.API/UserContent.API.csproj">

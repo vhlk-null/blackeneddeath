@@ -10,8 +10,8 @@ namespace UserContent.API.Data.Seed
             public static readonly Guid BlastBeatLover = Guid.Parse("d0000000-0000-0000-0000-000000000003");
         }
 
-        // Reference to Archive.API album IDs (must match Archive seed data)
-        public static class ArchiveAlbums
+        // Reference to Library.API album IDs (must match Library seed data)
+        public static class LibraryAlbums
         {
             public static readonly Guid TransilvanianHunger = Guid.Parse("a0000000-0000-0000-0000-000000000001");
             public static readonly Guid Filosofem = Guid.Parse("a0000000-0000-0000-0000-000000000002");
@@ -21,8 +21,8 @@ namespace UserContent.API.Data.Seed
             public static readonly Guid TheSatanist = Guid.Parse("a0000000-0000-0000-0000-000000000006");
         }
 
-        // Reference to Archive.API band IDs (must match Archive seed data)
-        public static class ArchiveBands
+        // Reference to Library.API band IDs (must match Library seed data)
+        public static class LibraryBands
         {
             public static readonly Guid Darkthrone = Guid.Parse("b0000000-0000-0000-0000-000000000001");
             public static readonly Guid Burzum = Guid.Parse("b0000000-0000-0000-0000-000000000002");

@@ -1,0 +1,219 @@
+{
+	"info": {
+		"_postman_id": "bands-collection-001",
+		"name": "Library API - Bands",
+		"description": "Postman collection for Bands endpoints in Library API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get All Bands",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:6000/bands?PageNumber=1&PageSize=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"bands"
+					],
+					"query": [
+						{
+							"key": "PageNumber",
+							"value": "1",
+							"description": "Page number for pagination"
+						},
+						{
+							"key": "PageSize",
+							"value": "10",
+							"description": "Number of items per page"
+						}
+					]
+				},
+				"description": "Get paginated list of all bands with their albums, genres, and country information"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Band By Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:6000/bands/b0000000-0000-0000-0000-000000000001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"bands",
+						"b0000000-0000-0000-0000-000000000001"
+					]
+				},
+				"description": "Get a specific band by its ID (Example: Darkthrone)"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Bands By Country",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:6000/bands/country/c0000000-0000-0000-0000-000000000001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"bands",
+						"country",
+						"c0000000-0000-0000-0000-000000000001"
+					]
+				},
+				"description": "Get all bands from a specific country (Example: Norway)"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Band",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Satyricon\",\n  \"bio\": \"Norwegian black metal band formed in Oslo in 1991.\",\n  \"countryId\": \"c0000000-0000-0000-0000-000000000001\",\n  \"formedYear\": 1991,\n  \"disbandedYear\": null,\n  \"status\": 0,\n  \"genreIds\": [\n    \"20000000-0000-0000-0000-000000000001\"\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:6000/bands",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"bands"
+					]
+				},
+				"description": "Create a new band\n\nStatus values:\n- 0: Active\n- 1: Split Up\n- 2: On Hold\n- 3: Unknown\n- 4: Changed Name"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Band",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Darkthrone\",\n  \"bio\": \"Norwegian black metal legends formed in 1986. Known for their raw and primitive black metal sound.\",\n  \"countryId\": \"c0000000-0000-0000-0000-000000000001\",\n  \"formedYear\": 1986,\n  \"disbandedYear\": null,\n  \"status\": 0,\n  \"genreIds\": [\n    \"20000000-0000-0000-0000-000000000001\",\n    \"30000000-0000-0000-0000-000000000001\"\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:6000/bands/b0000000-0000-0000-0000-000000000001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"bands",
+						"b0000000-0000-0000-0000-000000000001"
+					]
+				},
+				"description": "Update an existing band by ID\n\nStatus values:\n- 0: Active\n- 1: Split Up\n- 2: On Hold\n- 3: Unknown\n- 4: Changed Name"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Band",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:6000/bands/b0000000-0000-0000-0000-000000000001",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"bands",
+						"b0000000-0000-0000-0000-000000000001"
+					]
+				},
+				"description": "Delete a band by ID"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:6000",
+			"type": "string"
+		},
+		{
+			"key": "norwayCountryId",
+			"value": "c0000000-0000-0000-0000-000000000001",
+			"type": "string"
+		},
+		{
+			"key": "swedenCountryId",
+			"value": "c0000000-0000-0000-0000-000000000002",
+			"type": "string"
+		},
+		{
+			"key": "polandCountryId",
+			"value": "c0000000-0000-0000-0000-000000000004",
+			"type": "string"
+		},
+		{
+			"key": "darkthroneBandId",
+			"value": "b0000000-0000-0000-0000-000000000001",
+			"type": "string"
+		},
+		{
+			"key": "burzumBandId",
+			"value": "b0000000-0000-0000-0000-000000000002",
+			"type": "string"
+		},
+		{
+			"key": "blackMetalGenreId",
+			"value": "20000000-0000-0000-0000-000000000001",
+			"type": "string"
+		},
+		{
+			"key": "rawBlackMetalGenreId",
+			"value": "30000000-0000-0000-0000-000000000001",
+			"type": "string"
+		}
+	]
+}

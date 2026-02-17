@@ -1,4 +1,4 @@
-﻿using Archive.Grpc;
+﻿using Library.Grpc;
 
 namespace UserContent.API.Extensions
 {
@@ -18,7 +18,7 @@ namespace UserContent.API.Extensions
 
         public static IServiceCollection AddGrpcServices(this IServiceCollection services, string connectionString)
         {
-            services.AddGrpcClient<ArchiveProtoService.ArchiveProtoServiceClient>(options =>
+            services.AddGrpcClient<LibraryProtoService.LibraryProtoServiceClient>(options =>
             {
                 options.Address = new Uri(connectionString);
             });

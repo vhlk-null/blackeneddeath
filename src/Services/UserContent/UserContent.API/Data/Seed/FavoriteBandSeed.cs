@@ -10,14 +10,14 @@ namespace UserContent.API.Data.Seed
                 new FavoriteBand
                 {
                     UserId = SeedConstants.Users.MetalHead666,
-                    BandId = SeedConstants.ArchiveBands.Darkthrone,
+                    BandId = SeedConstants.LibraryBands.Darkthrone,
                     AddedDate = new DateTime(2023, 1, 20, 0, 0, 0, DateTimeKind.Utc),
                     IsFollowing = true
                 },
                 new FavoriteBand
                 {
                     UserId = SeedConstants.Users.MetalHead666,
-                    BandId = SeedConstants.ArchiveBands.Burzum,
+                    BandId = SeedConstants.LibraryBands.Burzum,
                     AddedDate = new DateTime(2023, 1, 25, 0, 0, 0, DateTimeKind.Utc),
                     IsFollowing = true
                 },
@@ -26,14 +26,14 @@ namespace UserContent.API.Data.Seed
                 new FavoriteBand
                 {
                     UserId = SeedConstants.Users.DarkSoulFan,
-                    BandId = SeedConstants.ArchiveBands.Emperor,
+                    BandId = SeedConstants.LibraryBands.Emperor,
                     AddedDate = new DateTime(2022, 6, 15, 0, 0, 0, DateTimeKind.Utc),
                     IsFollowing = true
                 },
                 new FavoriteBand
                 {
                     UserId = SeedConstants.Users.DarkSoulFan,
-                    BandId = SeedConstants.ArchiveBands.Mayhem,
+                    BandId = SeedConstants.LibraryBands.Mayhem,
                     AddedDate = new DateTime(2022, 7, 1, 0, 0, 0, DateTimeKind.Utc),
                     IsFollowing = true
                 },
@@ -42,14 +42,14 @@ namespace UserContent.API.Data.Seed
                 new FavoriteBand
                 {
                     UserId = SeedConstants.Users.BlastBeatLover,
-                    BandId = SeedConstants.ArchiveBands.Behemoth,
+                    BandId = SeedConstants.LibraryBands.Behemoth,
                     AddedDate = new DateTime(2024, 3, 15, 0, 0, 0, DateTimeKind.Utc),
                     IsFollowing = true
                 },
                 new FavoriteBand
                 {
                     UserId = SeedConstants.Users.BlastBeatLover,
-                    BandId = SeedConstants.ArchiveBands.Dissection,
+                    BandId = SeedConstants.LibraryBands.Dissection,
                     AddedDate = new DateTime(2024, 3, 20, 0, 0, 0, DateTimeKind.Utc),
                     IsFollowing = false
                 }

@@ -8,35 +8,35 @@ namespace UserContent.API.Data.Seed
             {
                 new Album
                 {
-                    Id = SeedConstants.ArchiveAlbums.TransilvanianHunger,
+                    Id = SeedConstants.LibraryAlbums.TransilvanianHunger,
                     Title = "Transilvanian Hunger",
                     CoverUrl = "https://example.com/covers/transilvanian-hunger.jpg",
                     ReleaseDate = 1994
                 },
                 new Album
                 {
-                    Id = SeedConstants.ArchiveAlbums.Filosofem,
+                    Id = SeedConstants.LibraryAlbums.Filosofem,
                     Title = "Filosofem",
                     CoverUrl = "https://example.com/covers/filosofem.jpg",
                     ReleaseDate = 1996
                 },
                 new Album
                 {
-                    Id = SeedConstants.ArchiveAlbums.NightsideEclipse,
+                    Id = SeedConstants.LibraryAlbums.NightsideEclipse,
                     Title = "In the Nightside Eclipse",
                     CoverUrl = "https://example.com/covers/nightside-eclipse.jpg",
                     ReleaseDate = 1994
                 },
                 new Album
                 {
-                    Id = SeedConstants.ArchiveAlbums.DeMysteriis,
+                    Id = SeedConstants.LibraryAlbums.DeMysteriis,
                     Title = "De Mysteriis Dom Sathanas",
                     CoverUrl = "https://example.com/covers/de-mysteriis.jpg",
                     ReleaseDate = 1994
                 },
                 new Album
                 {
-                    Id = SeedConstants.ArchiveAlbums.TheSatanist,
+                    Id = SeedConstants.LibraryAlbums.TheSatanist,
                     Title = "The Satanist",
                     CoverUrl = "https://example.com/covers/the-satanist.jpg",
                     ReleaseDate = 2014
