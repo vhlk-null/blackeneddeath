@@ -48,14 +48,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__LibraryDb=Host=librarydb;Port=5432;Database=LibraryDb;Username=postgres;Password=postgres
     depends_on:
       librarydb:
         condition: service_healthy
     ports:
       - "6000:8080"
-      - "6001:8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -69,7 +67,7 @@ services:
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__UserContentDB=Host=usercontentdb;Port=5432;Database=UserContentDB;Username=postgres;Password=postgres
       - ConnectionStrings__Redis=distributedcache:6379,abortConnect=false
-      - GrpcSettings__LibraryUrl=https://library.api:8081
+      - GrpcSettings__LibraryUrl=http://library.api:8080
     depends_on:
       usercontentdb:
         condition: service_healthy

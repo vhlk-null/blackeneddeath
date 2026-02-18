@@ -5,6 +5,9 @@
   <Folder Name="/Services/" />
   <Folder Name="/Services/Library/">
     <Project Path="Services/Library/Library.API/Library.API.csproj" />
+    <Project Path="Services/Library/Library.Application/Library.Application.csproj" Id="12629964-a2d2-4e69-bd1c-58077bff5888" />
+    <Project Path="Services/Library/Library.Infrastructure/Library.Infrastructure.csproj" Id="8bf9a027-3108-429c-aaee-c75ac93ab9b6" />
+    <Project Path="Services/Library/Librrary.Domain/Librrary.Domain.csproj" Id="eb062dac-c81c-4759-895d-c66aaae8320a" />
   </Folder>
   <Folder Name="/Services/UserContent/">
     <Project Path="Services/UserContent/UserContent.API/UserContent.API.csproj">
