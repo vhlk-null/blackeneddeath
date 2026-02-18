@@ -2,7 +2,7 @@
 
 namespace Library.API.Extensions
 {
-    public static class ServiceCollectionDIExtensions
+    public static class ServiceCollectionDiExtensions
     {
         public static IServiceCollection AddDatabaseServices(
         this IServiceCollection services,

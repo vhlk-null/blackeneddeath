@@ -1,4 +1,14 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Library.API;
+using Library.Application;
+using Library.Infrastructure;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
+        .AddApplicationServices()
+        .AddInfrastructureServices(builder.Configuration)
+        .AddApiServices();
+// -----------------------------
 
 // ===== MAPPINGS =====
 MappingConfig.RegisterMappings();
