@@ -1,6 +1,6 @@
 ﻿using BuildingBlocks.Extentions;
 using Library.API.Data;
-using Library.API.Models;
+using Library.Domain.Models;
 
 namespace Library.API.Albums.GetAlbums
 {

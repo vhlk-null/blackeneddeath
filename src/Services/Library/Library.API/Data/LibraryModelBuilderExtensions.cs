@@ -1,5 +1,6 @@
-﻿using Library.API.Models;
-using Library.API.Models.JoinTables;
+﻿using Library.API.Models.JoinTables;
+using Library.Domain.Models;
+using Library.Domain.Models.JoinTables;
 
 namespace Library.API.Data
 {

@@ -1,6 +1,6 @@
 ﻿using Grpc.Core;
 using Library.API.Data;
-using Library.API.Models;
+using Library.Domain.Models;
 using Library.Grpc;
 
 namespace Library.API.gRPC.Services

@@ -1,4 +1,5 @@
 using Library.API.Models.JoinTables;
+using Library.Domain.Models.JoinTables;
 
 namespace Library.API.Data.Seed
 {

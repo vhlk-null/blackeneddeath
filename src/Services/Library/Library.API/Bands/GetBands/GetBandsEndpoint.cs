@@ -1,4 +1,4 @@
-using Library.API.Models;
+using Library.Domain.Models;
 
 namespace Library.API.Bands.GetBands
 {

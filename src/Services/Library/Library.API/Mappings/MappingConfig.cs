@@ -1,4 +1,4 @@
-using Library.API.Models;
+using Library.Domain.Models;
 using AlbumDto = Library.API.Albums.GetAlbums.AlbumDto;
 using BandDto = Library.API.Albums.GetAlbums.BandDto;
 using CountryDto = Library.API.Albums.GetAlbums.CountryDto;

@@ -1,7 +1,7 @@
 using Library.API.Bands.GetBands;
 using Library.API.Data;
 using Library.API.Exceptions;
-using Library.API.Models;
+using Library.Domain.Models;
 
 namespace Library.API.Bands.GetBandsBy.GetBandById;
 

@@ -1,6 +1,6 @@
 using Library.API.Data;
-using Library.API.Models;
 using Library.API.Resources.ResourceManagement;
+using Library.Domain.Models;
 
 namespace Library.API.Bands.CreateBand
 {
