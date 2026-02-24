@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Configurations\" />
     <Folder Include="Data\Extenstions\" />
     <Folder Include="Data\Interceptors\" />
     <Folder Include="Data\NewFolder\" />
