@@ -1,9 +1,9 @@
-﻿namespace Library.Domain.Models.JoinTables;
+namespace Library.Domain.Models.JoinTables;
 
 public class AlbumGenre : JoinEntity
 {
-    public AlbumId AlbumId { get; private set; }
-    public GenreId GenreId { get; private set; }
+    public AlbumId AlbumId { get; private set; } = null!;
+    public GenreId GenreId { get; private set; } = null!;
     public bool IsPrimary { get; private set; }
 
     private AlbumGenre() { }

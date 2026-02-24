@@ -1,9 +1,9 @@
-﻿namespace Library.Domain.Models.JoinTables;
+namespace Library.Domain.Models.JoinTables;
 
 public class AlbumCountry : JoinEntity
 {
-    public AlbumId AlbumId { get; private set; }
-    public CountryId CountryId { get; private set; }
+    public AlbumId AlbumId { get; private set; } = null!;
+    public CountryId CountryId { get; private set; } = null!;
 
     private AlbumCountry() { }
 

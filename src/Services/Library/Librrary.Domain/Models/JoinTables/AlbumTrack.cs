@@ -2,8 +2,8 @@ namespace Library.Domain.Models.JoinTables;
 
 public class AlbumTrack : JoinEntity
 {
-    public AlbumId AlbumId { get; private set; }
-    public TrackId TrackId { get; private set; }
+    public AlbumId AlbumId { get; private set; } = null!;
+    public TrackId TrackId { get; private set; } = null!;
     public int TrackNumber { get; private set; }
 
     private AlbumTrack() { }

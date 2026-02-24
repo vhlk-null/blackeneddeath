@@ -2,7 +2,7 @@
 
 public class Genre : Aggregate<GenreId>
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
     public GenreId? ParentGenreId { get; private set; }
 
     private readonly List<GenreId> _subGenreIds = [];

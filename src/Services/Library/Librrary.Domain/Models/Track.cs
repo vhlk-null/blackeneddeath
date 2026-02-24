@@ -2,7 +2,7 @@ namespace Library.Domain.Models;
 
 public class Track : Entity<TrackId>
 {
-    public string Title { get; private set; }
+    public string Title { get; private set; } = null!;
 
     private Track() { }
 
