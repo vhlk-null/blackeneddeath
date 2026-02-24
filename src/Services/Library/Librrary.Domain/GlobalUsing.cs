@@ -3,3 +3,7 @@ global using Library.Domain.Enums;
 global using Library.Domain.Models.JoinTables;
 global using Library.Domain.ValueObjects;
 global using Library.Domain.ValueObjects.Ids;
+global using Library.Domain.Exceptions;
+global using Library.Domain.Models;
+global using Library.Domain.Events.Album;
+global using Library.Domain.Events.Band;

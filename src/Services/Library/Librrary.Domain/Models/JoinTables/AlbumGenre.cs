@@ -6,6 +6,8 @@
         public GenreId GenreId { get; private set; }
         public bool IsPrimary { get; private set; }
 
+        private AlbumGenre() { }
+
         internal AlbumGenre(AlbumId albumId, GenreId genreId, bool isPrimary)
         {
             AlbumId = albumId;

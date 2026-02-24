@@ -5,6 +5,8 @@
         public CountryId CountryId { get; private set; }
         public BandId BandId { get; private set; }
 
+        private BandCountry() { }
+
         internal BandCountry(CountryId countryId, BandId bandId)
         {
             CountryId = countryId;

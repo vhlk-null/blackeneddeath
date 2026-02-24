@@ -5,6 +5,8 @@
         public AlbumId AlbumId { get; private set; }
         public CountryId CountryId { get; private set; }
 
+        private AlbumCountry() { }
+
         internal AlbumCountry(AlbumId albumId, CountryId countryId)
         {
             AlbumId = albumId;
