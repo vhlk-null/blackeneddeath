@@ -1,15 +1,15 @@
 ﻿using Library.API.Albums.GetAlbums;
 
-namespace Library.API.Albums.GetAlbumsBy.GetAlbumById
-{
-    //public record GetAlbumByIdRequest(Guid Id) : IRequest<GetAlbumByIdResult>;
-    public record GetAlbumByIdResponse(AlbumDto Album);
+namespace Library.API.Albums.GetAlbumsBy.GetAlbumById;
 
-    public class GetAlbumByIdEndpoint : ICarterModule
+//public record GetAlbumByIdRequest(Guid Id) : IRequest<GetAlbumByIdResult>;
+public record GetAlbumByIdResponse(AlbumDto Album);
+
+public class GetAlbumByIdEndpoint : ICarterModule
+{
+    public void AddRoutes(IEndpointRouteBuilder app)
     {
-        public void AddRoutes(IEndpointRouteBuilder app)
-        {
-            app.MapGet("/albums/{id:guid}", async (Guid id, ISender sender) =>
+        app.MapGet("/albums/{id:guid}", async (Guid id, ISender sender) =>
             {
                 var query = new GetAlbumByIdQuery(id);
                 var result = await sender.Send(query);
@@ -21,6 +21,5 @@ namespace Library.API.Albums.GetAlbumsBy.GetAlbumById
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Album by Id")
             .WithDescription("Get Album by Id");
-        }
     }
 }

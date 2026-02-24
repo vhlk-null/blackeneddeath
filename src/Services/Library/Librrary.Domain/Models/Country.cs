@@ -1,8 +1,7 @@
-﻿namespace Library.Domain.Models
+﻿namespace Library.Domain.Models;
+
+public class Country : Entity<Guid>
 {
-    public class Country : Entity<Guid>
-    {
-        public string Name { get; set; } = null!;
-        public string Code { get; set; } = null!;
-    }
+    public string Name { get; set; } = null!;
+    public string Code { get; set; } = null!;
 }

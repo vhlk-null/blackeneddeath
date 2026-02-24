@@ -1,13 +1,13 @@
-﻿namespace Library.API.Albums.DeleteAlbums
-{
-    //public record DeleteAlbumRequest(Guid Id);
-    public record DeleteAlbumResponse(bool IsSuccess);
+﻿namespace Library.API.Albums.DeleteAlbums;
 
-    public class DeleteAlbumEndpoint : ICarterModule
+//public record DeleteAlbumRequest(Guid Id);
+public record DeleteAlbumResponse(bool IsSuccess);
+
+public class DeleteAlbumEndpoint : ICarterModule
+{
+    public void AddRoutes(IEndpointRouteBuilder app)
     {
-        public void AddRoutes(IEndpointRouteBuilder app)
-        {
-            app.MapDelete("/albums/{id:guid}", async (Guid id, ISender sender) =>
+        app.MapDelete("/albums/{id:guid}", async (Guid id, ISender sender) =>
             {
                 var command = new DeleteAlbumCommand(id);
                 var result = await sender.Send(command);
@@ -20,6 +20,5 @@
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Delete Album")
             .WithDescription("Delete Album");
-        }
     }
 }

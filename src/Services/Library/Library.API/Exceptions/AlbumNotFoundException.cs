@@ -1,9 +1,8 @@
-﻿namespace Library.API.Exceptions
+﻿namespace Library.API.Exceptions;
+
+public class AlbumNotFoundException : NotFoundException
 {
-    public class AlbumNotFoundException : NotFoundException
+    public AlbumNotFoundException(Guid Id) : base("Album", Id)
     {
-        public AlbumNotFoundException(Guid Id) : base("Album", Id)
-        {
-        }
     }
 }

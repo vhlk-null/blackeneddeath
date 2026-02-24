@@ -142,6 +142,4 @@ public class Album : Aggregate<AlbumId>
 
         _streamingLinks.Remove(entry);
     }
-
-   
 }

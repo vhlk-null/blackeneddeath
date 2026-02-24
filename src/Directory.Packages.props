@@ -24,8 +24,9 @@
   </ItemGroup>
   <ItemGroup Label="Database - Entity Framework Core">
     <!-- EF Core -->
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3" />
     <!-- PostgreSQL provider -->
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
   </ItemGroup>
@@ -34,12 +35,12 @@
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.2" />
   </ItemGroup>
   <ItemGroup Label="Communication - gRPC">
-    <!-- gRPC Server -->
-    <PackageVersion Include="Grpc.AspNetCore" Version="2.49.0" />
-    <!-- gRPC Client (add when needed for UserContent.API) -->
-    <!-- <PackageVersion Include="Grpc.Net.Client" Version="2.60.0" /> -->
-    <!-- <PackageVersion Include="Grpc.Tools" Version="2.60.0" /> -->
-    <!-- <PackageVersion Include="Google.Protobuf" Version="3.25.1" /> -->
+    <!-- gRPC Server (Library.API) -->
+    <PackageVersion Include="Grpc.AspNetCore" Version="2.60.0" />
+    <!-- gRPC Client (UserContent.API) -->
+    <PackageVersion Include="Grpc.Net.Client" Version="2.60.0" />
+    <PackageVersion Include="Grpc.Tools" Version="2.60.0" />
+    <PackageVersion Include="Google.Protobuf" Version="3.25.1" />
   </ItemGroup>
   <ItemGroup Label="Health Checks">
     <!-- Health checks for databases and caches -->

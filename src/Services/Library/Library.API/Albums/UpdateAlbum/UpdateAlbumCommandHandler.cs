@@ -3,9 +3,9 @@ using Library.API.Exceptions;
 using Library.API.Resources.ResourceManagement;
 using Library.Domain.Models;
 
-namespace Library.API.Albums.UpdateAlbum
-{
-    public record UpdateAlbumCommand(Guid Id,
+namespace Library.API.Albums.UpdateAlbum;
+
+public record UpdateAlbumCommand(Guid Id,
     string Title,
     int ReleaseDate,
     AlbumType Type,
@@ -16,46 +16,45 @@ namespace Library.API.Albums.UpdateAlbum
     List<Guid> GenreIds,
     List<Guid> TagIds) : ICommand<UpdateAlbumResult>;
 
-    public record UpdateAlbumResult(bool IsSuccess);
+public record UpdateAlbumResult(bool IsSuccess);
 
-    public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
+public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
+{
+    public UpdateAlbumCommandValidator()
     {
-        public UpdateAlbumCommandValidator()
-        {
-            RuleFor(x => x.Title)
-             .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
-             .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
+        RuleFor(x => x.Title)
+            .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
+            .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
 
-            RuleFor(x => x.Label)
-                .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
-             .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
+        RuleFor(x => x.Label)
+            .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
+            .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
 
-            //RuleFor(x => x.CountryId)
-            //    .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
-            //    .WithMessage(ValidationMessages.MaxLengthIsExceeded);
+        //RuleFor(x => x.CountryId)
+        //    .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
+        //    .WithMessage(ValidationMessages.MaxLengthIsExceeded);
 
-            RuleFor(x => x.ReleaseDate)
-                .GreaterThan(0).WithMessage(ValidationMessages.ReleaseYearRequired)
-                .GreaterThan(1900).WithMessage(ValidationMessages.ReleaseYearTooOld)
-                .LessThanOrEqualTo(DateTime.UtcNow.Year).WithMessage(ValidationMessages.ReleaseYearInFuture);
-        }
+        RuleFor(x => x.ReleaseDate)
+            .GreaterThan(0).WithMessage(ValidationMessages.ReleaseYearRequired)
+            .GreaterThan(1900).WithMessage(ValidationMessages.ReleaseYearTooOld)
+            .LessThanOrEqualTo(DateTime.UtcNow.Year).WithMessage(ValidationMessages.ReleaseYearInFuture);
     }
+}
 
-    internal class UpdateAlbumCommandHandler(IRepository<LibraryContext> repo) : ICommandHandler<UpdateAlbumCommand, UpdateAlbumResult>
+internal class UpdateAlbumCommandHandler(IRepository<LibraryContext> repo) : ICommandHandler<UpdateAlbumCommand, UpdateAlbumResult>
+{
+    public async ValueTask<UpdateAlbumResult> Handle(UpdateAlbumCommand command, CancellationToken cancellationToken)
     {
-        public async ValueTask<UpdateAlbumResult> Handle(UpdateAlbumCommand command, CancellationToken cancellationToken)
-        {
-            var album = await repo.GetByAsync<Album>(a => a.Id == command.Id) ?? throw new AlbumNotFoundException(command.Id);
+        var album = await repo.GetByAsync<Album>(a => a.Id == command.Id) ?? throw new AlbumNotFoundException(command.Id);
 
-            album.Title = command.Title;
-            album.ReleaseDate = command.ReleaseDate;
-            album.Type = command.Type;
-            album.Format = command.Format;
-            album.Label = command.Label;
+        album.Title = command.Title;
+        album.ReleaseDate = command.ReleaseDate;
+        album.Type = command.Type;
+        album.Format = command.Format;
+        album.Label = command.Label;
 
-            repo.Update(album);
+        repo.Update(album);
 
-            return new UpdateAlbumResult(true);
-        }
+        return new UpdateAlbumResult(true);
     }
 }

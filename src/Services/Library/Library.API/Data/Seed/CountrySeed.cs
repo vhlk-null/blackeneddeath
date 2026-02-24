@@ -1,11 +1,11 @@
 ﻿using Library.Domain.Models;
 
-namespace Library.API.Data.Seed
+namespace Library.API.Data.Seed;
+
+public static class CountrySeed
 {
-    public static class CountrySeed
+    public static List<Country> GetCountries()
     {
-        public static List<Country> GetCountries()
-        {
         return new List<Country>
         {
             new Country
@@ -63,6 +63,5 @@ namespace Library.API.Data.Seed
                 Code = "FR"
             }
         };
-        }
     }
 }

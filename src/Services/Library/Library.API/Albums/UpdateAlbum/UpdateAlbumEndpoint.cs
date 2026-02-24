@@ -1,8 +1,8 @@
 ﻿using Library.Domain.Models;
 
-namespace Library.API.Albums.UpdateAlbum
-{
-    public record UpdateAlbumRequest(Guid Id,
+namespace Library.API.Albums.UpdateAlbum;
+
+public record UpdateAlbumRequest(Guid Id,
     string Title,
     int ReleaseDate,
     AlbumType Type,
@@ -13,13 +13,13 @@ namespace Library.API.Albums.UpdateAlbum
     List<Guid> GenreIds,
     List<Guid> TagIds);
 
-    public record UpdateAlbumResponse(bool IsSuccess);
+public record UpdateAlbumResponse(bool IsSuccess);
 
-    public class UpdateAlbumEndpoint : ICarterModule
+public class UpdateAlbumEndpoint : ICarterModule
+{
+    public void AddRoutes(IEndpointRouteBuilder app)
     {
-        public void AddRoutes(IEndpointRouteBuilder app)
-        {
-            app.MapPut("/albums", async (UpdateAlbumRequest request, ISender sender) =>
+        app.MapPut("/albums", async (UpdateAlbumRequest request, ISender sender) =>
             {
                 var command = request.Adapt<UpdateAlbumCommand>();
 
@@ -29,11 +29,10 @@ namespace Library.API.Albums.UpdateAlbum
 
                 return Results.Ok(response);
             })
-             .WithName("UpdateAlbums")
-             .Produces<UpdateAlbumResponse>(StatusCodes.Status200OK)
-             .ProducesProblem(StatusCodes.Status400BadRequest)
-             .WithSummary("Update Albums")
-             .WithDescription("Update Albums");
-        }
+            .WithName("UpdateAlbums")
+            .Produces<UpdateAlbumResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .WithSummary("Update Albums")
+            .WithDescription("Update Albums");
     }
 }

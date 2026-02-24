@@ -1,69 +1,68 @@
 ﻿using Library.API.Data;
 
-namespace Library.API.Extensions
+namespace Library.API.Extensions;
+
+public static class ServiceCollectionDiExtensions
 {
-    public static class ServiceCollectionDiExtensions
-    {
-        public static IServiceCollection AddDatabaseServices(
+    public static IServiceCollection AddDatabaseServices(
         this IServiceCollection services,
         string connectionString)
+    {
+        services.AddDbContext<LibraryContext>(options =>
+            options.UseNpgsql(connectionString));
+
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<LibraryContext>());
+
+        return services;
+    }
+
+    public static IServiceCollection AddMediatorServices(this IServiceCollection services)
+    {
+        services.AddMediator(options =>
         {
-            services.AddDbContext<LibraryContext>(options =>
-                options.UseNpgsql(connectionString));
+            options.ServiceLifetime = ServiceLifetime.Scoped;
+        });
 
-            services.AddScoped<DbContext>(sp => sp.GetRequiredService<LibraryContext>());
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(Behavior.UnitOfWorkBehavior<,>));
 
-            return services;
-        }
+        return services;
+    }
 
-        public static IServiceCollection AddMediatorServices(this IServiceCollection services)
-        {
-            services.AddMediator(options =>
-            {
-                options.ServiceLifetime = ServiceLifetime.Scoped;
-            });
+    public static IServiceCollection AddValidationServices(this IServiceCollection services)
+    {
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        return services;
+    }
 
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(Behavior.UnitOfWorkBehavior<,>));
+    public static IServiceCollection AddHealthCheckServices(
+        this IServiceCollection services,
+        string dbConnection)
+    {
+        services.AddHealthChecks()
+            .AddNpgSql(dbConnection, name: "postgresql");
 
-            return services;
-        }
+        return services;
+    }
 
-        public static IServiceCollection AddValidationServices(this IServiceCollection services)
-        {
-            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-            return services;
-        }
+    public static IServiceCollection AddApiDocumentation(this IServiceCollection services)
+    {
+        services.AddEndpointsApiExplorer();
+        return services;
+    }
 
-        public static IServiceCollection AddHealthCheckServices(
-            this IServiceCollection services,
-            string dbConnection)
-        {
-            services.AddHealthChecks()
-                .AddNpgSql(dbConnection, name: "postgresql");
+    public static IServiceCollection AddRepositoryServices(this IServiceCollection services)
+    {
+        services.AddScoped<IRepository<LibraryContext>, LibraryRepository>();
 
-            return services;
-        }
-
-        public static IServiceCollection AddApiDocumentation(this IServiceCollection services)
-        {
-            services.AddEndpointsApiExplorer();
-            return services;
-        }
-
-        public static IServiceCollection AddRepositoryServices(this IServiceCollection services)
-        {
-            services.AddScoped<IRepository<LibraryContext>, LibraryRepository>();
-
-            return services;
-        }
+        return services;
+    }
 
 
-        public static IServiceCollection AddGrpcServices(this IServiceCollection services)
-        {
-            services.AddGrpc();
-            return services;
-        }
+    public static IServiceCollection AddGrpcServices(this IServiceCollection services)
+    {
+        services.AddGrpc();
+        return services;
     }
 }

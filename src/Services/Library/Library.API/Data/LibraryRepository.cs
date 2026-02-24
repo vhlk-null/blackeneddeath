@@ -1,10 +1,9 @@
-﻿namespace Library.API.Data
+﻿namespace Library.API.Data;
+
+public class LibraryRepository : BaseGenericRepository<LibraryContext>
 {
-    public class LibraryRepository : BaseGenericRepository<LibraryContext>
+    public LibraryRepository(LibraryContext context)
     {
-        public LibraryRepository(LibraryContext context)
-        {
-            Context = context;
-        }
+        Context = context;
     }
 }
