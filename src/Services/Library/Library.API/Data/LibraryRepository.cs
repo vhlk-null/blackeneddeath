@@ -1,4 +1,6 @@
-﻿namespace Library.API.Data;
+﻿using Library.Infrastructure.Data;
+
+namespace Library.API.Data;
 
 public class LibraryRepository : BaseGenericRepository<LibraryContext>
 {

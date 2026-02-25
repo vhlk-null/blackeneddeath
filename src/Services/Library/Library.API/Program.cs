@@ -18,14 +18,14 @@ var dbConnection = builder.Configuration.GetConnectionString(ConnectionStrings.L
     ?? throw new InvalidOperationException($"{ConnectionStrings.LibraryDatabase} connection string is missing");
 
 // ===== SERVICES =====
-builder.Services
-    .AddDatabaseServices(dbConnection)
-    .AddRepositoryServices()
-    .AddMediatorServices()
-    .AddGrpcServices()
-    .AddValidationServices()
-    .AddHealthCheckServices(dbConnection)
-    .AddApiDocumentation();
+//builder.Services
+//    .AddDatabaseServices(dbConnection)
+//    .AddRepositoryServices()
+//    .AddMediatorServices()
+//    .AddGrpcServices()
+//    .AddValidationServices()
+//    .AddHealthCheckServices(dbConnection)
+//    .AddApiDocumentation();
 
 builder.Services.AddCarter();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();

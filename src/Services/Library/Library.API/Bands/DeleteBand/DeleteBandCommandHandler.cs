@@ -2,6 +2,7 @@ using Library.API.Data;
 using Library.API.Exceptions;
 using Library.API.Resources.ResourceManagement;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Bands.DeleteBand;
 
@@ -26,7 +27,7 @@ internal class DeleteBandCommandHandler(
         CancellationToken cancellationToken)
     {
         var band = await repo.GetByAsync<Band>(
-            b => b.Id == command.Id,
+            b => b.Id.Value == command.Id,
             cancellationToken: cancellationToken);
 
         if (band == null) throw new BandNotFoundException(command.Id);

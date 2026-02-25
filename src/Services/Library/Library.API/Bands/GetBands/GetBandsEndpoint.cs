@@ -1,3 +1,4 @@
+using Library.Domain.Enums;
 using Library.Domain.Models;
 
 namespace Library.API.Bands.GetBands;

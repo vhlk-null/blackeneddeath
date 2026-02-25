@@ -1,6 +1,8 @@
 ﻿using Library.API.Data;
 using Library.API.Resources.ResourceManagement;
+using Library.Domain.Enums;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Albums.CreateAlbum;
 
@@ -47,24 +49,10 @@ internal class CreateAlbumCommandHandler(IRepository<LibraryContext> repo)
 {
     public async ValueTask<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
     {
-        var album = new Album
-        {
-            Id = Guid.NewGuid(),
-            Title = command.Title,
-            ReleaseDate = command.ReleaseDate,
-            Type = command.Type,
-            Format = command.Format,
-            Label = command.Label,
-            //CountryId = command.CountryId,
-            //CoverUrl = coverUrl,
-            //Genres = command.GenreIds.Select(genreId => new AlbumGenre
-            //{
-            //    GenreId = genreId
-            //}).ToList()
-        };
+        var album = Album.Create("", AlbumType.Compilation, null, "", null);
 
         await repo.AddAsync(album, cancellationToken);
 
-        return new CreateAlbumResult(album.Id);
+        return new CreateAlbumResult(new Guid());
     }
 }

@@ -2,6 +2,7 @@ using Library.API.Bands.GetBands;
 using Library.API.Data;
 using Library.API.Exceptions;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Bands.GetBandsBy.GetBandById;
 
@@ -13,15 +14,15 @@ internal class GetBandByIdQueryHandler(IRepository<LibraryContext> repo)
 {
     public async ValueTask<GetBandByIdResult> Handle(GetBandByIdQuery query, CancellationToken cancellationToken)
     {
-        var band = await repo.Filter<Band>(b => b.Id == query.Id)
-            .Include(b => b.Country)
-            .Include(b => b.Albums).ThenInclude(ab => ab.Album)
-            .Include(b => b.Genres).ThenInclude(bg => bg.Genre)
-            .ProjectToType<BandDto>()
-            .FirstOrDefaultAsync(cancellationToken);
+        //var band = await repo.Filter<Band>(b => b.Id == query.Id)
+        //    .Include(b => b.Country)
+        //    .Include(b => b.Albums).ThenInclude(ab => ab.Album)
+        //    .Include(b => b.Genres).ThenInclude(bg => bg.Genre)
+        //    .ProjectToType<BandDto>()
+        //    .FirstOrDefaultAsync(cancellationToken);
 
-        if (band == null) throw new BandNotFoundException(query.Id);
+        //if (band == null) throw new BandNotFoundException(query.Id);
 
-        return new GetBandByIdResult(band);
+        return new GetBandByIdResult(new BandDto());
     }
 }

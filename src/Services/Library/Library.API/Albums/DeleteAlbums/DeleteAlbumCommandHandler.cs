@@ -2,6 +2,7 @@
 using Library.API.Exceptions;
 using Library.API.Resources.ResourceManagement;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Albums.DeleteAlbums;
 
@@ -26,7 +27,7 @@ internal class DeleteAlbumCommandHandler(
         CancellationToken cancellationToken)
     {
         var album = await repo.GetByAsync<Album>(
-            a => a.Id == command.Id,
+            a => a.Id.Value == command.Id,
             cancellationToken: cancellationToken);
 
         if (album == null) throw new AlbumNotFoundException(command.Id);

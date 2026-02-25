@@ -1,6 +1,7 @@
 using BuildingBlocks.Extentions;
 using Library.API.Data;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Bands.GetBands;
 
@@ -14,17 +15,19 @@ public class GetBandsQueryHandler(IRepository<LibraryContext> repo)
         GetBandsQuery query,
         CancellationToken cancellationToken)
     {
-        var bandsQuery = repo.All<Band>()
-            .Include(b => b.Country)
-            .Include(b => b.Albums).ThenInclude(ab => ab.Album)
-            .Include(b => b.Genres).ThenInclude(bg => bg.Genre)
-            .OrderBy(b => b.Name)
-            .ProjectToType<BandDto>();
+        //var bandsQuery = repo.All<Band>()
+        //    .Include(b => b.Country)
+        //    .Include(b => b.Albums).ThenInclude(ab => ab.Album)
+        //    .Include(b => b.Genres).ThenInclude(bg => bg.Genre)
+        //    .OrderBy(b => b.Name)
+        //    .ProjectToType<BandDto>();
 
-        return await bandsQuery.ToPagedResultAsync(
-            query.PageNumber ?? 1,
-            query.PageSize ?? 10,
-            cancellationToken
-        );
+        //return await bandsQuery.ToPagedResultAsync(
+        //    query.PageNumber ?? 1,
+        //    query.PageSize ?? 10,
+        //    cancellationToken
+        //);
+
+        return new PagedResult<BandDto>();
     }
 }

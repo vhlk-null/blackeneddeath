@@ -1,7 +1,9 @@
 using Library.API.Data;
 using Library.API.Exceptions;
 using Library.API.Resources.ResourceManagement;
+using Library.Domain.Enums;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Bands.UpdateBand;
 
@@ -43,17 +45,17 @@ internal class UpdateBandCommandHandler(IRepository<LibraryContext> repo) : ICom
 {
     public async ValueTask<UpdateBandResult> Handle(UpdateBandCommand command, CancellationToken cancellationToken)
     {
-        var band = await repo.GetByAsync<Band>(b => b.Id == command.Id, cancellationToken: cancellationToken)
-                   ?? throw new BandNotFoundException(command.Id);
+        //var band = await repo.GetByAsync<Band>(b => b.Id == command.Id, cancellationToken: cancellationToken)
+        //           ?? throw new BandNotFoundException(command.Id);
 
-        band.Name = command.Name;
-        band.Bio = command.Bio;
-        band.CountryId = command.CountryId;
-        band.FormedYear = command.FormedYear;
-        band.DisbandedYear = command.DisbandedYear;
-        band.Status = command.Status;
+        //band.Name = command.Name;
+        //band.Bio = command.Bio;
+        //band.CountryId = command.CountryId;
+        //band.FormedYear = command.FormedYear;
+        //band.DisbandedYear = command.DisbandedYear;
+        //band.Status = command.Status;
 
-        repo.Update(band);
+        //repo.Update(band);
 
         return new UpdateBandResult(true);
     }

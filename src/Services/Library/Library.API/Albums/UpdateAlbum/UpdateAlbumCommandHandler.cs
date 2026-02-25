@@ -1,7 +1,9 @@
 ﻿using Library.API.Data;
 using Library.API.Exceptions;
 using Library.API.Resources.ResourceManagement;
+using Library.Domain.Enums;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Albums.UpdateAlbum;
 
@@ -45,15 +47,15 @@ internal class UpdateAlbumCommandHandler(IRepository<LibraryContext> repo) : ICo
 {
     public async ValueTask<UpdateAlbumResult> Handle(UpdateAlbumCommand command, CancellationToken cancellationToken)
     {
-        var album = await repo.GetByAsync<Album>(a => a.Id == command.Id) ?? throw new AlbumNotFoundException(command.Id);
+        //var album = await repo.GetByAsync<Album>(a => a.Id == command.Id) ?? throw new AlbumNotFoundException(command.Id);
 
-        album.Title = command.Title;
-        album.ReleaseDate = command.ReleaseDate;
-        album.Type = command.Type;
-        album.Format = command.Format;
-        album.Label = command.Label;
+        //album.Title = command.Title;
+        //album.ReleaseDate = command.ReleaseDate;
+        //album.Type = command.Type;
+        //album.Format = command.Format;
+        //album.Label = command.Label;
 
-        repo.Update(album);
+        //repo.Update(album);
 
         return new UpdateAlbumResult(true);
     }

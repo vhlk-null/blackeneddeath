@@ -1,6 +1,7 @@
 using Library.API.Bands.GetBands;
 using Library.API.Data;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Bands.GetBandsBy.GetBandsByCountry;
 
@@ -12,13 +13,13 @@ internal class GetBandsByCountryQueryHandler(IRepository<LibraryContext> repo)
 {
     public async ValueTask<GetBandsByCountryResult> Handle(GetBandsByCountryQuery query, CancellationToken cancellationToken)
     {
-        var bands = await repo.Filter<Band>(b => b.CountryId == query.CountryId)
-            .Include(b => b.Country)
-            .Include(b => b.Albums).ThenInclude(ab => ab.Album)
-            .Include(b => b.Genres).ThenInclude(bg => bg.Genre)
-            .ProjectToType<BandDto>()
-            .ToListAsync(cancellationToken);
+        //var bands = await repo.Filter<Band>(b => b.CountryId == query.CountryId)
+        //    .Include(b => b.Country)
+        //    .Include(b => b.Albums).ThenInclude(ab => ab.Album)
+        //    .Include(b => b.Genres).ThenInclude(bg => bg.Genre)
+        //    .ProjectToType<BandDto>()
+        //    .ToListAsync(cancellationToken);
 
-        return new GetBandsByCountryResult(bands);
+        return new GetBandsByCountryResult(new BandDto[]{});
     }
 }

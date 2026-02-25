@@ -1,6 +1,8 @@
 using Library.API.Data;
 using Library.API.Resources.ResourceManagement;
+using Library.Domain.Enums;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Bands.CreateBand;
 
@@ -43,19 +45,19 @@ internal class CreateBandCommandHandler(IRepository<LibraryContext> repo)
 {
     public async ValueTask<CreateBandResult> Handle(CreateBandCommand command, CancellationToken cancellationToken)
     {
-        var band = new Band
-        {
-            Id = Guid.NewGuid(),
-            Name = command.Name,
-            Bio = command.Bio,
-            CountryId = command.CountryId,
-            FormedYear = command.FormedYear,
-            DisbandedYear = command.DisbandedYear,
-            Status = command.Status
-        };
+        //var band = new Band
+        //{
+        //    Id = Guid.NewGuid(),
+        //    Name = command.Name,
+        //    Bio = command.Bio,
+        //    CountryId = command.CountryId,
+        //    FormedYear = command.FormedYear,
+        //    DisbandedYear = command.DisbandedYear,
+        //    Status = command.Status
+        //};
 
-        await repo.AddAsync(band, cancellationToken);
+        //await repo.AddAsync(band, cancellationToken);
 
-        return new CreateBandResult(band.Id);
+        return new CreateBandResult(new Guid());
     }
 }

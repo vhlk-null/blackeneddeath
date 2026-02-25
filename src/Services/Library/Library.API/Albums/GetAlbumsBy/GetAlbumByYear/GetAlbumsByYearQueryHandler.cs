@@ -1,5 +1,6 @@
 ﻿using Library.API.Data;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Albums.GetAlbumsBy.GetAlbumByYear;
 
@@ -11,7 +12,7 @@ internal class GetAlbumByByYearQueryHandler(IRepository<LibraryContext> repo)
 {
     public async ValueTask<GetAlbumsByYearResult> Handle(GetAlbumsByYearQuery query, CancellationToken cancellationToken)
     {
-        var albums = await repo.FilterAsync<Album>(a => a.ReleaseDate == query.ReleaseDate);
+        var albums = await repo.FilterAsync<Album>(a => a.AlbumRelease.ReleaseYear == query.ReleaseDate);
 
         return new GetAlbumsByYearResult(albums);
     }

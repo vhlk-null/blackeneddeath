@@ -1,6 +1,7 @@
 ﻿using BuildingBlocks.Extentions;
 using Library.API.Data;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Albums.GetAlbums;
 
@@ -14,19 +15,21 @@ public class GetAlbumsQueryHandler(IRepository<LibraryContext> repo)
         GetAlbumsQuery query,
         CancellationToken cancellationToken)
     {
-        var albumsQuery = repo.All<Album>()
-            .Include(a => a.Bands).ThenInclude(ab => ab.Band)
-            .Include(a => a.Countries).ThenInclude(ac => ac.Country)
-            .Include(a => a.StreamingLinks)
-            .Include(a => a.Tracks).ThenInclude(at => at.Track)
-            .Include(a => a.Genres).ThenInclude(ag => ag.Genre)
-            .OrderByDescending(a => a.ReleaseDate)
-            .ProjectToType<AlbumDto>();
+        //var albumsQuery = repo.All<Album>()
+        //    .Include(a => a.Bands).ThenInclude(ab => ab.Band)
+        //    .Include(a => a.Countries).ThenInclude(ac => ac.Country)
+        //    .Include(a => a.StreamingLinks)
+        //    .Include(a => a.Tracks).ThenInclude(at => at.Track)
+        //    .Include(a => a.Genres).ThenInclude(ag => ag.Genre)
+        //    .OrderByDescending(a => a.ReleaseDate)
+        //    .ProjectToType<AlbumDto>();
 
-        return await albumsQuery.ToPagedResultAsync(
-            query.PageNumber ?? 1,
-            query.PageSize ?? 10,
-            cancellationToken
-        );
+        //return await albumsQuery.ToPagedResultAsync(
+        //    query.PageNumber ?? 1,
+        //    query.PageSize ?? 10,
+        //    cancellationToken
+        //);
+
+        return new PagedResult<AlbumDto>();
     }
 }

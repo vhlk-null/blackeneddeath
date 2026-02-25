@@ -1,4 +1,5 @@
-﻿using Library.Domain.Models;
+﻿using Library.Domain.Enums;
+using Library.Domain.Models;
 
 namespace Library.API.Albums.UpdateAlbum;
 

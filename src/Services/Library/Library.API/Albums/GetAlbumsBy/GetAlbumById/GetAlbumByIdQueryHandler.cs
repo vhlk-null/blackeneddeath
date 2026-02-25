@@ -2,6 +2,7 @@
 using Library.API.Data;
 using Library.API.Exceptions;
 using Library.Domain.Models;
+using Library.Infrastructure.Data;
 
 namespace Library.API.Albums.GetAlbumsBy.GetAlbumById;
 
@@ -13,16 +14,16 @@ internal class GetAlbumByIdQueryHandler(IRepository<LibraryContext> repo)
 {
     public async ValueTask<GetAlbumByIdResult> Handle(GetAlbumByIdQuery query, CancellationToken cancellationToken)
     {
-        var album = await repo.GetWithIncludesAsync<Album>(
-                        a => a.Id == query.Id,
-                        q => q.Include(a => a.Bands).ThenInclude(ab => ab.Band)
-                            .Include(a => a.Countries).ThenInclude(ac => ac.Country)
-                            .Include(a => a.StreamingLinks)
-                            .Include(a => a.Tracks).ThenInclude(at => at.Track)
-                            .Include(a => a.Genres).ThenInclude(ag => ag.Genre),
-                        cancellationToken)
-                    ?? throw new AlbumNotFoundException(query.Id);
+        //var album = await repo.GetWithIncludesAsync<Album>(
+        //                a => a.Id == query.Id,
+        //                q => q.Include(a => a.Bands).ThenInclude(ab => ab.Band)
+        //                    .Include(a => a.Countries).ThenInclude(ac => ac.Country)
+        //                    .Include(a => a.StreamingLinks)
+        //                    .Include(a => a.Tracks).ThenInclude(at => at.Track)
+        //                    .Include(a => a.Genres).ThenInclude(ag => ag.Genre),
+        //                cancellationToken)
+        //            ?? throw new AlbumNotFoundException(query.Id);
 
-        return new GetAlbumByIdResult(album.Adapt<AlbumDto>());
+        return new GetAlbumByIdResult(null);
     }
 }
