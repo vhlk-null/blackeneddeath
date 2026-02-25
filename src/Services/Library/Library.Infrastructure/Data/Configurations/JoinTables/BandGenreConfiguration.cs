@@ -4,7 +4,7 @@ using Library.Domain.ValueObjects.Ids;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Library.Infrastructure.Data.Configurations;
+namespace Library.Infrastructure.Data.Configurations.JoinTables;
 
 public class BandGenreConfiguration : IEntityTypeConfiguration<BandGenre>
 {
@@ -26,7 +26,7 @@ public class BandGenreConfiguration : IEntityTypeConfiguration<BandGenre>
             .HasColumnName("is_primary");
 
         entity.HasOne<Band>()
-            .WithMany()
+            .WithMany(b => b.BandGenres)
             .HasForeignKey(e => e.BandId)
             .OnDelete(DeleteBehavior.Cascade);
 

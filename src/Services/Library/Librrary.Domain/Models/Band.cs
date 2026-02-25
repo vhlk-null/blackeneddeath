@@ -9,8 +9,10 @@ public class Band : Aggregate<BandId>
     public BandStatus Status { get; private set; }
 
     private readonly List<BandCountry> _bandCountries = [];
+    private readonly List<BandGenre> _bandGenres = [];
 
     public IReadOnlyList<BandCountry> BandCountries => _bandCountries.AsReadOnly();
+    public IReadOnlyList<BandGenre> BandGenres => _bandGenres.AsReadOnly();
 
     private Band() { }
 
@@ -53,6 +55,23 @@ public class Band : Aggregate<BandId>
     public void Remove()
     {
         AddDomainEvent(new BandRemovedEvent(this));
+    }
+
+    public void AddGenre(GenreId genreId, bool isPrimary)
+    {
+        ArgumentNullException.ThrowIfNull(genreId);
+        if (_bandGenres.Any(x => x.GenreId == genreId))
+            throw new DomainException("Genre is already associated with this band.");
+
+        _bandGenres.Add(new BandGenre(Id, genreId, isPrimary));
+    }
+
+    public void RemoveGenre(GenreId genreId)
+    {
+        var entry = _bandGenres.FirstOrDefault(x => x.GenreId == genreId)
+            ?? throw new DomainException("Genre is not associated with this band.");
+
+        _bandGenres.Remove(entry);
     }
 
     public void AddCountry(CountryId countryId)

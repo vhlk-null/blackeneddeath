@@ -26,18 +26,20 @@ public class BandConfiguration : IEntityTypeConfiguration<Band>
             .HasColumnName("bio");
 
         entity.Property(e => e.Status)
+            .HasConversion<string>()
             .HasColumnName("status");
 
         entity.Property(e => e.LogoUrl)
             .HasMaxLength(500)
             .HasColumnName("logo_url");
 
-        entity.OwnsOne(e => e.Activity, ba =>
+        entity.ComplexProperty(e => e.Activity, ba =>
         {
             ba.Property(a => a.FormedYear).HasColumnName("formed_year");
             ba.Property(a => a.DisbandedYear).HasColumnName("disbanded_year");
         });
 
         entity.Navigation(e => e.BandCountries).UsePropertyAccessMode(PropertyAccessMode.Field);
+        entity.Navigation(e => e.BandGenres).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

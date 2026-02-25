@@ -4,7 +4,7 @@ using Library.Domain.ValueObjects.Ids;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Library.Infrastructure.Data.Configurations;
+namespace Library.Infrastructure.Data.Configurations.JoinTables;
 
 public class AlbumBandConfiguration : IEntityTypeConfiguration<AlbumBand>
 {

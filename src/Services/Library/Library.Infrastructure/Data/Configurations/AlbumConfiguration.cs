@@ -26,19 +26,22 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
             .HasColumnName("cover_url");
 
         entity.Property(e => e.Type)
+            .HasConversion<string>()
             .HasColumnName("type");
 
-        entity.OwnsOne(e => e.AlbumRelease, ar =>
+        entity.ComplexProperty(e => e.AlbumRelease, ar =>
         {
             ar.Property(r => r.ReleaseYear).HasColumnName("release_year");
-            ar.Property(r => r.Format).HasColumnName("format");
+            ar.Property(r => r.Format)
+                .HasConversion<string>()
+                .HasColumnName("format");
         });
 
-        entity.OwnsOne(e => e.LabelInfo, li =>
+        entity.ComplexProperty(e => e.LabelInfo!, li =>
         {
+            li.IsRequired(false);
             li.Property(l => l.Name).HasMaxLength(200).HasColumnName("label_name");
         });
-        entity.Navigation(e => e.LabelInfo).IsRequired(false);
 
         entity.Navigation(e => e.AlbumBands).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumGenres).UsePropertyAccessMode(PropertyAccessMode.Field);

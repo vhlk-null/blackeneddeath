@@ -17,6 +17,7 @@ public class StreamingLinkConfiguration : IEntityTypeConfiguration<StreamingLink
             .HasConversion(linkId => linkId.Value, dbId => StreamingLinkId.Of(dbId));
 
         entity.Property(e => e.Platform)
+            .HasConversion<string>()
             .HasColumnName("platform");
 
         entity.Property(e => e.EmbedCode)
