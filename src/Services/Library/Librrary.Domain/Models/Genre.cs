@@ -9,4 +9,15 @@ public class Genre : Aggregate<GenreId>
     public IReadOnlyList<GenreId> SubGenreIds => _subGenreIds.AsReadOnly();
 
     private Genre() { }
+
+    public static Genre Create(GenreId id, string name, GenreId? parentGenreId = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        return new Genre
+        {
+            Id = id,
+            Name = name,
+            ParentGenreId = parentGenreId
+        };
+    }
 }

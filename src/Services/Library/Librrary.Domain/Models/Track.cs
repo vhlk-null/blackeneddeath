@@ -11,4 +11,10 @@ public class Track : Entity<TrackId>
         Title = title;
         Id = TrackId.Of(Guid.NewGuid());
     }
+
+    public static Track Create(TrackId id, string title)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        return new Track { Id = id, Title = title };
+    }
 }

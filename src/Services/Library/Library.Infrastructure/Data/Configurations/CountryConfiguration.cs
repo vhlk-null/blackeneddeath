@@ -1,4 +1,5 @@
 using Library.Domain.Models;
+using Library.Domain.ValueObjects.Ids;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -14,6 +15,7 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
 
         entity.Property(e => e.Id)
             .HasColumnName("id")
+            .HasConversion(countryId => countryId.Value, dbId => CountryId.Of(dbId))
             .ValueGeneratedNever();
 
         entity.Property(e => e.Name)

@@ -1,8 +1,4 @@
-﻿using Library.API;
-using Library.Application;
-using Library.Infrastructure;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
         .AddApplicationServices()
@@ -11,11 +7,11 @@ builder.Services
 // -----------------------------
 
 // ===== MAPPINGS =====
-MappingConfig.RegisterMappings();
+//MappingConfig.RegisterMappings();
 
 // ===== CONFIGURATION =====
-var dbConnection = builder.Configuration.GetConnectionString(ConnectionStrings.LibraryDatabase)
-    ?? throw new InvalidOperationException($"{ConnectionStrings.LibraryDatabase} connection string is missing");
+//var dbConnection = builder.Configuration.GetConnectionString(ConnectionStrings.LibraryDatabase)
+//    ?? throw new InvalidOperationException($"{ConnectionStrings.LibraryDatabase} connection string is missing");
 
 // ===== SERVICES =====
 //builder.Services
@@ -27,25 +23,32 @@ var dbConnection = builder.Configuration.GetConnectionString(ConnectionStrings.L
 //    .AddHealthCheckServices(dbConnection)
 //    .AddApiDocumentation();
 
-builder.Services.AddCarter();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
+//builder.Services.AddCarter();
+//builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+//builder.Services.AddProblemDetails();
 
 // ===== APP =====
 var app = builder.Build();
 
 // Database initialization
-await app.InitializeDatabaseAsync();
+//await app.InitializeDatabaseAsync();
 
 // Exception handling middleware
-app.UseExceptionHandler();
+//app.UseExceptionHandler();
 
 // Endpoints
-app.MapCarter();
-app.MapGrpcService<LibraryService>();
-app.MapHealthChecks("/health", new HealthCheckOptions
+//app.MapCarter();
+//app.MapGrpcService<LibraryService>();
+//app.MapHealthChecks("/health", new HealthCheckOptions
+//{
+//    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+//});
+
+builder.UseApiServices();
+
+if (app.Environment.IsDevelopment())
 {
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
+    await app.InitializeDatabaseAsync();
+}
 
 app.Run();

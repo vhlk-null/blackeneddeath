@@ -12,3 +12,7 @@ global using System.Reflection;
 global using Library.API.Extensions;
 global using Library.API.gRPC.Services;
 global using Library.API.Mappings;
+global using Library.API;
+global using Library.Application;
+global using Library.Infrastructure;
+global using Library.Infrastructure.Data.Extensions;

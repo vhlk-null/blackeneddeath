@@ -16,14 +16,14 @@ public class Band : Aggregate<BandId>
 
     private Band() { }
 
-    public static Band Create(string name, string? bio, string? logoUrl, BandActivity activity, BandStatus status)
+    public static Band Create(string name, string? bio, string? logoUrl, BandActivity activity, BandStatus status, BandId? id = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(activity);
 
         var band = new Band
         {
-            Id = BandId.Of(Guid.NewGuid()),
+            Id = id ?? BandId.Of(Guid.NewGuid()),
             Name = name,
             Bio = bio,
             LogoUrl = logoUrl,

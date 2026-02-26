@@ -22,14 +22,14 @@ public class Album : Aggregate<AlbumId>
 
     private Album() { }
 
-    public static Album Create(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelInfo? labelInfo)
+    public static Album Create(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelInfo? labelInfo, AlbumId? id = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentNullException.ThrowIfNull(albumRelease);
 
         var album =  new Album
         {
-            Id = AlbumId.Of(Guid.NewGuid()),
+            Id = id ?? AlbumId.Of(Guid.NewGuid()),
             Title = title,
             Type = type,
             AlbumRelease = albumRelease,
