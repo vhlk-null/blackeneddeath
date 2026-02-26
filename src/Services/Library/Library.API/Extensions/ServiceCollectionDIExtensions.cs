@@ -19,14 +19,14 @@ public static class ServiceCollectionDiExtensions
 
     public static IServiceCollection AddMediatorServices(this IServiceCollection services)
     {
-        services.AddMediator(options =>
-        {
-            options.ServiceLifetime = ServiceLifetime.Scoped;
-        });
+        //services.AddMediator(options =>
+        //{
+        //    options.ServiceLifetime = ServiceLifetime.Scoped;
+        //});
 
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(Behavior.UnitOfWorkBehavior<,>));
+        //services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        //services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+        //services.AddScoped(typeof(IPipelineBehavior<,>), typeof(Behavior.UnitOfWorkBehavior<,>));
 
         return services;
     }

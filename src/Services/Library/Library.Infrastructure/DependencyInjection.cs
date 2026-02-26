@@ -1,8 +1,4 @@
-﻿using Library.Infrastructure.Data;
-using Library.Infrastructure.Data.Interceptors;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Library.Infrastructure;
 
@@ -12,13 +8,15 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("LibraryDb");
 
-        services.AddSingleton<AuditableEntityInterceptor>();
+        services.AddScoped<AuditableEntityInterceptor>();
+        services.AddScoped<DispatchDomainEventsInterceptor>();
         services.AddSingleton<SlowQueryInterceptor>();
 
         services.AddDbContext<LibraryContext>((sp, options) =>
         {
             options.AddInterceptors(
                 sp.GetRequiredService<AuditableEntityInterceptor>(),
+                sp.GetRequiredService<DispatchDomainEventsInterceptor>(),
                 sp.GetRequiredService<SlowQueryInterceptor>()
             );
             options.UseNpgsql(connectionString);
