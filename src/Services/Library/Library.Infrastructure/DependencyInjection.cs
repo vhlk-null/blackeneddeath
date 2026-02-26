@@ -1,4 +1,5 @@
 ﻿using Library.Infrastructure.Data;
+using Library.Infrastructure.Data.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +12,11 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("LibraryDb");
 
-        services.AddDbContext<LibraryContext>(options => options.UseNpgsql(connectionString));
+        services.AddDbContext<LibraryContext>(options =>
+        {
+            options.AddInterceptors(new AuditableEntityInterceptor());
+            options.UseNpgsql(connectionString);
+        });
 
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<LibraryContext>());
 

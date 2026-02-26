@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 
 namespace Library.Infrastructure.Data.Extensions;
 
@@ -14,16 +15,57 @@ public static class DatabaseInitializerExtensions
         var context = scope.ServiceProvider.GetRequiredService<LibraryContext>();
         var logger  = scope.ServiceProvider.GetRequiredService<ILogger<LibraryContext>>();
 
-        context.Database.MigrateAsync().GetAwaiter().GetResult();
-
+        await ApplyMigrationsAsync(context, logger);
         await SeedAsync(context, logger);
+    }
+
+    private static async Task ApplyMigrationsAsync(LibraryContext context, ILogger logger)
+    {
+        try
+        {
+            logger.LogInformation("Applying database migrations...");
+            await context.Database.MigrateAsync();
+            logger.LogInformation("Migrations applied successfully.");
+        }
+        catch (PostgresException ex) when (ex.SqlState == "42P07")
+        {
+            // 42P07 = "relation already exists". This happens when the schema was
+            // created (e.g. by a previous run that deadlocked before recording the
+            // migration history), so the tables exist but __EFMigrationsHistory has
+            // no entry.  Recover by marking all migrations as applied.
+            logger.LogWarning(
+                "Database schema already exists without recorded migration history. " +
+                "Inserting missing migration records and continuing...");
+
+            await EnsureMigrationHistoryAsync(context);
+        }
+    }
+
+    private static async Task EnsureMigrationHistoryAsync(LibraryContext context)
+    {
+        const string productVersion = "10.0.3";
+
+        await context.Database.ExecuteSqlRawAsync("""
+            CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
+                "MigrationId"   character varying(150) NOT NULL,
+                "ProductVersion" character varying(32)  NOT NULL,
+                CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId")
+            )
+            """);
+
+        foreach (var migrationId in context.Database.GetMigrations())
+        {
+            await context.Database.ExecuteSqlAsync(
+                $"""
+                INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+                VALUES ({migrationId}, {productVersion})
+                ON CONFLICT DO NOTHING
+                """);
+        }
     }
 
     private static async Task SeedAsync(LibraryContext context, ILogger logger)
     {
-        // Order matters: independent entities first, then those with FK dependencies.
-        // Band/Album inserts cascade their junction rows automatically via EF Core
-        // navigation tracking (BandGenres, BandCountries, AlbumBands, etc.).
         await SeedCountriesAsync(context, logger);
         await SeedGenresAsync(context, logger);
         await SeedTracksAsync(context, logger);
