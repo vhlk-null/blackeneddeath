@@ -12,14 +12,19 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("LibraryDb");
 
-        services.AddDbContext<LibraryContext>(options =>
+        services.AddSingleton<AuditableEntityInterceptor>();
+        services.AddSingleton<SlowQueryInterceptor>();
+
+        services.AddDbContext<LibraryContext>((sp, options) =>
         {
-            options.AddInterceptors(new AuditableEntityInterceptor());
+            options.AddInterceptors(
+                sp.GetRequiredService<AuditableEntityInterceptor>(),
+                sp.GetRequiredService<SlowQueryInterceptor>()
+            );
             options.UseNpgsql(connectionString);
         });
 
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<LibraryContext>());
-
         return services;
     }
 }
