@@ -1,5 +1,4 @@
 ﻿using Grpc.Core;
-using Library.API.Data;
 using Library.Domain.Models;
 using Library.Grpc;
 using Library.Infrastructure.Data;

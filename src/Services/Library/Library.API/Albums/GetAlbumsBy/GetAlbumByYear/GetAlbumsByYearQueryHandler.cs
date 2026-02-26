@@ -1,5 +1,4 @@
-﻿using Library.API.Data;
-using Library.Domain.Models;
+﻿using Library.Domain.Models;
 using Library.Infrastructure.Data;
 
 namespace Library.API.Albums.GetAlbumsBy.GetAlbumByYear;

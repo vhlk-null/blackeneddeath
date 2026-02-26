@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
-
-namespace Library.Infrastructure;
+﻿namespace Library.Infrastructure;
 
 public static class DependencyInjection
 {

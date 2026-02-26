@@ -1,5 +1,4 @@
-﻿using Library.API.Data;
-using Library.Infrastructure.Data;
+﻿using Library.Infrastructure.Data;
 
 namespace Library.API.Behavior;
 

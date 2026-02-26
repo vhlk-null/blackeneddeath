@@ -1,14 +1,3 @@
-using Library.Domain.Models;
-using AlbumDto = Library.API.Albums.GetAlbums.AlbumDto;
-using BandDto = Library.API.Albums.GetAlbums.BandDto;
-using CountryDto = Library.API.Albums.GetAlbums.CountryDto;
-using GenreDto = Library.API.Albums.GetAlbums.GenreDto;
-using GetBands_AlbumDto = Library.API.Bands.GetBands.AlbumDto;
-using GetBands_BandDto = Library.API.Bands.GetBands.BandDto;
-using GetBands_CountryDto = Library.API.Bands.GetBands.CountryDto;
-using GetBands_GenreDto = Library.API.Bands.GetBands.GenreDto;
-using TrackDto = Library.API.Albums.GetAlbums.TrackDto;
-
 namespace Library.API.Mappings;
 
 public static class MappingConfig

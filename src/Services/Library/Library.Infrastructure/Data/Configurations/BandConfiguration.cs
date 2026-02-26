@@ -1,6 +1,5 @@
 using Library.Domain.Models;
 using Library.Domain.ValueObjects.Ids;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Library.Infrastructure.Data.Configurations;

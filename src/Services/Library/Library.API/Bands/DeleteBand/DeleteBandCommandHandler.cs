@@ -1,4 +1,3 @@
-using Library.API.Data;
 using Library.API.Exceptions;
 using Library.API.Resources.ResourceManagement;
 using Library.Domain.Models;

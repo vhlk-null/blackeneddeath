@@ -18,7 +18,9 @@
       "Bash(dir:*)",
       "Bash(dotnet restore:*)",
       "Bash(git checkout:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git:*)",
+      "Bash(xargs grep:*)"
     ],
     "deny": [],
     "ask": []

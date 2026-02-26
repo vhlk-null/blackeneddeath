@@ -1,6 +1,4 @@
 using Library.API.Bands.GetBands;
-using Library.API.Data;
-using Library.Domain.Models;
 using Library.Infrastructure.Data;
 
 namespace Library.API.Bands.GetBandsBy.GetBandsByCountry;

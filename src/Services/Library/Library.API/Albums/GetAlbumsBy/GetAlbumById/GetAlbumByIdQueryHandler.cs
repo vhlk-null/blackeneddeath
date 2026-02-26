@@ -1,7 +1,4 @@
 ﻿using Library.API.Albums.GetAlbums;
-using Library.API.Data;
-using Library.API.Exceptions;
-using Library.Domain.Models;
 using Library.Infrastructure.Data;
 
 namespace Library.API.Albums.GetAlbumsBy.GetAlbumById;
