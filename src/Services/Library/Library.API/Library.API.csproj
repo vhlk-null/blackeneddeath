@@ -35,19 +35,4 @@
 		<ProjectReference Include="..\Library.Application\Library.Application.csproj" />
 		<ProjectReference Include="..\Library.Infrastructure\Library.Infrastructure.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Update="Resources\ResourceFiles\ValidationMessages.Designer.cs">
-			<DependentUpon>ValidationMessages.resx</DependentUpon>
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-		</Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Update="Resources\ResourceFiles\ValidationMessages.resx">
-			<LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>
-			<Generator>ResXFileCodeGenerator</Generator>
-		</EmbeddedResource>
-	</ItemGroup>
 </Project>

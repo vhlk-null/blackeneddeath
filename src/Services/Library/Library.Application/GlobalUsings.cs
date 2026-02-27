@@ -1,1 +1,12 @@
 ﻿global using Library.Domain.Enums;
+global using BuildingBlocks.CQRS;
+global using Library.Application.Dtos;
+global using BuildingBlocks.Resources.ResourceManagement;
+global using FluentValidation;
+global using Library.Application.Data;
+global using Library.Domain.Models;
+global using Library.Domain.ValueObjects;
+global using Library.Domain.ValueObjects.Ids;
+global using Library.Application.Exceptions;
+global using Microsoft.EntityFrameworkCore;
+global using BuildingBlocks.Exceptions;

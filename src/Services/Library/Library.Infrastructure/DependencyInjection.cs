@@ -20,7 +20,7 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString);
         });
 
-        services.AddScoped<DbContext>(sp => sp.GetRequiredService<LibraryContext>());
+        services.AddScoped<ILibraryDbContext, LibraryContext>();
         return services;
     }
 }

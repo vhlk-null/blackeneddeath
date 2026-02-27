@@ -19,17 +19,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Albums\Commands\" />
     <Folder Include="Albums\EventHandlers\Domain\" />
     <Folder Include="Albums\EventHandlers\Integration\" />
-    <Folder Include="Albums\Queries\" />
-    <Folder Include="Bands\Commands\" />
     <Folder Include="Bands\EventHandlers\Domain\" />
     <Folder Include="Bands\EventHandlers\Integration\" />
-    <Folder Include="Bands\Queries\" />
-    <Folder Include="Data\" />
     <Folder Include="Exceptions\" />
     <Folder Include="Extentions\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\ResourceFiles\ValidationMessages.Designer.cs">
+      <DependentUpon>ValidationMessages.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\ResourceFiles\ValidationMessages.resx">
+      <LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
