@@ -1,23 +1,48 @@
-using Library.Application.Bands.Queries.GetBands;
-using Library.Infrastructure.Data;
-
 namespace Library.Application.Bands.Queries.GetBandsBy.GetBandsByCountry;
 
-public record GetBandsByCountryQuery(Guid CountryId) : IQuery<GetBandsByCountryResult>;
-public record GetBandsByCountryResult(IEnumerable<BandDto> Bands);
-
-internal class GetBandsByCountryQueryHandler(IRepository<LibraryContext> repo)
-    : IQueryHandler<GetBandsByCountryQuery, GetBandsByCountryResult>
+internal class GetBandsByCountryQueryHandler(ILibraryDbContext context)
+    : BuildingBlocks.CQRS.IQueryHandler<GetBandsByCountryQuery, GetBandsByCountryResult>
 {
     public async ValueTask<GetBandsByCountryResult> Handle(GetBandsByCountryQuery query, CancellationToken cancellationToken)
     {
-        //var bands = await repo.Filter<Band>(b => b.CountryId == query.CountryId)
-        //    .Include(b => b.Country)
-        //    .Include(b => b.Albums).ThenInclude(ab => ab.Album)
-        //    .Include(b => b.Genres).ThenInclude(bg => bg.Genre)
-        //    .ProjectToType<BandDto>()
-        //    .ToListAsync(cancellationToken);
+        var countryId = CountryId.Of(query.CountryId);
 
-        return new GetBandsByCountryResult(new BandDto[]{});
+        var bands = await context.Bands
+            .AsNoTracking()
+            .Include(b => b.BandCountries)
+            .Include(b => b.BandGenres)
+            .Where(b => b.BandCountries.Any(bc => bc.CountryId == countryId))
+            .ToListAsync(cancellationToken);
+
+        var bandIds = bands.Select(b => b.Id).ToList();
+        var countryIds = bands.SelectMany(b => b.BandCountries.Select(bc => bc.CountryId)).Distinct().ToList();
+        var genreIds = bands.SelectMany(b => b.BandGenres.Select(bg => bg.GenreId)).Distinct().ToList();
+
+        var albumBands = await context.AlbumBands.AsNoTracking()
+            .Where(ab => bandIds.Contains(ab.BandId))
+            .ToListAsync(cancellationToken);
+
+        var albumIds = albumBands.Select(ab => ab.AlbumId).Distinct().ToList();
+
+        var albums = await context.Albums.AsNoTracking()
+            .Where(a => albumIds.Contains(a.Id))
+            .ToListAsync(cancellationToken);
+
+        var countries = await context.Countries.AsNoTracking()
+            .Where(c => countryIds.Contains(c.Id))
+            .ToDictionaryAsync(c => c.Id, cancellationToken);
+
+        var genres = await context.Genres.AsNoTracking()
+            .Where(g => genreIds.Contains(g.Id))
+            .ToDictionaryAsync(g => g.Id, cancellationToken);
+
+        var albumsById = albums.ToDictionary(a => a.Id);
+        var albumsByBand = albumBands.ToLookup(ab => ab.BandId, ab => albumsById[ab.AlbumId]);
+
+        var bandDtos = bands
+            .Select(b => b.ToBandDto(countries, genres, albumsByBand))
+            .ToList();
+
+        return new GetBandsByCountryResult(bandDtos);
     }
 }

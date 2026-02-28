@@ -24,7 +24,6 @@
     <Folder Include="Bands\EventHandlers\Domain\" />
     <Folder Include="Bands\EventHandlers\Integration\" />
     <Folder Include="Exceptions\" />
-    <Folder Include="Extentions\" />
   </ItemGroup>
 
   <ItemGroup>

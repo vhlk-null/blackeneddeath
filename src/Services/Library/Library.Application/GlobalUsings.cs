@@ -4,6 +4,7 @@ global using Library.Application.Dtos;
 global using BuildingBlocks.Resources.ResourceManagement;
 global using FluentValidation;
 global using Library.Application.Data;
+global using Library.Application.Extensions;
 global using Library.Domain.Models;
 global using Library.Domain.ValueObjects;
 global using Library.Domain.ValueObjects.Ids;
