@@ -1,7 +1,7 @@
 namespace Library.Application.Albums.Commands.DeleteAlbums;
 
 internal class DeleteAlbumCommandHandler(ILibraryDbContext context)
-    : ICommandHandler<DeleteAlbumCommand, DeleteAlbumResult>
+    : BuildingBlocks.CQRS.ICommandHandler<DeleteAlbumCommand, DeleteAlbumResult>
 {
     public async ValueTask<DeleteAlbumResult> Handle(
         DeleteAlbumCommand command,

@@ -10,3 +10,6 @@ global using Library.Domain.ValueObjects.Ids;
 global using Library.Application.Exceptions;
 global using Microsoft.EntityFrameworkCore;
 global using BuildingBlocks.Exceptions;
+global using Library.Domain.Events.Album;
+global using Mediator;
+global using Microsoft.Extensions.Logging;

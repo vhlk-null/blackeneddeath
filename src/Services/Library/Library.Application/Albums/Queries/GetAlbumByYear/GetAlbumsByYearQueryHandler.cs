@@ -1,7 +1,7 @@
 ﻿using Library.Domain.Models;
 using Library.Infrastructure.Data;
 
-namespace Library.Application.Albums.Queries.GetAlbumsBy.GetAlbumByYear;
+namespace Library.Application.Albums.Queries.GetAlbumByYear;
 
 public record GetAlbumsByYearQuery(int ReleaseDate) : IQuery<GetAlbumsByYearResult>;
 public record GetAlbumsByYearResult(IEnumerable<Album> Albums);

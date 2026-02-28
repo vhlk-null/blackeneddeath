@@ -1,13 +1,12 @@
-﻿namespace Library.Application.Albums.Commands.DeleteAlbums
-{
-    public record DeleteAlbumCommand(Guid AlbumId) : ICommand<DeleteAlbumResult>;
-    public record DeleteAlbumResult(bool IsSuccess);
+﻿namespace Library.Application.Albums.Commands.DeleteAlbums;
 
-    public class DeleteAlbumCommandValidator : AbstractValidator<DeleteAlbumCommand>
+public record DeleteAlbumCommand(Guid AlbumId) : BuildingBlocks.CQRS.ICommand<DeleteAlbumResult>;
+public record DeleteAlbumResult(bool IsSuccess);
+
+public class DeleteAlbumCommandValidator : AbstractValidator<DeleteAlbumCommand>
+{
+    public DeleteAlbumCommandValidator()
     {
-        public DeleteAlbumCommandValidator()
-        {
-            RuleFor(x => x.AlbumId).NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField);
-        }
+        RuleFor(x => x.AlbumId).NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField);
     }
 }

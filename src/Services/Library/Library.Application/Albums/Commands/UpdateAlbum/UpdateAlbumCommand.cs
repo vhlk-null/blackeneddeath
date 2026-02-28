@@ -1,6 +1,6 @@
 ﻿namespace Library.Application.Albums.Commands.UpdateAlbum;
 
-public record UpdateAlbumCommand(AlbumDto Album) : ICommand<UpdateAlbumResult>;
+public record UpdateAlbumCommand(AlbumDto Album) : BuildingBlocks.CQRS.ICommand<UpdateAlbumResult>;
 
 public record UpdateAlbumResult(bool IsSuccess);
 

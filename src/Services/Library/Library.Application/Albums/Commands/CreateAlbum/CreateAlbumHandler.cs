@@ -1,6 +1,6 @@
 ﻿namespace Library.Application.Albums.Commands.CreateAlbum;
 
-public class CreateAlbumHandler(ILibraryDbContext context) : ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
+public class CreateAlbumHandler(ILibraryDbContext context) : BuildingBlocks.CQRS.ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
 {
     public async ValueTask<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
     {
