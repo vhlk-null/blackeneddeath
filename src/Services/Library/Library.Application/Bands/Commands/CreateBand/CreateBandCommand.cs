@@ -1,6 +1,6 @@
 namespace Library.Application.Bands.Commands.CreateBand;
 
-public record CreateBandCommand(BandDto Band) : ICommand<CreateBandResult>;
+public record CreateBandCommand(BandDto Band) : BuildingBlocks.CQRS.ICommand<CreateBandResult>;
 
 public record CreateBandResult(Guid Id);
 

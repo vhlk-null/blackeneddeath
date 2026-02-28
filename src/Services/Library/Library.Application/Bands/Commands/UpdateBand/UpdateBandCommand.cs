@@ -1,6 +1,6 @@
 namespace Library.Application.Bands.Commands.UpdateBand;
 
-public record UpdateBandCommand(BandDto Band) : ICommand<UpdateBandResult>;
+public record UpdateBandCommand(BandDto Band) : BuildingBlocks.CQRS.ICommand<UpdateBandResult>;
 
 public record UpdateBandResult(bool IsSuccess);
 

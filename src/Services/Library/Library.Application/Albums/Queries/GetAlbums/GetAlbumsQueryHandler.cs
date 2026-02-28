@@ -5,6 +5,11 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetAlbumsResult> Handle(GetAlbumsQuery query, CancellationToken cancellationToken)
     {
+        var pageIndex = query.PaginationRequest.PageIndex;
+        var pageSize = query.PaginationRequest.PageSize;
+
+        var totalCount = await context.Albums.LongCountAsync(cancellationToken);
+
         var albums = await context.Albums
             .AsNoTracking()
             .Include(a => a.AlbumBands)
@@ -12,6 +17,8 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context)
             .Include(a => a.AlbumCountries)
             .Include(a => a.AlbumTracks)
             .Include(a => a.StreamingLinks)
+            .Skip(pageSize * pageIndex)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
 
         var bandIds = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
@@ -39,6 +46,6 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context)
             .Select(a => a.ToAlbumDto(bands, genres, countries, tracks))
             .ToList();
 
-        return new GetAlbumsResult(albumDtos);
+        return new GetAlbumsResult(new PaginatedResult<AlbumDto>(pageIndex, pageSize, totalCount, albumDtos));
     }
 }

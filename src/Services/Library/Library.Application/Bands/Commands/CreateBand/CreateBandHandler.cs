@@ -1,7 +1,7 @@
 namespace Library.Application.Bands.Commands.CreateBand;
 
 internal class CreateBandCommandHandler(ILibraryDbContext context)
-    : ICommandHandler<CreateBandCommand, CreateBandResult>
+    : BuildingBlocks.CQRS.ICommandHandler<CreateBandCommand, CreateBandResult>
 {
     public async ValueTask<CreateBandResult> Handle(CreateBandCommand command, CancellationToken cancellationToken)
     {

@@ -1,6 +1,6 @@
 namespace Library.Application.Bands.Commands.UpdateBand;
 
-internal class UpdateBandCommandHandler(ILibraryDbContext context) : ICommandHandler<UpdateBandCommand, UpdateBandResult>
+internal class UpdateBandCommandHandler(ILibraryDbContext context) : BuildingBlocks.CQRS.ICommandHandler<UpdateBandCommand, UpdateBandResult>
 {
     public async ValueTask<UpdateBandResult> Handle(UpdateBandCommand command, CancellationToken cancellationToken)
     {

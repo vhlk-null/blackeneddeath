@@ -1,6 +1,6 @@
 namespace Library.Application.Bands.Commands.DeleteBand;
 
-public record DeleteBandCommand(Guid Id) : ICommand<DeleteBandResult>;
+public record DeleteBandCommand(Guid Id) : BuildingBlocks.CQRS.ICommand<DeleteBandResult>;
 
 public record DeleteBandResult(bool IsSuccess);
 
