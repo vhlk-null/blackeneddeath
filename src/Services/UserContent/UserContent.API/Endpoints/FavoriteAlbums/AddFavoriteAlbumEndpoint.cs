@@ -1,28 +1,18 @@
-using UserContent.Application.UserContent.FavoriteAlbums.AddFavoriteAlbum;
-
 namespace UserContent.API.Endpoints.FavoriteAlbums;
 
 public record AddAlbumToFavoriteRequest(Guid AlbumId, Guid UserId);
 public record AddAlbumToFavoriteResponse(Guid UserId);
 
-public class StoreUserFavoriteAlbumsEndpoint : ICarterModule
+[ApiController]
+[Route("favoriteAlbums")]
+public class AddFavoriteAlbumController(IUserContentService service) : ControllerBase
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    [HttpPost]
+    [ProducesResponseType(typeof(AddAlbumToFavoriteResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddAlbumToFavorite(AddAlbumToFavoriteRequest request, CancellationToken ct)
     {
-        app.MapPost("/favoriteAlbums", async (AddAlbumToFavoriteRequest request, ISender sender) =>
-        {
-            var command = new AddAlbumToFavoriteCommand(request.AlbumId, request.UserId);
-
-            var result = await sender.Send(command);
-
-            var response = result.Adapt<AddAlbumToFavoriteResponse>();
-
-            return Results.Created($"/favoriteAlbums/{response.UserId}", response);
-        })
-        .WithName("AddAlbumToFavorite")
-        .Produces<AddAlbumToFavoriteResponse>(StatusCodes.Status201Created)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithSummary("Add Album To Favorite")
-        .WithDescription("Add Album To Favorite");
+        var userId = await service.AddFavoriteAlbumAsync(request.UserId, request.AlbumId, ct);
+        return Created($"/favoriteAlbums/{userId}", new AddAlbumToFavoriteResponse(userId));
     }
 }

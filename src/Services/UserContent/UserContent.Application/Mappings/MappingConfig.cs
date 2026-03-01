@@ -1,4 +1,4 @@
-using UserContent.Application.UserContent.UserProfile.GetUserProfile;
+using UserContent.Application.Dtos;
 
 namespace UserContent.Application.Mappings;
 

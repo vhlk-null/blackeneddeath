@@ -1,29 +1,18 @@
-using Microsoft.AspNetCore.Mvc;
-using UserContent.Application.UserContent.FavoriteBands.DeleteFavoriteBand;
-
 namespace UserContent.API.Endpoints.FavoriteBands;
 
 public record DeleteFavoriteBandResponse(bool IsSuccess);
 
-public class DeleteUserFavoriteBandsEndpoint : ICarterModule
+[ApiController]
+[Route("favoriteBands")]
+public class DeleteFavoriteBandController(IUserContentService service) : ControllerBase
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    [HttpDelete]
+    [ProducesResponseType(typeof(DeleteFavoriteBandResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteFavoriteBand([FromQuery] Guid userId, [FromQuery] Guid bandId, CancellationToken ct)
     {
-        app.MapDelete("/favoriteBands", async ([FromQuery] Guid userId, [FromQuery] Guid bandId, ISender sender) =>
-        {
-            var command = new DeleteFavoriteBandCommand(userId, bandId);
-
-            var result = await sender.Send(command);
-
-            var response = result.Adapt<DeleteFavoriteBandResponse>();
-
-            return Results.Ok(response);
-        })
-        .WithName("DeleteFavoriteBand")
-        .Produces<DeleteFavoriteBandResponse>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithSummary("Delete Favorite Band")
-        .WithDescription("Remove a band from user's favorite bands");
+        await service.DeleteFavoriteBandAsync(userId, bandId, ct);
+        return Ok(new DeleteFavoriteBandResponse(true));
     }
 }

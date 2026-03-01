@@ -1,29 +1,18 @@
-using Microsoft.AspNetCore.Mvc;
-using UserContent.Application.UserContent.FavoriteAlbums.DeleteFavoriteAlbum;
-
 namespace UserContent.API.Endpoints.FavoriteAlbums;
 
 public record DeleteFavoriteAlbumResponse(bool IsSuccess);
 
-public class DeleteUserFavoriteAlbumsEndpoint : ICarterModule
+[ApiController]
+[Route("favoriteAlbums")]
+public class DeleteFavoriteAlbumController(IUserContentService service) : ControllerBase
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    [HttpDelete]
+    [ProducesResponseType(typeof(DeleteFavoriteAlbumResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteFavoriteAlbum([FromQuery] Guid userId, [FromQuery] Guid albumId, CancellationToken ct)
     {
-        app.MapDelete("/favoriteAlbums", async ([FromQuery] Guid userId, [FromQuery] Guid albumId, ISender sender) =>
-        {
-            var command = new DeleteFavoriteAlbumCommand(userId, albumId);
-
-            var result = await sender.Send(command);
-
-            var response = result.Adapt<DeleteFavoriteAlbumResponse>();
-
-            return Results.Ok(response);
-        })
-        .WithName("DeleteFavoriteAlbum")
-        .Produces<DeleteFavoriteAlbumResponse>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithSummary("Delete Favorite Album")
-        .WithDescription("Remove an album from user's favorite albums");
+        await service.DeleteFavoriteAlbumAsync(userId, albumId, ct);
+        return Ok(new DeleteFavoriteAlbumResponse(true));
     }
 }

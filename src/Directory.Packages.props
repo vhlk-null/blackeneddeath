@@ -39,6 +39,7 @@
     <PackageVersion Include="Grpc.AspNetCore" Version="2.60.0" />
     <!-- gRPC Client (UserContent.API) -->
     <PackageVersion Include="Grpc.Net.Client" Version="2.60.0" />
+    <PackageVersion Include="Grpc.Net.ClientFactory" Version="2.60.0" />
     <PackageVersion Include="Grpc.Tools" Version="2.60.0" />
     <PackageVersion Include="Google.Protobuf" Version="3.25.1" />
   </ItemGroup>

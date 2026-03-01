@@ -24,7 +24,7 @@ var app = builder.Build();
 await app.InitializeDatabaseAsync();
 
 app.UseExceptionHandler();
-app.MapCarter();
+app.MapControllers();
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
