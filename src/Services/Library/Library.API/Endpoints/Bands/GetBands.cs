@@ -1,39 +1,8 @@
-using Library.Application.Bands.Queries.GetBands;
-using Library.Domain.Enums;
-
 namespace Library.API.Endpoints.Bands;
 
-public record GetBandsRequest(int? PageNumber, int? PageSize = 10);
+public record GetBandsRequest(PaginationRequest PaginationRequest);
 
-public record GetBandsResult(
-    List<BandDto> Items,
-    int PageNumber,
-    int PageSize,
-    int TotalCount,
-    int TotalPages,
-    bool HasPreviousPage,
-    bool HasNextPage
-);
-
-public record BandDto
-{
-    public Guid Id { get; init; }
-    public string Name { get; init; } = null!;
-    public string? Bio { get; init; }
-    public string? LogoUrl { get; init; }
-    public int? FormedYear { get; init; }
-    public int? DisbandedYear { get; init; }
-    public BandStatus Status { get; init; }
-
-    public CountryDto? Country { get; init; }
-    public List<AlbumDto> Albums { get; init; } = new();
-    public List<GenreDto> Genres { get; init; } = new();
-}
-
-public record CountryDto(Guid Id, string Name, string Code);
-public record AlbumDto(Guid Id, string Title, int ReleaseDate);
-public record GenreDto(Guid Id, string Name);
-
+public record GetBandsResult(PaginatedResult<BandDto> Bands);
 public class GetBands : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)

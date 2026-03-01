@@ -1,7 +1,7 @@
 
 namespace Library.Application.Bands.Commands.DeleteBand;
 
-internal class DeleteBandCommandHandler(ILibraryDbContext context)
+public class DeleteBandCommandHandler(ILibraryDbContext context)
     : BuildingBlocks.CQRS.ICommandHandler<DeleteBandCommand, DeleteBandResult>
 {
     public async ValueTask<DeleteBandResult> Handle(

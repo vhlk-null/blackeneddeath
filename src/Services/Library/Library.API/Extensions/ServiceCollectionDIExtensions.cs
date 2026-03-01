@@ -1,5 +1,4 @@
-﻿using Library.API.Data;
-using Library.Infrastructure.Data;
+﻿using Library.Infrastructure.Data;
 
 namespace Library.API.Extensions;
 
@@ -53,12 +52,6 @@ public static class ServiceCollectionDiExtensions
         return services;
     }
 
-    public static IServiceCollection AddRepositoryServices(this IServiceCollection services)
-    {
-        services.AddScoped<IRepository<LibraryContext>, LibraryRepository>();
-
-        return services;
-    }
 
 
     public static IServiceCollection AddGrpcServices(this IServiceCollection services)

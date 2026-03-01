@@ -1,7 +1,7 @@
-﻿using BuildingBlocks.Constants;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using System.Resources;
+using BuildingBlocks.Constants;
 
 namespace BuildingBlocks.Resources.ResourceManagement;
 

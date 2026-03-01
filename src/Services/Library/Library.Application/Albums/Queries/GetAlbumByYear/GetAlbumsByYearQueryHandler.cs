@@ -1,6 +1,6 @@
 namespace Library.Application.Albums.Queries.GetAlbumByYear;
 
-internal class GetAlbumsByYearQueryHandler(ILibraryDbContext context)
+public class GetAlbumsByYearQueryHandler(ILibraryDbContext context)
     : BuildingBlocks.CQRS.IQueryHandler<GetAlbumsByYearQuery, GetAlbumsByYearResult>
 {
     public async ValueTask<GetAlbumsByYearResult> Handle(GetAlbumsByYearQuery query, CancellationToken cancellationToken)

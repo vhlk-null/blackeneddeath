@@ -1,6 +1,6 @@
-﻿using Mediator;
+﻿using System.Diagnostics;
+using Mediator;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
 namespace BuildingBlocks.Behaviors;
 

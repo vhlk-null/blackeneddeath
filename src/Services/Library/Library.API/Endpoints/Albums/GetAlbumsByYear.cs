@@ -1,6 +1,4 @@
-﻿using Library.Domain.Models;
-
-namespace Library.API.Endpoints.Albums;
+﻿namespace Library.API.Endpoints.Albums;
 
 //public record GetAlbumsByYearRequest(int ReleaseDate) : IRequest<GetAlbumsByYearResult>;
 

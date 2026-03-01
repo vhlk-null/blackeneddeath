@@ -2,14 +2,7 @@ using Library.Application.Bands.Commands.UpdateBand;
 
 namespace Library.API.Endpoints.Bands;
 
-public record UpdateBandRequest(
-    string Name,
-    string? Bio,
-    Guid? CountryId,
-    int? FormedYear,
-    int? DisbandedYear,
-    BandStatus Status,
-    List<Guid> GenreIds);
+public record UpdateBandRequest(BandDto Band);
 
 public record UpdateBandResponse(bool IsSuccess);
 
@@ -20,7 +13,7 @@ public class UpdateBand : ICarterModule
         app.MapPut("/bands/{id}",
                 async (Guid id, UpdateBandRequest request, ISender sender) =>
                 {
-                    var command = request.Adapt<UpdateBandCommand>() with { Id = id };
+                    var command = request.Adapt<UpdateBandCommand>();
 
                     var result = await sender.Send(command);
 

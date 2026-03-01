@@ -1,6 +1,6 @@
 namespace Library.Application.Bands.Queries.GetBandsBy.GetBandById;
 
-internal class GetBandByIdQueryHandler(ILibraryDbContext context)
+public class GetBandByIdQueryHandler(ILibraryDbContext context)
     : BuildingBlocks.CQRS.IQueryHandler<GetBandByIdQuery, GetBandByIdResult>
 {
     public async ValueTask<GetBandByIdResult> Handle(GetBandByIdQuery query, CancellationToken cancellationToken)

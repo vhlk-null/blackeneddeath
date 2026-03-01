@@ -2,14 +2,7 @@ using Library.Application.Bands.Commands.CreateBand;
 
 namespace Library.API.Endpoints.Bands;
 
-public record CreateBandRequest(
-    string Name,
-    string? Bio,
-    Guid? CountryId,
-    int? FormedYear,
-    int? DisbandedYear,
-    BandStatus Status,
-    List<Guid> GenreIds);
+public record CreateBandRequest(BandDto Band);
 
 public record CreateBandResponse(Guid Id);
 

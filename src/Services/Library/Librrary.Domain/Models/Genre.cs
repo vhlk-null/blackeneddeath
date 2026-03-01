@@ -13,11 +13,33 @@ public class Genre : Aggregate<GenreId>
     public static Genre Create(GenreId id, string name, GenreId? parentGenreId = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        return new Genre
+
+        var genre = new Genre
         {
             Id = id,
             Name = name,
             ParentGenreId = parentGenreId
         };
+
+        genre.AddDomainEvent(new GenreCreatedEvent(genre));
+
+        return genre;
+    }
+
+    public Genre Update(string name, GenreId? parentGenreId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+        Name = name;
+        ParentGenreId = parentGenreId;
+
+        AddDomainEvent(new GenreUpdatedEvent(this));
+
+        return this;
+    }
+
+    public void Remove()
+    {
+        AddDomainEvent(new GenreRemovedEvent(this));
     }
 }

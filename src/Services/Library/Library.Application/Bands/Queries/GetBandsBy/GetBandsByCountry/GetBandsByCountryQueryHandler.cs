@@ -1,6 +1,6 @@
 namespace Library.Application.Bands.Queries.GetBandsBy.GetBandsByCountry;
 
-internal class GetBandsByCountryQueryHandler(ILibraryDbContext context)
+public class GetBandsByCountryQueryHandler(ILibraryDbContext context)
     : BuildingBlocks.CQRS.IQueryHandler<GetBandsByCountryQuery, GetBandsByCountryResult>
 {
     public async ValueTask<GetBandsByCountryResult> Handle(GetBandsByCountryQuery query, CancellationToken cancellationToken)

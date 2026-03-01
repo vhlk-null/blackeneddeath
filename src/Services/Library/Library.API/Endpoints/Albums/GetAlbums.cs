@@ -1,4 +1,4 @@
-﻿using Library.Application.Albums.Queries.GetAlbums;
+using Library.Application.Albums.Queries.GetAlbums;
 using Library.Domain.Enums;
 
 namespace Library.API.Endpoints.Albums;
