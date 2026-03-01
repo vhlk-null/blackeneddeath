@@ -13,6 +13,11 @@
     <Project Path="Services/UserContent/UserContent.API/UserContent.API.csproj">
       <Deploy Solution="Debug|*" />
     </Project>
+    <Project Path="Services/UserContent/UserContent.Application/UserContent.Application.csproj" />
+    <Project Path="Services/UserContent/UserContent.Domain/UserContent.Domain.csproj" />
+    <Project Path="Services/UserContent/UserContent.Infrastructure/UserContent.Infrastructure.csproj" />
+    <Project Path="Services/UserContent/UserContent.ApplicationTests/UserContent.ApplicationTests.csproj" />
+    <Project Path="Services/UserContent/UserContent.InfrastructureTests/UserContent.InfrastructureTests.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="Directory.Packages.props" />

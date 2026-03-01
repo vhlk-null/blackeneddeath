@@ -2,9 +2,6 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
-    && rm -rf /var/lib/apt/lists/*
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
@@ -18,6 +15,9 @@ WORKDIR /src
 COPY ["Directory.Packages.props", "."]
 COPY ["Services/Library/Library.API/Library.API.csproj", "Services/Library/Library.API/"]
 COPY ["BuildingBlocks/BuildingBlocks/BuildingBlocks.csproj", "BuildingBlocks/BuildingBlocks/"]
+COPY ["Services/Library/Library.Application/Library.Application.csproj", "Services/Library/Library.Application/"]
+COPY ["Services/Library/Librrary.Domain/Library.Domain.csproj", "Services/Library/Librrary.Domain/"]
+COPY ["Services/Library/Library.Infrastructure/Library.Infrastructure.csproj", "Services/Library/Library.Infrastructure/"]
 RUN dotnet restore "./Services/Library/Library.API/Library.API.csproj"
 COPY . .
 WORKDIR "/src/Services/Library/Library.API"
