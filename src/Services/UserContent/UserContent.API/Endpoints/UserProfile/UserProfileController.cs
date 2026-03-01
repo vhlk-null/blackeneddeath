@@ -2,7 +2,7 @@ namespace UserContent.API.Endpoints.UserProfile;
 
 [ApiController]
 [Route("profile")]
-public class GetUserProfileController(IUserContentService service) : ControllerBase
+public class UserProfileController(IUserContentService service) : ControllerBase
 {
     [HttpGet("{userId:guid}")]
     [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status200OK)]

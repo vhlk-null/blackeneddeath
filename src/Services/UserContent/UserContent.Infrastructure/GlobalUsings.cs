@@ -1,11 +1,11 @@
-global using Microsoft.EntityFrameworkCore;
-global using Microsoft.Extensions.Caching.Distributed;
-global using StackExchange.Redis;
 global using System.Linq.Expressions;
 global using System.Security.Cryptography;
 global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Caching.Distributed;
+global using StackExchange.Redis;
 global using UserContent.Application.Abstractions;
 global using UserContent.Domain.Models;
 global using UserContent.Infrastructure.Data;

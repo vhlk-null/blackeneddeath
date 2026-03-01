@@ -1,8 +1,8 @@
+global using System.Text.Json.Serialization;
 global using BuildingBlocks.Exceptions;
 global using HealthChecks.UI.Client;
 global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 global using Microsoft.AspNetCore.Mvc;
-global using System.Text.Json.Serialization;
 global using UserContent.API;
 global using UserContent.API.Constants;
 global using UserContent.Application.Abstractions;
