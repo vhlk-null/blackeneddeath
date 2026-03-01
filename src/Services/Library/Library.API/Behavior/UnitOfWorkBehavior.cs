@@ -4,7 +4,7 @@ namespace Library.API.Behavior;
 
 public class UnitOfWorkBehavior<TRequest, TResponse>(LibraryContext repo)
     : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : notnull, IMessage
+    where TRequest : IMessage
     where TResponse : notnull
 {
     public async ValueTask<TResponse> Handle(TRequest message, MessageHandlerDelegate<TRequest, TResponse> next, CancellationToken cancellationToken)

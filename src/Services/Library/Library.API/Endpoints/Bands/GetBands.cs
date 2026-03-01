@@ -1,6 +1,7 @@
+using Library.Application.Bands.Queries.GetBands;
 using Library.Domain.Enums;
 
-namespace Library.Application.Bands.Queries.GetBands;
+namespace Library.API.Endpoints.Bands;
 
 public record GetBandsRequest(int? PageNumber, int? PageSize = 10);
 
@@ -33,7 +34,7 @@ public record CountryDto(Guid Id, string Name, string Code);
 public record AlbumDto(Guid Id, string Title, int ReleaseDate);
 public record GenreDto(Guid Id, string Name);
 
-public class GetBandsEndpoint : ICarterModule
+public class GetBands : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

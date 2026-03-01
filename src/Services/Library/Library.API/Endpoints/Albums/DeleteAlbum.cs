@@ -1,9 +1,11 @@
-﻿namespace Library.Application.Albums.Commands.DeleteAlbums;
+﻿using Library.Application.Albums.Commands.DeleteAlbums;
+
+namespace Library.API.Endpoints.Albums;
 
 //public record DeleteAlbumRequest(Guid Id);
 public record DeleteAlbumResponse(bool IsSuccess);
 
-public class DeleteAlbumEndpoint : ICarterModule
+public class DeleteAlbum : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

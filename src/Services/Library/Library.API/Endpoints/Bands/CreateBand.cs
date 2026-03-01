@@ -1,4 +1,6 @@
-namespace Library.Application.Bands.Commands.CreateBand;
+using Library.Application.Bands.Commands.CreateBand;
+
+namespace Library.API.Endpoints.Bands;
 
 public record CreateBandRequest(
     string Name,
@@ -11,7 +13,7 @@ public record CreateBandRequest(
 
 public record CreateBandResponse(Guid Id);
 
-public class CreateBandEndpoint : ICarterModule
+public class CreateBand : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

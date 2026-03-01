@@ -1,4 +1,6 @@
-namespace Library.Application.Bands.Commands.UpdateBand;
+using Library.Application.Bands.Commands.UpdateBand;
+
+namespace Library.API.Endpoints.Bands;
 
 public record UpdateBandRequest(
     string Name,
@@ -11,7 +13,7 @@ public record UpdateBandRequest(
 
 public record UpdateBandResponse(bool IsSuccess);
 
-public class UpdateBandEndpoint : ICarterModule
+public class UpdateBand : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

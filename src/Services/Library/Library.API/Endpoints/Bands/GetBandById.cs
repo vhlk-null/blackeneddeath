@@ -1,11 +1,10 @@
-using Library.API.Bands.GetBandsBy.GetBandById;
-using Library.Application.Bands.Queries.GetBands;
+using Library.Application.Bands.Queries.GetBandsBy.GetBandById;
 
-namespace Library.Application.Bands.Queries.GetBandsBy.GetBandById;
+namespace Library.API.Endpoints.Bands;
 
 public record GetBandByIdResponse(BandDto Band);
 
-public class GetBandByIdEndpoint : ICarterModule
+public class GetBandById : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

@@ -44,7 +44,8 @@ var app = builder.Build();
 //    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 //});
 
-builder.UseApiServices();
+app.UseApiServices();
+app.UseRouting();
 
 if (app.Environment.IsDevelopment())
 {

@@ -1,19 +1,10 @@
-﻿namespace Library.Application.Albums.Commands.UpdateAlbum;
+﻿namespace Library.API.Endpoints.Albums;
 
-public record UpdateAlbumRequest(Guid Id,
-    string Title,
-    int ReleaseDate,
-    AlbumType Type,
-    AlbumFormat Format,
-    string? Label,
-    Guid? CountryId,
-    List<Guid> BandIds,
-    List<Guid> GenreIds,
-    List<Guid> TagIds);
+public record UpdateAlbumRequest(AlbumDto Album);
 
 public record UpdateAlbumResponse(bool IsSuccess);
 
-public class UpdateAlbumEndpoint : ICarterModule
+public class UpdateAlbum : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

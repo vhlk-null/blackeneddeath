@@ -5,10 +5,17 @@ public class GetBandsQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetBandsResult> Handle(GetBandsQuery query, CancellationToken cancellationToken)
     {
+        var pageIndex = query.PaginationRequest.PageIndex;
+        var pageSize = query.PaginationRequest.PageSize;
+
+        var totalCount = await context.Bands.LongCountAsync(cancellationToken);
+
         var bands = await context.Bands
             .AsNoTracking()
             .Include(b => b.BandCountries)
             .Include(b => b.BandGenres)
+            .Skip(pageSize * pageIndex)
+            .Take(pageSize)
             .ToListAsync(cancellationToken);
 
         var bandIds = bands.Select(b => b.Id).ToList();
@@ -40,6 +47,6 @@ public class GetBandsQueryHandler(ILibraryDbContext context)
             .Select(b => b.ToBandDto(countries, genres, albumsByBand))
             .ToList();
 
-        return new GetBandsResult(bandDtos);
+        return new GetBandsResult(new PaginatedResult<BandDto>(pageIndex, pageSize, totalCount, bandDtos));
     }
 }

@@ -1,11 +1,10 @@
-using Library.API.Bands.GetBandsBy.GetBandsByCountry;
-using Library.Application.Bands.Queries.GetBands;
+using Library.Application.Bands.Queries.GetBandsBy.GetBandsByCountry;
 
-namespace Library.Application.Bands.Queries.GetBandsBy.GetBandsByCountry;
+namespace Library.API.Endpoints.Bands;
 
 public record GetBandsByCountryResponse(IEnumerable<BandDto> Bands);
 
-public class GetBandsByCountryEndpoint : ICarterModule
+public class GetBandsByCountry : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

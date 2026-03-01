@@ -1,25 +1,10 @@
-﻿using Mapster;
-using Mediator;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+﻿namespace Library.API.Endpoints.Albums;
 
-namespace Library.Application.Albums.Commands.CreateAlbum;
-
-public record CreateAlbumRequest(
-    string Title,
-    int ReleaseDate,
-    AlbumType Type,
-    AlbumFormat Format,
-    string? Label,
-    Guid? CountryId,
-    List<Guid> BandIds,
-    List<Guid> GenreIds,
-    List<Guid> TagIds);
+public record CreateAlbumRequest(AlbumDto Album);
 
 public record CreateAlbumResponse(Guid Id);
 
-public class CreateAlbumEndpoint : ICarterModule
+public class CreateAlbum : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

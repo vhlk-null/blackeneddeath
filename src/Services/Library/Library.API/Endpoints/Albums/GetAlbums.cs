@@ -1,6 +1,7 @@
-﻿using Library.Domain.Enums;
+﻿using Library.Application.Albums.Queries.GetAlbums;
+using Library.Domain.Enums;
 
-namespace Library.Application.Albums.Queries.GetAlbums;
+namespace Library.API.Endpoints.Albums;
 
 public record GetAlbumsRequest(int? PageNumber, int? PageSize = 10);
 
@@ -36,7 +37,7 @@ public record CountryDto(Guid Id, string Name, string Code);
 public record TrackDto(Guid Id, string Title);
 public record GenreDto(Guid Id, string Name);
 
-public class GetAlbumsEndpoint : ICarterModule
+public class GetAlbums : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

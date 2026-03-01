@@ -1,12 +1,11 @@
-﻿using Library.API.Albums.GetAlbumsBy.GetAlbumById;
-using Library.Application.Albums.Queries.GetAlbums;
+﻿using Library.Application.Albums.Queries.GetAlbumById;
 
-namespace Library.Application.Albums.Queries.GetAlbumsBy.GetAlbumById;
+namespace Library.API.Endpoints.Albums;
 
 //public record GetAlbumByIdRequest(Guid Id) : IRequest<GetAlbumByIdResult>;
 public record GetAlbumByIdResponse(AlbumDto Album);
 
-public class GetAlbumByIdEndpoint : ICarterModule
+public class GetAlbumById : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

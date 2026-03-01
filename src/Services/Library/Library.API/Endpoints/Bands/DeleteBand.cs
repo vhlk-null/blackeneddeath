@@ -1,8 +1,10 @@
-namespace Library.Application.Bands.Commands.DeleteBand;
+using Library.Application.Bands.Commands.DeleteBand;
+
+namespace Library.API.Endpoints.Bands;
 
 public record DeleteBandResponse(bool IsSuccess);
 
-public class DeleteBandEndpoint : ICarterModule
+public class DeleteBand : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

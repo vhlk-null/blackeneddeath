@@ -16,3 +16,6 @@ global using Library.API;
 global using Library.Application;
 global using Library.Infrastructure;
 global using Library.Infrastructure.Data.Extensions;
+global using Library.Application.Albums.Commands.CreateAlbum;
+global using Library.Domain.Enums;
+global using Library.Application.Albums.Commands.UpdateAlbum;

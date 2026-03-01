@@ -1,13 +1,12 @@
-﻿using Library.API.Albums.GetAlbumsBy.GetAlbumByYear;
-using Library.Domain.Models;
+﻿using Library.Domain.Models;
 
-namespace Library.Application.Albums.Queries.GetAlbumsBy.GetAlbumByYear;
+namespace Library.API.Endpoints.Albums;
 
 //public record GetAlbumsByYearRequest(int ReleaseDate) : IRequest<GetAlbumsByYearResult>;
 
 public record GetAlbumsByYearResponse(IEnumerable<Album> Albums);
 
-public class GetAlbumsByYearEndpoint : ICarterModule
+public class GetAlbumsByYear : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
