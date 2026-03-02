@@ -27,5 +27,5 @@ global using Library.Infrastructure.Data.Extensions;
 global using Mapster;
 global using Mediator;
 global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.EntityFrameworkCore;

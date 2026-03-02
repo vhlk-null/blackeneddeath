@@ -22,7 +22,8 @@
       "Bash(git:*)",
       "Bash(xargs grep:*)",
       "Bash(rm:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(dotnet test:*)"
     ],
     "deny": [],
     "ask": []
