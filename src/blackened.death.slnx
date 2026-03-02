@@ -9,6 +9,7 @@
     <Project Path="Services/Library/Library.Infrastructure/Library.Infrastructure.csproj" Id="8bf9a027-3108-429c-aaee-c75ac93ab9b6" />
     <Project Path="Services/Library/Librrary.Domain/Library.Domain.csproj" Id="eb062dac-c81c-4759-895d-c66aaae8320a" />
     <Project Path="Services/Library/Library.ApplicationTests/Library.ApplicationTests.csproj" />
+    <Project Path="Services/Library/Library.InfrastructureTests/Library.InfrastructureTests.csproj" />
     <Project Path="Services/Library/Library.APITests/Library.APITests.csproj" />
   </Folder>
   <Folder Name="/Services/UserContent/">
