@@ -7,7 +7,7 @@ builder.Services
 // -----------------------------
 
 // ===== MAPPINGS =====
-//MappingConfig.RegisterMappings();
+//MappingConfig.RegisterMappings()
 
 // ===== CONFIGURATION =====
 //var dbConnection = builder.Configuration.GetConnectionString(ConnectionStrings.LibraryDatabase)
@@ -53,3 +53,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Run();
+
+public partial class Program { }

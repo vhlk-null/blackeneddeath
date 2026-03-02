@@ -2,8 +2,6 @@ using Library.Application.Genres.Queries.GetGenres;
 
 namespace Library.API.Endpoints.Genres;
 
-public record GetGenresRequest(PaginationRequest PaginationRequest);
-
 public record GetGenresResult(PaginatedResult<GenreDto> Genres);
 
 public record GenreDto(Guid Id, string Name, Guid? ParentGenreId);
@@ -12,9 +10,9 @@ public class GetGenres : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/genres", async ([AsParameters] GetGenresRequest request, ISender sender) =>
+        app.MapGet("/genres", async ([AsParameters] PaginationRequest paginationRequest, ISender sender) =>
             {
-                var query = request.Adapt<GetGenresQuery>();
+                var query = new GetGenresQuery(paginationRequest);
                 var result = await sender.Send(query);
                 var response = result.Adapt<GetGenresResult>();
                 return Results.Ok(response);

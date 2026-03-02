@@ -1,15 +1,13 @@
 namespace Library.API.Endpoints.Albums;
 
-public record GetAlbumsRequest(PaginationRequest PaginationRequest);
-
 public record GetAlbumsResult(PaginatedResult<AlbumDto> Albums);
 public class GetAlbums : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/albums", async ([AsParameters] GetAlbumsRequest request, ISender sender) =>
+        app.MapGet("/albums", async ([AsParameters] PaginationRequest paginationRequest, ISender sender) =>
             {
-                var query = request.Adapt<GetAlbumsQuery>();
+                var query = new GetAlbumsQuery(paginationRequest);
                 var result = await sender.Send(query);
                 var response = result.Adapt<GetAlbumsResult>();
                 return Results.Ok(response);
