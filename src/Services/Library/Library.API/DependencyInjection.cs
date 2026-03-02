@@ -1,16 +1,30 @@
-﻿namespace Library.API;
+    namespace Library.API;
 
-public static class DependencyInjection
-{
-    public static IServiceCollection AddApiServices(this IServiceCollection services)
+    public static class DependencyInjection
     {
-        services.AddCarter();
-        return services;
-    }
+        public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddCarter();
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddProblemDetails();
+            services.AddGrpc();
 
-    public static WebApplication UseApiServices(this WebApplication app)
-    {
-        app.MapCarter();
-        return app;
+            var connectionString = configuration.GetConnectionString(ConnectionStrings.LibraryDatabase);
+            services.AddHealthChecks()
+                .AddNpgSql(connectionString ?? string.Empty, name: "postgresql");
+
+            return services;
+        }
+
+        public static WebApplication UseApiServices(this WebApplication app)
+        {
+            app.UseExceptionHandler();
+            app.MapCarter();
+            app.MapGrpcService<LibraryService>();
+            app.MapHealthChecks("/health", new HealthCheckOptions
+            {
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+            return app;
+        }
     }
-}
