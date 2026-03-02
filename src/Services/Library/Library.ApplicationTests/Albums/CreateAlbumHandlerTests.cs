@@ -48,7 +48,7 @@ public class CreateAlbumHandlerTests
         var command = new CreateAlbumCommand(new AlbumDto(
             Guid.NewGuid(), "Symbolic", 1995, null,
             AlbumType.FullLength, AlbumFormat.CD, "Roadrunner Records",
-            [new BandSummaryDto(bandId, "Death", null)],
+            [new BandSummaryDto((Guid?)bandId, "Death")],
             [], [], [], []));
 
         var result = await _handler.Handle(command, CancellationToken.None);

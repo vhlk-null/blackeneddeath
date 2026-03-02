@@ -37,7 +37,10 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context) : BuildingBloc
     private static void ReconcileBands(Album album, AlbumDto dto)
     {
         var currentIds = album.AlbumBands.Select(x => x.BandId).ToHashSet();
-        var incomingIds = dto.Bands.Select(x => BandId.Of(x.Id)).ToHashSet();
+        var incomingIds = dto.Bands
+            .Where(x => x.Id.HasValue && x.Id.Value != Guid.Empty)
+            .Select(x => BandId.Of(x.Id!.Value))
+            .ToHashSet();
 
         foreach (var id in currentIds.Except(incomingIds))
             album.RemoveBand(id);

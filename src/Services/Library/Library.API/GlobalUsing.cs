@@ -1,4 +1,5 @@
 ﻿global using System.Reflection;
+global using System.Text.Json.Serialization;
 global using BuildingBlocks.Behaviors;
 global using BuildingBlocks.Exceptions;
 global using BuildingBlocks.Pagination;

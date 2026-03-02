@@ -4,6 +4,9 @@
     {
         public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.ConfigureHttpJsonOptions(options =>
+                options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
             services.AddCarter();
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();

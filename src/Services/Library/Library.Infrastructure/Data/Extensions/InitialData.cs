@@ -318,9 +318,11 @@ internal static class InitialData
                 "Transilvanian Hunger",
                 AlbumType.FullLength,
                 AlbumRelease.Of(1994, AlbumFormat.CD),
-                null,
+                "https://example.com/covers/transilvanian-hunger.jpg",
                 LabelInfo.Of("Peaceville Records"),
                 AlbumIds.TransilvanianHunger);
+            transilvanianHunger.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:transilvanian-hunger-dummy");
+            transilvanianHunger.AddStreamingLink(StreamingPlatform.Bandcamp, "https://darkthrone.bandcamp.com/album/transilvanian-hunger");
             transilvanianHunger.AddBand(BandIds.Darkthrone);
             transilvanianHunger.AddGenre(GenreIds.BlackMetal,    isPrimary: true);
             transilvanianHunger.AddGenre(GenreIds.RawBlackMetal, isPrimary: false);
@@ -338,9 +340,11 @@ internal static class InitialData
                 "Filosofem",
                 AlbumType.FullLength,
                 AlbumRelease.Of(1996, AlbumFormat.CD),
-                null,
+                "https://example.com/covers/filosofem.jpg",
                 LabelInfo.Of("Misanthropy Records"),
                 AlbumIds.Filosofem);
+            filosofem.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:filosofem-dummy");
+            filosofem.AddStreamingLink(StreamingPlatform.YouTube, "https://www.youtube.com/playlist?list=filosofem-dummy");
             filosofem.AddBand(BandIds.Burzum);
             filosofem.AddGenre(GenreIds.BlackMetal,           isPrimary: true);
             filosofem.AddGenre(GenreIds.AtmosphericBlackMetal, isPrimary: false);
@@ -354,9 +358,11 @@ internal static class InitialData
                 "In the Nightside Eclipse",
                 AlbumType.FullLength,
                 AlbumRelease.Of(1994, AlbumFormat.CD),
-                null,
+                "https://example.com/covers/in-the-nightside-eclipse.jpg",
                 LabelInfo.Of("Candlelight Records"),
                 AlbumIds.NightsideEclipse);
+            nightsideEclipse.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:nightside-eclipse-dummy");
+            nightsideEclipse.AddStreamingLink(StreamingPlatform.Tidal, "https://tidal.com/album/nightside-eclipse-dummy");
             nightsideEclipse.AddBand(BandIds.Emperor);
             nightsideEclipse.AddGenre(GenreIds.BlackMetal,         isPrimary: true);
             nightsideEclipse.AddGenre(GenreIds.SymphonicBlackMetal, isPrimary: false);
@@ -374,9 +380,11 @@ internal static class InitialData
                 "De Mysteriis Dom Sathanas",
                 AlbumType.FullLength,
                 AlbumRelease.Of(1994, AlbumFormat.CD),
-                null,
+                "https://example.com/covers/de-mysteriis-dom-sathanas.jpg",
                 LabelInfo.Of("Deathlike Silence Productions"),
                 AlbumIds.DeMysteriis);
+            deMysteriis.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:de-mysteriis-dummy");
+            deMysteriis.AddStreamingLink(StreamingPlatform.Bandcamp, "https://mayhem.bandcamp.com/album/de-mysteriis-dom-sathanas");
             deMysteriis.AddBand(BandIds.Mayhem);
             deMysteriis.AddGenre(GenreIds.BlackMetal, isPrimary: true);
             deMysteriis.AddCountry(CountryIds.Norway);
@@ -393,9 +401,11 @@ internal static class InitialData
                 "Storm of the Light's Bane",
                 AlbumType.FullLength,
                 AlbumRelease.Of(1995, AlbumFormat.CD),
-                null,
+                "https://example.com/covers/storm-of-the-lights-bane.jpg",
                 LabelInfo.Of("Nuclear Blast"),
                 AlbumIds.StormOfLightsBane);
+            stormOfLightsBane.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:storm-of-lights-bane-dummy");
+            stormOfLightsBane.AddStreamingLink(StreamingPlatform.AppleMusic, "https://music.apple.com/album/storm-of-lights-bane-dummy");
             stormOfLightsBane.AddBand(BandIds.Dissection);
             stormOfLightsBane.AddGenre(GenreIds.BlackMetal,        isPrimary: true);
             stormOfLightsBane.AddGenre(GenreIds.MelodicBlackMetal, isPrimary: false);
@@ -413,9 +423,11 @@ internal static class InitialData
                 "The Satanist",
                 AlbumType.FullLength,
                 AlbumRelease.Of(2014, AlbumFormat.CD),
-                null,
+                "https://example.com/covers/the-satanist.jpg",
                 LabelInfo.Of("Nuclear Blast"),
                 AlbumIds.TheSatanist);
+            theSatanist.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:the-satanist-dummy");
+            theSatanist.AddStreamingLink(StreamingPlatform.YouTube, "https://www.youtube.com/playlist?list=the-satanist-dummy");
             theSatanist.AddBand(BandIds.Behemoth);
             theSatanist.AddGenre(GenreIds.BlackMetal, isPrimary: true);
             theSatanist.AddGenre(GenreIds.DeathMetal, isPrimary: false);

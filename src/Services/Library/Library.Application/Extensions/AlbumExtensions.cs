@@ -17,7 +17,7 @@ public static class AlbumExtensions
             album.LabelInfo?.Name,
             album.AlbumBands
                 .Select(ab => bands[ab.BandId])
-                .Select(b => new BandSummaryDto(b.Id.Value, b.Name, b.LogoUrl))
+                .Select(b => new BandSummaryDto((Guid?)b.Id.Value, b.Name))
                 .ToList(),
             album.AlbumCountries
                 .Select(ac => countries[ac.CountryId])
