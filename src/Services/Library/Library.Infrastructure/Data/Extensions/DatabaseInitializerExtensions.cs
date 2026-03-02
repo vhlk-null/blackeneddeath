@@ -69,6 +69,8 @@ public static class DatabaseInitializerExtensions
         await SeedTracksAsync(context, logger);
         await SeedBandsAsync(context, logger);
         await SeedAlbumsAsync(context, logger);
+        await SeedAlbumCoverUrlsAsync(context, logger);
+        await SeedStreamingLinksAsync(context, logger);
     }
 
     private static async Task SeedCountriesAsync(LibraryContext context, ILogger logger)
@@ -113,6 +115,48 @@ public static class DatabaseInitializerExtensions
 
         logger.LogInformation("Seeding albums...");
         await context.Albums.AddRangeAsync(InitialData.Albums);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedAlbumCoverUrlsAsync(LibraryContext context, ILogger logger)
+    {
+        var seedLookup = InitialData.Albums
+            .Where(a => a.CoverUrl != null)
+            .ToDictionary(a => a.Id, a => a.CoverUrl!);
+
+        if (!await context.Albums.AnyAsync(a => a.CoverUrl == null && seedLookup.Keys.Contains(a.Id)))
+            return;
+
+        logger.LogInformation("Backfilling album cover URLs...");
+
+        foreach (var (id, coverUrl) in seedLookup)
+        {
+            await context.Albums
+                .Where(a => a.Id == id && a.CoverUrl == null)
+                .ExecuteUpdateAsync(s => s.SetProperty(a => a.CoverUrl, coverUrl));
+        }
+    }
+
+    private static async Task SeedStreamingLinksAsync(LibraryContext context, ILogger logger)
+    {
+        if (await context.StreamingLinks.AnyAsync()) return;
+
+        logger.LogInformation("Backfilling streaming links...");
+
+        var seedLookup = InitialData.Albums.ToDictionary(a => a.Id, a => a.StreamingLinks);
+
+        var dbAlbums = await context.Albums
+            .Include(a => a.StreamingLinks)
+            .ToListAsync();
+
+        foreach (var album in dbAlbums)
+        {
+            if (!seedLookup.TryGetValue(album.Id, out var links)) continue;
+
+            foreach (var link in links)
+                album.AddStreamingLink(link.Platform, link.EmbedCode);
+        }
+
         await context.SaveChangesAsync();
     }
 }
