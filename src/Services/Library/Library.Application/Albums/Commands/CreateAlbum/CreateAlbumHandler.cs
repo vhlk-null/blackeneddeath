@@ -8,13 +8,13 @@ public class CreateAlbumHandler(ILibraryDbContext context) : BuildingBlocks.CQRS
 
         var album = CreateNewAlbum(command.Album);
 
-        var tracks = (command.Album.Tracks ?? [])
+        var tracks = command.Album.Tracks
             .Select(t => Track.Create(TrackId.Of(Guid.NewGuid()), t.Title))
             .ToList();
 
         await context.Tracks.AddRangeAsync(tracks, cancellationToken);
 
-        foreach (var (track, dto) in tracks.Zip(command.Album.Tracks ?? []))
+        foreach (var (track, dto) in tracks.Zip(command.Album.Tracks))
             album.AddTrack(track.Id, dto.TrackNumber);
 
         context.Albums.Add(album);
@@ -25,7 +25,7 @@ public class CreateAlbumHandler(ILibraryDbContext context) : BuildingBlocks.CQRS
 
     private async Task ValidateReferencedEntitiesAsync(AlbumDto album, CancellationToken cancellationToken)
     {
-        foreach (var band in album.Bands ?? [])
+        foreach (var band in album.Bands)
         {
             if (!band.Id.HasValue || band.Id.Value == Guid.Empty) continue;
 
@@ -34,14 +34,14 @@ public class CreateAlbumHandler(ILibraryDbContext context) : BuildingBlocks.CQRS
                 throw new BandNotFoundException(band.Id.Value);
         }
 
-        foreach (var country in album.Countries ?? [])
+        foreach (var country in album.Countries)
         {
             var countryId = CountryId.Of(country.Id);
             if (!await context.Countries.AnyAsync(c => c.Id == countryId, cancellationToken))
                 throw new CountryNotFoundException(country.Id);
         }
 
-        foreach (var genre in album.Genres ?? [])
+        foreach (var genre in album.Genres)
         {
             var genreId = GenreId.Of(genre.Id);
             if (!await context.Genres.AnyAsync(g => g.Id == genreId, cancellationToken))
@@ -56,7 +56,7 @@ public class CreateAlbumHandler(ILibraryDbContext context) : BuildingBlocks.CQRS
 
         var newAlbum = Album.Create(album.Title, album.Type, albumRelease, album.CoverUrl, labelInfo);
 
-        foreach (var band in album.Bands ?? [])
+        foreach (var band in album.Bands)
         {
             if (band.Id is not null && band.Id != Guid.Empty)
             {
@@ -70,13 +70,13 @@ public class CreateAlbumHandler(ILibraryDbContext context) : BuildingBlocks.CQRS
             }
         }
 
-        foreach (var country in album.Countries ?? [])
+        foreach (var country in album.Countries)
             newAlbum.AddCountry(CountryId.Of(country.Id));
 
-        foreach (var genre in album.Genres ?? [])
+        foreach (var genre in album.Genres)
             newAlbum.AddGenre(GenreId.Of(genre.Id), isPrimary: genre.IsPrimary);
 
-        foreach (var link in album.StreamingLinks ?? [])
+        foreach (var link in album.StreamingLinks)
             newAlbum.AddStreamingLink(link.Platform, link.EmbedCode);
 
         return newAlbum;

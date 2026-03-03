@@ -4,13 +4,15 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context) : BuildingBloc
 {
     public async ValueTask<UpdateAlbumResult> Handle(UpdateAlbumCommand command, CancellationToken cancellationToken)
     {
+        var albumId = AlbumId.Of(command.Album.Id);
+
         var album = await context.Albums
             .Include(a => a.AlbumBands)
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
             .Include(a => a.StreamingLinks)
             .Include(a => a.AlbumTracks)
-            .FirstOrDefaultAsync(a => a.Id.Value == command.Album.Id, cancellationToken)
+            .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
             ?? throw new AlbumNotFoundException(command.Album.Id);
 
         UpdateAlbum(album, command.Album);
