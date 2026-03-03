@@ -1,14 +1,9 @@
-﻿namespace Library.Domain.Abstractions
+﻿namespace Library.Domain.Abstractions;
+
+public interface IAggregate<T> : IAggregate, IEntity<T> { }
+
+public interface IAggregate : IEntity
 {
-
-    public interface IAggregate<T> : IAggregate, IEntity<T>
-    {
-
-    }
-
-    public interface IAggregate : IEntity
-    {
-        IReadOnlyList<IDomainEvent> DomainEvents { get; }
-        IDomainEvent[] ClearDomainEvents();
-    }
+    IReadOnlyList<IDomainEvent> DomainEvents { get; }
+    IDomainEvent[] ClearDomainEvents();
 }

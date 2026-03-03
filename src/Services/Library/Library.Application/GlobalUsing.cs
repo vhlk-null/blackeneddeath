@@ -1,0 +1,17 @@
+﻿global using BuildingBlocks.CQRS;
+global using BuildingBlocks.Exceptions;
+global using BuildingBlocks.Pagination;
+global using BuildingBlocks.Resources.ResourceManagement;
+global using FluentValidation;
+global using Library.Application.Data;
+global using Library.Application.Dtos;
+global using Library.Application.Exceptions;
+global using Library.Application.Extensions;
+global using Library.Domain.Enums;
+global using Library.Domain.Events.Album;
+global using Library.Domain.Models;
+global using Library.Domain.ValueObjects;
+global using Library.Domain.ValueObjects.Ids;
+global using Mediator;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Logging;

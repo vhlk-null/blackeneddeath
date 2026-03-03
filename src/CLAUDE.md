@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-.NET 10.0 microservices application for managing a music archive (albums, bands, tracks, genres). Uses Clean Architecture with CQRS pattern and vertical slice architecture.
+.NET 10.0 microservices application for managing a music archive (albums, bands, tracks, genres). Uses Domain-Driven Design (DDD) with CQRS, vertical slice endpoints, and a layered architecture inside the Library service.
 
 ## Technology Stack
 
@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **FluentValidation 12.1.1** — request validation
 - **Mapster 7.4.0** — object mapping (`source.Adapt<T>()`)
 - **Scrutor** — decorator pattern for DI (used in UserContent.API for cached repository)
-- **gRPC** — inter-service communication (Archive.API = server, UserContent.API = client)
+- **gRPC** — inter-service communication (Library.API = server, UserContent.API = client)
 - **Docker Compose** — containerization
 
 ## Common Development Commands
@@ -25,46 +25,54 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Build the entire solution
 dotnet build blackened.death.slnx
 
-# Run a specific service locally
-dotnet run --project Services/Archive/Archive.API
+# Run services locally
+dotnet run --project Services/Library/Library.API
 dotnet run --project Services/UserContent/UserContent.API
 
 # Run with Docker Compose (from src directory)
 docker-compose up --build
 
-# EF Core migrations (run from the respective service directory)
-dotnet ef migrations add MigrationName
-dotnet ef database update
-dotnet ef migrations remove
+# EF Core migrations for Library service (DbContext is in Library.Infrastructure)
+dotnet ef migrations add MigrationName --project Services/Library/Library.Infrastructure --startup-project Services/Library/Library.API
+dotnet ef database update --project Services/Library/Library.Infrastructure --startup-project Services/Library/Library.API
+dotnet ef migrations remove --project Services/Library/Library.Infrastructure --startup-project Services/Library/Library.API
+
+# EF Core migrations for UserContent service
+dotnet ef migrations add MigrationName --project Services/UserContent/UserContent.API
 ```
 
 **No test projects exist yet.** Testing packages (xunit, FluentAssertions, Moq, Testcontainers) are pre-configured in `Directory.Packages.props` but commented out.
 
 ## Docker Environment
 
-| Service          | Host Port | Container Port | Protocol  |
-|------------------|-----------|----------------|-----------|
-| Archive.API HTTP | 6000      | 8080           | HTTP/1+2  |
-| Archive.API HTTPS| 6001      | 8081           | HTTP/1+2  |
-| UserContent HTTP | 6010      | 8080           | HTTP      |
-| UserContent HTTPS| 6011      | 8081           | HTTPS     |
-| ArchiveDb        | 5432      | 5432           | PostgreSQL|
-| UserContentDB    | 5433      | 5432           | PostgreSQL|
-| Redis            | 6379      | 6379           | Redis     |
+| Service            | Host Port | Container Port | Protocol  |
+|--------------------|-----------|----------------|-----------|
+| Library.API HTTP   | 6000      | 8080           | HTTP/1+2  |
+| Library.API HTTPS  | 6001      | 8081           | HTTP/1+2  |
+| UserContent HTTP   | 6010      | 8080           | HTTP      |
+| UserContent HTTPS  | 6011      | 8081           | HTTPS     |
+| librarydb          | 5432      | 5432           | PostgreSQL|
+| usercontentdb      | 5433      | 5432           | PostgreSQL|
+| Redis              | 6379      | 6379           | Redis     |
 
-Archive.API serves both REST and gRPC on the same ports (HTTP/1+2 via Kestrel `EndpointDefaults`). No separate gRPC port.
+Library.API serves both REST and gRPC on the same ports (HTTP/1+2 via Kestrel `EndpointDefaults`). No separate gRPC port.
 
 Database credentials: `postgres/postgres` for both databases.
 
 ## Solution Structure
 
 ```
-blackened.death.slnx          # XML-format solution file (.slnx)
-Directory.Packages.props      # Central Package Management — ALL package versions here
-BuildingBlocks/               # Shared library (CQRS, Repository, Behaviors, Exceptions)
+blackened.death.slnx                   # XML-format solution file (.slnx)
+Directory.Packages.props               # Central Package Management — ALL versions here
+BuildingBlocks/                        # Shared library (CQRS, Repository, Behaviors, Exceptions)
 Services/
-  Archive/Archive.API/        # Music archive CRUD + gRPC server
-  UserContent/UserContent.API/ # User favorites/profiles + gRPC client
+  Library/
+    Librrary.Domain/                   # ⚠️ Folder typo (triple-r); csproj/namespace: Library.Domain
+    Library.Application/               # Mediator registration, DI extension
+    Library.Infrastructure/            # EF Core, DbContext, interceptors, migrations, seeding
+    Library.API/                       # Carter endpoints, Program.cs, gRPC server
+  UserContent/
+    UserContent.API/                   # User favorites/profiles + gRPC client
 ```
 
 ### BuildingBlocks (shared library)
@@ -75,9 +83,33 @@ Services/
 - **Pagination**: `PagedQuery<T>`, `PagedResult<T>`, `QueryableExtensions.ToPagedResultAsync()` in `Extentions/`
 - **Exceptions**: `GlobalExceptionHandler`, `NotFoundException`, `BadRequestException`, `InternalServerException`
 
-### Archive.API
+### Librrary.Domain
 
-Vertical slice feature folders: `Albums/CreateAlbum/`, `Bands/GetBands/`, etc. Each feature contains its endpoint, handler, validator, and DTOs in one folder. Nested features for related queries (e.g., `Albums/GetAlbumsBy/GetAlbumById/`).
+Pure domain layer — no framework dependencies.
+
+- **Abstractions**: `IEntity` (audit fields), `IAggregate` / `IAggregate<T>` (domain events list + clear), `Entity<T>` (base class), `IDomainEvent`
+- **Models**: `Album`, `Band`, `Track`, `Genre`, `Country`, `StreamingLink` as aggregate roots; join tables under `Models/JoinTables/`
+- **ValueObjects**: `AlbumRelease`, `BandActivity`, `LabelInfo`; strongly-typed IDs under `ValueObjects/Ids/` (`AlbumId`, `BandId`, etc.) extending `EntityId<TValue>`
+- **Events**: Domain events under `Events/Album/` and `Events/Band/` (e.g., `AlbumCreatedEvent`, `BandUpdatedEvent`)
+- **Exceptions**: `DomainException` (thrown from factory methods and invariant checks)
+
+### Library.Infrastructure
+
+- **`LibraryContext`** — EF Core DbContext; registers interceptors via `AddInterceptors()`
+- **`DependencyInjection.cs`** — registers interceptors and DbContext:
+  - `AuditableEntityInterceptor` and `DispatchDomainEventsInterceptor` as **Scoped**
+  - `SlowQueryInterceptor` as **Singleton**
+- **`Data/Configurations/`** — entity type configurations (Fluent API, snake_case column names)
+- **`Data/Interceptors/`** — three EF Core interceptors (see section below)
+- **`Data/Migrations/`** — EF Core migrations
+- **`Data/Extensions/`** — `DatabaseInitializerExtensions`, `InitialData` seed class
+
+### Library.API
+
+Vertical slice feature folders: `Albums/CreateAlbum/`, `Bands/GetBands/`, etc. DI is split across three extension files:
+- `Library.Application/DependencyInjection.cs` — `AddApplicationServices()` (registers Mediator)
+- `Library.Infrastructure/DependencyInjection.cs` — `AddInfrastructureServices()` (DbContext + interceptors)
+- `Library.API/DependencyInjection.cs` — `AddApiServices()` (Carter, exception handler, etc.)
 
 Also serves as **gRPC server** — proto at `gRPC/Protos/archive.proto`, service implementation at `gRPC/Services/ArchiveService.cs`. Exposes `GetBandById` and `GetAlbumById` RPCs.
 
@@ -87,43 +119,81 @@ Uses `Mappings/MappingConfig.cs` for explicit Mapster type mappings (registered 
 
 Same vertical slice pattern. Feature folders under `UserContent/` (FavoriteAlbums, FavoriteBands, UserProfile).
 
-Acts as **gRPC client** — references Archive.API's proto file to validate albums/bands exist before adding to favorites. The `.csproj` links the proto with `GrpcServices="Client"`.
+Acts as **gRPC client** — references Library.API's proto file to validate albums/bands exist before adding to favorites. The `.csproj` links the proto with `GrpcServices="Client"`.
 
-**Data model**: Many-to-many between `UserProfileInfo` ↔ `Album` (via `FavoriteAlbum` join table) and `UserProfileInfo` ↔ `Band` (via `FavoriteBand` join table). `Album` and `Band` are local entities mirroring Archive.API data. Join tables use composite PKs `(UserId, AlbumId/BandId)` with payload columns (AddedDate, UserRating, etc.). Bidirectional navigation properties on all entities.
+**Data model**: Many-to-many between `UserProfileInfo` ↔ `Album` (via `FavoriteAlbum` join table) and `UserProfileInfo` ↔ `Band` (via `FavoriteBand` join table). Join tables use composite PKs `(UserId, AlbumId/BandId)` with payload columns (AddedDate, UserRating, etc.). Bidirectional navigation properties on all entities.
 
 **Caching**: Decorator pattern via Scrutor — `CachedUserContentRepository` wraps `UserContentRepository`. Reads cached 30 min via Redis. Mutations invalidate all cache keys for the entity type using Redis `KEYS` pattern scan.
 
+## DDD Patterns
+
+### Aggregates
+
+Aggregates extend `Aggregate<TId>` (which extends `Entity<TId>`). Key conventions:
+- Private collection backing fields (`List<AlbumBand> _albumBands = []`), exposed as `IReadOnlyList<>`
+- **Factory methods** (`Create(...)`) instead of public constructors — validate arguments and raise domain events
+- **Behavioral methods** (`AddBand()`, `Update()`, etc.) that enforce invariants and raise domain events
+- `AddDomainEvent(IDomainEvent)` called inside aggregate methods; events are dispatched by `DispatchDomainEventsInterceptor` at `SaveChanges`
+
+### Value Objects & Strongly-Typed IDs
+
+All entity IDs are strongly typed, extending `EntityId<TValue>`:
+```csharp
+public record AlbumId : EntityId<Guid>
+{
+    public static AlbumId Of(Guid value) =>
+        value == Guid.Empty ? throw new DomainException(...) : Of<AlbumId>(value);
+}
+```
+Use `AlbumId.Of(guid)` — never pass raw `Guid` where an `AlbumId` is expected.
+
+### Domain Events
+
+Events implement `IDomainEvent` (which extends `Mediator.INotification`). Aggregates accumulate events during method calls; `DispatchDomainEventsInterceptor` publishes all events via Mediator just before the transaction commits, then clears them.
+
+## EF Core Interceptors
+
+Three interceptors run in pipeline order during `SaveChanges`:
+
+1. **`AuditableEntityInterceptor`** (Scoped, `SaveChangesInterceptor`) — sets `CreatedAt`, `CreatedBy`, `LastModifiedAt`, `LastModifiedBy` on all `IEntity` entries; also handles owned entity changes via `HasChangedOwnedEntities()`
+
+2. **`DispatchDomainEventsInterceptor`** (Scoped, `SaveChangesInterceptor`) — extracts `IDomainEvent`s from all tracked `IAggregate` entries, clears them, then publishes each via `IMediator.Publish()`
+
+3. **`SlowQueryInterceptor`** (Singleton, `DbCommandInterceptor`) — logs any DB command exceeding 500 ms, including the SQL and parameters
+
 ## Architecture Patterns
 
-### CQRS Flow
+### CQRS Flow (Library.API)
 1. **Carter Endpoint** → maps HTTP request to Command/Query via `Adapt<T>()`
 2. **Mediator pipeline**: LoggingBehavior → ValidationBehavior → UnitOfWorkBehavior
-3. **Handler** executes logic via `IRepository<TContext>`
-4. **UnitOfWorkBehavior** auto-calls `SaveChangesAsync()` for commands only
+3. **Handler** executes logic, calling aggregate factory/behavioral methods
+4. **DispatchDomainEventsInterceptor** fires on SaveChanges, publishing domain events
+5. **UnitOfWorkBehavior** auto-calls `SaveChangesAsync()` for commands only
 
 ### Adding a New Package
-All NuGet versions are centrally managed. To add a package:
+All NuGet versions are centrally managed:
 1. Add `<PackageVersion>` to `Directory.Packages.props` (with version)
 2. Add `<PackageReference>` to the service `.csproj` (without version)
 
 ### Database Initialization
-Both services use `DatabaseInitializerExtensions.InitializeDatabaseAsync()` — applies EF migrations then seeds data via `DatabaseSeeder`. Only runs in Development environment. Seeding checks for existing data and uses transactions.
+Both services use `DatabaseInitializerExtensions.InitializeDatabaseAsync()` — applies EF migrations then seeds data. Only runs in Development. Seeding checks for existing data and uses transactions.
 
 ### Inter-Service Communication
-UserContent.API → Archive.API via gRPC on the same port as REST (HTTP/2 content-type negotiation). When adding a favorite album/band, UserContent.API calls Archive.API's gRPC service to verify the entity exists, then maps the response to a local model.
+UserContent.API → Library.API via gRPC on the same port as REST (HTTP/2 content-type negotiation). When adding a favorite album/band, UserContent.API calls Library.API's gRPC service to verify the entity exists, then maps the response to a local model.
 
 ## Key Conventions
 
-- **Vertical slices**: Group by feature, not layer. Each feature folder = endpoint + handler + validator + DTOs
+- **Vertical slices in API layer**: Each feature folder = endpoint + handler + validator + DTOs
 - **Records** for DTOs, Commands, Queries, Results
-- **Primary constructors** for DI: `class Handler(IRepository<ArchiveContext> repo)`
+- **Primary constructors** for DI: `class Handler(IRepository<LibraryContext> repo)`
 - **Naming**: `{Feature}Endpoint.cs`, `{Feature}Handler.cs` (or `{Feature}CommandHandler.cs`/`{Feature}QueryHandler.cs`)
 - **DTOs** (Request/Response records) defined in endpoint files; Command/Query + Result + Validator defined in handler files
-- **GlobalUsing.cs** in each service project imports common namespaces
+- **GlobalUsing.cs** in each project imports common namespaces
 - **Service DI** organized as extension methods in `Extenstions/ServiceCollection*.cs`
-- **Folder name typo**: `Extenstions/` (not `Extensions/`) is used in both service projects — follow this existing convention, do not rename
+- **Folder name typo**: `Extenstions/` (not `Extensions/`) in both service API projects — follow as-is
 - **BuildingBlocks folder typo**: `Extentions/` (different typo) — also follow as-is
-- **Validation messages**: Archive.API uses `.resx` resource files (`Resources/ResourceFiles/ValidationMessages`); UserContent.API uses inline strings
-- **Exception types**: Each service defines its own (e.g., `AlbumNotFoundException`, `FavoriteAlbumNotFoundException`), inheriting from BuildingBlocks base exceptions
-- **Join tables**: Use composite PKs (no surrogate `Id`), bidirectional nav props, configured via `HasOne().WithMany().HasForeignKey()` in `UserContentModelBuilderExtensions`
+- **Domain folder typo**: `Librrary.Domain/` (triple-r in folder name) — the csproj and namespace use correct spelling `Library.Domain`
+- **Validation messages**: Library.API uses `.resx` resource files (`Resources/ResourceFiles/ValidationMessages`); UserContent.API uses inline strings
+- **Exception types**: Each service defines its own (e.g., `AlbumNotFoundException`), inheriting from BuildingBlocks base exceptions
 - **EF column naming**: All columns use explicit snake_case `HasColumnName()` — never rely on EF conventions
+- **Join tables**: Composite PKs (no surrogate `Id`), bidirectional nav props, configured via `HasOne().WithMany().HasForeignKey()`

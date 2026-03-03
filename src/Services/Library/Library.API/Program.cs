@@ -1,51 +1,20 @@
-﻿using Library.API;
-using Library.Application;
-using Library.Infrastructure;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-        .AddApplicationServices()
-        .AddInfrastructureServices(builder.Configuration)
-        .AddApiServices();
-// -----------------------------
+    .AddApplicationServices()
+    .AddInfrastructureServices(builder.Configuration)
+    .AddApiServices(builder.Configuration);
 
-// ===== MAPPINGS =====
-MappingConfig.RegisterMappings();
-
-// ===== CONFIGURATION =====
-var dbConnection = builder.Configuration.GetConnectionString(ConnectionStrings.LibraryDatabase)
-    ?? throw new InvalidOperationException($"{ConnectionStrings.LibraryDatabase} connection string is missing");
-
-// ===== SERVICES =====
-builder.Services
-    .AddDatabaseServices(dbConnection)
-    .AddRepositoryServices()
-    .AddMediatorServices()
-    .AddGrpcServices()
-    .AddValidationServices()
-    .AddHealthCheckServices(dbConnection)
-    .AddApiDocumentation();
-
-builder.Services.AddCarter();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
-
-// ===== APP =====
 var app = builder.Build();
 
-// Database initialization
-await app.InitializeDatabaseAsync();
+app.UseApiServices();
+app.UseRouting();
 
-// Exception handling middleware
-app.UseExceptionHandler();
-
-// Endpoints
-app.MapCarter();
-app.MapGrpcService<LibraryService>();
-app.MapHealthChecks("/health", new HealthCheckOptions
+if (app.Environment.IsDevelopment())
 {
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
+    await app.InitializeDatabaseAsync();
+}
 
 app.Run();
+
+public partial class Program { }

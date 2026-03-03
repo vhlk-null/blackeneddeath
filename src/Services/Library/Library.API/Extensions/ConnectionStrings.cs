@@ -1,7 +1,6 @@
-﻿namespace Library.API.Extensions
+﻿namespace Library.API.Extensions;
+
+public static class ConnectionStrings
 {
-    public static class ConnectionStrings
-    {
-        public const string LibraryDatabase = "LibraryDb";
-    }
+    public const string LibraryDatabase = "LibraryDb";
 }

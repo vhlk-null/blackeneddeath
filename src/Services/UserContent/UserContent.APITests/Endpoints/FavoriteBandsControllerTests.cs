@@ -1,0 +1,60 @@
+using System.Net;
+using System.Net.Http.Json;
+using BuildingBlocks.Exceptions;
+using FluentAssertions;
+using Moq;
+using UserContent.API.Endpoints.FavoriteBands;
+using Xunit;
+
+namespace UserContent.APITests.Endpoints;
+
+public class FavoriteBandsControllerTests(UserContentWebAppFactory factory) : IClassFixture<UserContentWebAppFactory>
+{
+    private readonly HttpClient _client = factory.CreateClient();
+
+    [Fact]
+    public async Task AddBandToFavorite_ValidRequest_Returns201WithUserId()
+    {
+        var userId = Guid.NewGuid();
+        var request = new AddBandToFavoriteRequest(Guid.NewGuid(), userId);
+        factory.ServiceMock
+            .Setup(s => s.AddFavoriteBandAsync(userId, request.BandId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(userId);
+
+        var response = await _client.PostAsJsonAsync("/favoriteBands", request);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var body = await response.Content.ReadFromJsonAsync<AddBandToFavoriteResponse>();
+        body!.UserId.Should().Be(userId);
+    }
+
+    [Fact]
+    public async Task DeleteFavoriteBand_ValidRequest_Returns200WithSuccess()
+    {
+        var userId = Guid.NewGuid();
+        var bandId = Guid.NewGuid();
+        factory.ServiceMock
+            .Setup(s => s.DeleteFavoriteBandAsync(userId, bandId, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var response = await _client.DeleteAsync($"/favoriteBands?userId={userId}&bandId={bandId}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var body = await response.Content.ReadFromJsonAsync<DeleteFavoriteBandResponse>();
+        body!.IsSuccess.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task DeleteFavoriteBand_ServiceThrowsNotFound_Returns404()
+    {
+        var userId = Guid.NewGuid();
+        var bandId = Guid.NewGuid();
+        factory.ServiceMock
+            .Setup(s => s.DeleteFavoriteBandAsync(userId, bandId, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new NotFoundException("FavoriteBand", bandId));
+
+        var response = await _client.DeleteAsync($"/favoriteBands?userId={userId}&bandId={bandId}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+}

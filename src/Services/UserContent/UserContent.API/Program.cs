@@ -1,34 +1,22 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+using UserContent.Application;
+using UserContent.Application.Mappings;
+using UserContent.Infrastructure;
+using UserContent.Infrastructure.Data.Extensions;
 
-// ===== CONFIGURATION =====
-var dbConnection = builder.Configuration.GetConnectionString(ConnectionStrings.UserContentDatabase)
-                   ?? throw new InvalidOperationException($"{ConnectionStrings.UserContentDatabase} is missing");
-
-var redisConnection = builder.Configuration.GetConnectionString(ConnectionStrings.Redis)
-                      ?? throw new InvalidOperationException($"{ConnectionStrings.Redis} is missing");
-
-var gRpcConnection = builder.Configuration[ConnectionStrings.GrpcSettings]
-                     ?? throw new InvalidOperationException($"{ConnectionStrings.GrpcSettings} is missing");
+var builder = WebApplication.CreateBuilder(args);
 
 // ===== SERVICES =====
 builder.Services
-    .AddDatabaseServices(dbConnection)
-    .AddRedisServices(redisConnection)
-    .AddHealthCheckServices(dbConnection, redisConnection)
-    .AddRepositoryServices()
-    .AddMediatorServices()
-    .AddGrpcServices(gRpcConnection)
-    .AddValidationServices();
+    .AddApplicationServices()
+    .AddInfrastructureServices(builder.Configuration)
+    .AddApiServices();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
-UserContent.API.Mappings.MappingConfig.RegisterMappings();
-builder.Services.AddCarter();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
+MappingConfig.RegisterMappings();
 
 // ===== APP =====
 var app = builder.Build();
@@ -36,10 +24,12 @@ var app = builder.Build();
 await app.InitializeDatabaseAsync();
 
 app.UseExceptionHandler();
-app.MapCarter();
+app.MapControllers();
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
 });
 
 app.Run();
+
+public partial class Program { }

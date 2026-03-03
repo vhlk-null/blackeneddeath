@@ -1,22 +1,21 @@
-﻿namespace Library.Domain.Abstractions
+﻿namespace Library.Domain.Abstractions;
+
+public abstract class Aggregate<TId> : Entity<TId>, IAggregate<TId>
 {
-    public abstract class Aggregate<TId> : Entity<TId>, IAggregate<TId>
+    private readonly List<IDomainEvent> _domainEvents = new();
+    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+    public void AddDomainEvent(IDomainEvent domainEvent)
     {
-        private readonly List<IDomainEvent> _domainEvents = new();
-        public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+        _domainEvents.Add(domainEvent);
+    }
 
-        public void AddDomainEvent(IDomainEvent domainEvent)
-        {
-            _domainEvents.Add(domainEvent);
-        }
+    public IDomainEvent[] ClearDomainEvents()
+    {
+        IDomainEvent[] domainEvents = _domainEvents.ToArray();
 
-        public IDomainEvent[] ClearDomainEvents()
-        {
-            IDomainEvent[] domainEvents = _domainEvents.ToArray();
+        _domainEvents.Clear();
 
-            _domainEvents.Clear();
-
-            return domainEvents;
-        }
+        return domainEvents;
     }
 }

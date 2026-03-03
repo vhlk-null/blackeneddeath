@@ -15,6 +15,9 @@ WORKDIR /src
 COPY ["Directory.Packages.props", "."]
 COPY ["Services/Library/Library.API/Library.API.csproj", "Services/Library/Library.API/"]
 COPY ["BuildingBlocks/BuildingBlocks/BuildingBlocks.csproj", "BuildingBlocks/BuildingBlocks/"]
+COPY ["Services/Library/Library.Application/Library.Application.csproj", "Services/Library/Library.Application/"]
+COPY ["Services/Library/Librrary.Domain/Library.Domain.csproj", "Services/Library/Librrary.Domain/"]
+COPY ["Services/Library/Library.Infrastructure/Library.Infrastructure.csproj", "Services/Library/Library.Infrastructure/"]
 RUN dotnet restore "./Services/Library/Library.API/Library.API.csproj"
 COPY . .
 WORKDIR "/src/Services/Library/Library.API"
