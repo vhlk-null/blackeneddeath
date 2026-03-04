@@ -1,4 +1,4 @@
-using Library.Application.Bands.Queries.GetBandsBy.GetBandsByCountry;
+using Library.Application.Services.Bands.Queries.GetBandsBy.GetBandsByCountry;
 
 namespace Library.API.Endpoints.Bands;
 

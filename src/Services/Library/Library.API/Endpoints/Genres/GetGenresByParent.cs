@@ -1,4 +1,4 @@
-using Library.Application.Genres.Queries.GetGenresByParent;
+using Library.Application.Services.Genres.Queries.GetGenresByParent;
 
 namespace Library.API.Endpoints.Genres;
 

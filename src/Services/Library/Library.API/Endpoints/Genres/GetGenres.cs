@@ -1,4 +1,4 @@
-using Library.Application.Genres.Queries.GetGenres;
+using Library.Application.Services.Genres.Queries.GetGenres;
 
 namespace Library.API.Endpoints.Genres;
 

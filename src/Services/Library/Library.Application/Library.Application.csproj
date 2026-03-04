@@ -8,6 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Albums\**" />
+    <Compile Remove="Bands\**" />
+    <EmbeddedResource Remove="Albums\**" />
+    <EmbeddedResource Remove="Bands\**" />
+    <None Remove="Albums\**" />
+    <None Remove="Bands\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Mapster" />
     <PackageReference Include="Mediator.SourceGenerator">
       <PrivateAssets>all</PrivateAssets>
@@ -21,10 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Albums\EventHandlers\Domain\" />
-    <Folder Include="Albums\EventHandlers\Integration\" />
-    <Folder Include="Bands\EventHandlers\Domain\" />
-    <Folder Include="Bands\EventHandlers\Integration\" />
     <Folder Include="Exceptions\" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿using Library.Application.Albums.Commands.DeleteAlbums;
+﻿using Library.Application.Services.Albums.Commands.DeleteAlbums;
 
 namespace Library.API.Endpoints.Albums;
 
