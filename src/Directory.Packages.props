@@ -8,9 +8,11 @@
   <ItemGroup Label="Web Frameworks">
     <!-- Carter - Minimal APIs -->
     <PackageVersion Include="Carter" Version="10.0.0" />
+    
   </ItemGroup>
   <ItemGroup Label="Message Bus - RabbitMQ">
     <PackageVersion Include="MassTransit.RabbitMQ" Version="9.0.1" />
+    <PackageVersion Include="MassTransit.Abstractions" Version="9.0.1" />
   </ItemGroup>
   <ItemGroup Label="Architecture">
     <!-- Mediator pattern (lightweight alternative to MediatR) -->

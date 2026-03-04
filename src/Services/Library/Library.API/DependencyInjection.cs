@@ -7,6 +7,7 @@
             services.ConfigureHttpJsonOptions(options =>
                 options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
+            services.AddMessageBroker(configuration);
             services.AddCarter();
             services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddProblemDetails();

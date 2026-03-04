@@ -1,5 +1,5 @@
-﻿global using BuildingBlocks.CQRS;
-global using BuildingBlocks.Exceptions;
+﻿global using BuildingBlocks.Exceptions;
+global using BuildingBlocks.Messaging.Events.Albums;
 global using BuildingBlocks.Pagination;
 global using BuildingBlocks.Resources.ResourceManagement;
 global using FluentValidation;
@@ -12,6 +12,8 @@ global using Library.Domain.Events.Album;
 global using Library.Domain.Models;
 global using Library.Domain.ValueObjects;
 global using Library.Domain.ValueObjects.Ids;
+global using Mapster;
+global using MassTransit;
 global using Mediator;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Logging;

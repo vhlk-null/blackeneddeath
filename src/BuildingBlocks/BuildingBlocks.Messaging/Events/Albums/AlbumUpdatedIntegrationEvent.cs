@@ -1,6 +1,6 @@
 ﻿namespace BuildingBlocks.Messaging.Events.Albums;
 
-internal class AlbumUpdatedIntegrationEvent : IntegrationEvent
+public class AlbumUpdatedIntegrationEvent : IntegrationEvent
 {
     public Guid AlbumId { get; set; }
     public string Title { get; set; } = null!;
