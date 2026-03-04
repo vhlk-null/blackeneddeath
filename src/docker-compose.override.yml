@@ -1,15 +1,15 @@
-﻿services:
-  archivedb:
-    container_name: archivedb
+services:
+  librarydb:
+    container_name: librarydb
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=ArchiveDb
+      - POSTGRES_DB=LibraryDb
     restart: always
     ports:
       - "5432:5432"
     volumes:
-      - postgres_archive:/var/lib/postgresql/data/
+      - postgres_library:/var/lib/postgresql/data/
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -44,14 +44,16 @@
       timeout: 5s
       retries: 5
 
-  archive.api:
+  library.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__ArchiveDb=Host=archivedb;Port=5432;Database=ArchiveDb;Username=postgres;Password=postgres
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=DevPassword123!
+      - ConnectionStrings__LibraryDb=Host=librarydb;Port=5432;Database=LibraryDb;Username=postgres;Password=postgres
     depends_on:
-      archivedb:
+      librarydb:
         condition: service_healthy
     ports:
       - "6000:8080"
@@ -69,7 +71,7 @@
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__UserContentDB=Host=usercontentdb;Port=5432;Database=UserContentDB;Username=postgres;Password=postgres
       - ConnectionStrings__Redis=distributedcache:6379,abortConnect=false
-      - GrpcSettings__ArchiveUrl=http://archive.api:8080
+      - GrpcSettings__LibraryUrl=http://library.api:8080
     depends_on:
       usercontentdb:
         condition: service_healthy

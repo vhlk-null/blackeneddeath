@@ -1,5 +1,5 @@
 services:
-  archivedb:
+  librarydb:
     image: postgres:16
 
   usercontentdb:
@@ -8,18 +8,18 @@ services:
   distributedcache:
     image: redis:7.2
 
-  archive.api:
-    image: ${DOCKER_REGISTRY-}archiveapi
-    build:
-      context: .
-      dockerfile: Services/Archive/Archive.API/Dockerfile
-
   usercontent.api:
     image: ${DOCKER_REGISTRY-}usercontentapi
     build:
       context: .
       dockerfile: Services/UserContent/UserContent.API/Dockerfile
 
+  library.api:
+    image: ${DOCKER_REGISTRY-}libraryapi
+    build:
+      context: .
+      dockerfile: Services/Library/Library.API/Dockerfile
+
 volumes:
-  postgres_archive:
+  postgres_library:
   postgres_usercontent:

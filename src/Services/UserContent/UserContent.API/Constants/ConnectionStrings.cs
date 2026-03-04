@@ -4,6 +4,6 @@
     {
         public const string UserContentDatabase = "UserContentDB";
         public const string Redis = "Redis";
-        public const string GrpcSettings = "GrpcSettings:ArchiveUrl";
+        public const string GrpcSettings = "GrpcSettings:LibraryUrl";
     }
 }

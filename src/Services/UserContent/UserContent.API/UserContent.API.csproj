@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
@@ -10,36 +10,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- Versions managed centrally -->
-		<PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
-		<PackageReference Include="AspNetCore.HealthChecks.Redis" />
 		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
-		<PackageReference Include="Carter" />
-		<PackageReference Include="Grpc.AspNetCore" />
-		<PackageReference Include="Mediator.SourceGenerator">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
-		<PackageReference Include="Scrutor" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="UserContent\FavoriteBands\" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Protobuf Include="..\..\Archive\Archive.API\gRPC\Protos\archive.proto" GrpcServices="Client">
-	    <Link>Protos\archive.proto</Link>
-	  </Protobuf>
+		<ProjectReference Include="..\UserContent.Application\UserContent.Application.csproj" />
+		<ProjectReference Include="..\UserContent.Infrastructure\UserContent.Infrastructure.csproj" />
 	</ItemGroup>
 </Project>

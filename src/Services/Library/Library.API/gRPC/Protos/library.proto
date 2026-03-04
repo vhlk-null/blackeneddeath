@@ -1,0 +1,34 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Library.Grpc";
+
+package library;
+
+service LibraryProtoService {
+  rpc GetBandById (GetBandRequest) returns (GetBandResponse);
+  rpc GetAlbumById (GetAlbumRequest) returns (GetAlbumResponse);
+}
+
+message GetBandRequest {
+  string Id = 1;
+}
+
+message GetBandResponse {
+  string Id = 1;
+  string title = 2;
+  int32 releaseDate = 3;
+  string logoUrl = 4; 
+  bool exists = 5;
+}
+
+message GetAlbumRequest {
+  string Id = 1;
+}
+
+message GetAlbumResponse {
+  string Id = 1;
+  string title = 2;
+  int32 releaseDate = 3;
+  string coverUrl = 4; 
+  bool exists = 5;
+}

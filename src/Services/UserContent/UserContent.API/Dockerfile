@@ -14,7 +14,10 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Directory.Packages.props", "."]
 COPY ["Services/UserContent/UserContent.API/UserContent.API.csproj", "Services/UserContent/UserContent.API/"]
+COPY ["Services/UserContent/UserContent.Application/UserContent.Application.csproj", "Services/UserContent/UserContent.Application/"]
 COPY ["BuildingBlocks/BuildingBlocks/BuildingBlocks.csproj", "BuildingBlocks/BuildingBlocks/"]
+COPY ["Services/UserContent/UserContent.Domain/UserContent.Domain.csproj", "Services/UserContent/UserContent.Domain/"]
+COPY ["Services/UserContent/UserContent.Infrastructure/UserContent.Infrastructure.csproj", "Services/UserContent/UserContent.Infrastructure/"]
 RUN dotnet restore "./Services/UserContent/UserContent.API/UserContent.API.csproj"
 COPY . .
 WORKDIR "/src/Services/UserContent/UserContent.API"

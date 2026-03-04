@@ -1,0 +1,52 @@
+using System.Net;
+using System.Net.Http.Json;
+using FluentAssertions;
+using Moq;
+using UserContent.Application.Dtos;
+using UserContent.Application.Exceptions;
+using Xunit;
+
+namespace UserContent.APITests.Endpoints;
+
+public class UserProfileControllerTests : IClassFixture<UserContentWebAppFactory>
+{
+    private readonly HttpClient _client;
+    private readonly UserContentWebAppFactory _factory;
+
+    public UserProfileControllerTests(UserContentWebAppFactory factory)
+    {
+        _factory = factory;
+        _client = factory.CreateClient();
+    }
+
+    [Fact]
+    public async Task GetUserProfile_ExistingUser_Returns200WithDto()
+    {
+        var userId = Guid.NewGuid();
+        var dto = new UserProfileDto(userId, "metal_head", "user@example.com",
+            null, DateTime.UtcNow, null, null, 0, 0, 0, [], []);
+        _factory.ServiceMock
+            .Setup(s => s.GetUserProfileAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dto);
+
+        var response = await _client.GetAsync($"/profile/{userId}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var body = await response.Content.ReadFromJsonAsync<UserProfileDto>();
+        body!.UserId.Should().Be(userId);
+        body.Username.Should().Be("metal_head");
+    }
+
+    [Fact]
+    public async Task GetUserProfile_UserNotFound_Returns404()
+    {
+        var userId = Guid.NewGuid();
+        _factory.ServiceMock
+            .Setup(s => s.GetUserProfileAsync(userId, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new UserProfileNotFoundException(userId));
+
+        var response = await _client.GetAsync($"/profile/{userId}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+}

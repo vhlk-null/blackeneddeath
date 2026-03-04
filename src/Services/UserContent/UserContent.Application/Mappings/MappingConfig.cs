@@ -1,0 +1,28 @@
+using UserContent.Application.Dtos;
+
+namespace UserContent.Application.Mappings;
+
+public static class MappingConfig
+{
+    public static void RegisterMappings()
+    {
+        ConfigureFavoriteAlbumMappings();
+        ConfigureFavoriteBandMappings();
+    }
+
+    private static void ConfigureFavoriteAlbumMappings()
+    {
+        TypeAdapterConfig<FavoriteAlbum, FavoriteAlbumDto>.NewConfig()
+            .Map(dest => dest.AlbumTitle, src => src.Album.Title)
+            .Map(dest => dest.CoverUrl, src => src.Album.CoverUrl)
+            .Map(dest => dest.ReleaseDate, src => src.Album.ReleaseDate);
+    }
+
+    private static void ConfigureFavoriteBandMappings()
+    {
+        TypeAdapterConfig<FavoriteBand, FavoriteBandDto>.NewConfig()
+            .Map(dest => dest.BandName, src => src.Band.BandName)
+            .Map(dest => dest.LogoUrl, src => src.Band.LogoUrl)
+            .Map(dest => dest.ReleaseDate, src => src.Band.ReleaseDate);
+    }
+}
