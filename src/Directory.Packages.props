@@ -9,6 +9,9 @@
     <!-- Carter - Minimal APIs -->
     <PackageVersion Include="Carter" Version="10.0.0" />
   </ItemGroup>
+  <ItemGroup Label="Message Bus - RabbitMQ">
+    <PackageVersion Include="MassTransit.RabbitMQ" Version="9.0.1" />
+  </ItemGroup>
   <ItemGroup Label="Architecture">
     <!-- Mediator pattern (lightweight alternative to MediatR) -->
     <PackageVersion Include="Mediator.Abstractions" Version="3.0.1" />
@@ -64,14 +67,8 @@
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.4.0" />
   </ItemGroup>
-
   <!-- Future packages (commented out, add when needed) -->
   <!--
-  <ItemGroup Label="Message Bus - RabbitMQ">
-    <PackageVersion Include="MassTransit" Version="8.1.3" />
-    <PackageVersion Include="MassTransit.RabbitMQ" Version="8.1.3" />
-  </ItemGroup>
-
   <ItemGroup Label="Logging - Serilog">
     <PackageVersion Include="Serilog.AspNetCore" Version="8.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="5.0.1" />
