@@ -1,6 +1,9 @@
+global using System.Reflection;
 global using BuildingBlocks.Exceptions;
+global using BuildingBlocks.Messaging.MassTransit;
 global using Mapster;
-global using UserContent.Application.Abstractions;
+global using MassTransit;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
 global using UserContent.Application.Dtos;
-global using UserContent.Application.Exceptions;
 global using UserContent.Domain.Models;

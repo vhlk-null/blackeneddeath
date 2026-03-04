@@ -1,6 +1,9 @@
 ﻿global using Library.Application.Data;
+global using Library.Domain.Abstractions;
 global using Library.Infrastructure.Data;
 global using Library.Infrastructure.Data.Interceptors;
+global using Mediator;
 global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Diagnostics;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;

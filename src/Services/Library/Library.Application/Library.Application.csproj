@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Folder Include="Exceptions\" />
+    <Folder Include="Services\Albums\EventHandlers\Domain\" />
   </ItemGroup>
 
   <ItemGroup>

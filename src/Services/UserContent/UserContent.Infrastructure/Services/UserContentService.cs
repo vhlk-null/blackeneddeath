@@ -1,18 +1,22 @@
-namespace UserContent.Application.Services;
+namespace UserContent.Infrastructure.Services;
 
-public class UserContentService(IUserContentRepository repo, ILibraryService libraryService)
+public class UserContentService(IRepository<UserContentContext> repo, ILibraryService libraryService)
     : IUserContentService
 {
     public async Task<UserProfileDto> GetUserProfileAsync(Guid userId, CancellationToken ct = default)
     {
-        var profile = await repo.GetUserProfileWithDetailsAsync(userId, ct)
-            ?? throw new UserProfileNotFoundException(userId);
+        var profile = await repo.GetWithIncludesAsync<UserProfileInfo>(
+            u => u.UserId == userId,
+            q => q.Include(u => u.FavoriteAlbums).ThenInclude(fa => fa.Album)
+                  .Include(u => u.FavoriteBands).ThenInclude(fb => fb.Band),
+            ct) ?? throw new UserProfileNotFoundException(userId);
+
         return profile.Adapt<UserProfileDto>();
     }
 
     public async Task<Guid> AddFavoriteAlbumAsync(Guid userId, Guid albumId, CancellationToken ct = default)
     {
-        var album = await repo.GetAlbumAsync(albumId, ct);
+        var album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct);
         if (album is null)
         {
             album = await libraryService.GetAlbumByIdAsync(albumId, ct)
@@ -20,23 +24,18 @@ public class UserContentService(IUserContentRepository repo, ILibraryService lib
             await repo.AddAsync(album, ct);
         }
 
-        var favoriteAlbum = new FavoriteAlbum
-        {
-            AlbumId = album.Id,
-            UserId = userId,
-            AddedDate = DateTime.UtcNow
-        };
-
-        await repo.AddAsync(favoriteAlbum, ct);
+        await repo.AddAsync(new FavoriteAlbum { AlbumId = album.Id, UserId = userId, AddedDate = DateTime.UtcNow }, ct);
         await repo.SaveChangesAsync(ct);
         return userId;
     }
 
     public async Task DeleteFavoriteAlbumAsync(Guid userId, Guid albumId, CancellationToken ct = default)
     {
-        var fa = await repo.GetFavoriteAlbumAsync(userId, albumId, ct)
+        var fa = await repo.GetByAsync<FavoriteAlbum>(
+            fa => fa.UserId == userId && fa.AlbumId == albumId, cancellationToken: ct)
             ?? throw new FavoriteAlbumNotFoundException(albumId);
-        repo.Remove(fa);
+
+        repo.Delete(fa);
         await repo.SaveChangesAsync(ct);
     }
 
@@ -49,9 +48,11 @@ public class UserContentService(IUserContentRepository repo, ILibraryService lib
 
     public async Task DeleteFavoriteBandAsync(Guid userId, Guid bandId, CancellationToken ct = default)
     {
-        var fb = await repo.GetFavoriteBandAsync(userId, bandId, ct)
+        var fb = await repo.GetByAsync<FavoriteBand>(
+            fb => fb.UserId == userId && fb.BandId == bandId, cancellationToken: ct)
             ?? throw new FavoriteBandNotFoundException(bandId);
-        repo.Remove(fb);
+
+        repo.Delete(fb);
         await repo.SaveChangesAsync(ct);
     }
 }

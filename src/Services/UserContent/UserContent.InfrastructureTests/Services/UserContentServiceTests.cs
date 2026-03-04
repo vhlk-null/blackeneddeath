@@ -1,18 +1,21 @@
+using System.Linq.Expressions;
 using BuildingBlocks.Exceptions;
+using BuildingBlocks.Repositories;
 using FluentAssertions;
 using Moq;
 using UserContent.Application.Abstractions;
 using UserContent.Application.Exceptions;
 using UserContent.Application.Mappings;
-using UserContent.Application.Services;
 using UserContent.Domain.Models;
+using UserContent.Infrastructure.Data;
+using UserContent.Infrastructure.Services;
 using Xunit;
 
-namespace UserContent.ApplicationTests.Services;
+namespace UserContent.InfrastructureTests.Services;
 
 public class UserContentServiceTests
 {
-    private readonly Mock<IUserContentRepository> _repoMock = new();
+    private readonly Mock<IRepository<UserContentContext>> _repoMock = new();
     private readonly Mock<ILibraryService> _libraryMock = new();
     private readonly UserContentService _sut;
 
@@ -20,6 +23,7 @@ public class UserContentServiceTests
 
     public UserContentServiceTests()
     {
+        _repoMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
         _sut = new UserContentService(_repoMock.Object, _libraryMock.Object);
     }
 
@@ -29,14 +33,11 @@ public class UserContentServiceTests
     public async Task GetUserProfileAsync_ProfileExists_ReturnsMappedDto()
     {
         var userId = Guid.NewGuid();
-        var profile = new UserProfileInfo
-        {
-            UserId = userId,
-            Username = "metal_head",
-            Email = "user@example.com",
-            RegisteredDate = DateTime.UtcNow
-        };
-        _repoMock.Setup(x => x.GetUserProfileWithDetailsAsync(userId, It.IsAny<CancellationToken>()))
+        var profile = new UserProfileInfo { UserId = userId, Username = "metal_head", Email = "user@example.com", RegisteredDate = DateTime.UtcNow };
+        _repoMock.Setup(x => x.GetWithIncludesAsync<UserProfileInfo>(
+                It.IsAny<Expression<Func<UserProfileInfo, bool>>>(),
+                It.IsAny<Func<IQueryable<UserProfileInfo>, IQueryable<UserProfileInfo>>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(profile);
 
         var result = await _sut.GetUserProfileAsync(userId);
@@ -49,11 +50,13 @@ public class UserContentServiceTests
     [Fact]
     public async Task GetUserProfileAsync_ProfileNotFound_ThrowsUserProfileNotFoundException()
     {
-        var userId = Guid.NewGuid();
-        _repoMock.Setup(x => x.GetUserProfileWithDetailsAsync(userId, It.IsAny<CancellationToken>()))
+        _repoMock.Setup(x => x.GetWithIncludesAsync<UserProfileInfo>(
+                It.IsAny<Expression<Func<UserProfileInfo, bool>>>(),
+                It.IsAny<Func<IQueryable<UserProfileInfo>, IQueryable<UserProfileInfo>>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync((UserProfileInfo?)null);
 
-        await _sut.Invoking(s => s.GetUserProfileAsync(userId))
+        await _sut.Invoking(s => s.GetUserProfileAsync(Guid.NewGuid()))
             .Should().ThrowAsync<UserProfileNotFoundException>();
     }
 
@@ -65,7 +68,7 @@ public class UserContentServiceTests
         var userId = Guid.NewGuid();
         var albumId = Guid.NewGuid();
         var album = new Album { Id = albumId, Title = "Symbolic" };
-        _repoMock.Setup(x => x.GetAlbumAsync(albumId, It.IsAny<CancellationToken>()))
+        _repoMock.Setup(x => x.GetByAsync<Album>(It.IsAny<Expression<Func<Album, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(album);
 
         var result = await _sut.AddFavoriteAlbumAsync(userId, albumId);
@@ -81,7 +84,7 @@ public class UserContentServiceTests
         var userId = Guid.NewGuid();
         var albumId = Guid.NewGuid();
         var album = new Album { Id = albumId, Title = "Symbolic" };
-        _repoMock.Setup(x => x.GetAlbumAsync(albumId, It.IsAny<CancellationToken>()))
+        _repoMock.Setup(x => x.GetByAsync<Album>(It.IsAny<Expression<Func<Album, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Album?)null);
         _libraryMock.Setup(x => x.GetAlbumByIdAsync(albumId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(album);
@@ -97,7 +100,7 @@ public class UserContentServiceTests
     public async Task AddFavoriteAlbumAsync_AlbumNotFoundAnywhere_ThrowsNotFoundException()
     {
         var albumId = Guid.NewGuid();
-        _repoMock.Setup(x => x.GetAlbumAsync(albumId, It.IsAny<CancellationToken>()))
+        _repoMock.Setup(x => x.GetByAsync<Album>(It.IsAny<Expression<Func<Album, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Album?)null);
         _libraryMock.Setup(x => x.GetAlbumByIdAsync(albumId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Album?)null);
@@ -114,24 +117,22 @@ public class UserContentServiceTests
         var userId = Guid.NewGuid();
         var albumId = Guid.NewGuid();
         var fa = new FavoriteAlbum { UserId = userId, AlbumId = albumId };
-        _repoMock.Setup(x => x.GetFavoriteAlbumAsync(userId, albumId, It.IsAny<CancellationToken>()))
+        _repoMock.Setup(x => x.GetByAsync<FavoriteAlbum>(It.IsAny<Expression<Func<FavoriteAlbum, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(fa);
 
         await _sut.DeleteFavoriteAlbumAsync(userId, albumId);
 
-        _repoMock.Verify(x => x.Remove(fa), Times.Once);
+        _repoMock.Verify(x => x.Delete(fa), Times.Once);
         _repoMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task DeleteFavoriteAlbumAsync_FavoriteNotFound_ThrowsFavoriteAlbumNotFoundException()
     {
-        var userId = Guid.NewGuid();
-        var albumId = Guid.NewGuid();
-        _repoMock.Setup(x => x.GetFavoriteAlbumAsync(userId, albumId, It.IsAny<CancellationToken>()))
+        _repoMock.Setup(x => x.GetByAsync<FavoriteAlbum>(It.IsAny<Expression<Func<FavoriteAlbum, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((FavoriteAlbum?)null);
 
-        await _sut.Invoking(s => s.DeleteFavoriteAlbumAsync(userId, albumId))
+        await _sut.Invoking(s => s.DeleteFavoriteAlbumAsync(Guid.NewGuid(), Guid.NewGuid()))
             .Should().ThrowAsync<FavoriteAlbumNotFoundException>();
     }
 
@@ -160,24 +161,22 @@ public class UserContentServiceTests
         var userId = Guid.NewGuid();
         var bandId = Guid.NewGuid();
         var fb = new FavoriteBand { UserId = userId, BandId = bandId };
-        _repoMock.Setup(x => x.GetFavoriteBandAsync(userId, bandId, It.IsAny<CancellationToken>()))
+        _repoMock.Setup(x => x.GetByAsync<FavoriteBand>(It.IsAny<Expression<Func<FavoriteBand, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(fb);
 
         await _sut.DeleteFavoriteBandAsync(userId, bandId);
 
-        _repoMock.Verify(x => x.Remove(fb), Times.Once);
+        _repoMock.Verify(x => x.Delete(fb), Times.Once);
         _repoMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task DeleteFavoriteBandAsync_FavoriteNotFound_ThrowsFavoriteBandNotFoundException()
     {
-        var userId = Guid.NewGuid();
-        var bandId = Guid.NewGuid();
-        _repoMock.Setup(x => x.GetFavoriteBandAsync(userId, bandId, It.IsAny<CancellationToken>()))
+        _repoMock.Setup(x => x.GetByAsync<FavoriteBand>(It.IsAny<Expression<Func<FavoriteBand, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((FavoriteBand?)null);
 
-        await _sut.Invoking(s => s.DeleteFavoriteBandAsync(userId, bandId))
+        await _sut.Invoking(s => s.DeleteFavoriteBandAsync(Guid.NewGuid(), Guid.NewGuid()))
             .Should().ThrowAsync<FavoriteBandNotFoundException>();
     }
 }

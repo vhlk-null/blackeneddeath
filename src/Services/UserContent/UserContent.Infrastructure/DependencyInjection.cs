@@ -1,10 +1,14 @@
+using BuildingBlocks.Messaging.MassTransit;
+using BuildingBlocks.Repositories;
 using Library.Grpc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Scrutor;
-using UserContent.Infrastructure.Data.Extensions;
+using UserContent.Application.Abstractions;
+using UserContent.Infrastructure.Consumers;
+using UserContent.Infrastructure.Data;
 using UserContent.Infrastructure.gRPC;
 using UserContent.Infrastructure.Repositories;
+using UserContent.Infrastructure.Services;
 
 namespace UserContent.Infrastructure;
 
@@ -27,11 +31,8 @@ public static class DependencyInjection
         services.AddDbContext<UserContentContext>(options =>
             options.UseNpgsql(dbConnection));
 
-        services.AddScoped<DbContext>(sp => sp.GetRequiredService<UserContentContext>());
-
-        // Repository + cache decorator
-        services.AddScoped<IUserContentRepository, UserContentRepository>();
-        services.Decorate<IUserContentRepository, CachedUserContentRepository>();
+        services.AddScoped<IRepository<UserContentContext>, UserContentRepository>();
+        services.AddScoped<IUserContentService, UserContentService>();
 
         // gRPC
         services.AddGrpcClient<LibraryProtoService.LibraryProtoServiceClient>(options =>
@@ -54,6 +55,9 @@ public static class DependencyInjection
             options.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(multiplexer);
             options.InstanceName = "UserContent:";
         });
+
+        // Message broker
+        services.AddMessageBroker(configuration, typeof(AlbumRemovedConsumer).Assembly);
 
         // Health checks
         services.AddHealthChecks()
