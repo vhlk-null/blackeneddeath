@@ -1,5 +1,3 @@
-using UserContent.Application.Dtos;
-
 namespace UserContent.Application.Mappings;
 
 public static class MappingConfig

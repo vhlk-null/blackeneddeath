@@ -1,4 +1,6 @@
-namespace UserContent.Infrastructure.gRPC;
+using Library.Grpc;
+
+namespace UserContent.Application.Services.gRPC;
 
 public class LibraryGrpcService(
     LibraryProtoService.LibraryProtoServiceClient client,

@@ -1,14 +1,9 @@
-global using BuildingBlocks.Exceptions;
-global using BuildingBlocks.Messaging.Events.Albums;
 global using BuildingBlocks.Repositories;
-global using Library.Grpc;
-global using Mapster;
 global using MassTransit;
+global using Microsoft.AspNetCore.Builder;
 global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using StackExchange.Redis;
-global using UserContent.Application.Abstractions;
-global using UserContent.Application.Dtos;
-global using UserContent.Application.Exceptions;
 global using UserContent.Domain.Models;
 global using UserContent.Infrastructure.Data;

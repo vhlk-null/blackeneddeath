@@ -27,13 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UserContent.Application\UserContent.Application.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="..\..\Library\Library.API\gRPC\Protos\library.proto" GrpcServices="Client">
-      <Link>gRPC\Protos\library.proto</Link>
-    </Protobuf>
+    <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj" />
+    <ProjectReference Include="..\UserContent.Domain\UserContent.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-namespace UserContent.Infrastructure.Services;
+namespace UserContent.Application.Services;
 
 public class UserContentService(IRepository<UserContentContext> repo, ILibraryService libraryService)
     : IUserContentService

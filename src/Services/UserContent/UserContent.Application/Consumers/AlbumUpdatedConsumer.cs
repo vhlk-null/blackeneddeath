@@ -1,8 +1,4 @@
-using BuildingBlocks.Messaging.Events.Albums;
-using MassTransit;
-using UserContent.Infrastructure.Data;
-
-namespace UserContent.Infrastructure.Consumers;
+namespace UserContent.Application.Consumers;
 
 public class AlbumUpdatedConsumer(IRepository<UserContentContext> repo) : IConsumer<AlbumUpdatedIntegrationEvent>
 {

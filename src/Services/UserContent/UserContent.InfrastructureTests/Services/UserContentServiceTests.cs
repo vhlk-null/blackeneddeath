@@ -6,9 +6,9 @@ using Moq;
 using UserContent.Application.Abstractions;
 using UserContent.Application.Exceptions;
 using UserContent.Application.Mappings;
+using UserContent.Application.Services;
 using UserContent.Domain.Models;
 using UserContent.Infrastructure.Data;
-using UserContent.Infrastructure.Services;
 using Xunit;
 
 namespace UserContent.InfrastructureTests.Services;

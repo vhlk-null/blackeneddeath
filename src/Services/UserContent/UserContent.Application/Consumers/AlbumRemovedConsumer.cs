@@ -1,4 +1,4 @@
-namespace UserContent.Infrastructure.Consumers;
+namespace UserContent.Application.Consumers;
 
 public class AlbumRemovedConsumer(IRepository<UserContentContext> repo) : IConsumer<AlbumRemovedIntegrationEvent>
 {

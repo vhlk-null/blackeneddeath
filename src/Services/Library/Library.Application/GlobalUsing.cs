@@ -1,4 +1,5 @@
-﻿global using BuildingBlocks.Exceptions;
+﻿global using BuildingBlocks.Behaviors;
+global using BuildingBlocks.Exceptions;
 global using BuildingBlocks.Messaging.Events.Albums;
 global using BuildingBlocks.Pagination;
 global using BuildingBlocks.Resources.ResourceManagement;
@@ -16,4 +17,5 @@ global using Mapster;
 global using MassTransit;
 global using Mediator;
 global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;

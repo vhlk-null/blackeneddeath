@@ -12,6 +12,10 @@
 	<ItemGroup>
 		<!-- Versions managed centrally -->
 		<PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
+		<PackageReference Include="Mediator.SourceGenerator">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
 		<PackageReference Include="Grpc.AspNetCore" />
 		<PackageReference Include="Carter" />

@@ -1,14 +1,6 @@
-using BuildingBlocks.Messaging.MassTransit;
-using BuildingBlocks.Repositories;
-using Library.Grpc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using UserContent.Application.Abstractions;
-using UserContent.Infrastructure.Consumers;
-using UserContent.Infrastructure.Data;
-using UserContent.Infrastructure.gRPC;
 using UserContent.Infrastructure.Repositories;
-using UserContent.Infrastructure.Services;
 
 namespace UserContent.Infrastructure;
 
@@ -24,22 +16,11 @@ public static class DependencyInjection
         var redisConnection = configuration.GetConnectionString("Redis")
             ?? throw new InvalidOperationException("Redis connection string is missing");
 
-        var grpcUrl = configuration["GrpcSettings:LibraryUrl"]
-            ?? throw new InvalidOperationException("GrpcSettings:LibraryUrl is missing");
-
         // Database
         services.AddDbContext<UserContentContext>(options =>
             options.UseNpgsql(dbConnection));
 
         services.AddScoped<IRepository<UserContentContext>, UserContentRepository>();
-        services.AddScoped<IUserContentService, UserContentService>();
-
-        // gRPC
-        services.AddGrpcClient<LibraryProtoService.LibraryProtoServiceClient>(options =>
-        {
-            options.Address = new Uri(grpcUrl);
-        });
-        services.AddScoped<ILibraryService, LibraryGrpcService>();
 
         // Redis
         var redisOptions = ConfigurationOptions.Parse(redisConnection);
@@ -55,9 +36,6 @@ public static class DependencyInjection
             options.ConnectionMultiplexerFactory = () => Task.FromResult<IConnectionMultiplexer>(multiplexer);
             options.InstanceName = "UserContent:";
         });
-
-        // Message broker
-        services.AddMessageBroker(configuration, typeof(AlbumRemovedConsumer).Assembly);
 
         // Health checks
         services.AddHealthChecks()
