@@ -11,6 +11,7 @@ public static class DependencyInjection
         //services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
 
         services.AddMediator();
+        services.AddFeatureManagement();
         return services;
     }
 }

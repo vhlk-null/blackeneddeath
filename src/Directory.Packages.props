@@ -8,7 +8,7 @@
   <ItemGroup Label="Web Frameworks">
     <!-- Carter - Minimal APIs -->
     <PackageVersion Include="Carter" Version="10.0.0" />
-    
+    <PackageVersion Include="Microsoft.FeatureManagement.AspNetCore" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup Label="Message Bus - RabbitMQ">
     <PackageVersion Include="MassTransit.RabbitMQ" Version="9.0.1" />
