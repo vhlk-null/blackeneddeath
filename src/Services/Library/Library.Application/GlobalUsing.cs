@@ -5,6 +5,7 @@ global using BuildingBlocks.Messaging.Events.Bands;
 global using BuildingBlocks.Pagination;
 global using BuildingBlocks.Resources.ResourceManagement;
 global using FluentValidation;
+global using Library.Application.Constants;
 global using Library.Application.Data;
 global using Library.Application.Dtos;
 global using Library.Application.Exceptions;

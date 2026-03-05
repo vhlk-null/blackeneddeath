@@ -10,7 +10,7 @@ public sealed class AlbumCreatedEventHandler(
     {
         logger.LogInformation("Domain Event handled: {DomainEvent}", domainEvent.GetType().Name);
 
-        if (await featureManager.IsEnabledAsync("AlbumFullfilment"))
+        if (await featureManager.IsEnabledAsync(FeatureFlags.AlbumFulfillment))
         {
             var integrationEvent = new AlbumCreatedIntegrationEvent
             {
