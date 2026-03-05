@@ -4,8 +4,24 @@ public static class MappingConfig
 {
     public static void RegisterMappings()
     {
+        ConfigureGrpcMappings();
         ConfigureAlbumMappings();
         //ConfigureBandMappings();
+    }
+
+    private static void ConfigureGrpcMappings()
+    {
+        TypeAdapterConfig<Album, GetAlbumResponse>.NewConfig()
+            .Map(dest => dest.Id, src => src.Id.Value.ToString())
+            .Map(dest => dest.Title, src => src.Title)
+            .Map(dest => dest.CoverUrl, src => src.CoverUrl)
+            .Map(dest => dest.ReleaseDate, src => src.AlbumRelease.ReleaseYear);
+
+        TypeAdapterConfig<Band, GetBandResponse>.NewConfig()
+            .Map(dest => dest.Id, src => src.Id.Value.ToString())
+            .Map(dest => dest.Title, src => src.Name)
+            .Map(dest => dest.LogoUrl, src => src.LogoUrl)
+            .Map(dest => dest.ReleaseDate, src => src.Activity.FormedYear ?? 0);
     }
 
     private static void ConfigureAlbumMappings()

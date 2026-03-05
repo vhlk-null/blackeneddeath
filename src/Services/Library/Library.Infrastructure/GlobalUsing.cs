@@ -1,7 +1,9 @@
-﻿global using Library.Application.Data;
+﻿global using BuildingBlocks.Repositories;
+global using Library.Application.Data;
 global using Library.Domain.Abstractions;
 global using Library.Infrastructure.Data;
 global using Library.Infrastructure.Data.Interceptors;
+global using Library.Infrastructure.Repositories;
 global using Mediator;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Diagnostics;

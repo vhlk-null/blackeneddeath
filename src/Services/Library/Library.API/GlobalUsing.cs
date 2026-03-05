@@ -21,6 +21,7 @@ global using Library.Application.Services.Bands.Queries.GetBands;
 global using Library.Application.Services.Genres.Commands.UpdateGenre;
 global using Library.Application.Services.Genres.Queries.GetGenres;
 global using Library.Domain.Models;
+global using Library.Domain.ValueObjects.Ids;
 global using Library.Grpc;
 global using Library.Infrastructure;
 global using Library.Infrastructure.Data;

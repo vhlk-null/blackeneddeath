@@ -4,19 +4,27 @@ public class LibraryService(IRepository<LibraryContext> repo) : LibraryProtoServ
 {
     public override async Task<GetAlbumResponse> GetAlbumById(GetAlbumRequest request, ServerCallContext context)
     {
-        var album = await repo.GetByAsync<Album>(a => a.Id.Value == Guid.Parse(request.Id));
+        if (!Guid.TryParse(request.Id, out var guid))
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request object."));
+
+        var id = AlbumId.Of(guid);
+        var album = await repo.GetByAsync<Album>(a => a.Id == id);
 
         return album == null
-            ? throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request object."))
+            ? throw new RpcException(new Status(StatusCode.NotFound, $"Album with id '{request.Id}' was not found."))
             : album.Adapt<GetAlbumResponse>();
     }
 
     public override async Task<GetBandResponse> GetBandById(GetBandRequest request, ServerCallContext context)
     {
-        var band = await repo.GetByAsync<Band>(a => a.Id.Value == Guid.Parse(request.Id));
+        if (!Guid.TryParse(request.Id, out var guid))
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request object."));
+
+        var bandId = BandId.Of(guid);
+        var band = await repo.GetByAsync<Band>(a => a.Id == bandId);
 
         return band == null
-            ? throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid request object."))
+            ? throw new RpcException(new Status(StatusCode.NotFound, $"Band with id '{request.Id}' was not found."))
             : band.Adapt<GetBandResponse>();
     }
 }
