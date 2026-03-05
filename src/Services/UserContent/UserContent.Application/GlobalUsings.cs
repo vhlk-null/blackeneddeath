@@ -15,3 +15,4 @@ global using UserContent.Application.Exceptions;
 global using UserContent.Application.Services;
 global using UserContent.Domain.Models;
 global using UserContent.Infrastructure.Data;
+global using Library.Grpc;

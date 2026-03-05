@@ -4,9 +4,9 @@ using BuildingBlocks.Pagination;
 using FluentAssertions;
 using Library.API.Endpoints.Genres;
 using Library.Application.Dtos;
-using Library.Application.Genres.Commands.CreateGenre;
-using Library.Application.Genres.Commands.DeleteGenre;
-using Library.Application.Genres.Queries.GetGenres;
+using Library.Application.Services.Genres.Commands.CreateGenre;
+using Library.Application.Services.Genres.Commands.DeleteGenre;
+using Library.Application.Services.Genres.Queries.GetGenres;
 using Moq;
 using Xunit;
 
@@ -49,11 +49,11 @@ public class GenreEndpointsTests(LibraryWebAppFactory factory) : IClassFixture<L
     [Fact]
     public async Task GetGenres_Returns200WithPaginatedResult()
     {
-        var appResult = new Library.Application.Genres.Queries.GetGenres.GetGenresResult(
+        var appResult = new Library.Application.Services.Genres.Queries.GetGenres.GetGenresResult(
             new PaginatedResult<GenreDetailDto>(0, 10, 0, []));
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<GetGenresQuery>(), It.IsAny<CancellationToken>()))
-            .Returns(new ValueTask<Library.Application.Genres.Queries.GetGenres.GetGenresResult>(appResult));
+            .Returns(new ValueTask<Library.Application.Services.Genres.Queries.GetGenres.GetGenresResult>(appResult));
 
         var response = await _client.GetAsync("/genres?pageIndex=0&pageSize=10");
 

@@ -47,8 +47,8 @@ public abstract class BaseGenericRepository<TContext> : IRepository<TContext> wh
     public IQueryable<T> Filter<T>(Expression<Func<T, bool>> expression, bool asTracked = true) where T : class
     {
         return asTracked
-            ? this.Context.Set<T>().Where(expression)
-            : this.Context.Set<T>().AsNoTracking().Where(expression);
+            ? Context.Set<T>().Where(expression)
+            : Context.Set<T>().AsNoTracking().Where(expression);
     }
 
     public async Task<List<T>> AllAsync<T>(CancellationToken cancellationToken = default) where T : class

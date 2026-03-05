@@ -1,9 +1,4 @@
-﻿using Grpc.Core;
-using Library.Domain.Models;
-using Library.Grpc;
-using Library.Infrastructure.Data;
-
-namespace Library.API.gRPC.Services;
+﻿namespace Library.API.gRPC.Services;
 
 public class LibraryService(IRepository<LibraryContext> repo) : LibraryProtoService.LibraryProtoServiceBase
 {

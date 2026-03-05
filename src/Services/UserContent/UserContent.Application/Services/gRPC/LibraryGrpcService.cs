@@ -1,5 +1,3 @@
-using Library.Grpc;
-
 namespace UserContent.Application.Services.gRPC;
 
 public class LibraryGrpcService(

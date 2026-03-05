@@ -1,7 +1,3 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using UserContent.Infrastructure.Repositories;
-
 namespace UserContent.Infrastructure;
 
 public static class DependencyInjection
