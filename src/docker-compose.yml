@@ -5,6 +5,9 @@ services:
   usercontentdb:
     image: postgres:16
 
+  messagebroker:
+    image: rabbitmq:management
+
   distributedcache:
     image: redis:7.2
 
@@ -23,3 +26,4 @@ services:
 volumes:
   postgres_library:
   postgres_usercontent:
+  rabbitmq_data:

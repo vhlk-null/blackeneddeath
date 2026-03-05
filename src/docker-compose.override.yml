@@ -33,6 +33,24 @@ services:
       timeout: 5s
       retries: 5
 
+  messagebroker: 
+    container_name: messagebroker
+    hostname: blackenddeath
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   distributedcache:
     container_name: distributedcache
     restart: always
@@ -52,8 +70,11 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=DevPassword123!
       - ConnectionStrings__LibraryDb=Host=librarydb;Port=5432;Database=LibraryDb;Username=postgres;Password=postgres
+      - ConnectionStrings__RabbitMq=amqp://guest:guest@messagebroker:5672
     depends_on:
       librarydb:
+        condition: service_healthy
+      messagebroker:
         condition: service_healthy
     ports:
       - "6000:8080"
@@ -77,6 +98,8 @@ services:
         condition: service_healthy
       distributedcache:
         condition: service_healthy
+      library.api:
+        condition: service_started
     ports:
       - "6010:8080"
       - "6011:8081"   
