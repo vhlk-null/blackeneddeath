@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using BuildingBlocks.Repositories;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -27,10 +28,18 @@ public class CachedUserContentRepositoryTests
     private readonly Mock<IConnectionMultiplexer> _redisMock = new();
     private readonly Mock<IServer> _serverMock = new();
     private readonly Mock<IDatabase> _dbMock = new();
+    private readonly UserContentContext _context;
     private readonly CachedUserContentRepository _sut;
 
     public CachedUserContentRepositoryTests()
     {
+        _context = new UserContentContext(
+            new DbContextOptionsBuilder<UserContentContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options);
+
+        _innerMock.Setup(r => r.Context).Returns(_context);
+
         _serverMock
             .Setup(s => s.Keys(It.IsAny<int>(), It.IsAny<RedisValue>(), It.IsAny<int>(),
                 It.IsAny<long>(), It.IsAny<int>(), It.IsAny<CommandFlags>()))
@@ -271,15 +280,38 @@ public class CachedUserContentRepositoryTests
         _innerMock.Verify(r => r.AddAsync(fa, It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    // ── Delegation ─────────────────────────────────────────────────────────────
+    // ── SaveChangesAsync ───────────────────────────────────────────────────────
 
     [Fact]
-    public async Task SaveChangesAsync_DelegatesToInner()
+    public async Task SaveChangesAsync_NoModifiedAlbums_DelegatesToInnerWithoutInvalidatingCache()
     {
         _innerMock.Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(3);
 
         var result = await _sut.SaveChangesAsync();
 
         result.Should().Be(3);
+        _redisMock.Verify(r => r.GetServers(), Times.Never);
+    }
+
+    [Fact]
+    public async Task SaveChangesAsync_WithModifiedAlbum_InvalidatesAllUserProfileCaches()
+    {
+        var album = new Album { Id = Guid.NewGuid(), Title = "Symbolic" };
+        await _context.Albums.AddAsync(album);
+        await _context.SaveChangesAsync();
+
+        album.Title = "Symbolic (Updated)";
+        _context.ChangeTracker.DetectChanges();
+
+        var keys = new RedisKey[] { "UserContent:user1:UserProfileInfo" };
+        _serverMock
+            .Setup(s => s.Keys(It.IsAny<int>(), It.IsAny<RedisValue>(), It.IsAny<int>(),
+                It.IsAny<long>(), It.IsAny<int>(), It.IsAny<CommandFlags>()))
+            .Returns(keys);
+        _innerMock.Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+
+        await _sut.SaveChangesAsync();
+
+        _dbMock.Verify(d => d.KeyDeleteAsync(It.IsAny<RedisKey[]>(), It.IsAny<CommandFlags>()), Times.Once);
     }
 }

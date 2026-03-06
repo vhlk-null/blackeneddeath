@@ -7,8 +7,6 @@ public class CachedUserContentRepository(
     ILogger<CachedUserContentRepository> logger)
     : IRepository<UserContentContext>
 {
-    private bool _albumModified;
-
     private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(30);
     private static readonly JsonSerializerOptions JsonOptions = new()
     {

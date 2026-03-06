@@ -12,7 +12,7 @@ using UserContent.Infrastructure.Data;
 namespace UserContent.Infrastructure.Migrations
 {
     [DbContext(typeof(UserContentContext))]
-    [Migration("20260303230340_MigrationName")]
+    [Migration("20260306162031_MigrationName")]
     partial class MigrationName
     {
         /// <inheritdoc />
