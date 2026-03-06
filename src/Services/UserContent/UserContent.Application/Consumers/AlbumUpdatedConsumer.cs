@@ -14,6 +14,7 @@ public class AlbumUpdatedConsumer(IRepository<UserContentContext> repo) : IConsu
         album.CoverUrl = consumeContext.Message.CoverUrl;
         album.ReleaseDate = consumeContext.Message.ReleaseDate;
 
+        repo.Update(album);
         await repo.SaveChangesAsync(consumeContext.CancellationToken);
     }
 }

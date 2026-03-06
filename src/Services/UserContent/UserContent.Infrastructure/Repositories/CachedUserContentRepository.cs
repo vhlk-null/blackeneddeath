@@ -7,6 +7,8 @@ public class CachedUserContentRepository(
     ILogger<CachedUserContentRepository> logger)
     : IRepository<UserContentContext>
 {
+    private bool _albumModified;
+
     private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(30);
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -126,7 +128,9 @@ public class CachedUserContentRepository(
         => inner.AllWithIncludeAsync(includeExpressions, cancellationToken);
 
     public void Update<T>(T entity) where T : class
-        => inner.Update(entity);
+    {
+        inner.Update(entity);
+    }
 
     public void UpdateRange<T>(IEnumerable<T> entities) where T : class
         => inner.UpdateRange(entities);
@@ -137,8 +141,18 @@ public class CachedUserContentRepository(
     public Task<int> CountAsync<T>(CancellationToken cancellationToken = default) where T : class
         => inner.CountAsync<T>(cancellationToken);
 
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        => inner.SaveChangesAsync(cancellationToken);
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var hasModifiedAlbums = Context.ChangeTracker.Entries<Album>()
+            .Any(e => e.State is EntityState.Modified or EntityState.Deleted);
+
+        var result = await inner.SaveChangesAsync(cancellationToken);
+
+        if (hasModifiedAlbums)
+            await InvalidateCacheForUserAsync(null);
+
+        return result;
+    }
 
     // Helpers
 

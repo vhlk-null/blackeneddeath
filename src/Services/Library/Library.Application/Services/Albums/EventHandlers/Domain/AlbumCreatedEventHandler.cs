@@ -1,8 +1,7 @@
 namespace Library.Application.Services.Albums.EventHandlers.Domain;
 
 public sealed class AlbumCreatedEventHandler(
-    ILogger<AlbumCreatedEventHandler> logger, 
-    IFeatureManager featureManager,
+    ILogger<AlbumCreatedEventHandler> logger,
     IPublishEndpoint publishEndpoint)
     : INotificationHandler<AlbumCreatedEvent>
 {
@@ -10,20 +9,20 @@ public sealed class AlbumCreatedEventHandler(
     {
         logger.LogInformation("Domain Event handled: {DomainEvent}", domainEvent.GetType().Name);
 
-        if (await featureManager.IsEnabledAsync(FeatureFlags.AlbumFulfillment))
-        {
-            var integrationEvent = new AlbumCreatedIntegrationEvent
-            {
-                AlbumId = domainEvent.Album.Id.Value,
-                Title = domainEvent.Album.Title,
-                CoverUrl = domainEvent.Album.CoverUrl,
-                ReleaseYear = domainEvent.Album.AlbumRelease.ReleaseYear,
-                Format = (int)domainEvent.Album.AlbumRelease.Format,
-                Type = (int)domainEvent.Album.Type,
-                Label = domainEvent.Album.LabelInfo?.Name
-            };
+        // Feature flag: FeatureFlags.AlbumFulfillment
+        // if (await featureManager.IsEnabledAsync(FeatureFlags.AlbumFulfillment))
 
-            await publishEndpoint.Publish(integrationEvent, cancellationToken);
-        }
+        var integrationEvent = new AlbumCreatedIntegrationEvent
+        {
+            AlbumId = domainEvent.Album.Id.Value,
+            Title = domainEvent.Album.Title,
+            CoverUrl = domainEvent.Album.CoverUrl,
+            ReleaseYear = domainEvent.Album.AlbumRelease.ReleaseYear,
+            Format = (int)domainEvent.Album.AlbumRelease.Format,
+            Type = (int)domainEvent.Album.Type,
+            Label = domainEvent.Album.LabelInfo?.Name
+        };
+
+        await publishEndpoint.Publish(integrationEvent, cancellationToken);
     }
 }

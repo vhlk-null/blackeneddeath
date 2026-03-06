@@ -70,7 +70,9 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=DevPassword123!
       - ConnectionStrings__LibraryDb=Host=librarydb;Port=5432;Database=LibraryDb;Username=postgres;Password=postgres
-      - ConnectionStrings__RabbitMq=amqp://guest:guest@messagebroker:5672
+      - MessageBroker__Host=amqp://blackenddeath-mq:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest
     depends_on:
       librarydb:
         condition: service_healthy
