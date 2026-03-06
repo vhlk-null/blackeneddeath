@@ -17,6 +17,7 @@ public static class DependencyInjection
             options.UseNpgsql(dbConnection));
 
         services.AddScoped<IRepository<UserContentContext>, UserContentRepository>();
+        services.Decorate<IRepository<UserContentContext>, CachedUserContentRepository>();
 
         // Redis
         var redisOptions = ConfigurationOptions.Parse(redisConnection);

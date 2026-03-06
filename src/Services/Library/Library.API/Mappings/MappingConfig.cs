@@ -14,13 +14,13 @@ public static class MappingConfig
         TypeAdapterConfig<Album, GetAlbumResponse>.NewConfig()
             .Map(dest => dest.Id, src => src.Id.Value.ToString())
             .Map(dest => dest.Title, src => src.Title)
-            .Map(dest => dest.CoverUrl, src => src.CoverUrl)
+            .Map(dest => dest.CoverUrl, src => src.CoverUrl ?? string.Empty)
             .Map(dest => dest.ReleaseDate, src => src.AlbumRelease.ReleaseYear);
 
         TypeAdapterConfig<Band, GetBandResponse>.NewConfig()
             .Map(dest => dest.Id, src => src.Id.Value.ToString())
             .Map(dest => dest.Title, src => src.Name)
-            .Map(dest => dest.LogoUrl, src => src.LogoUrl)
+            .Map(dest => dest.LogoUrl, src => src.LogoUrl ?? string.Empty)
             .Map(dest => dest.ReleaseDate, src => src.Activity.FormedYear ?? 0);
     }
 

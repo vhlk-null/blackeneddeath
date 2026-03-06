@@ -9,3 +9,7 @@ global using StackExchange.Redis;
 global using UserContent.Domain.Models;
 global using UserContent.Infrastructure.Data;
 global using UserContent.Infrastructure.Repositories;
+global using System.Linq.Expressions;
+global using System.Text.Json;
+global using System.Text.Json.Serialization;
+global using Microsoft.Extensions.Caching.Distributed;
