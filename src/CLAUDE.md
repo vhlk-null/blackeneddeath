@@ -16,7 +16,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **FluentValidation 12.1.1** — request validation
 - **Mapster 7.4.0** — object mapping (`source.Adapt<T>()`)
 - **Scrutor** — decorator pattern for DI (CachedUserContentRepository)
-- **gRPC** — inter-service communication (Library.API = server, UserContent.Infrastructure = client)
+- **MassTransit** + **RabbitMQ** — async integration events (`BuildingBlocks.Messaging`); Library publishes, UserContent consumes
+- **Microsoft.FeatureManagement** — feature flags in Library.Application (e.g., `FeatureFlags.AlbumFulfillment`)
+- **gRPC** — inter-service communication (Library.API = server, UserContent.Application = client)
 - **Docker Compose** — containerization
 
 ## Common Development Commands
@@ -62,6 +64,8 @@ dotnet ef migrations add MigrationName --project Services/UserContent/UserConten
 | librarydb          | 5432      | 5432           | PostgreSQL|
 | usercontentdb      | 5433      | 5432           | PostgreSQL|
 | Redis              | 6379      | 6379           | Redis     |
+| RabbitMQ AMQP      | 5672      | 5672           | AMQP      |
+| RabbitMQ UI        | 15672     | 15672          | HTTP      |
 
 Library.API serves both REST and gRPC on the same ports (HTTP/1+2 via Kestrel `EndpointDefaults`). No separate gRPC port.
 
@@ -72,7 +76,9 @@ Database credentials: `postgres/postgres` for both databases.
 ```
 blackened.death.slnx                   # XML-format solution file (.slnx)
 Directory.Packages.props               # Central Package Management — ALL versions here
-BuildingBlocks/                        # Shared library (CQRS, Repository, Behaviors, Exceptions)
+BuildingBlocks/
+  BuildingBlocks/                      # CQRS, Repository, Behaviors, Exceptions
+  BuildingBlocks.Messaging/            # Integration events + MassTransit RabbitMQ setup
 Services/
   Library/
     Librrary.Domain/                   # ⚠️ Folder typo (triple-r); csproj/namespace: Library.Domain
@@ -92,13 +98,19 @@ Services/
     UserContent.APITests/
 ```
 
-### BuildingBlocks (shared library)
+### BuildingBlocks
 
+**BuildingBlocks** (core shared library):
 - **CQRS**: `ICommand<T>`, `IQuery<T>`, `ICommandHandler<,>`, `IQueryHandler<,>` — thin wrappers over `Mediator.IRequest`
 - **Repository**: Generic `IRepository<TContext>` with `BaseGenericRepository<T>` implementation
-- **Pipeline Behaviors**: `LoggingBehavior` → `ValidationBehavior` → `UnitOfWorkBehavior` (auto-saves for commands)
+- **Pipeline Behaviors**: `LoggingBehavior` → `ValidationBehavior` (⚠️ `UnitOfWorkBehavior` is currently **commented out** in Library.Application DI — handlers call `SaveChangesAsync` explicitly)
 - **Pagination**: `PagedQuery<T>`, `PagedResult<T>`, `QueryableExtensions.ToPagedResultAsync()` in `Extentions/`
 - **Exceptions**: `GlobalExceptionHandler`, `NotFoundException`, `BadRequestException`, `InternalServerException`
+
+**BuildingBlocks.Messaging** (integration events + messaging):
+- `IntegrationEvent` base class (Id, OccuredOn, EventType)
+- Integration event types under `Events/Albums/` and `Events/Bands/` (Created/Updated/Removed variants)
+- `AddMessageBroker(IConfiguration, params Assembly[] consumerAssemblies)` — registers MassTransit with RabbitMQ; pass consumer assemblies to auto-register consumers. Config keys: `MessageBroker:Host`, `MessageBroker:Username`, `MessageBroker:Password`
 
 ### Librrary.Domain
 
@@ -120,14 +132,15 @@ CQRS handlers, validators, and application logic. Folder structure: `Services/{F
 - **`Extensions/`** — domain-to-DTO extension methods (AlbumExtensions, BandExtensions, etc.)
 - **`Services/{Feature}/Commands/{Name}/`** — command + handler pair (e.g., `CreateAlbumCommand.cs` + `CreateAlbumHandler.cs`)
 - **`Services/{Feature}/Queries/{Name}/`** — query + handler pair
-- **`Services/{Feature}/EventHandlers/`** — domain event handlers
+- **`Services/{Feature}/EventHandlers/Domain/`** — domain event handlers that publish integration events via `IPublishEndpoint`; guarded by feature flags
+- **`Constants/FeatureFlags.cs`** — feature flag name constants (e.g., `FeatureFlags.AlbumFulfillment`); configured in `appsettings.json` under `FeatureManagement`
 - **`Resources/ResourceFiles/`** — `.resx` validation message files
 - **Handler namespace pattern**: `Library.Application.Services.Albums.Commands.CreateAlbum` (note `.Services.` segment)
 
 ### Library.Infrastructure
 
 - **`LibraryContext`** — EF Core DbContext, implements `ILibraryDbContext`; registers interceptors via `AddInterceptors()`
-- **`DependencyInjection.cs`** — registers interceptors and DbContext:
+- **`DependencyInjection.cs`** — registers interceptors, DbContext, and both `ILibraryDbContext` and `IRepository<LibraryContext>` (both registered and pointing to the same `LibraryContext`)
   - `AuditableEntityInterceptor` and `DispatchDomainEventsInterceptor` as **Scoped**
   - `SlowQueryInterceptor` as **Singleton**
 - **`Data/Configurations/`** — entity type configurations (Fluent API, snake_case column names)
@@ -153,14 +166,17 @@ Uses `Mappings/MappingConfig.cs` for explicit Mapster type mappings (registered 
 
 **UserContent.Application**: service-pattern (not CQRS — no Mediator handlers):
 - `Abstractions/IUserContentService` — primary interface used by controllers
-- `Abstractions/IUserContentRepository` — repository interface
-- `Abstractions/ILibraryService` — gRPC client abstraction
-- `Services/UserContentService` — implementation
+- `Abstractions/ILibraryService` — gRPC client abstraction (⚠️ `IUserContentRepository` was removed; service uses `IRepository<UserContentContext>` from BuildingBlocks directly)
+- `Services/UserContentService` — injects `IRepository<UserContentContext>` and `ILibraryService`
+- `Services/gRPC/LibraryGrpcService` — implements `ILibraryService` via gRPC (moved here from Infrastructure)
+- `Consumers/` — MassTransit consumers: `AlbumRemovedConsumer`, `AlbumUpdatedConsumer` (sync local Album data from Library events)
 - `Dtos/`, `Exceptions/`, `Mappings/MappingConfig.cs`
+- `DependencyInjection.cs` takes `IConfiguration` (needs gRPC URL + message broker settings); calls `AddMessageBroker()` with its own assembly to register consumers
 
-**UserContent.Infrastructure**: EF Core, Redis caching, gRPC client:
-- `Repositories/UserContentRepository` and `CachedUserContentRepository` (Scrutor decorator, 30-min Redis cache)
-- `gRPC/LibraryGrpcService` — implements `ILibraryService` via gRPC client
+**UserContent.Infrastructure**: EF Core, Redis caching:
+- `Repositories/UserContentRepository` and `CachedUserContentRepository` (Scrutor decorator of `IRepository<UserContentContext>`, 30-min Redis cache)
+- Caches `GetWithIncludesAsync<UserProfileInfo>` by userId; invalidates on `AddAsync`/`Delete` of entities with `UserId`
+- gRPC client registration and `LibraryGrpcService` have moved to **UserContent.Application**
 
 **UserContent.API**: MVC controllers (not Carter), feature folders under `Endpoints/`:
 - `FavoriteAlbumsController`, `FavoriteBandsController`, `UserProfileController`
@@ -190,9 +206,13 @@ public record AlbumId : EntityId<Guid>
 ```
 Use `AlbumId.Of(guid)` — never pass raw `Guid` where an `AlbumId` is expected.
 
-### Domain Events
+### Domain Events → Integration Events
 
-Events implement `IDomainEvent` (which extends `Mediator.INotification`). Aggregates accumulate events during method calls; `DispatchDomainEventsInterceptor` publishes all events via Mediator just before the transaction commits, then clears them. Event handlers live in `Library.Application/Services/{Feature}/EventHandlers/`.
+Events implement `IDomainEvent` (which extends `Mediator.INotification`). Aggregates accumulate events during method calls; `DispatchDomainEventsInterceptor` publishes all events via Mediator just before the transaction commits, then clears them.
+
+Domain event handlers in `Library.Application/Services/{Feature}/EventHandlers/Domain/` translate domain events into integration events and publish them via MassTransit `IPublishEndpoint`, **gated by a feature flag** (e.g. `FeatureFlags.AlbumFulfillment`). This keeps the event publishing opt-in during development.
+
+Album domain events also implement `IAlbumDomainEvent` (marker interface in `Library.Domain/Events/Album/`) to enable type-safe handler constraints.
 
 ## EF Core Interceptors
 
@@ -208,10 +228,16 @@ Three interceptors run in pipeline order during `SaveChanges`:
 
 ### CQRS Flow (Library service)
 1. **Carter Endpoint** (`Library.API/Endpoints/`) → maps HTTP request to Command/Query via `Adapt<T>()`, sends via `ISender`
-2. **Mediator pipeline**: `LoggingBehavior` → `ValidationBehavior` → `UnitOfWorkBehavior`
-3. **Handler** in `Library.Application/Services/{Feature}/` executes logic via `ILibraryDbContext`
-4. **DispatchDomainEventsInterceptor** fires on SaveChanges, publishing domain events to Application event handlers
-5. **UnitOfWorkBehavior** auto-calls `SaveChangesAsync()` for commands only
+2. **Mediator pipeline**: `LoggingBehavior` → `ValidationBehavior` (UnitOfWorkBehavior currently disabled)
+3. **Handler** in `Library.Application/Services/{Feature}/` executes logic via `ILibraryDbContext`, calls `SaveChangesAsync()` explicitly
+4. **DispatchDomainEventsInterceptor** fires on SaveChanges, publishing domain events to domain event handlers
+5. **Domain event handlers** publish integration events to RabbitMQ via `IPublishEndpoint` (feature-flag-gated)
+6. **UserContent consumers** receive integration events and sync their local read model
+
+### Messaging Flow
+- Library domain events → domain event handlers → MassTransit `IPublishEndpoint` → RabbitMQ
+- UserContent MassTransit consumers (in `UserContent.Application/Consumers/`) → update local `Album`/`Band` data
+- Queue names use kebab-case formatter (MassTransit default)
 
 ### Adding a New Package
 All NuGet versions are centrally managed:
@@ -222,14 +248,17 @@ All NuGet versions are centrally managed:
 Both services use `DatabaseInitializerExtensions.InitializeDatabaseAsync()` — applies EF migrations then seeds data. Only runs in Development.
 
 ### Inter-Service Communication
-UserContent.Infrastructure → Library.API via gRPC. `LibraryGrpcService` implements `ILibraryService` and is injected into `UserContentService` to verify albums/bands exist before adding to favorites.
+Two channels:
+- **gRPC (sync)**: UserContent.Application → Library.API. `LibraryGrpcService` (in `UserContent.Application/Services/gRPC/`) implements `ILibraryService`, registered in `UserContent.Application/DependencyInjection.cs`. Used to fetch album/band data on-demand when not cached locally.
+- **RabbitMQ (async)**: Library.API publishes integration events; UserContent.Application consumers keep local `Album`/`Band` copies up to date.
 
 ## Testing
 
 - **Library.ApplicationTests**: xunit unit tests; mock `ILibraryDbContext` with Moq + `MockDbSetFactory`; test handlers directly
-- **Library.APITests**: integration tests via `WebApplicationFactory<Program>` (`LibraryWebAppFactory`); mock `ISender` to test Carter endpoint routing and HTTP responses in isolation
+- **Library.APITests**: integration tests via `WebApplicationFactory<Program>` (`LibraryWebAppFactory`); mock `ISender` to test Carter endpoint routing and HTTP responses in isolation; also includes gRPC service tests (`gRPC/LibraryServiceTests.cs`) and Mapster mapping tests (`Mappings/GrpcMappingTests.cs`)
 - **Library.InfrastructureTests**: test EF Core interceptors
-- **UserContent.*Tests**: equivalent test projects (some are placeholder stubs)
+- **UserContent.InfrastructureTests**: unit tests for `CachedUserContentRepository` (mock `IRepository`, `IDistributedCache`, `IConnectionMultiplexer`) and `UserContentService`
+- **UserContent.ApplicationTests / UserContent.APITests**: placeholder stubs
 
 ## Key Conventions
 

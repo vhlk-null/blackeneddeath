@@ -42,6 +42,11 @@ public class Album : Aggregate<AlbumId>
         return album;
     }
 
+    public void Delete()
+    {
+        AddDomainEvent(new AlbumRemovedEvent(this));
+    }
+
     public Album Update(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelInfo? labelInfo)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);

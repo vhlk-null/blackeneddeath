@@ -10,6 +10,7 @@ public class DeleteAlbumCommandHandler(ILibraryDbContext context)
         var album = await context.Albums.FindAsync([AlbumId.Of(command.AlbumId)], cancellationToken)
             ?? throw new AlbumNotFoundException(command.AlbumId);
 
+        album.Delete();
         context.Albums.Remove(album);
         await context.SaveChangesAsync(cancellationToken);
 
