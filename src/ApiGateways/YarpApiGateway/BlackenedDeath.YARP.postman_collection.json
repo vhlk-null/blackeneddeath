@@ -1,0 +1,518 @@
+{
+  "info": {
+    "name": "Blackened Death - YARP API Gateway",
+    "_postman_id": "bd-yarp-gateway-collection",
+    "description": "All requests routed through the YARP API Gateway (http://localhost:5050).\n\nRoutes:\n  /library/**  → Library.API  (http://localhost:6000)\n  /usercontent/** → UserContent.API (http://localhost:6010)\n\nSet the `gateway_url` variable to override the base URL.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "gateway_url",
+      "value": "http://localhost:5050",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Library",
+      "description": "Library service endpoints — proxied via /library prefix",
+      "item": [
+        {
+          "name": "Albums",
+          "item": [
+            {
+              "name": "Get Albums",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/albums?pageIndex=0&pageSize=10",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "albums"],
+                  "query": [
+                    { "key": "pageIndex", "value": "0" },
+                    { "key": "pageSize", "value": "10" }
+                  ]
+                },
+                "description": "Returns a paginated list of albums."
+              }
+            },
+            {
+              "name": "Get Album By Id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/albums/:id",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "albums", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000",
+                      "description": "Album GUID"
+                    }
+                  ]
+                },
+                "description": "Returns a single album by its GUID."
+              }
+            },
+            {
+              "name": "Get Albums By Release Year",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/albums/releaseyear/:releaseDate",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "albums", "releaseyear", ":releaseDate"],
+                  "variable": [
+                    {
+                      "key": "releaseDate",
+                      "value": "1992",
+                      "description": "4-digit release year"
+                    }
+                  ]
+                },
+                "description": "Returns all albums released in a given year."
+              }
+            },
+            {
+              "name": "Create Album",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"album\": {\n    \"id\": \"00000000-0000-0000-0000-000000000000\",\n    \"title\": \"Covenant\",\n    \"releaseDate\": 1994,\n    \"coverUrl\": null,\n    \"type\": \"FullLength\",\n    \"format\": \"CD\",\n    \"label\": \"Earache Records\",\n    \"bands\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000001\",\n        \"name\": \"Morbid Angel\"\n      }\n    ],\n    \"countries\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000002\",\n        \"name\": \"United States\"\n      }\n    ],\n    \"streamingLinks\": [\n      {\n        \"platform\": \"Spotify\",\n        \"embedCode\": \"spotify:album:example\"\n      }\n    ],\n    \"tracks\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000003\",\n        \"title\": \"Rapture\",\n        \"trackNumber\": 1\n      }\n    ],\n    \"genres\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000004\",\n        \"name\": \"Death Metal\",\n        \"parentGenreId\": null\n      }\n    ]\n  }\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{gateway_url}}/library/albums",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "albums"]
+                },
+                "description": "Creates a new album.\n\nAlbumType values: FullLength, EP, Demo, Single, Compilation, LiveAlbum, Split\nAlbumFormat values: CD, Digital, Vinyl, Cassette, VinylLP, VinylEP, DVD, BluRay\nStreamingPlatform values: Spotify, AppleMusic, YouTube, Deezer, SoundCloud, Tidal, AmazonMusic, Bandcamp"
+              }
+            },
+            {
+              "name": "Update Album",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"album\": {\n    \"id\": \"00000000-0000-0000-0000-000000000000\",\n    \"title\": \"Covenant (Remastered)\",\n    \"releaseDate\": 1994,\n    \"coverUrl\": \"https://example.com/cover.jpg\",\n    \"type\": \"FullLength\",\n    \"format\": \"Vinyl\",\n    \"label\": \"Earache Records\",\n    \"bands\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000001\",\n        \"name\": \"Morbid Angel\"\n      }\n    ],\n    \"countries\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000002\",\n        \"name\": \"United States\"\n      }\n    ],\n    \"streamingLinks\": [],\n    \"tracks\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000003\",\n        \"title\": \"Rapture\",\n        \"trackNumber\": 1\n      }\n    ],\n    \"genres\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000004\",\n        \"name\": \"Death Metal\",\n        \"parentGenreId\": null\n      }\n    ]\n  }\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{gateway_url}}/library/albums",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "albums"]
+                },
+                "description": "Updates an existing album. The album Id in the body identifies the record to update."
+              }
+            },
+            {
+              "name": "Delete Album",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/albums/:id",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "albums", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000",
+                      "description": "Album GUID"
+                    }
+                  ]
+                },
+                "description": "Deletes an album by its GUID."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bands",
+          "item": [
+            {
+              "name": "Get Bands",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/bands?pageIndex=0&pageSize=10",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "bands"],
+                  "query": [
+                    { "key": "pageIndex", "value": "0" },
+                    { "key": "pageSize", "value": "10" }
+                  ]
+                },
+                "description": "Returns a paginated list of bands."
+              }
+            },
+            {
+              "name": "Get Band By Id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/bands/:id",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "bands", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000",
+                      "description": "Band GUID"
+                    }
+                  ]
+                },
+                "description": "Returns a single band by its GUID."
+              }
+            },
+            {
+              "name": "Get Bands By Country",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/bands/country/:countryId",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "bands", "country", ":countryId"],
+                  "variable": [
+                    {
+                      "key": "countryId",
+                      "value": "00000000-0000-0000-0000-000000000000",
+                      "description": "Country GUID"
+                    }
+                  ]
+                },
+                "description": "Returns all bands from a given country."
+              }
+            },
+            {
+              "name": "Create Band",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"band\": {\n    \"id\": \"00000000-0000-0000-0000-000000000000\",\n    \"name\": \"Morbid Angel\",\n    \"bio\": \"American death metal band formed in Tampa, Florida.\",\n    \"logoUrl\": null,\n    \"formedYear\": 1983,\n    \"disbandedYear\": null,\n    \"status\": \"Active\",\n    \"countries\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000001\",\n        \"name\": \"United States\"\n      }\n    ],\n    \"albums\": [],\n    \"genres\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000002\",\n        \"name\": \"Death Metal\",\n        \"parentGenreId\": null\n      }\n    ]\n  }\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{gateway_url}}/library/bands",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "bands"]
+                },
+                "description": "Creates a new band.\n\nBandStatus values: Active, SplitUp, OnHold, Unknown"
+              }
+            },
+            {
+              "name": "Update Band",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"band\": {\n    \"id\": \"00000000-0000-0000-0000-000000000000\",\n    \"name\": \"Morbid Angel\",\n    \"bio\": \"Updated biography.\",\n    \"logoUrl\": \"https://example.com/logo.png\",\n    \"formedYear\": 1983,\n    \"disbandedYear\": null,\n    \"status\": \"Active\",\n    \"countries\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000001\",\n        \"name\": \"United States\"\n      }\n    ],\n    \"albums\": [],\n    \"genres\": [\n      {\n        \"id\": \"00000000-0000-0000-0000-000000000002\",\n        \"name\": \"Death Metal\",\n        \"parentGenreId\": null\n      }\n    ]\n  }\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{gateway_url}}/library/bands/:id",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "bands", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000",
+                      "description": "Band GUID"
+                    }
+                  ]
+                },
+                "description": "Updates an existing band."
+              }
+            },
+            {
+              "name": "Delete Band",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/bands/:id",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "bands", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000",
+                      "description": "Band GUID"
+                    }
+                  ]
+                },
+                "description": "Deletes a band by its GUID."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Genres",
+          "item": [
+            {
+              "name": "Get Genres",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/genres?pageIndex=0&pageSize=10",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "genres"],
+                  "query": [
+                    { "key": "pageIndex", "value": "0" },
+                    { "key": "pageSize", "value": "10" }
+                  ]
+                },
+                "description": "Returns a paginated list of genres."
+              }
+            },
+            {
+              "name": "Get Genre By Id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/genres/:id",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "genres", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000",
+                      "description": "Genre GUID"
+                    }
+                  ]
+                },
+                "description": "Returns a single genre by its GUID."
+              }
+            },
+            {
+              "name": "Get Genres By Parent",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/genres/parent/:parentId",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "genres", "parent", ":parentId"],
+                  "variable": [
+                    {
+                      "key": "parentId",
+                      "value": "00000000-0000-0000-0000-000000000000",
+                      "description": "Parent genre GUID"
+                    }
+                  ]
+                },
+                "description": "Returns all sub-genres of a given parent genre."
+              }
+            },
+            {
+              "name": "Create Genre",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Death Metal\",\n  \"parentGenreId\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{gateway_url}}/library/genres",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "genres"]
+                },
+                "description": "Creates a new genre. Set parentGenreId to a GUID to create a sub-genre."
+              }
+            },
+            {
+              "name": "Update Genre",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Brutal Death Metal\",\n  \"parentGenreId\": \"00000000-0000-0000-0000-000000000000\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{gateway_url}}/library/genres/:id",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "genres", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000",
+                      "description": "Genre GUID"
+                    }
+                  ]
+                },
+                "description": "Updates an existing genre."
+              }
+            },
+            {
+              "name": "Delete Genre",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/library/genres/:id",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["library", "genres", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "00000000-0000-0000-0000-000000000000",
+                      "description": "Genre GUID"
+                    }
+                  ]
+                },
+                "description": "Deletes a genre by its GUID."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UserContent",
+      "description": "UserContent service endpoints — proxied via /usercontent prefix",
+      "item": [
+        {
+          "name": "Favorite Albums",
+          "item": [
+            {
+              "name": "Add Album To Favorites",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"albumId\": \"00000000-0000-0000-0000-000000000000\",\n  \"userId\": \"00000000-0000-0000-0000-000000000001\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{gateway_url}}/usercontent/favoriteAlbums",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["usercontent", "favoriteAlbums"]
+                },
+                "description": "Adds an album to a user's favorites list."
+              }
+            },
+            {
+              "name": "Remove Album From Favorites",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/usercontent/favoriteAlbums?userId=00000000-0000-0000-0000-000000000001&albumId=00000000-0000-0000-0000-000000000000",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["usercontent", "favoriteAlbums"],
+                  "query": [
+                    { "key": "userId", "value": "00000000-0000-0000-0000-000000000001" },
+                    { "key": "albumId", "value": "00000000-0000-0000-0000-000000000000" }
+                  ]
+                },
+                "description": "Removes an album from a user's favorites list."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Favorite Bands",
+          "item": [
+            {
+              "name": "Add Band To Favorites",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bandId\": \"00000000-0000-0000-0000-000000000000\",\n  \"userId\": \"00000000-0000-0000-0000-000000000001\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{gateway_url}}/usercontent/favoriteBands",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["usercontent", "favoriteBands"]
+                },
+                "description": "Adds a band to a user's favorites list."
+              }
+            },
+            {
+              "name": "Remove Band From Favorites",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/usercontent/favoriteBands?userId=00000000-0000-0000-0000-000000000001&bandId=00000000-0000-0000-0000-000000000000",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["usercontent", "favoriteBands"],
+                  "query": [
+                    { "key": "userId", "value": "00000000-0000-0000-0000-000000000001" },
+                    { "key": "bandId", "value": "00000000-0000-0000-0000-000000000000" }
+                  ]
+                },
+                "description": "Removes a band from a user's favorites list."
+              }
+            }
+          ]
+        },
+        {
+          "name": "User Profile",
+          "item": [
+            {
+              "name": "Get User Profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway_url}}/usercontent/profile/:userId",
+                  "host": ["{{gateway_url}}"],
+                  "path": ["usercontent", "profile", ":userId"],
+                  "variable": [
+                    {
+                      "key": "userId",
+                      "value": "00000000-0000-0000-0000-000000000001",
+                      "description": "User GUID"
+                    }
+                  ]
+                },
+                "description": "Returns the user profile including favorite albums and bands."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
