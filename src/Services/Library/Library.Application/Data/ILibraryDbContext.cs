@@ -1,8 +1,4 @@
-﻿using Library.Domain.Models;
-using Library.Domain.Models.JoinTables;
-using Microsoft.EntityFrameworkCore;
-
-namespace Library.Application.Data;
+﻿namespace Library.Application.Data;
 
 public interface ILibraryDbContext
 {

@@ -1,13 +1,8 @@
-using UserContent.Application;
-using UserContent.Application.Mappings;
-using UserContent.Infrastructure;
-using UserContent.Infrastructure.Data.Extensions;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // ===== SERVICES =====
 builder.Services
-    .AddApplicationServices()
+    .AddApplicationServices(builder.Configuration)
     .AddInfrastructureServices(builder.Configuration)
     .AddApiServices();
 
@@ -21,7 +16,10 @@ MappingConfig.RegisterMappings();
 // ===== APP =====
 var app = builder.Build();
 
-await app.InitializeDatabaseAsync();
+if (app.Environment.IsDevelopment())
+{
+    await app.InitializeDatabaseAsync();
+}
 
 app.UseExceptionHandler();
 app.MapControllers();

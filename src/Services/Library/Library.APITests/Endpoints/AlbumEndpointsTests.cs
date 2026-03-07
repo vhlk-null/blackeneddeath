@@ -3,10 +3,10 @@ using System.Net.Http.Json;
 using BuildingBlocks.Pagination;
 using FluentAssertions;
 using Library.API.Endpoints.Albums;
-using Library.Application.Albums.Commands.CreateAlbum;
-using Library.Application.Albums.Commands.DeleteAlbums;
-using Library.Application.Albums.Queries.GetAlbums;
 using Library.Application.Dtos;
+using Library.Application.Services.Albums.Commands.CreateAlbum;
+using Library.Application.Services.Albums.Commands.DeleteAlbums;
+using Library.Application.Services.Albums.Queries.GetAlbums;
 using Moq;
 using Xunit;
 
@@ -68,11 +68,11 @@ public class AlbumEndpointsTests(LibraryWebAppFactory factory) : IClassFixture<L
     [Fact]
     public async Task GetAlbums_Returns200WithPaginatedResult()
     {
-        var appResult = new Library.Application.Albums.Queries.GetAlbums.GetAlbumsResult(
+        var appResult = new Library.Application.Services.Albums.Queries.GetAlbums.GetAlbumsResult(
             new PaginatedResult<AlbumDto>(0, 10, 0, []));
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<GetAlbumsQuery>(), It.IsAny<CancellationToken>()))
-            .Returns(new ValueTask<Library.Application.Albums.Queries.GetAlbums.GetAlbumsResult>(appResult));
+            .Returns(new ValueTask<Library.Application.Services.Albums.Queries.GetAlbums.GetAlbumsResult>(appResult));
 
         var response = await _client.GetAsync("/albums?pageIndex=0&pageSize=10");
 
