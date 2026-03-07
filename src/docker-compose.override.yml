@@ -66,7 +66,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_Kestrel__Endpoints__Http__Url=http://+:8080
-      - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http2
+      - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1AndHttp2
       - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://+:8081
       - ASPNETCORE_Kestrel__Endpoints__Https__Protocols=Http1AndHttp2
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
