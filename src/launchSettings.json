@@ -5,7 +5,8 @@
       "commandVersion": "1.0",
       "serviceActions": {
         "usercontent.api": "StartDebugging",
-        "library.api": "StartDebugging"
+        "library.api": "StartDebugging",
+        "yarpapigateway": "StartDebugging"
       }
     }
   }
