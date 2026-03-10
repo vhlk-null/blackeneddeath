@@ -29,6 +29,12 @@ services:
       context: .
       dockerfile: ApiGateways/YarpApiGateway/Dockerfile
 
+  blackenddeath.ui:
+    image: ${DOCKER_REGISTRY-}blackenddeathui
+    build:
+      context: ../../blackenddeath.UI/blackanddeath.UI
+      dockerfile: Dockerfile
+
 volumes:
   postgres_library:
   postgres_usercontent:

@@ -118,6 +118,15 @@ services:
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
+  blackenddeath.ui:
+    container_name: blackenddeath.ui
+    restart: always
+    ports:
+      - "4200:80"
+    depends_on:
+      yarpapigateway:
+        condition: service_started
+
   yarpapigateway:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
