@@ -66,7 +66,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_Kestrel__Endpoints__Http__Url=http://+:8080
-      - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http2
+      - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1AndHttp2
       - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://+:8081
       - ASPNETCORE_Kestrel__Endpoints__Https__Protocols=Http1AndHttp2
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
@@ -112,6 +112,36 @@ services:
     ports:
       - "6010:8080"
       - "6011:8081"   
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  blackenddeath.ui:
+    container_name: blackenddeath.ui
+    restart: always
+    ports:
+      - "4200:80"
+    depends_on:
+      yarpapigateway:
+        condition: service_started
+
+  yarpapigateway:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=DevPassword123!
+    depends_on:
+      library.api:
+        condition: service_started
+      usercontent.api:
+        condition: service_started
+    ports:
+      - "6050:8080"
+      - "6051:8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro

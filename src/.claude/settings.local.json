@@ -27,7 +27,8 @@
       "Bash(APIDIR=/d/Projects/blackeneddeath/src/Services/Library/Library.API)",
       "Bash(__NEW_LINE_1f5da02ca6df3650__ find \"$APIDIR/Endpoints\" -name \"*.cs\")",
       "Bash(ls:*)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []
