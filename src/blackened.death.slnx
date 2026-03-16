@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/workflows/">
+    <File Path="ci.yml" />
+  </Folder>
   <Folder Name="/APIGateways/">
     <Project Path="ApiGateways/YarpApiGateway/YarpApiGateway.csproj" />
     <Project Path="ApiGateways/YarpApiGateway.Tests/YarpApiGateway.Tests.csproj">

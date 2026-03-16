@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build
+        run: dotnet build src/blackened.death.slnx
+
+      - name: Test Library.ApplicationTests
+        run: dotnet test src/Services/Library/Library.ApplicationTests
+
+      - name: Test Library.InfrastructureTests
+        run: dotnet test src/Services/Library/Library.InfrastructureTests
+
+      - name: Test Library.APITests
+        run: dotnet test src/Services/Library/Library.APITests
+
+      - name: Test UserContent.ApplicationTests
+        run: dotnet test src/Services/UserContent/UserContent.ApplicationTests
+
+      - name: Test UserContent.InfrastructureTests
+        run: dotnet test src/Services/UserContent/UserContent.InfrastructureTests
+
+      - name: Test UserContent.APITests
+        run: dotnet test src/Services/UserContent/UserContent.APITests
