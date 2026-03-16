@@ -74,7 +74,11 @@ namespace UserContent.Infrastructure.Migrations
                         column: x => x.album_id,
                         principalTable: "albums",
                         principalColumn: "id",
+<<<<<<<< HEAD:src/Services/UserContent/UserContent.Infrastructure/Migrations/20260212134233_InitialCreateWithSeed.cs
+                        onDelete: ReferentialAction.Cascade);
+========
                         onDelete: ReferentialAction.Restrict);
+>>>>>>>> origin/develop:src/Services/UserContent/UserContent.Infrastructure/Migrations/20260306162031_MigrationName.cs
                     table.ForeignKey(
                         name: "FK_favorite_albums_user_profiles_user_id",
                         column: x => x.user_id,

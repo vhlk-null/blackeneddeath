@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UserContent.Infrastructure.Data;
@@ -11,9 +12,16 @@ using UserContent.Infrastructure.Data;
 namespace UserContent.Infrastructure.Migrations
 {
     [DbContext(typeof(UserContentContext))]
-    partial class UserContentContextModelSnapshot : ModelSnapshot
+<<<<<<<< HEAD:src/Services/UserContent/UserContent.Infrastructure/Migrations/20260212134233_InitialCreateWithSeed.Designer.cs
+    [Migration("20260212134233_InitialCreateWithSeed")]
+    partial class InitialCreateWithSeed
+========
+    [Migration("20260306162031_MigrationName")]
+    partial class MigrationName
+>>>>>>>> origin/develop:src/Services/UserContent/UserContent.Infrastructure/Migrations/20260306162031_MigrationName.Designer.cs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
