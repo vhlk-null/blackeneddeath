@@ -1,4 +1,4 @@
-using Library.Application.Bands.Commands.DeleteBand;
+using Library.Application.Services.Bands.Commands.DeleteBand;
 
 namespace Library.API.Endpoints.Bands;
 

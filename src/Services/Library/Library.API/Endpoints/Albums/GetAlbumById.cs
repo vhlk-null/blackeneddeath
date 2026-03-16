@@ -1,4 +1,4 @@
-﻿using Library.Application.Albums.Queries.GetAlbumById;
+﻿using Library.Application.Services.Albums.Queries.GetAlbumById;
 
 namespace Library.API.Endpoints.Albums;
 

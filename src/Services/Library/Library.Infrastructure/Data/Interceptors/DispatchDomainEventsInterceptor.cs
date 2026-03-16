@@ -1,8 +1,4 @@
-﻿using Library.Domain.Abstractions;
-using Mediator;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-
-namespace Library.Infrastructure.Data.Interceptors;
+﻿namespace Library.Infrastructure.Data.Interceptors;
 
 internal class DispatchDomainEventsInterceptor(IMediator mediator) : SaveChangesInterceptor
 {

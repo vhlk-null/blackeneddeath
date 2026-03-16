@@ -5,6 +5,9 @@ services:
   usercontentdb:
     image: postgres:16
 
+  messagebroker:
+    image: rabbitmq:management
+
   distributedcache:
     image: redis:7.2
 
@@ -20,6 +23,19 @@ services:
       context: .
       dockerfile: Services/Library/Library.API/Dockerfile
 
+  yarpapigateway:
+    image: ${DOCKER_REGISTRY-}yarpapigateway
+    build:
+      context: .
+      dockerfile: ApiGateways/YarpApiGateway/Dockerfile
+
+  blackenddeath.ui:
+    image: ${DOCKER_REGISTRY-}blackenddeathui
+    build:
+      context: ../../blackenddeath.UI/blackanddeath.UI
+      dockerfile: Dockerfile
+
 volumes:
   postgres_library:
   postgres_usercontent:
+  rabbitmq_data:

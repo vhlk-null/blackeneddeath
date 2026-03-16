@@ -21,6 +21,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<ILibraryDbContext, LibraryContext>();
+        services.AddScoped<IRepository<LibraryContext>, LibraryRepository>();
         return services;
     }
 }

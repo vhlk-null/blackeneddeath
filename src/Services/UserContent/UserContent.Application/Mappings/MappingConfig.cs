@@ -1,13 +1,27 @@
-using UserContent.Application.Dtos;
-
 namespace UserContent.Application.Mappings;
 
 public static class MappingConfig
 {
     public static void RegisterMappings()
     {
+        ConfigureGrpcMappings();
         ConfigureFavoriteAlbumMappings();
         ConfigureFavoriteBandMappings();
+    }
+
+    private static void ConfigureGrpcMappings()
+    {
+        TypeAdapterConfig<GetAlbumResponse, Album>.NewConfig()
+            .Map(dest => dest.Id, src => Guid.Parse(src.Id))
+            .Map(dest => dest.Title, src => src.Title)
+            .Map(dest => dest.CoverUrl, src => src.CoverUrl)
+            .Map(dest => dest.ReleaseDate, src => src.ReleaseDate);
+
+        TypeAdapterConfig<GetBandResponse, Band>.NewConfig()
+            .Map(dest => dest.BandId, src => Guid.Parse(src.Id))
+            .Map(dest => dest.BandName, src => src.Title)
+            .Map(dest => dest.LogoUrl, src => src.LogoUrl)
+            .Map(dest => dest.ReleaseDate, src => src.ReleaseDate);
     }
 
     private static void ConfigureFavoriteAlbumMappings()

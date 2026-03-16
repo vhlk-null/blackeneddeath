@@ -33,6 +33,24 @@ services:
       timeout: 5s
       retries: 5
 
+  messagebroker: 
+    container_name: messagebroker
+    hostname: blackenddeath
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   distributedcache:
     container_name: distributedcache
     restart: always
@@ -47,13 +65,20 @@ services:
   library.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_Kestrel__Endpoints__Http__Url=http://+:8080
+      - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1AndHttp2
+      - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://+:8081
+      - ASPNETCORE_Kestrel__Endpoints__Https__Protocols=Http1AndHttp2
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=DevPassword123!
       - ConnectionStrings__LibraryDb=Host=librarydb;Port=5432;Database=LibraryDb;Username=postgres;Password=postgres
+      - MessageBroker__Host=amqp://messagebroker:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest
     depends_on:
       librarydb:
+        condition: service_healthy
+      messagebroker:
         condition: service_healthy
     ports:
       - "6000:8080"
@@ -72,14 +97,51 @@ services:
       - ConnectionStrings__UserContentDB=Host=usercontentdb;Port=5432;Database=UserContentDB;Username=postgres;Password=postgres
       - ConnectionStrings__Redis=distributedcache:6379,abortConnect=false
       - GrpcSettings__LibraryUrl=http://library.api:8080
+      - MessageBroker__Host=amqp://messagebroker:5672
+      - MessageBroker__UserName=guest
+      - MessageBroker__Password=guest
     depends_on:
       usercontentdb:
         condition: service_healthy
       distributedcache:
         condition: service_healthy
+      messagebroker:
+        condition: service_healthy
+      library.api:
+        condition: service_started
     ports:
       - "6010:8080"
       - "6011:8081"   
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  blackenddeath.ui:
+    container_name: blackenddeath.ui
+    restart: always
+    ports:
+      - "4200:80"
+    depends_on:
+      yarpapigateway:
+        condition: service_started
+
+  yarpapigateway:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=DevPassword123!
+    depends_on:
+      library.api:
+        condition: service_started
+      usercontent.api:
+        condition: service_started
+    ports:
+      - "6050:8080"
+      - "6051:8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro

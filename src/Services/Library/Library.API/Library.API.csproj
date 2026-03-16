@@ -12,6 +12,10 @@
 	<ItemGroup>
 		<!-- Versions managed centrally -->
 		<PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
+		<PackageReference Include="Mediator.SourceGenerator">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
 		<PackageReference Include="Grpc.AspNetCore" />
 		<PackageReference Include="Carter" />
@@ -27,6 +31,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.Messaging\BuildingBlocks.Messaging.csproj" />
 		<ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj" />
 		<ProjectReference Include="..\Library.Application\Library.Application.csproj" />
 		<ProjectReference Include="..\Library.Infrastructure\Library.Infrastructure.csproj" />
