@@ -12,13 +12,8 @@ using UserContent.Infrastructure.Data;
 namespace UserContent.Infrastructure.Migrations
 {
     [DbContext(typeof(UserContentContext))]
-<<<<<<<< HEAD:src/Services/UserContent/UserContent.Infrastructure/Migrations/20260212134233_InitialCreateWithSeed.Designer.cs
     [Migration("20260212134233_InitialCreateWithSeed")]
     partial class InitialCreateWithSeed
-========
-    [Migration("20260306162031_MigrationName")]
-    partial class MigrationName
->>>>>>>> origin/develop:src/Services/UserContent/UserContent.Infrastructure/Migrations/20260306162031_MigrationName.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

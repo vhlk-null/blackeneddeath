@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace UserContent.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class MigrationName : Migration
+    public partial class InitialCreateWithSeed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -74,11 +74,7 @@ namespace UserContent.Infrastructure.Migrations
                         column: x => x.album_id,
                         principalTable: "albums",
                         principalColumn: "id",
-<<<<<<<< HEAD:src/Services/UserContent/UserContent.Infrastructure/Migrations/20260212134233_InitialCreateWithSeed.cs
                         onDelete: ReferentialAction.Cascade);
-========
-                        onDelete: ReferentialAction.Restrict);
->>>>>>>> origin/develop:src/Services/UserContent/UserContent.Infrastructure/Migrations/20260306162031_MigrationName.cs
                     table.ForeignKey(
                         name: "FK_favorite_albums_user_profiles_user_id",
                         column: x => x.user_id,
@@ -104,7 +100,7 @@ namespace UserContent.Infrastructure.Migrations
                         column: x => x.band_id,
                         principalTable: "bands",
                         principalColumn: "band_id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_favorite_bands_user_profiles_user_id",
                         column: x => x.user_id,
