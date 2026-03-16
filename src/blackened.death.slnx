@@ -1,27 +1,44 @@
 <Solution>
+  <Folder Name="/APIGateways/">
+    <Project Path="ApiGateways/YarpApiGateway/YarpApiGateway.csproj" />
+    <Project Path="ApiGateways/YarpApiGateway.Tests/YarpApiGateway.Tests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
+  </Folder>
   <Folder Name="/BuildingBlocks/">
+    <Project Path="BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj" Id="64b989a7-1e04-400f-8ff9-20b0b8292d3e" />
     <Project Path="BuildingBlocks/BuildingBlocks/BuildingBlocks.csproj" Id="360266db-31f0-4e2f-9490-f5622bdc9f17" />
   </Folder>
   <Folder Name="/Services/" />
   <Folder Name="/Services/Library/">
     <Project Path="Services/Library/Library.API/Library.API.csproj" />
+    <Project Path="Services/Library/Library.APITests/Library.APITests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="Services/Library/Library.Application/Library.Application.csproj" Id="12629964-a2d2-4e69-bd1c-58077bff5888" />
+    <Project Path="Services/Library/Library.ApplicationTests/Library.ApplicationTests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="Services/Library/Library.Infrastructure/Library.Infrastructure.csproj" Id="8bf9a027-3108-429c-aaee-c75ac93ab9b6" />
+    <Project Path="Services/Library/Library.InfrastructureTests/Library.InfrastructureTests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="Services/Library/Librrary.Domain/Library.Domain.csproj" Id="eb062dac-c81c-4759-895d-c66aaae8320a" />
-    <Project Path="Services/Library/Library.ApplicationTests/Library.ApplicationTests.csproj" />
-    <Project Path="Services/Library/Library.InfrastructureTests/Library.InfrastructureTests.csproj" />
-    <Project Path="Services/Library/Library.APITests/Library.APITests.csproj" />
   </Folder>
   <Folder Name="/Services/UserContent/">
     <Project Path="Services/UserContent/UserContent.API/UserContent.API.csproj">
       <Deploy Solution="Debug|*" />
     </Project>
+    <Project Path="Services/UserContent/UserContent.APITests/UserContent.APITests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="Services/UserContent/UserContent.Application/UserContent.Application.csproj" />
+    <Project Path="Services/UserContent/UserContent.ApplicationTests/UserContent.ApplicationTests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="Services/UserContent/UserContent.Domain/UserContent.Domain.csproj" />
     <Project Path="Services/UserContent/UserContent.Infrastructure/UserContent.Infrastructure.csproj" />
-    <Project Path="Services/UserContent/UserContent.ApplicationTests/UserContent.ApplicationTests.csproj" />
     <Project Path="Services/UserContent/UserContent.InfrastructureTests/UserContent.InfrastructureTests.csproj" />
-    <Project Path="Services/UserContent/UserContent.APITests/UserContent.APITests.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="Directory.Packages.props" />

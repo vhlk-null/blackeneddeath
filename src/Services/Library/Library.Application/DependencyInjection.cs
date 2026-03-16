@@ -1,8 +1,4 @@
-﻿using BuildingBlocks.Behaviors;
-using Mediator;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Library.Application;
+﻿namespace Library.Application;
 
 public static class DependencyInjection
 {
@@ -14,10 +10,8 @@ public static class DependencyInjection
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
         //services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
 
-        services.AddMediator(options =>
-        {
-            options.ServiceLifetime = ServiceLifetime.Scoped;
-        });
+        services.AddMediator();
+        services.AddFeatureManagement();
         return services;
     }
 }

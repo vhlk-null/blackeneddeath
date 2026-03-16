@@ -1,4 +1,4 @@
-using Library.Application.Bands.Commands.UpdateBand;
+using Library.Application.Services.Bands.Commands.UpdateBand;
 
 namespace Library.API.Endpoints.Bands;
 

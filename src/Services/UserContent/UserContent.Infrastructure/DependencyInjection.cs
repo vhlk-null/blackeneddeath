@@ -1,11 +1,3 @@
-using Library.Grpc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Scrutor;
-using UserContent.Infrastructure.Data.Extensions;
-using UserContent.Infrastructure.gRPC;
-using UserContent.Infrastructure.Repositories;
-
 namespace UserContent.Infrastructure;
 
 public static class DependencyInjection
@@ -20,25 +12,12 @@ public static class DependencyInjection
         var redisConnection = configuration.GetConnectionString("Redis")
             ?? throw new InvalidOperationException("Redis connection string is missing");
 
-        var grpcUrl = configuration["GrpcSettings:LibraryUrl"]
-            ?? throw new InvalidOperationException("GrpcSettings:LibraryUrl is missing");
-
         // Database
         services.AddDbContext<UserContentContext>(options =>
             options.UseNpgsql(dbConnection));
 
-        services.AddScoped<DbContext>(sp => sp.GetRequiredService<UserContentContext>());
-
-        // Repository + cache decorator
-        services.AddScoped<IUserContentRepository, UserContentRepository>();
-        services.Decorate<IUserContentRepository, CachedUserContentRepository>();
-
-        // gRPC
-        services.AddGrpcClient<LibraryProtoService.LibraryProtoServiceClient>(options =>
-        {
-            options.Address = new Uri(grpcUrl);
-        });
-        services.AddScoped<ILibraryService, LibraryGrpcService>();
+        services.AddScoped<IRepository<UserContentContext>, UserContentRepository>();
+        services.Decorate<IRepository<UserContentContext>, CachedUserContentRepository>();
 
         // Redis
         var redisOptions = ConfigurationOptions.Parse(redisConnection);

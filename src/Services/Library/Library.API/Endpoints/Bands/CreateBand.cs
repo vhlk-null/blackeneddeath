@@ -1,4 +1,4 @@
-using Library.Application.Bands.Commands.CreateBand;
+using Library.Application.Services.Bands.Commands.CreateBand;
 
 namespace Library.API.Endpoints.Bands;
 
