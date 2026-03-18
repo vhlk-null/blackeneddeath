@@ -16,11 +16,20 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()!;
+    options.AddDefaultPolicy(policy =>
+        policy.WithOrigins(origins)
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
 
 var app = builder.Build();
 
 // Configure HTTP request pipeline.
-app.UseRateLimiter();
+app.UseCors(); 
+//app.UseRateLimiter();
 app.MapReverseProxy();
 
 app.MapGet("/", () => "Hello World!");
