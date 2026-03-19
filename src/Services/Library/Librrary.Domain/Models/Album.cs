@@ -3,6 +3,7 @@
 public class Album : Aggregate<AlbumId>
 {
     public string Title { get; private set; } = null!;
+    public string Slug { get; private set; } = null!;
     public AlbumType Type { get; private set; }
     public AlbumRelease AlbumRelease { get; private set; } = null!;
     public string? CoverUrl { get; private set; }
@@ -31,6 +32,7 @@ public class Album : Aggregate<AlbumId>
         {
             Id = id ?? AlbumId.Of(Guid.NewGuid()),
             Title = title,
+            Slug = SlugHelper.Generate(title),
             Type = type,
             AlbumRelease = albumRelease,
             CoverUrl = coverUrl,

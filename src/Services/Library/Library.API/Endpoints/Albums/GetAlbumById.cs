@@ -2,7 +2,6 @@
 
 namespace Library.API.Endpoints.Albums;
 
-//public record GetAlbumByIdRequest(Guid Id) : IRequest<GetAlbumByIdResult>;
 public record GetAlbumByIdResponse(AlbumDto Album);
 
 public class GetAlbumById : ICarterModule
@@ -18,6 +17,7 @@ public class GetAlbumById : ICarterModule
             })
             .WithName("GetAlbumById")
             .Produces<GetAlbumByIdResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Album by Id")
             .WithDescription("Get Album by Id");

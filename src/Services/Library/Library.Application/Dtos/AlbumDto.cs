@@ -3,6 +3,7 @@
 public record AlbumDto(
     Guid Id,
     string Title,
+    string? Slug,
     int ReleaseDate,
     string? CoverUrl,
     AlbumType Type,

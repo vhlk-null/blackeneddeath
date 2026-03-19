@@ -20,6 +20,15 @@ public class BandConfiguration : IEntityTypeConfiguration<Band>
             .HasMaxLength(200)
             .HasColumnName("name");
 
+        entity.Property(e => e.Slug)
+            .IsRequired()
+            .HasMaxLength(220)
+            .HasColumnName("slug");
+
+        entity.HasIndex(e => e.Slug)
+            .IsUnique()
+            .HasDatabaseName("ix_bands_slug");
+
         entity.Property(e => e.Bio)
             .HasColumnType("text")
             .HasColumnName("bio");

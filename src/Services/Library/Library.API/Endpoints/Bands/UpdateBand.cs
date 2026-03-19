@@ -10,7 +10,7 @@ public class UpdateBand : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/bands/{id}",
+        app.MapPut("/bands/{id:guid}",
                 async (Guid id, UpdateBandRequest request, ISender sender) =>
                 {
                     var command = request.Adapt<UpdateBandCommand>();

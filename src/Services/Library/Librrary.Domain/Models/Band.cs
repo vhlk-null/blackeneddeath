@@ -3,6 +3,7 @@ namespace Library.Domain.Models;
 public class Band : Aggregate<BandId>
 {
     public string Name { get; private set; } = null!;
+    public string Slug { get; private set; } = null!;
     public string? Bio { get; private set; }
     public string? LogoUrl { get; private set; }
     public BandActivity Activity { get; private set; } = null!;
@@ -25,6 +26,7 @@ public class Band : Aggregate<BandId>
         {
             Id = id ?? BandId.Of(Guid.NewGuid()),
             Name = name,
+            Slug = SlugHelper.Generate(name),
             Bio = bio,
             LogoUrl = logoUrl,
             Activity = activity,

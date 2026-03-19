@@ -3,6 +3,7 @@ namespace Library.Application.Dtos;
 public record BandDto(
     Guid Id,
     string Name,
+    string? Slug,
     string? Bio,
     string? LogoUrl,
     int? FormedYear,

@@ -8,7 +8,7 @@ public class DeleteBand : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/bands/{id}",
+        app.MapDelete("/bands/{id:guid}",
                 async (Guid id, ISender sender) =>
                 {
                     var command = new DeleteBandCommand(id);

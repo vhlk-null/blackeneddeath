@@ -10,6 +10,7 @@ public static class AlbumExtensions
         IReadOnlyDictionary<TrackId, Track> tracks) => new(
             album.Id.Value,
             album.Title,
+            album.Slug,
             album.AlbumRelease.ReleaseYear,
             album.CoverUrl,
             album.Type,
@@ -17,7 +18,7 @@ public static class AlbumExtensions
             album.LabelInfo?.Name,
             album.AlbumBands
                 .Select(ab => bands[ab.BandId])
-                .Select(b => new BandSummaryDto((Guid?)b.Id.Value, b.Name))
+                .Select(b => new BandSummaryDto((Guid?)b.Id.Value, b.Name, b.Slug))
                 .ToList(),
             album.AlbumCountries
                 .Select(ac => countries[ac.CountryId])
@@ -31,7 +32,7 @@ public static class AlbumExtensions
                 .Select(at => new TrackDto(tracks[at.TrackId].Id.Value, tracks[at.TrackId].Title, at.TrackNumber))
                 .ToList(),
             album.AlbumGenres
-                .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, ag.IsPrimary))
+                .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
                 .ToList()
         );
 }

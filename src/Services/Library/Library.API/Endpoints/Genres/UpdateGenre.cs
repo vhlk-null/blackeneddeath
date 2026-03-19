@@ -8,7 +8,7 @@ public class UpdateGenre : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/genres/{id}",
+        app.MapPut("/genres/{id:guid}",
                 async (Guid id, UpdateGenreRequest request, ISender sender) =>
                 {
                     var command = request.Adapt<UpdateGenreCommand>() with { Id = id };

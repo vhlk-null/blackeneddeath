@@ -43,7 +43,7 @@ public class CreateAlbumHandlerTests
     public async Task Handle_ValidCommand_AddsAlbumAndReturnsId()
     {
         var command = new CreateAlbumCommand(new AlbumDto(
-            Guid.NewGuid(), "Symbolic", 1995, null,
+            Guid.NewGuid(), "Symbolic", null, 1995, null,
             AlbumType.FullLength, AlbumFormat.CD, "Roadrunner Records",
             [], [], [], [], []));
 
@@ -58,9 +58,9 @@ public class CreateAlbumHandlerTests
     public async Task Handle_CommandWithNewBand_AddsAlbumWithBand()
     {
         var command = new CreateAlbumCommand(new AlbumDto(
-            Guid.NewGuid(), "Symbolic", 1995, null,
+            Guid.NewGuid(), "Symbolic", null, 1995, null,
             AlbumType.FullLength, AlbumFormat.CD, "Roadrunner Records",
-            [new BandSummaryDto(null, "Death")],
+            [new BandSummaryDto(null, "Death", null)],
             [], [], [], []));
 
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -79,10 +79,10 @@ public class CreateAlbumHandlerTests
         _contextMock.Setup(x => x.Genres).Returns(genresDbSetMock.Object);
 
         var command = new CreateAlbumCommand(new AlbumDto(
-            Guid.NewGuid(), "Symbolic", 1995, null,
+            Guid.NewGuid(), "Symbolic", null, 1995, null,
             AlbumType.FullLength, AlbumFormat.CD, "Roadrunner Records",
             [], [], [], [],
-            [new GenreDto(genreId, "Death Metal", true)]));
+            [new GenreDto(genreId, "Death Metal", null, true)]));
 
         var result = await _handler.Handle(command, CancellationToken.None);
 

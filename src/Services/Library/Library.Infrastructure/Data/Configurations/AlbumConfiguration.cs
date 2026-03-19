@@ -20,6 +20,15 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
             .HasMaxLength(200)
             .HasColumnName("title");
 
+        entity.Property(e => e.Slug)
+            .IsRequired()
+            .HasMaxLength(220)
+            .HasColumnName("slug");
+
+        entity.HasIndex(e => e.Slug)
+            .IsUnique()
+            .HasDatabaseName("ix_albums_slug");
+
         entity.Property(e => e.CoverUrl)
             .HasMaxLength(500)
             .HasColumnName("cover_url");

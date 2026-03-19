@@ -1,4 +1,5 @@
-﻿global using Library.Domain.Abstractions;
+﻿global using BuildingBlocks.Helpers;
+global using Library.Domain.Abstractions;
 global using Library.Domain.Enums;
 global using Library.Domain.Events.Album;
 global using Library.Domain.Events.Band;

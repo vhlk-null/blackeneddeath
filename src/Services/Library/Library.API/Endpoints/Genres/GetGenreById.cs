@@ -8,7 +8,7 @@ public class GetGenreById : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/genres/{id}", async (Guid id, ISender sender) =>
+        app.MapGet("/genres/{id:guid}", async (Guid id, ISender sender) =>
             {
                 var query = new GetGenreByIdQuery(id);
                 var result = await sender.Send(query);

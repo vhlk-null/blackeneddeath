@@ -8,7 +8,7 @@ public class GetBandById : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/bands/{id}", async (Guid id, ISender sender) =>
+        app.MapGet("/bands/{id:guid}", async (Guid id, ISender sender) =>
         {
             var query = new GetBandByIdQuery(id);
             var result = await sender.Send(query);

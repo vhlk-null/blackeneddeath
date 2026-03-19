@@ -3,6 +3,7 @@
 public class Genre : Aggregate<GenreId>
 {
     public string Name { get; private set; } = null!;
+    public string Slug { get; private set; } = null!;
     public GenreId? ParentGenreId { get; private set; }
 
     private readonly List<GenreId> _subGenreIds = [];
@@ -18,6 +19,7 @@ public class Genre : Aggregate<GenreId>
         {
             Id = id,
             Name = name,
+            Slug = SlugHelper.Generate(name),
             ParentGenreId = parentGenreId
         };
 

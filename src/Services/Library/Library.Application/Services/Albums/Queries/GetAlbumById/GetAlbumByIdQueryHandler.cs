@@ -1,4 +1,4 @@
-﻿namespace Library.Application.Services.Albums.Queries.GetAlbumById;
+namespace Library.Application.Services.Albums.Queries.GetAlbumById;
 
 public class GetAlbumByIdQueryHandler(ILibraryDbContext context) : BuildingBlocks.CQRS.IQueryHandler<GetAlbumByIdQuery, GetAlbumByIdResult>
 {

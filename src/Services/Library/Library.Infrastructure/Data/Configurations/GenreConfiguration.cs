@@ -20,6 +20,15 @@ public class GenreConfiguration : IEntityTypeConfiguration<Genre>
             .HasColumnName("name")
             .IsRequired();
 
+        entity.Property(g => g.Slug)
+            .IsRequired()
+            .HasMaxLength(120)
+            .HasColumnName("slug");
+
+        entity.HasIndex(g => g.Slug)
+            .IsUnique()
+            .HasDatabaseName("ix_genres_slug");
+
         entity.Property(g => g.ParentGenreId)
             .HasColumnName("parent_genre_id")
             .HasConversion(
