@@ -21,6 +21,8 @@
     <PackageVersion Include="Mediator.SourceGenerator" Version="3.0.1" />
     <!-- Dependency Injection extensions -->
     <PackageVersion Include="Scrutor" Version="7.0.0" />
+    <!-- Pinned to avoid vulnerabilities in transitive 6.2.0 (via Scrutor) -->
+    <PackageVersion Include="Scriban" Version="6.6.0" />
   </ItemGroup>
   <ItemGroup Label="ValidationMapping">
     <!-- FluentValidation -->

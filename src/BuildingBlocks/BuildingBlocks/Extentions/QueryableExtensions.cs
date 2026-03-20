@@ -1,9 +1,8 @@
-﻿using BuildingBlocks.CQRS;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace BuildingBlocks.Extentions;
 
-public record PagedQuery<TResponse> : IQuery<PagedResult<TResponse>>
+public record PagedQuery<TResponse>
 {
     public int PageNumber { get; init; } = 1;
     public int PageSize { get; init; } = 10;

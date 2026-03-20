@@ -2,6 +2,7 @@
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace BuildingBlocks.Messaging.MassTransit;
 
@@ -21,13 +22,28 @@ public static class Extensions
 
             config.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host(new Uri(configuration["MessageBroker:Host"]!), h =>
+                var logger = context.GetRequiredService<ILogger<IBus>>();
+
+                var host = configuration["MessageBroker:Host"];
+                var username = configuration["MessageBroker:Username"];
+
+                if (string.IsNullOrWhiteSpace(host))
                 {
-                    h.Username(configuration["MessageBroker:Username"]!);
+                    logger.LogError("MessageBroker:Host is not configured.");
+                    throw new InvalidOperationException("MessageBroker:Host is not configured.");
+                }
+
+                logger.LogInformation("Connecting to RabbitMQ at {Host} as {Username}", host, username);
+
+                cfg.Host(new Uri(host), h =>
+                {
+                    h.Username(username!);
                     h.Password(configuration["MessageBroker:Password"]!);
                 });
 
                 cfg.ConfigureEndpoints(context);
+
+                logger.LogInformation("RabbitMQ configured successfully.");
             });
         });
 
