@@ -75,6 +75,9 @@ services:
       - MessageBroker__Host=amqp://messagebroker:5672
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
+      - Storage__CloudName=dledijbyt
+      - Storage__ApiKey=695255835435442
+      - Storage__ApiSecret=IfARU4chBqqo_usv7spAL76YOL4
     depends_on:
       librarydb:
         condition: service_healthy

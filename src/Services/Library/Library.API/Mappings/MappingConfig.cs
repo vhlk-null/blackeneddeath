@@ -26,6 +26,12 @@ public static class MappingConfig
 
     private static void ConfigureAlbumMappings()
     {
+        TypeAdapterConfig<Library.API.Endpoints.Albums.CreateAlbumRequest, CreateAlbumCommand>.NewConfig()
+            .Map(dest => dest.Album, src => src.Album)
+            .Map(dest => dest.CoverImage, src => src.CoverImage != null ? src.CoverImage.OpenReadStream() : null)
+            .Map(dest => dest.CoverImageContentType, src => src.CoverImage != null ? src.CoverImage.ContentType : null)
+            .Map(dest => dest.CoverImageFileName, src => src.CoverImage != null ? src.CoverImage.FileName : null);
+
     //    TypeAdapterConfig<Album, AlbumDto>.NewConfig()
     //        .Map(dest => dest.Bands,
     //            src => src.Bands.Select(ab => new BandDto(ab.Band.Id, ab.Band.Name, ab.Band.LogoUrl)))

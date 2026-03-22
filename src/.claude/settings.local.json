@@ -30,7 +30,16 @@
       "Bash(head:*)",
       "Bash(python3:*)",
       "Bash(grep -r \"MassTransit\\\\|IPublishEndpoint\\\\|IBus\" /d/Projects/blackeneddeath/src/Services/UserContent/UserContent.Infrastructure --include=\"*.cs\" 2>/dev/null | grep -v \"GlobalUsings\")",
-      "WebFetch(domain:api.nuget.org)"
+      "WebFetch(domain:api.nuget.org)",
+      "Read(//d/Projects/blackeneddeath//**)",
+      "Read(//d/Projects//**)",
+      "Bash(find /d/Projects/blackeneddeath/src -name *.csproj)",
+      "Bash(npm list:*)",
+      "Read(//tmp/**)",
+      "Bash(node index.mjs)",
+      "Bash(wsl --shutdown)",
+      "Bash(wsl -l -v)",
+      "Bash(find /d/Projects/blackeneddeath/src/Services/Library/Library.Application/Dtos -name *.cs)"
     ],
     "deny": [],
     "ask": []

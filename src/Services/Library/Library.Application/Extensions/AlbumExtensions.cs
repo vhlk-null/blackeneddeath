@@ -7,12 +7,13 @@ public static class AlbumExtensions
         IReadOnlyDictionary<BandId, Band> bands,
         IReadOnlyDictionary<GenreId, Genre> genres,
         IReadOnlyDictionary<CountryId, Country> countries,
-        IReadOnlyDictionary<TrackId, Track> tracks) => new(
+        IReadOnlyDictionary<TrackId, Track> tracks,
+        IStorageUrlResolver urlResolver) => new(
             album.Id.Value,
             album.Title,
             album.Slug,
             album.AlbumRelease.ReleaseYear,
-            album.CoverUrl,
+            urlResolver.Resolve(album.CoverUrl),
             album.Type,
             album.AlbumRelease.Format,
             album.LabelInfo?.Name,

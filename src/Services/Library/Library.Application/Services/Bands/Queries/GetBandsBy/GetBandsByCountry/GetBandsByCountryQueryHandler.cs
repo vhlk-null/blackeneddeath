@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Bands.Queries.GetBandsBy.GetBandsByCountry;
 
-public class GetBandsByCountryQueryHandler(ILibraryDbContext context)
+public class GetBandsByCountryQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver)
     : BuildingBlocks.CQRS.IQueryHandler<GetBandsByCountryQuery, GetBandsByCountryResult>
 {
     public async ValueTask<GetBandsByCountryResult> Handle(GetBandsByCountryQuery query, CancellationToken cancellationToken)
@@ -40,7 +40,7 @@ public class GetBandsByCountryQueryHandler(ILibraryDbContext context)
         var albumsByBand = albumBands.ToLookup(ab => ab.BandId, ab => albumsById[ab.AlbumId]);
 
         var bandDtos = bands
-            .Select(b => b.ToBandDto(countries, genres, albumsByBand))
+            .Select(b => b.ToBandDto(countries, genres, albumsByBand, urlResolver))
             .ToList();
 
         return new GetBandsByCountryResult(bandDtos);

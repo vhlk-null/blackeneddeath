@@ -1,12 +1,19 @@
 ﻿namespace Library.Application.Services.Albums.Commands.CreateAlbum;
 
-public class CreateAlbumHandler(ILibraryDbContext context) : BuildingBlocks.CQRS.ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
+public class CreateAlbumHandler(ILibraryDbContext context, IStorageService storage) : BuildingBlocks.CQRS.ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
 {
     public async ValueTask<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
     {
         await ValidateReferencedEntitiesAsync(command.Album, cancellationToken);
 
-        var album = CreateNewAlbum(command.Album);
+        string? coverKey = null;
+        if (command.CoverImage is not null && command.CoverImageContentType is not null && command.CoverImageFileName is not null)
+        {
+            var extension = Path.GetExtension(command.CoverImageFileName);
+            coverKey = await storage.UploadFileAsync("album-images", $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
+        }
+
+        var album = CreateNewAlbum(command.Album with { CoverUrl = coverKey });
 
         var tracks = command.Album.Tracks
             .Select(t => Track.Create(TrackId.Of(Guid.NewGuid()), t.Title))

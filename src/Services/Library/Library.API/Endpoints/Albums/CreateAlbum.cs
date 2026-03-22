@@ -1,6 +1,19 @@
-﻿namespace Library.API.Endpoints.Albums;
+using System.Text.Json;
 
-public record CreateAlbumRequest(AlbumDto Album);
+namespace Library.API.Endpoints.Albums;
+
+public record CreateAlbumRequest(AlbumDto Album, IFormFile? CoverImage)
+{
+    public static async ValueTask<CreateAlbumRequest> BindAsync(HttpContext ctx)
+    {
+        var form = await ctx.Request.ReadFormAsync();
+        var album = JsonSerializer.Deserialize<AlbumDto>(form["album"].ToString(), new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        })!;
+        return new CreateAlbumRequest(album, form.Files["coverImage"]);
+    }
+}
 
 public record CreateAlbumResponse(Guid Id);
 
@@ -11,18 +24,14 @@ public class CreateAlbum : ICarterModule
         app.MapPost("/albums",
                 async (CreateAlbumRequest request, ISender sender) =>
                 {
-                    var command = request.Adapt<CreateAlbumCommand>();
-
-                    var result = await sender.Send(command);
-
-                    var response = result.Adapt<CreateAlbumResponse>();
-
-                    return Results.Created($"/albums/{response.Id}", response);
+                    var result = await sender.Send(request.Adapt<CreateAlbumCommand>());
+                    return Results.Created($"/albums/{result.Id}", result.Adapt<CreateAlbumResponse>());
                 })
             .WithName("CreatedAlbum")
             .Produces<CreateAlbumResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Create Album")
-            .WithDescription("Create Album");
+            .WithDescription("Create Album")
+            .DisableAntiforgery();
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Library.Application.Services.Albums.Commands.CreateAlbum;
 
-public record CreateAlbumCommand(AlbumDto Album) : BuildingBlocks.CQRS.ICommand<CreateAlbumResult>;
+public record CreateAlbumCommand(AlbumDto Album, Stream? CoverImage = null, string? CoverImageContentType = null, string? CoverImageFileName = null) : BuildingBlocks.CQRS.ICommand<CreateAlbumResult>;
 
 public record CreateAlbumResult(Guid Id);
 

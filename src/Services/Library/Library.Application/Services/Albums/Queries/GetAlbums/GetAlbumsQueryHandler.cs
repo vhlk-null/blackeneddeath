@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Albums.Queries.GetAlbums;
 
-public class GetAlbumsQueryHandler(ILibraryDbContext context)
+public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver)
     : BuildingBlocks.CQRS.IQueryHandler<GetAlbumsQuery, GetAlbumsResult>
 {
     public async ValueTask<GetAlbumsResult> Handle(GetAlbumsQuery query, CancellationToken cancellationToken)
@@ -43,7 +43,7 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context)
             .ToDictionaryAsync(t => t.Id, cancellationToken);
 
         var albumDtos = albums
-            .Select(a => a.ToAlbumDto(bands, genres, countries, tracks))
+            .Select(a => a.ToAlbumDto(bands, genres, countries, tracks, urlResolver))
             .ToList();
 
         return new GetAlbumsResult(new PaginatedResult<AlbumDto>(pageIndex, pageSize, totalCount, albumDtos));

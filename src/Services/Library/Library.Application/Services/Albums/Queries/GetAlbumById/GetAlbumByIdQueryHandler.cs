@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Albums.Queries.GetAlbumById;
 
-public class GetAlbumByIdQueryHandler(ILibraryDbContext context) : BuildingBlocks.CQRS.IQueryHandler<GetAlbumByIdQuery, GetAlbumByIdResult>
+public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver) : BuildingBlocks.CQRS.IQueryHandler<GetAlbumByIdQuery, GetAlbumByIdResult>
 {
     public async ValueTask<GetAlbumByIdResult> Handle(GetAlbumByIdQuery query, CancellationToken cancellationToken)
     {
@@ -32,6 +32,6 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context) : BuildingBlock
             .Where(t => album.AlbumTracks.Select(at => at.TrackId).Contains(t.Id))
             .ToDictionaryAsync(t => t.Id, cancellationToken);
 
-        return new GetAlbumByIdResult(album.ToAlbumDto(bands, genres, countries, tracks));
+        return new GetAlbumByIdResult(album.ToAlbumDto(bands, genres, countries, tracks, urlResolver));
     }
 }

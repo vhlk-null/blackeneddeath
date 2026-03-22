@@ -40,6 +40,9 @@
     <!-- PostgreSQL provider -->
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
   </ItemGroup>
+  <ItemGroup Label="Storage - Cloudinary">
+    <PackageVersion Include="CloudinaryDotNet" Version="1.26.2" />
+  </ItemGroup>
   <ItemGroup Label="Caching">
     <!-- Redis -->
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.2" />

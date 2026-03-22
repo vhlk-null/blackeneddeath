@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Albums.Queries.GetAlbumByYear;
 
-public class GetAlbumsByYearQueryHandler(ILibraryDbContext context)
+public class GetAlbumsByYearQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver)
     : BuildingBlocks.CQRS.IQueryHandler<GetAlbumsByYearQuery, GetAlbumsByYearResult>
 {
     public async ValueTask<GetAlbumsByYearResult> Handle(GetAlbumsByYearQuery query, CancellationToken cancellationToken)
@@ -37,7 +37,7 @@ public class GetAlbumsByYearQueryHandler(ILibraryDbContext context)
             .ToDictionaryAsync(t => t.Id, cancellationToken);
 
         var albumDtos = albums
-            .Select(a => a.ToAlbumDto(bands, genres, countries, tracks))
+            .Select(a => a.ToAlbumDto(bands, genres, countries, tracks, urlResolver))
             .ToList();
 
         return new GetAlbumsByYearResult(albumDtos);

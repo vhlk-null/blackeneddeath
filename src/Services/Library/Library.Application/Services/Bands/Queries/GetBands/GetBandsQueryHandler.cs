@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Bands.Queries.GetBands;
 
-public class GetBandsQueryHandler(ILibraryDbContext context)
+public class GetBandsQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver)
     : BuildingBlocks.CQRS.IQueryHandler<GetBandsQuery, GetBandsResult>
 {
     public async ValueTask<GetBandsResult> Handle(GetBandsQuery query, CancellationToken cancellationToken)
@@ -44,7 +44,7 @@ public class GetBandsQueryHandler(ILibraryDbContext context)
         var albumsByBand = albumBands.ToLookup(ab => ab.BandId, ab => albumsById[ab.AlbumId]);
 
         var bandDtos = bands
-            .Select(b => b.ToBandDto(countries, genres, albumsByBand))
+            .Select(b => b.ToBandDto(countries, genres, albumsByBand, urlResolver))
             .ToList();
 
         return new GetBandsResult(new PaginatedResult<BandDto>(pageIndex, pageSize, totalCount, bandDtos));
