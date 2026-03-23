@@ -1,6 +1,3 @@
-using CloudinaryDotNet;
-using Library.Infrastructure.Repositories;
-
 namespace Library.Infrastructure;
 
 public static class DependencyInjection

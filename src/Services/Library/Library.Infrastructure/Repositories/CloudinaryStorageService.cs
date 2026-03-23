@@ -1,7 +1,3 @@
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
-using Library.Application.Data;
-
 namespace Library.Infrastructure.Repositories;
 
 public class CloudinaryStorageService(Cloudinary cloudinary) : IStorageService

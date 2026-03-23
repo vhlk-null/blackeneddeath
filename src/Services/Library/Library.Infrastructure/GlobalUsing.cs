@@ -1,4 +1,6 @@
 ﻿global using BuildingBlocks.Repositories;
+global using CloudinaryDotNet;
+global using CloudinaryDotNet.Actions;
 global using Library.Application.Data;
 global using Library.Domain.Abstractions;
 global using Library.Infrastructure.Data;
