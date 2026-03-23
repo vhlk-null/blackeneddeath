@@ -1,6 +1,6 @@
 using Library.Domain.Events.Genre;
 
-namespace Library.Application.Services.Genres.EventHandlers;
+namespace Library.Application.Genres.EventHandlers;
 
 public class GenreUpdatedEventHandler(ILogger<GenreUpdatedEventHandler> logger) : INotificationHandler<GenreUpdatedEvent>
 {

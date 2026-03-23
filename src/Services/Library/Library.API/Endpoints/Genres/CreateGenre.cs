@@ -1,4 +1,4 @@
-using Library.Application.Services.Genres.Commands.CreateGenre;
+using Library.Application.Genres.Commands.CreateGenre;
 
 namespace Library.API.Endpoints.Genres;
 

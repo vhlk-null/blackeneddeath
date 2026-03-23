@@ -23,15 +23,18 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
         var genreIds = band.BandGenres.Select(bg => bg.GenreId).ToList();
 
         var albums = await context.Albums.AsNoTracking()
+            .Include(a => a.AlbumGenres)
             .Where(a => albumIds.Contains(a.Id))
             .ToListAsync(cancellationToken);
+
+        var albumGenreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)).Distinct().ToList();
 
         var countries = await context.Countries.AsNoTracking()
             .Where(c => countryIds.Contains(c.Id))
             .ToDictionaryAsync(c => c.Id, cancellationToken);
 
         var genres = await context.Genres.AsNoTracking()
-            .Where(g => genreIds.Contains(g.Id))
+            .Where(g => genreIds.Concat(albumGenreIds).Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, cancellationToken);
 
         var albumsByBand = albums.ToLookup(_ => band.Id);

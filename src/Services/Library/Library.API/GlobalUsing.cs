@@ -18,8 +18,6 @@ global using Library.Application.Services.Albums.Commands.UpdateAlbum;
 global using Library.Application.Services.Albums.Queries.GetAlbumByYear;
 global using Library.Application.Services.Albums.Queries.GetAlbums;
 global using Library.Application.Services.Bands.Queries.GetBands;
-global using Library.Application.Services.Genres.Commands.UpdateGenre;
-global using Library.Application.Services.Genres.Queries.GetGenres;
 global using Library.Domain.Models;
 global using Library.Domain.ValueObjects.Ids;
 global using Library.Grpc;

@@ -28,8 +28,13 @@ internal static class InitialData
         public static readonly BandId Burzum     = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-000000000002"));
         public static readonly BandId Emperor    = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-000000000003"));
         public static readonly BandId Mayhem     = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-000000000004"));
-        public static readonly BandId Dissection = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-000000000005"));
-        public static readonly BandId Behemoth   = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-000000000006"));
+        public static readonly BandId Dissection        = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-000000000005"));
+        public static readonly BandId Behemoth          = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-000000000006"));
+        public static readonly BandId Abuser            = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-000000000007"));
+        public static readonly BandId BloodCoven        = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-000000000008"));
+        public static readonly BandId Deathwinds        = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-000000000009"));
+        public static readonly BandId MorsVoidDiscipline = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-00000000000a"));
+        public static readonly BandId Vider             = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-00000000000b"));
     }
 
     // ── Album IDs ──────────────────────────────────────────────────────────────
@@ -41,6 +46,57 @@ internal static class InitialData
         public static readonly AlbumId DeMysteriis         = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000004"));
         public static readonly AlbumId StormOfLightsBane   = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000005"));
         public static readonly AlbumId TheSatanist         = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000006"));
+
+        // Abuser (9)
+        public static readonly AlbumId Abuser_1585         = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000007"));
+        public static readonly AlbumId Abuser_GreatWork    = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000008"));
+        public static readonly AlbumId Abuser_Merging      = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000009"));
+        public static readonly AlbumId Abuser_Anneliese    = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000000a"));
+        public static readonly AlbumId Abuser_BoundBySpells = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000000b"));
+        public static readonly AlbumId Abuser_Conduit      = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000000c"));
+        public static readonly AlbumId Abuser_DesolateDivine = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000000d"));
+        public static readonly AlbumId Abuser_HisBestDeceit = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000000e"));
+        public static readonly AlbumId Abuser_PsychicSecretions = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000000f"));
+
+        // Blood Coven (6)
+        public static readonly AlbumId BC_CaughtInTheUnlight   = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000010"));
+        public static readonly AlbumId BC_ForTheHolyLord       = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000011"));
+        public static readonly AlbumId BC_ContinuumHypothesis  = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000012"));
+        public static readonly AlbumId BC_MolecularScythe      = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000013"));
+        public static readonly AlbumId BC_ScreamToreSky        = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000014"));
+        public static readonly AlbumId BC_WhatWillBe           = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000015"));
+
+        // Deathwinds (8)
+        public static readonly AlbumId DW_AuricGates          = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000016"));
+        public static readonly AlbumId DW_BellumRegiis        = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000017"));
+        public static readonly AlbumId DW_Crvsade             = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000018"));
+        public static readonly AlbumId DW_Erebos              = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000019"));
+        public static readonly AlbumId DW_Misanthropic        = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000001a"));
+        public static readonly AlbumId DW_Rugia               = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000001b"));
+        public static readonly AlbumId DW_Solarflesh          = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000001c"));
+        public static readonly AlbumId DW_Tremendum           = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000001d"));
+
+        // Mors.Void.Discipline (11)
+        public static readonly AlbumId MVD_Exorkizein         = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000001e"));
+        public static readonly AlbumId MVD_Malignancy         = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000001f"));
+        public static readonly AlbumId MVD_OnslaughtKommand   = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000020"));
+        public static readonly AlbumId MVD_PassioChristiI     = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000021"));
+        public static readonly AlbumId MVD_PassioChristiII    = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000022"));
+        public static readonly AlbumId MVD_Possession         = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000023"));
+        public static readonly AlbumId MVD_Seidr              = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000024"));
+        public static readonly AlbumId MVD_TheCall            = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000025"));
+        public static readonly AlbumId MVD_MotherOfDarkness   = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000026"));
+        public static readonly AlbumId MVD_ThirdAntichrist    = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000027"));
+        public static readonly AlbumId MVD_WombOfLilithu      = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000028"));
+
+        // Vider (7)
+        public static readonly AlbumId Vider_Bloodhymns       = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-000000000029"));
+        public static readonly AlbumId Vider_Darkside         = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000002a"));
+        public static readonly AlbumId Vider_DawnOfDamned     = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000002b"));
+        public static readonly AlbumId Vider_DeathToAll       = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000002c"));
+        public static readonly AlbumId Vider_InTheTwilightGrey = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000002d"));
+        public static readonly AlbumId Vider_MarkOfNecrogram  = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000002e"));
+        public static readonly AlbumId Vider_NocturnalSilence = AlbumId.Of(Guid.Parse("a0000000-0000-0000-0000-00000000002f"));
     }
 
     // ── Genre IDs ──────────────────────────────────────────────────────────────
@@ -306,7 +362,61 @@ internal static class InitialData
             behemoth.AddGenre(GenreIds.DeathMetal, isPrimary: false);
             behemoth.AddCountry(CountryIds.Poland);
 
-            return [darkthrone, burzum, emperor, mayhem, dissection, behemoth];
+            var abuser = Band.Create(
+                "Abuser",
+                "American black metal outfit known for hypnotic, dissonant riffing and occult lyricism. Their discography spans from raw early recordings to a more expansive atmospheric sound.",
+                "Abuser_ua465w",
+                BandActivity.Of(2004, null),
+                BandStatus.Active,
+                BandIds.Abuser);
+            abuser.AddGenre(GenreIds.BlackMetal, isPrimary: true);
+            abuser.AddGenre(GenreIds.DeathMetal, isPrimary: false);
+            abuser.AddCountry(CountryIds.UnitedStates);
+
+            var bloodCoven = Band.Create(
+                "Blood Coven",
+                "American black metal band rooted in orthodox darkness and ritualistic atmospheres. Their albums blend cold tremolo-picked aggression with dense, ceremonial structures.",
+                "Blood_Coven_dsbu7i",
+                BandActivity.Of(2001, null),
+                BandStatus.Active,
+                BandIds.BloodCoven);
+            bloodCoven.AddGenre(GenreIds.BlackMetal, isPrimary: true);
+            bloodCoven.AddCountry(CountryIds.UnitedStates);
+
+            var deathwinds = Band.Create(
+                "Deathwinds",
+                "Polish black metal force drawing on Slavic mythology and martial themes. Their sound is relentless and austere, combining raw aggression with an unmistakable Eastern European coldness.",
+                "Deathwinds_bee5xe",
+                BandActivity.Of(2005, null),
+                BandStatus.Active,
+                BandIds.Deathwinds);
+            deathwinds.AddGenre(GenreIds.BlackMetal, isPrimary: true);
+            deathwinds.AddGenre(GenreIds.AtmosphericBlackMetal, isPrimary: false);
+            deathwinds.AddCountry(CountryIds.Poland);
+
+            var morsVoidDiscipline = Band.Create(
+                "Mors.Void.Discipline",
+                "French black metal entity steeped in occult theology and anti-cosmic philosophy. Operating under a doctrine of absolute negation, their works are dense and uncompromising ritual pieces.",
+                "Mors.Void.Discipline_to2isd",
+                BandActivity.Of(1998, null),
+                BandStatus.Active,
+                BandIds.MorsVoidDiscipline);
+            morsVoidDiscipline.AddGenre(GenreIds.BlackMetal, isPrimary: true);
+            morsVoidDiscipline.AddCountry(CountryIds.France);
+
+            var vider = Band.Create(
+                "Vider",
+                "Swedish black metal band who helped define the Scandinavian second wave sound. Known for icy guitar textures, minimalist song structures, and an unwavering devotion to darkness.",
+                "Vider_dvzm6c",
+                BandActivity.Of(1992, null),
+                BandStatus.Active,
+                BandIds.Vider);
+            vider.AddGenre(GenreIds.BlackMetal, isPrimary: true);
+            vider.AddGenre(GenreIds.RawBlackMetal, isPrimary: false);
+            vider.AddCountry(CountryIds.Sweden);
+
+            return [darkthrone, burzum, emperor, mayhem, dissection, behemoth,
+                    abuser, bloodCoven, deathwinds, morsVoidDiscipline, vider];
         }
     }
 
@@ -442,7 +552,140 @@ internal static class InitialData
             theSatanist.AddTrack(TrackIds.TS8, 8);
             theSatanist.AddTrack(TrackIds.TS9, 9);
 
-            return [transilvanianHunger, filosofem, nightsideEclipse, deMysteriis, stormOfLightsBane, theSatanist];
+            // ── Abuser ────────────────────────────────────────────────────────────
+            var a1585 = Album.Create("1585-1646", AlbumType.FullLength, AlbumRelease.Of(2009, AlbumFormat.CD), "Psychic_Secretions_c0bo9q", null, AlbumIds.Abuser_1585);
+            a1585.AddBand(BandIds.Abuser); a1585.AddGenre(GenreIds.BlackMetal, isPrimary: true); a1585.AddCountry(CountryIds.UnitedStates);
+
+            var aGreatWork = Album.Create("A Great Work of Ages", AlbumType.FullLength, AlbumRelease.Of(2019, AlbumFormat.CD), "His_Best_Deceit_divtip", null, AlbumIds.Abuser_GreatWork);
+            aGreatWork.AddBand(BandIds.Abuser); aGreatWork.AddGenre(GenreIds.BlackMetal, isPrimary: true); aGreatWork.AddCountry(CountryIds.UnitedStates);
+
+            var aMerging = Album.Create("A Merging to the Boundless", AlbumType.FullLength, AlbumRelease.Of(2013, AlbumFormat.CD), "Desolate_Divine_yu1kin", null, AlbumIds.Abuser_Merging);
+            aMerging.AddBand(BandIds.Abuser); aMerging.AddGenre(GenreIds.BlackMetal, isPrimary: true); aMerging.AddCountry(CountryIds.UnitedStates);
+
+            var anneliese = Album.Create("Anneliese", AlbumType.FullLength, AlbumRelease.Of(2011, AlbumFormat.CD), "Conduit_pe9plu", null, AlbumIds.Abuser_Anneliese);
+            anneliese.AddBand(BandIds.Abuser); anneliese.AddGenre(GenreIds.BlackMetal, isPrimary: true); anneliese.AddCountry(CountryIds.UnitedStates);
+
+            var boundBySpells = Album.Create("Bound by Spells", AlbumType.FullLength, AlbumRelease.Of(2016, AlbumFormat.CD), "Bound_By_Spells_pwiu6e", null, AlbumIds.Abuser_BoundBySpells);
+            boundBySpells.AddBand(BandIds.Abuser); boundBySpells.AddGenre(GenreIds.BlackMetal, isPrimary: true); boundBySpells.AddCountry(CountryIds.UnitedStates);
+
+            var conduit = Album.Create("Conduit", AlbumType.FullLength, AlbumRelease.Of(2021, AlbumFormat.CD), "Psychic_Secretions_c0bo9q", null, AlbumIds.Abuser_Conduit);
+            conduit.AddBand(BandIds.Abuser); conduit.AddGenre(GenreIds.BlackMetal, isPrimary: true); conduit.AddCountry(CountryIds.UnitedStates);
+
+            var desolateDivine = Album.Create("Desolate Divine", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), "His_Best_Deceit_divtip", null, AlbumIds.Abuser_DesolateDivine);
+            desolateDivine.AddBand(BandIds.Abuser); desolateDivine.AddGenre(GenreIds.BlackMetal, isPrimary: true); desolateDivine.AddCountry(CountryIds.UnitedStates);
+
+            var hisBestDeceit = Album.Create("His Best Deceit", AlbumType.FullLength, AlbumRelease.Of(2007, AlbumFormat.CD), "Desolate_Divine_yu1kin", null, AlbumIds.Abuser_HisBestDeceit);
+            hisBestDeceit.AddBand(BandIds.Abuser); hisBestDeceit.AddGenre(GenreIds.BlackMetal, isPrimary: true); hisBestDeceit.AddCountry(CountryIds.UnitedStates);
+
+            var psychicSecretions = Album.Create("Psychic Secretions", AlbumType.FullLength, AlbumRelease.Of(2022, AlbumFormat.CD), "Conduit_pe9plu", null, AlbumIds.Abuser_PsychicSecretions);
+            psychicSecretions.AddBand(BandIds.Abuser); psychicSecretions.AddGenre(GenreIds.BlackMetal, isPrimary: true); psychicSecretions.AddCountry(CountryIds.UnitedStates);
+
+            // ── Blood Coven ───────────────────────────────────────────────────────
+            var caughtInUnlight = Album.Create("Caught in the Unlight!", AlbumType.FullLength, AlbumRelease.Of(2003, AlbumFormat.CD), "Bound_By_Spells_pwiu6e", null, AlbumIds.BC_CaughtInTheUnlight);
+            caughtInUnlight.AddBand(BandIds.BloodCoven); caughtInUnlight.AddGenre(GenreIds.BlackMetal, isPrimary: true); caughtInUnlight.AddCountry(CountryIds.UnitedStates);
+
+            var forTheHolyLord = Album.Create("For the Holy Lord", AlbumType.FullLength, AlbumRelease.Of(2007, AlbumFormat.CD), "Psychic_Secretions_c0bo9q", null, AlbumIds.BC_ForTheHolyLord);
+            forTheHolyLord.AddBand(BandIds.BloodCoven); forTheHolyLord.AddGenre(GenreIds.BlackMetal, isPrimary: true); forTheHolyLord.AddCountry(CountryIds.UnitedStates);
+
+            var continuumHypothesis = Album.Create("The Continuum Hypothesis", AlbumType.FullLength, AlbumRelease.Of(2012, AlbumFormat.CD), "His_Best_Deceit_divtip", null, AlbumIds.BC_ContinuumHypothesis);
+            continuumHypothesis.AddBand(BandIds.BloodCoven); continuumHypothesis.AddGenre(GenreIds.BlackMetal, isPrimary: true); continuumHypothesis.AddCountry(CountryIds.UnitedStates);
+
+            var molecularScythe = Album.Create("The Molecular Scythe", AlbumType.FullLength, AlbumRelease.Of(2015, AlbumFormat.CD), "Desolate_Divine_yu1kin", null, AlbumIds.BC_MolecularScythe);
+            molecularScythe.AddBand(BandIds.BloodCoven); molecularScythe.AddGenre(GenreIds.BlackMetal, isPrimary: true); molecularScythe.AddCountry(CountryIds.UnitedStates);
+
+            var screamToreSky = Album.Create("The Scream That Tore the Sky", AlbumType.FullLength, AlbumRelease.Of(2009, AlbumFormat.CD), "Conduit_pe9plu", null, AlbumIds.BC_ScreamToreSky);
+            screamToreSky.AddBand(BandIds.BloodCoven); screamToreSky.AddGenre(GenreIds.BlackMetal, isPrimary: true); screamToreSky.AddCountry(CountryIds.UnitedStates);
+
+            var whatWillBe = Album.Create("What Will Be Has Been", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), "Bound_By_Spells_pwiu6e", null, AlbumIds.BC_WhatWillBe);
+            whatWillBe.AddBand(BandIds.BloodCoven); whatWillBe.AddGenre(GenreIds.BlackMetal, isPrimary: true); whatWillBe.AddCountry(CountryIds.UnitedStates);
+
+            // ── Deathwinds ────────────────────────────────────────────────────────
+            var auricGates = Album.Create("Auric Gates of Veles", AlbumType.FullLength, AlbumRelease.Of(2015, AlbumFormat.CD), "Psychic_Secretions_c0bo9q", null, AlbumIds.DW_AuricGates);
+            auricGates.AddBand(BandIds.Deathwinds); auricGates.AddGenre(GenreIds.BlackMetal, isPrimary: true); auricGates.AddCountry(CountryIds.Poland);
+
+            var bellumRegiis = Album.Create("Bellum Regiis", AlbumType.FullLength, AlbumRelease.Of(2012, AlbumFormat.CD), "His_Best_Deceit_divtip", null, AlbumIds.DW_BellumRegiis);
+            bellumRegiis.AddBand(BandIds.Deathwinds); bellumRegiis.AddGenre(GenreIds.BlackMetal, isPrimary: true); bellumRegiis.AddCountry(CountryIds.Poland);
+
+            var crvsade = Album.Create("Crvsade - Zero", AlbumType.FullLength, AlbumRelease.Of(2017, AlbumFormat.CD), "Desolate_Divine_yu1kin", null, AlbumIds.DW_Crvsade);
+            crvsade.AddBand(BandIds.Deathwinds); crvsade.AddGenre(GenreIds.BlackMetal, isPrimary: true); crvsade.AddCountry(CountryIds.Poland);
+
+            var erebos = Album.Create("Erebos", AlbumType.FullLength, AlbumRelease.Of(2008, AlbumFormat.CD), "Conduit_pe9plu", null, AlbumIds.DW_Erebos);
+            erebos.AddBand(BandIds.Deathwinds); erebos.AddGenre(GenreIds.BlackMetal, isPrimary: true); erebos.AddCountry(CountryIds.Poland);
+
+            var misanthropicPath = Album.Create("Misanthropic Path of Carnal Deliverance", AlbumType.FullLength, AlbumRelease.Of(2006, AlbumFormat.CD), "Bound_By_Spells_pwiu6e", null, AlbumIds.DW_Misanthropic);
+            misanthropicPath.AddBand(BandIds.Deathwinds); misanthropicPath.AddGenre(GenreIds.BlackMetal, isPrimary: true); misanthropicPath.AddCountry(CountryIds.Poland);
+
+            var rugia = Album.Create("Rugia", AlbumType.FullLength, AlbumRelease.Of(2019, AlbumFormat.CD), "Psychic_Secretions_c0bo9q", null, AlbumIds.DW_Rugia);
+            rugia.AddBand(BandIds.Deathwinds); rugia.AddGenre(GenreIds.BlackMetal, isPrimary: true); rugia.AddCountry(CountryIds.Poland);
+
+            var solarflesh = Album.Create("Solarflesh", AlbumType.FullLength, AlbumRelease.Of(2013, AlbumFormat.CD), "His_Best_Deceit_divtip", null, AlbumIds.DW_Solarflesh);
+            solarflesh.AddBand(BandIds.Deathwinds); solarflesh.AddGenre(GenreIds.BlackMetal, isPrimary: true); solarflesh.AddCountry(CountryIds.Poland);
+
+            var tremendum = Album.Create("Tremendum", AlbumType.FullLength, AlbumRelease.Of(2010, AlbumFormat.CD), "Desolate_Divine_yu1kin", null, AlbumIds.DW_Tremendum);
+            tremendum.AddBand(BandIds.Deathwinds); tremendum.AddGenre(GenreIds.BlackMetal, isPrimary: true); tremendum.AddCountry(CountryIds.Poland);
+
+            // ── Mors.Void.Discipline ──────────────────────────────────────────────
+            var exorkizein = Album.Create("Exorkizein", AlbumType.FullLength, AlbumRelease.Of(2013, AlbumFormat.CD), "Conduit_pe9plu", null, AlbumIds.MVD_Exorkizein);
+            exorkizein.AddBand(BandIds.MorsVoidDiscipline); exorkizein.AddGenre(GenreIds.BlackMetal, isPrimary: true); exorkizein.AddCountry(CountryIds.France);
+
+            var malignancy = Album.Create("Malignancy", AlbumType.FullLength, AlbumRelease.Of(2006, AlbumFormat.CD), "Bound_By_Spells_pwiu6e", null, AlbumIds.MVD_Malignancy);
+            malignancy.AddBand(BandIds.MorsVoidDiscipline); malignancy.AddGenre(GenreIds.BlackMetal, isPrimary: true); malignancy.AddCountry(CountryIds.France);
+
+            var onslaughtKommand = Album.Create("Onslaught Kommand", AlbumType.FullLength, AlbumRelease.Of(2009, AlbumFormat.CD), "Psychic_Secretions_c0bo9q", null, AlbumIds.MVD_OnslaughtKommand);
+            onslaughtKommand.AddBand(BandIds.MorsVoidDiscipline); onslaughtKommand.AddGenre(GenreIds.BlackMetal, isPrimary: true); onslaughtKommand.AddCountry(CountryIds.France);
+
+            var passioChristiI = Album.Create("Passio Christi Part I", AlbumType.FullLength, AlbumRelease.Of(2015, AlbumFormat.CD), "His_Best_Deceit_divtip", null, AlbumIds.MVD_PassioChristiI);
+            passioChristiI.AddBand(BandIds.MorsVoidDiscipline); passioChristiI.AddGenre(GenreIds.BlackMetal, isPrimary: true); passioChristiI.AddCountry(CountryIds.France);
+
+            var passioChristiII = Album.Create("Passio Christi Part II", AlbumType.FullLength, AlbumRelease.Of(2016, AlbumFormat.CD), "Desolate_Divine_yu1kin", null, AlbumIds.MVD_PassioChristiII);
+            passioChristiII.AddBand(BandIds.MorsVoidDiscipline); passioChristiII.AddGenre(GenreIds.BlackMetal, isPrimary: true); passioChristiII.AddCountry(CountryIds.France);
+
+            var possession = Album.Create("Possession", AlbumType.FullLength, AlbumRelease.Of(2004, AlbumFormat.CD), "Conduit_pe9plu", null, AlbumIds.MVD_Possession);
+            possession.AddBand(BandIds.MorsVoidDiscipline); possession.AddGenre(GenreIds.BlackMetal, isPrimary: true); possession.AddCountry(CountryIds.France);
+
+            var seidr = Album.Create("Seiðr", AlbumType.FullLength, AlbumRelease.Of(2011, AlbumFormat.CD), "Bound_By_Spells_pwiu6e", null, AlbumIds.MVD_Seidr);
+            seidr.AddBand(BandIds.MorsVoidDiscipline); seidr.AddGenre(GenreIds.BlackMetal, isPrimary: true); seidr.AddCountry(CountryIds.France);
+
+            var theCall = Album.Create("The Call", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), "Psychic_Secretions_c0bo9q", null, AlbumIds.MVD_TheCall);
+            theCall.AddBand(BandIds.MorsVoidDiscipline); theCall.AddGenre(GenreIds.BlackMetal, isPrimary: true); theCall.AddCountry(CountryIds.France);
+
+            var motherOfDarkness = Album.Create("The Mother of Darkness", AlbumType.FullLength, AlbumRelease.Of(2008, AlbumFormat.CD), "His_Best_Deceit_divtip", null, AlbumIds.MVD_MotherOfDarkness);
+            motherOfDarkness.AddBand(BandIds.MorsVoidDiscipline); motherOfDarkness.AddGenre(GenreIds.BlackMetal, isPrimary: true); motherOfDarkness.AddCountry(CountryIds.France);
+
+            var thirdAntichrist = Album.Create("The Third Antichrist", AlbumType.FullLength, AlbumRelease.Of(2020, AlbumFormat.CD), "Desolate_Divine_yu1kin", null, AlbumIds.MVD_ThirdAntichrist);
+            thirdAntichrist.AddBand(BandIds.MorsVoidDiscipline); thirdAntichrist.AddGenre(GenreIds.BlackMetal, isPrimary: true); thirdAntichrist.AddCountry(CountryIds.France);
+
+            var wombOfLilithu = Album.Create("Womb of Lilithu", AlbumType.FullLength, AlbumRelease.Of(2002, AlbumFormat.CD), "Conduit_pe9plu", null, AlbumIds.MVD_WombOfLilithu);
+            wombOfLilithu.AddBand(BandIds.MorsVoidDiscipline); wombOfLilithu.AddGenre(GenreIds.BlackMetal, isPrimary: true); wombOfLilithu.AddCountry(CountryIds.France);
+
+            // ── Vider ─────────────────────────────────────────────────────────────
+            var bloodhymns = Album.Create("Bloodhymns", AlbumType.FullLength, AlbumRelease.Of(2002, AlbumFormat.CD), "Bound_By_Spells_pwiu6e", null, AlbumIds.Vider_Bloodhymns);
+            bloodhymns.AddBand(BandIds.Vider); bloodhymns.AddGenre(GenreIds.BlackMetal, isPrimary: true); bloodhymns.AddCountry(CountryIds.Sweden);
+
+            var darkside = Album.Create("Darkside", AlbumType.FullLength, AlbumRelease.Of(1997, AlbumFormat.CD), "Psychic_Secretions_c0bo9q", null, AlbumIds.Vider_Darkside);
+            darkside.AddBand(BandIds.Vider); darkside.AddGenre(GenreIds.BlackMetal, isPrimary: true); darkside.AddCountry(CountryIds.Sweden);
+
+            var dawnOfDamned = Album.Create("Dawn of the Damned", AlbumType.FullLength, AlbumRelease.Of(2004, AlbumFormat.CD), "His_Best_Deceit_divtip", null, AlbumIds.Vider_DawnOfDamned);
+            dawnOfDamned.AddBand(BandIds.Vider); dawnOfDamned.AddGenre(GenreIds.BlackMetal, isPrimary: true); dawnOfDamned.AddCountry(CountryIds.Sweden);
+
+            var deathToAll = Album.Create("Death to All", AlbumType.FullLength, AlbumRelease.Of(2012, AlbumFormat.CD), "Desolate_Divine_yu1kin", null, AlbumIds.Vider_DeathToAll);
+            deathToAll.AddBand(BandIds.Vider); deathToAll.AddGenre(GenreIds.BlackMetal, isPrimary: true); deathToAll.AddCountry(CountryIds.Sweden);
+
+            var inTheTwilightGrey = Album.Create("In the Twilight Grey", AlbumType.FullLength, AlbumRelease.Of(1999, AlbumFormat.CD), "Conduit_pe9plu", null, AlbumIds.Vider_InTheTwilightGrey);
+            inTheTwilightGrey.AddBand(BandIds.Vider); inTheTwilightGrey.AddGenre(GenreIds.BlackMetal, isPrimary: true); inTheTwilightGrey.AddCountry(CountryIds.Sweden);
+
+            var markOfNecrogram = Album.Create("Mark of the Necrogram", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), "Bound_By_Spells_pwiu6e", null, AlbumIds.Vider_MarkOfNecrogram);
+            markOfNecrogram.AddBand(BandIds.Vider); markOfNecrogram.AddGenre(GenreIds.BlackMetal, isPrimary: true); markOfNecrogram.AddCountry(CountryIds.Sweden);
+
+            var nocturnalSilence = Album.Create("The Nocturnal Silence", AlbumType.FullLength, AlbumRelease.Of(1994, AlbumFormat.CD), "Psychic_Secretions_c0bo9q", null, AlbumIds.Vider_NocturnalSilence);
+            nocturnalSilence.AddBand(BandIds.Vider); nocturnalSilence.AddGenre(GenreIds.BlackMetal, isPrimary: true); nocturnalSilence.AddCountry(CountryIds.Sweden);
+
+            return [transilvanianHunger, filosofem, nightsideEclipse, deMysteriis, stormOfLightsBane, theSatanist,
+                    a1585, aGreatWork, aMerging, anneliese, boundBySpells, conduit, desolateDivine, hisBestDeceit, psychicSecretions,
+                    caughtInUnlight, forTheHolyLord, continuumHypothesis, molecularScythe, screamToreSky, whatWillBe,
+                    auricGates, bellumRegiis, crvsade, erebos, misanthropicPath, rugia, solarflesh, tremendum,
+                    exorkizein, malignancy, onslaughtKommand, passioChristiI, passioChristiII, possession, seidr, theCall, motherOfDarkness, thirdAntichrist, wombOfLilithu,
+                    bloodhymns, darkside, dawnOfDamned, deathToAll, inTheTwilightGrey, markOfNecrogram, nocturnalSilence];
         }
     }
 }

@@ -7,4 +7,5 @@ public record AlbumSummaryDto(
     int ReleaseDate,
     string? CoverUrl,
     AlbumType Type,
-    AlbumFormat Format);
+    AlbumFormat Format,
+    IReadOnlyList<GenreDto> Genres);

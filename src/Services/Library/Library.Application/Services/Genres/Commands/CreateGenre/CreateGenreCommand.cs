@@ -1,4 +1,4 @@
-namespace Library.Application.Services.Genres.Commands.CreateGenre;
+namespace Library.Application.Genres.Commands.CreateGenre;
 
 public record CreateGenreCommand(string Name, Guid? ParentGenreId) : BuildingBlocks.CQRS.ICommand<CreateGenreResult>;
 

@@ -39,7 +39,10 @@
       "Bash(node index.mjs)",
       "Bash(wsl --shutdown)",
       "Bash(wsl -l -v)",
-      "Bash(find /d/Projects/blackeneddeath/src/Services/Library/Library.Application/Dtos -name *.cs)"
+      "Bash(find /d/Projects/blackeneddeath/src/Services/Library/Library.Application/Dtos -name *.cs)",
+      "Bash(tasklist /FI \"PID eq 48112\" /FO LIST)",
+      "Bash(tasklist /FI \"PID eq 11616\" /FO LIST)",
+      "Bash(powershell \"Get-Process -Id 48112,11616 | Select-Object Id,ProcessName,Path\")"
     ],
     "deny": [],
     "ask": []

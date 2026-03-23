@@ -1,4 +1,4 @@
-namespace Library.Application.Services.Genres.Queries.GetGenresByParent;
+namespace Library.Application.Genres.Queries.GetGenresByParent;
 
 public record GetGenresByParentQuery(Guid ParentId) : BuildingBlocks.CQRS.IQuery<GetGenresByParentResult>;
 

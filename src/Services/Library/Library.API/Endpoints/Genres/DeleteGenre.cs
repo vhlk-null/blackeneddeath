@@ -1,4 +1,4 @@
-using Library.Application.Services.Genres.Commands.DeleteGenre;
+using Library.Application.Genres.Commands.DeleteGenre;
 
 namespace Library.API.Endpoints.Genres;
 
