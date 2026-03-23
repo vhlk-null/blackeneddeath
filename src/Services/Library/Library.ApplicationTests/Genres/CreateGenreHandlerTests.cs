@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Library.Application.Data;
-using Library.Application.Genres.Commands.CreateGenre;
+using Library.Application.Services.Genres.Commands.CreateGenre;
 using Library.ApplicationTests.Utils;
 using Library.Domain.Models;
 using Microsoft.EntityFrameworkCore;

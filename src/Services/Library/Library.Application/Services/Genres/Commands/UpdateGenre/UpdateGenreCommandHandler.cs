@@ -1,4 +1,4 @@
-namespace Library.Application.Genres.Commands.UpdateGenre;
+namespace Library.Application.Services.Genres.Commands.UpdateGenre;
 
 public class UpdateGenreCommandHandler(ILibraryDbContext context)
     : BuildingBlocks.CQRS.ICommandHandler<UpdateGenreCommand, UpdateGenreResult>

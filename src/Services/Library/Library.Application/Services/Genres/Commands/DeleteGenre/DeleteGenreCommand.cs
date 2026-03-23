@@ -1,4 +1,4 @@
-namespace Library.Application.Genres.Commands.DeleteGenre;
+namespace Library.Application.Services.Genres.Commands.DeleteGenre;
 
 public record DeleteGenreCommand(Guid Id) : BuildingBlocks.CQRS.ICommand<DeleteGenreResult>;
 

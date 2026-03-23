@@ -42,7 +42,9 @@
       "Bash(find /d/Projects/blackeneddeath/src/Services/Library/Library.Application/Dtos -name *.cs)",
       "Bash(tasklist /FI \"PID eq 48112\" /FO LIST)",
       "Bash(tasklist /FI \"PID eq 11616\" /FO LIST)",
-      "Bash(powershell \"Get-Process -Id 48112,11616 | Select-Object Id,ProcessName,Path\")"
+      "Bash(powershell \"Get-Process -Id 48112,11616 | Select-Object Id,ProcessName,Path\")",
+      "Bash(grep -oP \"\\(?<=src\\\\\\\\\\).*?\\(?= \\\\[\\)\")",
+      "Bash(xargs sed:*)"
     ],
     "deny": [],
     "ask": []

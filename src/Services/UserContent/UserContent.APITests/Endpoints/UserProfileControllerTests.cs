@@ -29,10 +29,10 @@ public class UserProfileControllerTests : IClassFixture<UserContentWebAppFactory
             .Setup(s => s.GetUserProfileAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(dto);
 
-        var response = await _client.GetAsync($"/profile/{userId}");
+        var response = await _client.GetAsync($"/profile/{userId}", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<UserProfileDto>();
+        var body = await response.Content.ReadFromJsonAsync<UserProfileDto>(TestContext.Current.CancellationToken);
         body!.UserId.Should().Be(userId);
         body.Username.Should().Be("metal_head");
     }
@@ -45,7 +45,7 @@ public class UserProfileControllerTests : IClassFixture<UserContentWebAppFactory
             .Setup(s => s.GetUserProfileAsync(userId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new UserProfileNotFoundException(userId));
 
-        var response = await _client.GetAsync($"/profile/{userId}");
+        var response = await _client.GetAsync($"/profile/{userId}", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }

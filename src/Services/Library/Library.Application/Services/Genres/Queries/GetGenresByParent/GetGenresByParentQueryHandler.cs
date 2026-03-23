@@ -1,4 +1,4 @@
-namespace Library.Application.Genres.Queries.GetGenresByParent;
+namespace Library.Application.Services.Genres.Queries.GetGenresByParent;
 
 public class GetGenresByParentQueryHandler(ILibraryDbContext context)
     : BuildingBlocks.CQRS.IQueryHandler<GetGenresByParentQuery, GetGenresByParentResult>

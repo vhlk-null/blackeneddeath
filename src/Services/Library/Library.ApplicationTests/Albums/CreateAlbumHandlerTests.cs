@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Library.Application.Albums.Commands.CreateAlbum;
+using Library.Application.Services.Albums.Commands.CreateAlbum;
 using Library.Application.Data;
 using Library.Application.Dtos;
 using Library.ApplicationTests.Utils;
@@ -36,7 +36,7 @@ public class CreateAlbumHandlerTests
         _contextMock.Setup(x => x.Bands).Returns(_bandsDbSetMock.Object);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
-        _handler = new CreateAlbumHandler(_contextMock.Object);
+        _handler = new CreateAlbumHandler(_contextMock.Object, Mock.Of<IStorageService>());
     }
 
     [Fact]

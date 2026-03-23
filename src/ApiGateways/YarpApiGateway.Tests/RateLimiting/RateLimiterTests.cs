@@ -17,7 +17,7 @@ public class RateLimiterTests
         var responses = new List<HttpResponseMessage>();
 
         for (int i = 0; i <= permitLimit; i++)
-            responses.Add(await client.GetAsync("/library/albums"));
+            responses.Add(await client.GetAsync("/library/albums", TestContext.Current.CancellationToken));
 
         // First 5 requests: route matched (not 429)
         responses.Take(permitLimit).Should().NotContain(r => r.StatusCode == HttpStatusCode.TooManyRequests);
@@ -36,7 +36,7 @@ public class RateLimiterTests
         var responses = new List<HttpResponseMessage>();
 
         for (int i = 0; i < permitLimit; i++)
-            responses.Add(await client.GetAsync("/library/albums"));
+            responses.Add(await client.GetAsync("/library/albums", TestContext.Current.CancellationToken));
 
         responses.Should().NotContain(r => r.StatusCode == HttpStatusCode.TooManyRequests);
     }

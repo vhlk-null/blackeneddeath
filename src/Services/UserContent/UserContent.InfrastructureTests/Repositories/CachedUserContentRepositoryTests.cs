@@ -226,7 +226,7 @@ public class CachedUserContentRepositoryTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(profile);
 
-        var result = await _sut.GetWithIncludesAsync<UserProfileInfo>(u => u.UserId == userId, q => q);
+        var result = await _sut.GetWithIncludesAsync<UserProfileInfo>(u => u.UserId == userId, q => q, TestContext.Current.CancellationToken);
 
         result.Should().NotBeNull();
         result!.UserId.Should().Be(userId);
@@ -245,7 +245,7 @@ public class CachedUserContentRepositoryTests
                 It.IsAny<long>(), It.IsAny<int>(), It.IsAny<CommandFlags>()))
             .Returns(keys);
 
-        await _sut.AddAsync(fa);
+        await _sut.AddAsync(fa, TestContext.Current.CancellationToken);
 
         _innerMock.Verify(r => r.AddAsync(fa, It.IsAny<CancellationToken>()), Times.Once);
         _dbMock.Verify(d => d.KeyDeleteAsync(It.IsAny<RedisKey[]>(), It.IsAny<CommandFlags>()), Times.Once);
@@ -287,7 +287,7 @@ public class CachedUserContentRepositoryTests
     {
         _innerMock.Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(3);
 
-        var result = await _sut.SaveChangesAsync();
+        var result = await _sut.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         result.Should().Be(3);
         _redisMock.Verify(r => r.GetServers(), Times.Never);
@@ -297,8 +297,8 @@ public class CachedUserContentRepositoryTests
     public async Task SaveChangesAsync_WithModifiedAlbum_InvalidatesAllUserProfileCaches()
     {
         var album = new Album { Id = Guid.NewGuid(), Title = "Symbolic" };
-        await _context.Albums.AddAsync(album);
-        await _context.SaveChangesAsync();
+        await _context.Albums.AddAsync(album, TestContext.Current.CancellationToken);
+        await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         album.Title = "Symbolic (Updated)";
         _context.ChangeTracker.DetectChanges();
@@ -310,7 +310,7 @@ public class CachedUserContentRepositoryTests
             .Returns(keys);
         _innerMock.Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
-        await _sut.SaveChangesAsync();
+        await _sut.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         _dbMock.Verify(d => d.KeyDeleteAsync(It.IsAny<RedisKey[]>(), It.IsAny<CommandFlags>()), Times.Once);
     }

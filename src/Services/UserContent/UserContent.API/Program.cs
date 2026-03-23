@@ -30,4 +30,7 @@ app.MapHealthChecks("/health", new HealthCheckOptions
 
 app.Run();
 
-public partial class Program { }
+namespace UserContent.API
+{
+    public partial class Program { }
+}

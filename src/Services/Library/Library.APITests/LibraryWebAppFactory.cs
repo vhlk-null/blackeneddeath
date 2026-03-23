@@ -1,3 +1,4 @@
+using Library.API;
 using MassTransit;
 using Mediator;
 using Microsoft.AspNetCore.Hosting;

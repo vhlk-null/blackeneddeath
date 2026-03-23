@@ -21,10 +21,10 @@ public class FavoriteAlbumsControllerTests(UserContentWebAppFactory factory) : I
             .Setup(s => s.AddFavoriteAlbumAsync(userId, request.AlbumId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(userId);
 
-        var response = await _client.PostAsJsonAsync("/favoriteAlbums", request);
+        var response = await _client.PostAsJsonAsync("/favoriteAlbums", request, TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var body = await response.Content.ReadFromJsonAsync<AddAlbumToFavoriteResponse>();
+        var body = await response.Content.ReadFromJsonAsync<AddAlbumToFavoriteResponse>(TestContext.Current.CancellationToken);
         body!.UserId.Should().Be(userId);
     }
 
@@ -37,10 +37,10 @@ public class FavoriteAlbumsControllerTests(UserContentWebAppFactory factory) : I
             .Setup(s => s.DeleteFavoriteAlbumAsync(userId, albumId, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
-        var response = await _client.DeleteAsync($"/favoriteAlbums?userId={userId}&albumId={albumId}");
+        var response = await _client.DeleteAsync($"/favoriteAlbums?userId={userId}&albumId={albumId}", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<DeleteFavoriteAlbumResponse>();
+        var body = await response.Content.ReadFromJsonAsync<DeleteFavoriteAlbumResponse>(TestContext.Current.CancellationToken);
         body!.IsSuccess.Should().BeTrue();
     }
 
@@ -53,7 +53,7 @@ public class FavoriteAlbumsControllerTests(UserContentWebAppFactory factory) : I
             .Setup(s => s.DeleteFavoriteAlbumAsync(userId, albumId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new NotFoundException("FavoriteAlbum", albumId));
 
-        var response = await _client.DeleteAsync($"/favoriteAlbums?userId={userId}&albumId={albumId}");
+        var response = await _client.DeleteAsync($"/favoriteAlbums?userId={userId}&albumId={albumId}", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }

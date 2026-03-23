@@ -21,10 +21,10 @@ public class FavoriteBandsControllerTests(UserContentWebAppFactory factory) : IC
             .Setup(s => s.AddFavoriteBandAsync(userId, request.BandId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(userId);
 
-        var response = await _client.PostAsJsonAsync("/favoriteBands", request);
+        var response = await _client.PostAsJsonAsync("/favoriteBands", request, TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var body = await response.Content.ReadFromJsonAsync<AddBandToFavoriteResponse>();
+        var body = await response.Content.ReadFromJsonAsync<AddBandToFavoriteResponse>(TestContext.Current.CancellationToken);
         body!.UserId.Should().Be(userId);
     }
 
@@ -37,10 +37,10 @@ public class FavoriteBandsControllerTests(UserContentWebAppFactory factory) : IC
             .Setup(s => s.DeleteFavoriteBandAsync(userId, bandId, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
-        var response = await _client.DeleteAsync($"/favoriteBands?userId={userId}&bandId={bandId}");
+        var response = await _client.DeleteAsync($"/favoriteBands?userId={userId}&bandId={bandId}", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<DeleteFavoriteBandResponse>();
+        var body = await response.Content.ReadFromJsonAsync<DeleteFavoriteBandResponse>(TestContext.Current.CancellationToken);
         body!.IsSuccess.Should().BeTrue();
     }
 
@@ -53,7 +53,7 @@ public class FavoriteBandsControllerTests(UserContentWebAppFactory factory) : IC
             .Setup(s => s.DeleteFavoriteBandAsync(userId, bandId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new NotFoundException("FavoriteBand", bandId));
 
-        var response = await _client.DeleteAsync($"/favoriteBands?userId={userId}&bandId={bandId}");
+        var response = await _client.DeleteAsync($"/favoriteBands?userId={userId}&bandId={bandId}", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }

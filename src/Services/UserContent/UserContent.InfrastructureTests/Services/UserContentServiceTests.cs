@@ -40,7 +40,7 @@ public class UserContentServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(profile);
 
-        var result = await _sut.GetUserProfileAsync(userId);
+        var result = await _sut.GetUserProfileAsync(userId, TestContext.Current.CancellationToken);
 
         result.UserId.Should().Be(userId);
         result.Username.Should().Be("metal_head");
@@ -71,7 +71,7 @@ public class UserContentServiceTests
         _repoMock.Setup(x => x.GetByAsync<Album>(It.IsAny<Expression<Func<Album, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(album);
 
-        var result = await _sut.AddFavoriteAlbumAsync(userId, albumId);
+        var result = await _sut.AddFavoriteAlbumAsync(userId, albumId, TestContext.Current.CancellationToken);
 
         result.Should().Be(userId);
         _libraryMock.Verify(x => x.GetAlbumByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -89,7 +89,7 @@ public class UserContentServiceTests
         _libraryMock.Setup(x => x.GetAlbumByIdAsync(albumId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(album);
 
-        var result = await _sut.AddFavoriteAlbumAsync(userId, albumId);
+        var result = await _sut.AddFavoriteAlbumAsync(userId, albumId, TestContext.Current.CancellationToken);
 
         result.Should().Be(userId);
         _repoMock.Verify(x => x.AddAsync(album, It.IsAny<CancellationToken>()), Times.Once);
@@ -120,7 +120,7 @@ public class UserContentServiceTests
         _repoMock.Setup(x => x.GetByAsync<FavoriteAlbum>(It.IsAny<Expression<Func<FavoriteAlbum, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(fa);
 
-        await _sut.DeleteFavoriteAlbumAsync(userId, albumId);
+        await _sut.DeleteFavoriteAlbumAsync(userId, albumId, TestContext.Current.CancellationToken);
 
         _repoMock.Verify(x => x.Delete(fa), Times.Once);
         _repoMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
@@ -144,7 +144,7 @@ public class UserContentServiceTests
         var userId = Guid.NewGuid();
         var bandId = Guid.NewGuid();
 
-        var result = await _sut.AddFavoriteBandAsync(userId, bandId);
+        var result = await _sut.AddFavoriteBandAsync(userId, bandId, TestContext.Current.CancellationToken);
 
         result.Should().Be(userId);
         _repoMock.Verify(x => x.AddAsync(
@@ -164,7 +164,7 @@ public class UserContentServiceTests
         _repoMock.Setup(x => x.GetByAsync<FavoriteBand>(It.IsAny<Expression<Func<FavoriteBand, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(fb);
 
-        await _sut.DeleteFavoriteBandAsync(userId, bandId);
+        await _sut.DeleteFavoriteBandAsync(userId, bandId, TestContext.Current.CancellationToken);
 
         _repoMock.Verify(x => x.Delete(fb), Times.Once);
         _repoMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);

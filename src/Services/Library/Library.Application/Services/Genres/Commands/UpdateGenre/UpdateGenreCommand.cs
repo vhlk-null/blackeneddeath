@@ -1,4 +1,4 @@
-namespace Library.Application.Genres.Commands.UpdateGenre;
+namespace Library.Application.Services.Genres.Commands.UpdateGenre;
 
 public record UpdateGenreCommand(Guid Id, string Name, Guid? ParentGenreId) : BuildingBlocks.CQRS.ICommand<UpdateGenreResult>;
 

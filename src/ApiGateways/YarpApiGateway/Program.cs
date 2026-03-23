@@ -11,10 +11,11 @@ builder.Services.AddReverseProxy()
 
 builder.Services.AddRateLimiter(rateLimiterOptions =>
 {
+    rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
     rateLimiterOptions.AddFixedWindowLimiter("fixed", options =>
     {
-        options.Window = TimeSpan.FromSeconds(10);
-        options.PermitLimit = 5;
+        options.Window = builder.Configuration.GetValue("RateLimiter:Window", TimeSpan.FromSeconds(10));
+        options.PermitLimit = builder.Configuration.GetValue("RateLimiter:PermitLimit", 5);
     });
 });
 
@@ -31,11 +32,14 @@ var app = builder.Build();
 
 // Configure HTTP request pipeline.
 app.UseCors(); 
-//app.UseRateLimiter();
+app.UseRateLimiter();
 app.MapReverseProxy();
 
 app.MapGet("/", () => "Hello World!");
 
 app.Run();
 
-public partial class Program { }
+namespace YarpApiGateway
+{
+    public partial class Program { }
+}

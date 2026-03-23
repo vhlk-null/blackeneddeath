@@ -1,4 +1,4 @@
-using Library.Application.Genres.Commands.UpdateGenre;
+using Library.Application.Services.Genres.Commands.UpdateGenre;
 
 namespace Library.API.Endpoints.Genres;
 

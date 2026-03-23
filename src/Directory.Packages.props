@@ -17,8 +17,8 @@
   </ItemGroup>
   <ItemGroup Label="Architecture">
     <!-- Mediator pattern (lightweight alternative to MediatR) -->
-    <PackageVersion Include="Mediator.Abstractions" Version="3.0.1" />
-    <PackageVersion Include="Mediator.SourceGenerator" Version="3.0.1" />
+    <PackageVersion Include="Mediator.Abstractions" Version="3.0.2" />
+    <PackageVersion Include="Mediator.SourceGenerator" Version="3.0.2" />
     <!-- Dependency Injection extensions -->
     <PackageVersion Include="Scrutor" Version="7.0.0" />
     <!-- Pinned to avoid vulnerabilities in transitive 6.2.0 (via Scrutor) -->
@@ -28,33 +28,33 @@
     <!-- FluentValidation -->
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <!-- Mapster (mapping alternative to AutoMapper) -->
-    <PackageVersion Include="Mapster" Version="7.4.0" />
+    <PackageVersion Include="Mapster" Version="10.0.3" />
   </ItemGroup>
   <ItemGroup Label="Database - Entity Framework Core">
     <!-- EF Core -->
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.3" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.3" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.5" />
     <!-- PostgreSQL provider -->
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
   </ItemGroup>
   <ItemGroup Label="Storage - Cloudinary">
-    <PackageVersion Include="CloudinaryDotNet" Version="1.26.2" />
+    <PackageVersion Include="CloudinaryDotNet" Version="1.28.0" />
   </ItemGroup>
   <ItemGroup Label="Caching">
     <!-- Redis -->
-    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.5" />
   </ItemGroup>
   <ItemGroup Label="Communication - gRPC">
     <!-- gRPC Server (Library.API) -->
-    <PackageVersion Include="Grpc.AspNetCore" Version="2.60.0" />
+    <PackageVersion Include="Grpc.AspNetCore" Version="2.76.0" />
     <!-- gRPC Client (UserContent.API) -->
-    <PackageVersion Include="Grpc.Net.Client" Version="2.60.0" />
-    <PackageVersion Include="Grpc.Net.ClientFactory" Version="2.60.0" />
-    <PackageVersion Include="Grpc.Tools" Version="2.60.0" />
-    <PackageVersion Include="Google.Protobuf" Version="3.25.1" />
+    <PackageVersion Include="Grpc.Net.Client" Version="2.76.0" />
+    <PackageVersion Include="Grpc.Net.ClientFactory" Version="2.76.0" />
+    <PackageVersion Include="Grpc.Tools" Version="2.78.0" />
+    <PackageVersion Include="Google.Protobuf" Version="3.34.1" />
   </ItemGroup>
   <ItemGroup Label="Health Checks">
     <!-- Health checks for databases and caches -->
@@ -68,12 +68,12 @@
   </ItemGroup>
   <ItemGroup Label="Testing">
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.3" />
-    <PackageVersion Include="xunit" Version="2.9.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-    <PackageVersion Include="FluentAssertions" Version="8.2.0" />
+    <PackageVersion Include="xunit.v3" Version="3.2.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+    <PackageVersion Include="FluentAssertions" Version="8.9.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
-    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.4.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.11.0" />
   </ItemGroup>
   <!-- Future packages (commented out, add when needed) -->
   <!--

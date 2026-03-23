@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Library.Application.Albums.Commands.DeleteAlbums;
+using Library.Application.Services.Albums.Commands.DeleteAlbums;
 using Library.Application.Data;
 using Library.Application.Exceptions;
 using Library.ApplicationTests.Utils;

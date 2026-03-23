@@ -24,7 +24,12 @@ public class CreateAlbum : ICarterModule
         app.MapPost("/albums",
                 async (CreateAlbumRequest request, ISender sender) =>
                 {
-                    var result = await sender.Send(request.Adapt<CreateAlbumCommand>());
+                    var command = new CreateAlbumCommand(
+                        request.Album,
+                        request.CoverImage?.OpenReadStream(),
+                        request.CoverImage?.ContentType,
+                        request.CoverImage?.FileName);
+                    var result = await sender.Send(command);
                     return Results.Created($"/albums/{result.Id}", result.Adapt<CreateAlbumResponse>());
                 })
             .WithName("CreatedAlbum")

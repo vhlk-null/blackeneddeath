@@ -1,4 +1,4 @@
-namespace Library.Application.Genres.Commands.CreateGenre;
+namespace Library.Application.Services.Genres.Commands.CreateGenre;
 
 public class CreateGenreCommandHandler(ILibraryDbContext context)
     : BuildingBlocks.CQRS.ICommandHandler<CreateGenreCommand, CreateGenreResult>

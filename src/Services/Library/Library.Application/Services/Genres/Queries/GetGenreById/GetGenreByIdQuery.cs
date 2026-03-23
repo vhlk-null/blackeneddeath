@@ -1,4 +1,4 @@
-namespace Library.Application.Genres.Queries.GetGenreById;
+namespace Library.Application.Services.Genres.Queries.GetGenreById;
 
 public record GetGenreByIdQuery(Guid Id) : BuildingBlocks.CQRS.IQuery<GetGenreByIdResult>;
 

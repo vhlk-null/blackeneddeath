@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Library.Application.Data;
 using Library.Application.Exceptions;
-using Library.Application.Genres.Commands.DeleteGenre;
+using Library.Application.Services.Genres.Commands.DeleteGenre;
 using Library.ApplicationTests.Utils;
 using Library.Domain.Models;
 using Library.Domain.ValueObjects.Ids;

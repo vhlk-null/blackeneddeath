@@ -1,5 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using BuildingBlocks.Pagination;
 using FluentAssertions;
 using Library.API.Endpoints.Albums;
@@ -24,26 +26,26 @@ public class AlbumEndpointsTests(LibraryWebAppFactory factory) : IClassFixture<L
             .Setup(s => s.Send(It.IsAny<CreateAlbumCommand>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<CreateAlbumResult>(new CreateAlbumResult(albumId)));
 
-        var request = new
+        var albumJson = JsonSerializer.Serialize(new
         {
-            Album = new
-            {
-                Id = Guid.NewGuid(),
-                Title = "Symbolic",
-                ReleaseDate = 1995,
-                CoverUrl = (string?)null,
-                Type = 0,
-                Format = 0,
-                Label = "Roadrunner Records",
-                Bands = Array.Empty<object>(),
-                Countries = Array.Empty<object>(),
-                StreamingLinks = Array.Empty<object>(),
-                Tracks = Array.Empty<object>(),
-                Genres = Array.Empty<object>()
-            }
-        };
+            Id = Guid.NewGuid(),
+            Title = "Symbolic",
+            ReleaseDate = 1995,
+            CoverUrl = (string?)null,
+            Type = 0,
+            Format = 0,
+            Label = "Roadrunner Records",
+            Bands = Array.Empty<object>(),
+            Countries = Array.Empty<object>(),
+            StreamingLinks = Array.Empty<object>(),
+            Tracks = Array.Empty<object>(),
+            Genres = Array.Empty<object>()
+        });
 
-        var response = await _client.PostAsJsonAsync("/albums", request);
+        var form = new MultipartFormDataContent();
+        form.Add(new StringContent(albumJson, Encoding.UTF8, "application/json"), "album");
+
+        var response = await _client.PostAsync("/albums", form);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         var body = await response.Content.ReadFromJsonAsync<CreateAlbumResponse>();
