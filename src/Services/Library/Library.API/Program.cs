@@ -14,10 +14,7 @@ var app = builder.Build();
 app.UseApiServices();
 app.UseRouting();
 
-if (app.Environment.IsDevelopment())
-{
-    await app.InitializeDatabaseAsync();
-}
+await app.InitializeDatabaseAsync();
 
 app.Run();
 
