@@ -25,6 +25,7 @@ public class CreateGenre : ICarterModule
             .Produces<CreateGenreResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Create Genre")
-            .WithDescription("Create Genre");
+            .WithDescription("Create Genre")
+            .WithTags("Genres");
     }
 }

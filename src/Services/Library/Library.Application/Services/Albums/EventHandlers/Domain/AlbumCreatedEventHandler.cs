@@ -20,7 +20,7 @@ public sealed class AlbumCreatedEventHandler(
             ReleaseYear = domainEvent.Album.AlbumRelease.ReleaseYear,
             Format = (int)domainEvent.Album.AlbumRelease.Format,
             Type = (int)domainEvent.Album.Type,
-            Label = domainEvent.Album.LabelInfo?.Name
+            Label = null
         };
 
         await publishEndpoint.Publish(integrationEvent, cancellationToken);

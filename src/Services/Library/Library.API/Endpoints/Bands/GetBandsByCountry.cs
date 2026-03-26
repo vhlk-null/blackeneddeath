@@ -18,6 +18,7 @@ public class GetBandsByCountry : ICarterModule
             .Produces<GetBandsByCountryResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Bands By Country")
-            .WithDescription("Get Bands By Country");
+            .WithDescription("Get Bands By Country")
+            .WithTags("Bands");
     }
 }

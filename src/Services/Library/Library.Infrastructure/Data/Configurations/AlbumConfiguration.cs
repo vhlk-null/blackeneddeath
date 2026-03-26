@@ -45,11 +45,10 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
                 .HasColumnName("format");
         });
 
-        entity.ComplexProperty(e => e.LabelInfo!, li =>
-        {
-            li.IsRequired(false);
-            li.Property(l => l.Name).HasMaxLength(200).HasColumnName("label_name");
-        });
+        entity.Property(e => e.LabelId)
+            .HasConversion(labelId => labelId!.Value, dbId => LabelId.Of(dbId))
+            .HasColumnName("label_id")
+            .IsRequired(false);
 
         entity.Navigation(e => e.AlbumBands).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumGenres).UsePropertyAccessMode(PropertyAccessMode.Field);

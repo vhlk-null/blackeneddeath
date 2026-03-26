@@ -19,6 +19,7 @@ public class GetAlbumsByYear : ICarterModule
         .Produces<GetAlbumsByYearResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithSummary("Get Album by Release year")
-        .WithDescription("Get Album by Release year");
+        .WithDescription("Get Album by Release year")
+        .WithTags("Albums");
     }
 }

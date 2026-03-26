@@ -19,6 +19,7 @@ public class GetAlbumsByYearQueryHandler(ILibraryDbContext context, IStorageUrlR
         var genreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)).Distinct().ToList();
         var countryIds = albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)).Distinct().ToList();
         var trackIds = albums.SelectMany(a => a.AlbumTracks.Select(at => at.TrackId)).Distinct().ToList();
+        var labelIds = albums.Where(a => a.LabelId != null).Select(a => a.LabelId!).Distinct().ToList();
 
         var bands = await context.Bands.AsNoTracking()
             .Where(b => bandIds.Contains(b.Id))
@@ -36,8 +37,12 @@ public class GetAlbumsByYearQueryHandler(ILibraryDbContext context, IStorageUrlR
             .Where(t => trackIds.Contains(t.Id))
             .ToDictionaryAsync(t => t.Id, cancellationToken);
 
+        var labels = await context.Labels.AsNoTracking()
+            .Where(l => labelIds.Contains(l.Id))
+            .ToDictionaryAsync(l => l.Id, cancellationToken);
+
         var albumDtos = albums
-            .Select(a => a.ToAlbumDto(bands, genres, countries, tracks, urlResolver))
+            .Select(a => a.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels))
             .ToList();
 
         return new GetAlbumsByYearResult(albumDtos);

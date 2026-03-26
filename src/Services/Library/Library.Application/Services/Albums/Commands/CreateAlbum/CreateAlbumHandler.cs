@@ -54,14 +54,21 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
             if (!await context.Genres.AnyAsync(g => g.Id == genreId, cancellationToken))
                 throw new GenreNotFoundException(genre.Id);
         }
+
+        if (album.Label?.Id is Guid labelId && labelId != Guid.Empty)
+        {
+            var lid = LabelId.Of(labelId);
+            if (!await context.Labels.AnyAsync(l => l.Id == lid, cancellationToken))
+                throw new LabelNotFoundException(labelId);
+        }
     }
 
     private Album CreateNewAlbum(AlbumDto album)
     {
         var albumRelease = AlbumRelease.Of(album.ReleaseDate, album.Format);
-        var labelInfo = string.IsNullOrWhiteSpace(album.Label) ? null : LabelInfo.Of(album.Label);
+        var labelId = album.Label?.Id is Guid lid && lid != Guid.Empty ? LabelId.Of(lid) : null;
 
-        var newAlbum = Album.Create(album.Title, album.Type, albumRelease, album.CoverUrl, labelInfo);
+        var newAlbum = Album.Create(album.Title, album.Type, albumRelease, album.CoverUrl, labelId);
 
         foreach (var band in album.Bands)
         {

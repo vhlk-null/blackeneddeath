@@ -18,6 +18,7 @@ public class GetGenresByParent : ICarterModule
             .Produces<GetGenresByParentResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Genres By Parent")
-            .WithDescription("Get Genres By Parent");
+            .WithDescription("Get Genres By Parent")
+            .WithTags("Genres");
     }
 }

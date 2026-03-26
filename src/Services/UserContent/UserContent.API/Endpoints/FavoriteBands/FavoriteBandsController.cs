@@ -6,6 +6,7 @@ public record DeleteFavoriteBandResponse(bool IsSuccess);
 
 [ApiController]
 [Route("favoriteBands")]
+[Tags("Favorite Bands")]
 public class FavoriteBandsController(IUserContentService service) : ControllerBase
 {
     [HttpPost]

@@ -8,7 +8,7 @@ public record AlbumDto(
     string? CoverUrl,
     AlbumType Type,
     AlbumFormat Format,
-    string? Label,
+    LabelDto? Label,
     List<BandSummaryDto> Bands,
     List<CountryDto> Countries,
     List<StreamingLinkDto> StreamingLinks,

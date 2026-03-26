@@ -25,6 +25,7 @@ public class CreateBand : ICarterModule
             .Produces<CreateBandResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Create Band")
-            .WithDescription("Create Band");
+            .WithDescription("Create Band")
+            .WithTags("Bands");
     }
 }

@@ -34,7 +34,7 @@ public class AlbumEndpointsTests(LibraryWebAppFactory factory) : IClassFixture<L
             CoverUrl = (string?)null,
             Type = 0,
             Format = 0,
-            Label = "Roadrunner Records",
+            Label = (object?)null,
             Bands = Array.Empty<object>(),
             Countries = Array.Empty<object>(),
             StreamingLinks = Array.Empty<object>(),

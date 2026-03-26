@@ -15,6 +15,13 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context) : BuildingBloc
             .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
             ?? throw new AlbumNotFoundException(command.Album.Id);
 
+        if (command.Album.Label?.Id is Guid labelGuid && labelGuid != Guid.Empty)
+        {
+            var lid = LabelId.Of(labelGuid);
+            if (!await context.Labels.AnyAsync(l => l.Id == lid, cancellationToken))
+                throw new LabelNotFoundException(labelGuid);
+        }
+
         UpdateAlbum(album, command.Album);
 
         await context.SaveChangesAsync(cancellationToken);
@@ -25,9 +32,9 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context) : BuildingBloc
     private static void UpdateAlbum(Album album, AlbumDto dto)
     {
         var albumRelease = AlbumRelease.Of(dto.ReleaseDate, dto.Format);
-        var labelInfo = string.IsNullOrWhiteSpace(dto.Label) ? null : LabelInfo.Of(dto.Label);
+        var labelId = dto.Label?.Id is Guid lid && lid != Guid.Empty ? LabelId.Of(lid) : null;
 
-        album.Update(dto.Title, dto.Type, albumRelease, dto.CoverUrl, labelInfo);
+        album.Update(dto.Title, dto.Type, albumRelease, dto.CoverUrl, labelId);
 
         ReconcileBands(album, dto);
         ReconcileCountries(album, dto);

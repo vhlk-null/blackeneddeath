@@ -7,7 +7,7 @@ public class Album : Aggregate<AlbumId>
     public AlbumType Type { get; private set; }
     public AlbumRelease AlbumRelease { get; private set; } = null!;
     public string? CoverUrl { get; private set; }
-    public LabelInfo? LabelInfo { get; private set; }
+    public LabelId? LabelId { get; private set; }
     
     private readonly List<AlbumBand> _albumBands = [];
     private readonly List<AlbumGenre> _albumGenres = [];
@@ -23,7 +23,7 @@ public class Album : Aggregate<AlbumId>
 
     private Album() { }
 
-    public static Album Create(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelInfo? labelInfo, AlbumId? id = null)
+    public static Album Create(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelId? labelId, AlbumId? id = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentNullException.ThrowIfNull(albumRelease);
@@ -36,7 +36,7 @@ public class Album : Aggregate<AlbumId>
             Type = type,
             AlbumRelease = albumRelease,
             CoverUrl = coverUrl,
-            LabelInfo = labelInfo
+            LabelId = labelId
         };
 
         album.AddDomainEvent(new AlbumCreatedEvent(album));
@@ -49,7 +49,7 @@ public class Album : Aggregate<AlbumId>
         AddDomainEvent(new AlbumRemovedEvent(this));
     }
 
-    public Album Update(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelInfo? labelInfo)
+    public Album Update(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelId? labelId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentNullException.ThrowIfNull(albumRelease);
@@ -58,7 +58,7 @@ public class Album : Aggregate<AlbumId>
         Type = type;
         AlbumRelease = albumRelease;
         CoverUrl = coverUrl;
-        LabelInfo = labelInfo;
+        LabelId = labelId;
 
         AddDomainEvent(new AlbumUpdatedEvent(this));
 

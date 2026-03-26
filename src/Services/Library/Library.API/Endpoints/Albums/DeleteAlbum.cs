@@ -21,6 +21,7 @@ public class DeleteAlbum : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Delete Album")
-            .WithDescription("Delete Album");
+            .WithDescription("Delete Album")
+            .WithTags("Albums");
     }
 }

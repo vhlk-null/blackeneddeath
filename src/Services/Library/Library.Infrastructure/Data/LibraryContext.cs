@@ -18,6 +18,7 @@ public class LibraryContext : DbContext, ILibraryDbContext
     public virtual DbSet<Track> Tracks { get; set; }
     public virtual DbSet<Genre> Genres { get; set; }
     public virtual DbSet<Country> Countries { get; set; }
+    public virtual DbSet<Label> Labels { get; set; }
     public virtual DbSet<StreamingLink> StreamingLinks { get; set; }
 
     // Junction tables (Many-to-Many)

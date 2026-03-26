@@ -7,6 +7,7 @@
             services.ConfigureHttpJsonOptions(options =>
                 options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
+            services.AddOpenApi();
             services.AddMessageBroker(configuration);
             services.AddCarter();
             services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -22,6 +23,12 @@
 
         public static WebApplication UseApiServices(this WebApplication app)
         {
+            if (app.Environment.IsDevelopment())
+            {
+                app.MapOpenApi();
+                app.MapScalarApiReference();
+            }
+
             app.UseExceptionHandler();
             app.MapCarter();
             app.MapGrpcService<LibraryService>();

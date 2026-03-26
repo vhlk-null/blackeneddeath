@@ -15,6 +15,7 @@ public class YarpGatewayWebAppFactory : WebApplicationFactory<Program>
                 ["ReverseProxy:Clusters:library-cluster:Destinations:destination1:Address"] = "http://localhost:19999/",
                 ["ReverseProxy:Clusters:usercontent-cluster:Destinations:destination1:Address"] = "http://localhost:19998/",
                 ["RateLimiter:Window"] = "00:05:00",
+                ["RateLimiter:PermitLimit"] = "3",
             });
         });
 

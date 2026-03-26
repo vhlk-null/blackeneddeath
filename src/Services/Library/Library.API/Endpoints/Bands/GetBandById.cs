@@ -20,6 +20,7 @@ public class GetBandById : ICarterModule
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithSummary("Get Band By Id")
-        .WithDescription("Get Band By Id");
+        .WithDescription("Get Band By Id")
+        .WithTags("Bands");
     }
 }

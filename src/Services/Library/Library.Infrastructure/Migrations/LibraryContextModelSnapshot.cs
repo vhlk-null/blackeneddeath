@@ -18,7 +18,7 @@ namespace Library.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.3")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -38,6 +38,10 @@ namespace Library.Infrastructure.Migrations
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("LabelId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("label_id");
 
                     b.Property<DateTime?>("LastModifiedAt")
                         .HasColumnType("timestamp with time zone");
@@ -74,15 +78,6 @@ namespace Library.Infrastructure.Migrations
                             b1.Property<int>("ReleaseYear")
                                 .HasColumnType("integer")
                                 .HasColumnName("release_year");
-                        });
-
-                    b.ComplexProperty(typeof(Dictionary<string, object>), "LabelInfo", "Library.Domain.Models.Album.LabelInfo#LabelInfo", b1 =>
-                        {
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasMaxLength(200)
-                                .HasColumnType("character varying(200)")
-                                .HasColumnName("label_name");
                         });
 
                     b.HasKey("Id");
@@ -392,6 +387,39 @@ namespace Library.Infrastructure.Migrations
                     b.HasIndex("GenreId");
 
                     b.ToTable("band_genres", (string)null);
+                });
+
+            modelBuilder.Entity("Library.Domain.Models.Label", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_labels_name");
+
+                    b.ToTable("labels", (string)null);
                 });
 
             modelBuilder.Entity("Library.Domain.Models.StreamingLink", b =>

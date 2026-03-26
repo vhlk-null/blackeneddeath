@@ -16,6 +16,7 @@ public class GetBands : ICarterModule
             .Produces<GetBandsResult>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Bands")
-            .WithDescription("Get Bands");
+            .WithDescription("Get Bands")
+            .WithTags("Bands");
     }
 }

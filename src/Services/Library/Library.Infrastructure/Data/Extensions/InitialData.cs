@@ -7,6 +7,16 @@ namespace Library.Infrastructure.Data.Extensions;
 
 internal static class InitialData
 {
+    // ── Label IDs ──────────────────────────────────────────────────────────────
+    private static class LabelIds
+    {
+        public static readonly LabelId Peaceville         = LabelId.Of(Guid.Parse("1a000000-0000-0000-0000-000000000001"));
+        public static readonly LabelId Misanthropy         = LabelId.Of(Guid.Parse("1a000000-0000-0000-0000-000000000002"));
+        public static readonly LabelId Candlelight         = LabelId.Of(Guid.Parse("1a000000-0000-0000-0000-000000000003"));
+        public static readonly LabelId DeathlikeSilence    = LabelId.Of(Guid.Parse("1a000000-0000-0000-0000-000000000004"));
+        public static readonly LabelId NuclearBlast        = LabelId.Of(Guid.Parse("1a000000-0000-0000-0000-000000000005"));
+    }
+
     // ── Country IDs ────────────────────────────────────────────────────────────
     private static class CountryIds
     {
@@ -440,15 +450,24 @@ internal static class InitialData
 
     public static IReadOnlyList<Country> Countries =>
     [
-        new Country { Id = CountryIds.Norway,        Name = "Norway",         Code = "NO" },
-        new Country { Id = CountryIds.Sweden,        Name = "Sweden",         Code = "SE" },
-        new Country { Id = CountryIds.Finland,       Name = "Finland",        Code = "FI" },
-        new Country { Id = CountryIds.Poland,        Name = "Poland",         Code = "PL" },
-        new Country { Id = CountryIds.Ukraine,       Name = "Ukraine",        Code = "UA" },
-        new Country { Id = CountryIds.UnitedStates,  Name = "United States",  Code = "US" },
-        new Country { Id = CountryIds.UnitedKingdom, Name = "United Kingdom", Code = "GB" },
-        new Country { Id = CountryIds.Germany,       Name = "Germany",        Code = "DE" },
-        new Country { Id = CountryIds.France,        Name = "France",         Code = "FR" },
+        Country.Create(CountryIds.Norway,        "Norway",         "NO"),
+        Country.Create(CountryIds.Sweden,        "Sweden",         "SE"),
+        Country.Create(CountryIds.Finland,       "Finland",        "FI"),
+        Country.Create(CountryIds.Poland,        "Poland",         "PL"),
+        Country.Create(CountryIds.Ukraine,       "Ukraine",        "UA"),
+        Country.Create(CountryIds.UnitedStates,  "United States",  "US"),
+        Country.Create(CountryIds.UnitedKingdom, "United Kingdom", "GB"),
+        Country.Create(CountryIds.Germany,       "Germany",        "DE"),
+        Country.Create(CountryIds.France,        "France",         "FR"),
+    ];
+
+    public static IReadOnlyList<Label> Labels =>
+    [
+        Label.Create(LabelIds.Peaceville,      "Peaceville Records"),
+        Label.Create(LabelIds.Misanthropy,     "Misanthropy Records"),
+        Label.Create(LabelIds.Candlelight,     "Candlelight Records"),
+        Label.Create(LabelIds.DeathlikeSilence,"Deathlike Silence Productions"),
+        Label.Create(LabelIds.NuclearBlast,    "Nuclear Blast"),
     ];
 
     public static IReadOnlyList<Genre> Genres
@@ -921,7 +940,7 @@ internal static class InitialData
                 AlbumType.FullLength,
                 AlbumRelease.Of(1994, AlbumFormat.CD),
                 "Bound_By_Spells_pwiu6e",
-                LabelInfo.Of("Peaceville Records"),
+                LabelIds.Peaceville,
                 AlbumIds.TransilvanianHunger);
             transilvanianHunger.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:transilvanian-hunger-dummy");
             transilvanianHunger.AddStreamingLink(StreamingPlatform.Bandcamp, "https://darkthrone.bandcamp.com/album/transilvanian-hunger");
@@ -943,7 +962,7 @@ internal static class InitialData
                 AlbumType.FullLength,
                 AlbumRelease.Of(1996, AlbumFormat.CD),
                 "Desolate_Divine_yu1kin",
-                LabelInfo.Of("Misanthropy Records"),
+                LabelIds.Misanthropy,
                 AlbumIds.Filosofem);
             filosofem.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:filosofem-dummy");
             filosofem.AddStreamingLink(StreamingPlatform.YouTube, "https://www.youtube.com/playlist?list=filosofem-dummy");
@@ -961,7 +980,7 @@ internal static class InitialData
                 AlbumType.FullLength,
                 AlbumRelease.Of(1994, AlbumFormat.CD),
                 "Conduit_pe9plu",
-                LabelInfo.Of("Candlelight Records"),
+                LabelIds.Candlelight,
                 AlbumIds.NightsideEclipse);
             nightsideEclipse.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:nightside-eclipse-dummy");
             nightsideEclipse.AddStreamingLink(StreamingPlatform.Tidal, "https://tidal.com/album/nightside-eclipse-dummy");
@@ -983,7 +1002,7 @@ internal static class InitialData
                 AlbumType.FullLength,
                 AlbumRelease.Of(1994, AlbumFormat.CD),
                 "His_Best_Deceit_divtip",
-                LabelInfo.Of("Deathlike Silence Productions"),
+                LabelIds.DeathlikeSilence,
                 AlbumIds.DeMysteriis);
             deMysteriis.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:de-mysteriis-dummy");
             deMysteriis.AddStreamingLink(StreamingPlatform.Bandcamp, "https://mayhem.bandcamp.com/album/de-mysteriis-dom-sathanas");
@@ -1004,7 +1023,7 @@ internal static class InitialData
                 AlbumType.FullLength,
                 AlbumRelease.Of(1995, AlbumFormat.CD),
                 "Psychic_Secretions_c0bo9q",
-                LabelInfo.Of("Nuclear Blast"),
+                LabelIds.NuclearBlast,
                 AlbumIds.StormOfLightsBane);
             stormOfLightsBane.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:storm-of-lights-bane-dummy");
             stormOfLightsBane.AddStreamingLink(StreamingPlatform.AppleMusic, "https://music.apple.com/album/storm-of-lights-bane-dummy");
@@ -1026,7 +1045,7 @@ internal static class InitialData
                 AlbumType.FullLength,
                 AlbumRelease.Of(2014, AlbumFormat.CD),
                 "Bound_By_Spells_pwiu6e",
-                LabelInfo.Of("Nuclear Blast"),
+                LabelIds.NuclearBlast,
                 AlbumIds.TheSatanist);
             theSatanist.AddStreamingLink(StreamingPlatform.Spotify, "spotify:album:the-satanist-dummy");
             theSatanist.AddStreamingLink(StreamingPlatform.YouTube, "https://www.youtube.com/playlist?list=the-satanist-dummy");

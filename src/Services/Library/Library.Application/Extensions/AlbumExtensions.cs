@@ -8,7 +8,8 @@ public static class AlbumExtensions
         IReadOnlyDictionary<GenreId, Genre> genres,
         IReadOnlyDictionary<CountryId, Country> countries,
         IReadOnlyDictionary<TrackId, Track> tracks,
-        IStorageUrlResolver urlResolver) => new(
+        IStorageUrlResolver urlResolver,
+        IReadOnlyDictionary<LabelId, Label> labels) => new(
             album.Id.Value,
             album.Title,
             album.Slug,
@@ -16,7 +17,7 @@ public static class AlbumExtensions
             urlResolver.Resolve(album.CoverUrl),
             album.Type,
             album.AlbumRelease.Format,
-            album.LabelInfo?.Name,
+            album.LabelId != null && labels.TryGetValue(album.LabelId, out var label) ? label.ToLabelDto() : null,
             album.AlbumBands
                 .Select(ab => bands[ab.BandId])
                 .Select(b => new BandSummaryDto((Guid?)b.Id.Value, b.Name, b.Slug))

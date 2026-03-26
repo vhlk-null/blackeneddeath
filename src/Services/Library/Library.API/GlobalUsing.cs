@@ -28,3 +28,4 @@ global using Mapster;
 global using Mediator;
 global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 global using Microsoft.EntityFrameworkCore;
+global using Scalar.AspNetCore;

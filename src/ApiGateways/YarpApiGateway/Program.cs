@@ -21,9 +21,13 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
 
 builder.Services.AddCors(options =>
 {
-    var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()!;
+    var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
     options.AddDefaultPolicy(policy =>
-        policy.WithOrigins(origins)
+        policy.SetIsOriginAllowed(origin =>
+              {
+                  var uri = new Uri(origin);
+                  return uri.Host == "localhost" || origins.Contains(origin);
+              })
               .AllowAnyHeader()
               .AllowAnyMethod());
 });

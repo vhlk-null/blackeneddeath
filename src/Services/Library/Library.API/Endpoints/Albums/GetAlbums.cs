@@ -16,6 +16,7 @@ public class GetAlbums : ICarterModule
             .Produces<GetAlbumsResult>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Albums")
-            .WithDescription("Get Albums");
+            .WithDescription("Get Albums")
+            .WithTags("Albums");
     }
 }

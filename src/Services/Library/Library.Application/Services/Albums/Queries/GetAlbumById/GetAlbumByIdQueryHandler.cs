@@ -32,6 +32,12 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
             .Where(t => album.AlbumTracks.Select(at => at.TrackId).Contains(t.Id))
             .ToDictionaryAsync(t => t.Id, cancellationToken);
 
-        return new GetAlbumByIdResult(album.ToAlbumDto(bands, genres, countries, tracks, urlResolver));
+        var labels = album.LabelId != null
+            ? await context.Labels.AsNoTracking()
+                .Where(l => l.Id == album.LabelId)
+                .ToDictionaryAsync(l => l.Id, cancellationToken)
+            : new Dictionary<LabelId, Label>();
+
+        return new GetAlbumByIdResult(album.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels));
     }
 }

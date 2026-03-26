@@ -20,6 +20,7 @@ public class GetAlbumById : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Album by Id")
-            .WithDescription("Get Album by Id");
+            .WithDescription("Get Album by Id")
+            .WithTags("Albums");
     }
 }

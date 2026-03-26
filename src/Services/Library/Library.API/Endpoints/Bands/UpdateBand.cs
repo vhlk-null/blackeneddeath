@@ -24,6 +24,7 @@ public class UpdateBand : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Update Band")
-            .WithDescription("Update Band");
+            .WithDescription("Update Band")
+            .WithTags("Bands");
     }
 }

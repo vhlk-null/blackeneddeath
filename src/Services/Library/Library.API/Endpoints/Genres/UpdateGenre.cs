@@ -24,6 +24,7 @@ public class UpdateGenre : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Update Genre")
-            .WithDescription("Update Genre");
+            .WithDescription("Update Genre")
+            .WithTags("Genres");
     }
 }

@@ -7,6 +7,7 @@ public interface ILibraryDbContext
     DbSet<Track> Tracks { get; }
     DbSet<Genre> Genres { get; }
     DbSet<Country> Countries { get; }
+    DbSet<Label> Labels { get; }
     DbSet<StreamingLink> StreamingLinks { get; }
 
     DbSet<AlbumBand> AlbumBands { get; }

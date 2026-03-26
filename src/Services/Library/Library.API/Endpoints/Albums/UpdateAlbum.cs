@@ -22,6 +22,7 @@ public class UpdateAlbum : ICarterModule
             .Produces<UpdateAlbumResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Update Albums")
-            .WithDescription("Update Albums");
+            .WithDescription("Update Albums")
+            .WithTags("Albums");
     }
 }

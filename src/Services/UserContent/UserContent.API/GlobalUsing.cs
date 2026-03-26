@@ -3,6 +3,7 @@ global using BuildingBlocks.Exceptions;
 global using HealthChecks.UI.Client;
 global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 global using Microsoft.AspNetCore.Mvc;
+global using Scalar.AspNetCore;
 global using UserContent.API;
 global using UserContent.Application;
 global using UserContent.Application.Abstractions;

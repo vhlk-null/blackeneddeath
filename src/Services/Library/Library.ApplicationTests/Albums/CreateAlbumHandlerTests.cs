@@ -44,7 +44,7 @@ public class CreateAlbumHandlerTests
     {
         var command = new CreateAlbumCommand(new AlbumDto(
             Guid.NewGuid(), "Symbolic", null, 1995, null,
-            AlbumType.FullLength, AlbumFormat.CD, "Roadrunner Records",
+            AlbumType.FullLength, AlbumFormat.CD, null,
             [], [], [], [], []));
 
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -59,7 +59,7 @@ public class CreateAlbumHandlerTests
     {
         var command = new CreateAlbumCommand(new AlbumDto(
             Guid.NewGuid(), "Symbolic", null, 1995, null,
-            AlbumType.FullLength, AlbumFormat.CD, "Roadrunner Records",
+            AlbumType.FullLength, AlbumFormat.CD, null,
             [new BandSummaryDto(null, "Death", null)],
             [], [], [], []));
 
@@ -80,7 +80,7 @@ public class CreateAlbumHandlerTests
 
         var command = new CreateAlbumCommand(new AlbumDto(
             Guid.NewGuid(), "Symbolic", null, 1995, null,
-            AlbumType.FullLength, AlbumFormat.CD, "Roadrunner Records",
+            AlbumType.FullLength, AlbumFormat.CD, null,
             [], [], [], [],
             [new GenreDto(genreId, "Death Metal", null, true)]));
 

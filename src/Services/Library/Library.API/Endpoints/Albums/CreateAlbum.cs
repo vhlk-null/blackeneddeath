@@ -37,6 +37,7 @@ public class CreateAlbum : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Create Album")
             .WithDescription("Create Album")
+            .WithTags("Albums")
             .DisableAntiforgery();
     }
 }

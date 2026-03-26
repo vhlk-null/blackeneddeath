@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Json;
-using BuildingBlocks.Pagination;
 using FluentAssertions;
 using Library.API.Endpoints.Genres;
 using Library.Application.Dtos;
@@ -48,15 +47,14 @@ public class GenreEndpointsTests(LibraryWebAppFactory factory) : IClassFixture<L
     }
 
     [Fact]
-    public async Task GetGenres_Returns200WithPaginatedResult()
+    public async Task GetGenres_Returns200WithList()
     {
-        var appResult = new GetGenresResult(
-            new PaginatedResult<GenreDetailDto>(0, 10, 0, []));
+        var appResult = new GetGenresResult([]);
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<GetGenresQuery>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<GetGenresResult>(appResult));
 
-        var response = await _client.GetAsync("/genres?pageIndex=0&pageSize=10");
+        var response = await _client.GetAsync("/genres");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }

@@ -12,10 +12,6 @@ public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
             .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
             .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
 
-        RuleFor(x => x.Album.Label)
-            .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
-            .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
-
         RuleFor(x => x.Album.Countries)
             .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
             .WithMessage(ValidationMessages.MaxLengthIsExceeded);

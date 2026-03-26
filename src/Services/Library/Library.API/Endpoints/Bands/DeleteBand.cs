@@ -22,6 +22,7 @@ public class DeleteBand : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Delete Band")
-            .WithDescription("Delete Band");
+            .WithDescription("Delete Band")
+            .WithTags("Bands");
     }
 }

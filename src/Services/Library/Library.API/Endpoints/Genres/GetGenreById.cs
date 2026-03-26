@@ -20,6 +20,7 @@ public class GetGenreById : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Get Genre By Id")
-            .WithDescription("Get Genre By Id");
+            .WithDescription("Get Genre By Id")
+            .WithTags("Genres");
     }
 }

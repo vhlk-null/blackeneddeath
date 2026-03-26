@@ -2,6 +2,7 @@ namespace UserContent.API.Endpoints.UserProfile;
 
 [ApiController]
 [Route("profile")]
+[Tags("User Profile")]
 public class UserProfileController(IUserContentService service) : ControllerBase
 {
     [HttpGet("{userId:guid}")]

@@ -64,6 +64,7 @@ public static class DatabaseInitializerExtensions
 
     private static async Task SeedAsync(LibraryContext context, ILogger logger)
     {
+        await SeedLabelsAsync(context, logger);
         await SeedCountriesAsync(context, logger);
         await SeedGenresAsync(context, logger);
         await SeedTracksAsync(context, logger);
@@ -71,6 +72,15 @@ public static class DatabaseInitializerExtensions
         await SeedAlbumsAsync(context, logger);
         await SeedAlbumCoverUrlsAsync(context, logger);
         await SeedStreamingLinksAsync(context, logger);
+    }
+
+    private static async Task SeedLabelsAsync(LibraryContext context, ILogger logger)
+    {
+        if (await context.Labels.AnyAsync()) return;
+
+        logger.LogInformation("Seeding labels...");
+        await context.Labels.AddRangeAsync(InitialData.Labels);
+        await context.SaveChangesAsync();
     }
 
     private static async Task SeedCountriesAsync(LibraryContext context, ILogger logger)
