@@ -54,6 +54,7 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
         entity.Navigation(e => e.AlbumGenres).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumCountries).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumTracks).UsePropertyAccessMode(PropertyAccessMode.Field);
+        entity.Navigation(e => e.AlbumTags).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.StreamingLinks).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

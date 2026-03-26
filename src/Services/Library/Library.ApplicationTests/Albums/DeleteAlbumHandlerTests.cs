@@ -1,7 +1,7 @@
 using FluentAssertions;
-using Library.Application.Services.Albums.Commands.DeleteAlbums;
 using Library.Application.Data;
 using Library.Application.Exceptions;
+using Library.Application.Services.Albums.Commands.DeleteAlbums;
 using Library.ApplicationTests.Utils;
 using Library.Domain.Enums;
 using Library.Domain.Models;

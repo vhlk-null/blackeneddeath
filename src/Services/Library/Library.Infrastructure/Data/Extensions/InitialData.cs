@@ -17,6 +17,21 @@ internal static class InitialData
         public static readonly LabelId NuclearBlast        = LabelId.Of(Guid.Parse("1a000000-0000-0000-0000-000000000005"));
     }
 
+    // ── Tag IDs ────────────────────────────────────────────────────────────────
+    private static class TagIds
+    {
+        public static readonly TagId Atmospheric  = TagId.Of(Guid.Parse("7a000000-0000-0000-0000-000000000001"));
+        public static readonly TagId Raw          = TagId.Of(Guid.Parse("7a000000-0000-0000-0000-000000000002"));
+        public static readonly TagId Melancholic  = TagId.Of(Guid.Parse("7a000000-0000-0000-0000-000000000003"));
+        public static readonly TagId Epic         = TagId.Of(Guid.Parse("7a000000-0000-0000-0000-000000000004"));
+        public static readonly TagId Ambient      = TagId.Of(Guid.Parse("7a000000-0000-0000-0000-000000000005"));
+        public static readonly TagId Progressive  = TagId.Of(Guid.Parse("7a000000-0000-0000-0000-000000000006"));
+        public static readonly TagId OldSchool    = TagId.Of(Guid.Parse("7a000000-0000-0000-0000-000000000007"));
+        public static readonly TagId Instrumental = TagId.Of(Guid.Parse("7a000000-0000-0000-0000-000000000008"));
+        public static readonly TagId Experimental = TagId.Of(Guid.Parse("7a000000-0000-0000-0000-000000000009"));
+        public static readonly TagId Kvlt         = TagId.Of(Guid.Parse("7a000000-0000-0000-0000-00000000000a"));
+    }
+
     // ── Country IDs ────────────────────────────────────────────────────────────
     private static class CountryIds
     {
@@ -459,6 +474,20 @@ internal static class InitialData
         Country.Create(CountryIds.UnitedKingdom, "United Kingdom", "GB"),
         Country.Create(CountryIds.Germany,       "Germany",        "DE"),
         Country.Create(CountryIds.France,        "France",         "FR"),
+    ];
+
+    public static IReadOnlyList<Tag> Tags =>
+    [
+        Tag.Create(TagIds.Atmospheric,  "Atmospheric"),
+        Tag.Create(TagIds.Raw,          "Raw"),
+        Tag.Create(TagIds.Melancholic,  "Melancholic"),
+        Tag.Create(TagIds.Epic,         "Epic"),
+        Tag.Create(TagIds.Ambient,      "Ambient"),
+        Tag.Create(TagIds.Progressive,  "Progressive"),
+        Tag.Create(TagIds.OldSchool,    "Old School"),
+        Tag.Create(TagIds.Instrumental, "Instrumental"),
+        Tag.Create(TagIds.Experimental, "Experimental"),
+        Tag.Create(TagIds.Kvlt,         "Kvlt"),
     ];
 
     public static IReadOnlyList<Label> Labels =>

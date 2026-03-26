@@ -19,12 +19,14 @@ public class LibraryContext : DbContext, ILibraryDbContext
     public virtual DbSet<Genre> Genres { get; set; }
     public virtual DbSet<Country> Countries { get; set; }
     public virtual DbSet<Label> Labels { get; set; }
+    public virtual DbSet<Tag> Tags { get; set; }
     public virtual DbSet<StreamingLink> StreamingLinks { get; set; }
 
     // Junction tables (Many-to-Many)
     public virtual DbSet<AlbumBand> AlbumBands { get; set; }
     public virtual DbSet<AlbumGenre> AlbumGenres { get; set; }
     public virtual DbSet<AlbumTrack> AlbumTracks { get; set; }
+    public virtual DbSet<AlbumTag> AlbumTags { get; set; }
     public virtual DbSet<BandGenre> BandGenres { get; set; }
     public virtual DbSet<BandCountry> BandCountries { get; set; }
     public virtual DbSet<AlbumCountry> AlbumCountries { get; set; }

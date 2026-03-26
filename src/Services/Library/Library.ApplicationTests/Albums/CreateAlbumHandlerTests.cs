@@ -1,7 +1,7 @@
 using FluentAssertions;
-using Library.Application.Services.Albums.Commands.CreateAlbum;
 using Library.Application.Data;
 using Library.Application.Dtos;
+using Library.Application.Services.Albums.Commands.CreateAlbum;
 using Library.ApplicationTests.Utils;
 using Library.Domain.Enums;
 using Library.Domain.Models;

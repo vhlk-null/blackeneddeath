@@ -13,12 +13,14 @@ public class Album : Aggregate<AlbumId>
     private readonly List<AlbumGenre> _albumGenres = [];
     private readonly List<AlbumCountry> _albumCountries = [];
     private readonly List<AlbumTrack> _albumTracks = [];
+    private readonly List<AlbumTag> _albumTags = [];
     private readonly List<StreamingLink> _streamingLinks = [];
 
     public IReadOnlyList<AlbumBand> AlbumBands => _albumBands.AsReadOnly();
     public IReadOnlyList<AlbumGenre> AlbumGenres => _albumGenres.AsReadOnly();
     public IReadOnlyList<AlbumCountry> AlbumCountries => _albumCountries.AsReadOnly();
     public IReadOnlyList<AlbumTrack> AlbumTracks => _albumTracks.AsReadOnly();
+    public IReadOnlyList<AlbumTag> AlbumTags => _albumTags.AsReadOnly();
     public IReadOnlyList<StreamingLink> StreamingLinks => _streamingLinks.AsReadOnly();
 
     private Album() { }
@@ -131,6 +133,23 @@ public class Album : Aggregate<AlbumId>
             ?? throw new DomainException("Track is not associated with this album.");
 
         _albumTracks.Remove(entry);
+    }
+
+    public void AddTag(TagId tagId)
+    {
+        ArgumentNullException.ThrowIfNull(tagId);
+        if (_albumTags.Any(x => x.TagId == tagId))
+            throw new DomainException("Tag is already associated with this album.");
+
+        _albumTags.Add(new AlbumTag(Id, tagId));
+    }
+
+    public void RemoveTag(TagId tagId)
+    {
+        var entry = _albumTags.FirstOrDefault(x => x.TagId == tagId)
+            ?? throw new DomainException("Tag is not associated with this album.");
+
+        _albumTags.Remove(entry);
     }
 
     public void AddStreamingLink(StreamingPlatform platform, string embedCode)
