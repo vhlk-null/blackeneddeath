@@ -40,7 +40,7 @@ public class GenreConfiguration : IEntityTypeConfiguration<Genre>
         entity.HasOne<Genre>()
             .WithMany()
             .HasForeignKey(g => g.ParentGenreId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.SetNull);
 
         entity.HasIndex(g => g.Name).IsUnique();
         entity.HasIndex(g => g.ParentGenreId);
