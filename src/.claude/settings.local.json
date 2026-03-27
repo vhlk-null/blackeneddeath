@@ -44,7 +44,8 @@
       "Bash(tasklist /FI \"PID eq 11616\" /FO LIST)",
       "Bash(powershell \"Get-Process -Id 48112,11616 | Select-Object Id,ProcessName,Path\")",
       "Bash(grep -oP \"\\(?<=src\\\\\\\\\\).*?\\(?= \\\\[\\)\")",
-      "Bash(xargs sed:*)"
+      "Bash(xargs sed:*)",
+      "Bash(dotnet tool:*)"
     ],
     "deny": [],
     "ask": []

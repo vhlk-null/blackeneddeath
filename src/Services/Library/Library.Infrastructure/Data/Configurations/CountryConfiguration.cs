@@ -23,7 +23,6 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
             .HasColumnName("name");
 
         entity.Property(e => e.Code)
-            .IsRequired()
             .HasMaxLength(2)
             .HasColumnName("code");
 

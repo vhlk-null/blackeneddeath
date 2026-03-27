@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Countries.Commands.UpdateCountry;
 
-public record UpdateCountryCommand(Guid Id, string Name, string Code) : BuildingBlocks.CQRS.ICommand<UpdateCountryResult>;
+public record UpdateCountryCommand(Guid Id, string Name, string? Code) : BuildingBlocks.CQRS.ICommand<UpdateCountryResult>;
 
 public record UpdateCountryResult(bool IsSuccess);
 
@@ -15,7 +15,7 @@ public class UpdateCountryCommandValidator : AbstractValidator<UpdateCountryComm
             .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
 
         RuleFor(x => x.Code)
-            .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
-            .Length(2).WithMessage(ValidationMessages.InvalidFieldValue);
+            .Length(2).WithMessage(ValidationMessages.InvalidFieldValue)
+            .When(x => x.Code is not null);
     }
 }
