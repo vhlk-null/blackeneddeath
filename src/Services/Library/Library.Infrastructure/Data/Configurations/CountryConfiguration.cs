@@ -26,6 +26,7 @@ public class CountryConfiguration : IEntityTypeConfiguration<Country>
             .HasMaxLength(2)
             .HasColumnName("code");
 
-        entity.HasIndex(e => e.Code).IsUnique();
+        entity.HasIndex(e => e.Code)
+            .HasDatabaseName("ix_countries_code");
     }
 }
