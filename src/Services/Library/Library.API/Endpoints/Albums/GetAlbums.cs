@@ -5,9 +5,9 @@ public class GetAlbums : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/albums", async ([AsParameters] PaginationRequest paginationRequest, ISender sender) =>
+        app.MapGet("/albums", async ([AsParameters] PaginationRequest paginationRequest, ISender sender, AlbumSortBy sortBy = AlbumSortBy.Newest) =>
             {
-                var query = new GetAlbumsQuery(paginationRequest);
+                var query = new GetAlbumsQuery(paginationRequest, sortBy);
                 var result = await sender.Send(query);
                 var response = result.Adapt<GetAlbumsResult>();
                 return Results.Ok(response);

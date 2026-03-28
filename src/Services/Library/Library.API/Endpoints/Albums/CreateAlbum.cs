@@ -1,20 +1,9 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Library.API.Endpoints.Albums;
 
-public record CreateAlbumRequest(AlbumDto Album, IFormFile? CoverImage)
-{
-    public static async ValueTask<CreateAlbumRequest> BindAsync(HttpContext ctx)
-    {
-        var form = await ctx.Request.ReadFormAsync();
-        var album = JsonSerializer.Deserialize<AlbumDto>(form["album"].ToString(), new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        })!;
-        return new CreateAlbumRequest(album, form.Files["coverImage"]);
-    }
-}
-
+public record CreateAlbumRequest(string Album, IFormFile? CoverImage);
 public record CreateAlbumResponse(Guid Id);
 
 public class CreateAlbum : ICarterModule
@@ -22,10 +11,17 @@ public class CreateAlbum : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/albums",
-                async (CreateAlbumRequest request, ISender sender) =>
+                async ([FromForm] CreateAlbumRequest request, ISender sender) =>
                 {
+                    var albumDto = JsonSerializer.Deserialize<CreateAlbumDto>(request.Album,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true,
+                            Converters = { new JsonStringEnumConverter() }
+                        });
+
                     var command = new CreateAlbumCommand(
-                        request.Album,
+                        albumDto!,
                         request.CoverImage?.OpenReadStream(),
                         request.CoverImage?.ContentType,
                         request.CoverImage?.FileName);
@@ -33,6 +29,7 @@ public class CreateAlbum : ICarterModule
                     return Results.Created($"/albums/{result.Id}", result.Adapt<CreateAlbumResponse>());
                 })
             .WithName("CreatedAlbum")
+            .Accepts<CreateAlbumRequest>("multipart/form-data")
             .Produces<CreateAlbumResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Create Album")

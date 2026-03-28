@@ -10,13 +10,23 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
 
         var totalCount = await context.Albums.LongCountAsync(cancellationToken);
 
-        var albums = await context.Albums
+        var albumsQuery = context.Albums
             .AsNoTracking()
             .Include(a => a.AlbumBands)
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
             .Include(a => a.AlbumTracks)
-            .Include(a => a.StreamingLinks)
+            .Include(a => a.StreamingLinks);
+
+        var sorted = query.SortBy switch
+        {
+            AlbumSortBy.Oldest      => albumsQuery.OrderBy(a => a.CreatedAt),
+            AlbumSortBy.ReleaseDate => albumsQuery.OrderByDescending(a => a.AlbumRelease.ReleaseYear),
+            AlbumSortBy.Title       => albumsQuery.OrderBy(a => a.Title),
+            _                       => albumsQuery.OrderByDescending(a => a.CreatedAt)
+        };
+
+        var albums = await sorted
             .Skip(pageSize * pageIndex)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

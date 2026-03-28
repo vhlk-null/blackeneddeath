@@ -45,7 +45,8 @@
       "Bash(powershell \"Get-Process -Id 48112,11616 | Select-Object Id,ProcessName,Path\")",
       "Bash(grep -oP \"\\(?<=src\\\\\\\\\\).*?\\(?= \\\\[\\)\")",
       "Bash(xargs sed:*)",
-      "Bash(dotnet tool:*)"
+      "Bash(dotnet tool:*)",
+      "Bash(grep -v \"^$\")"
     ],
     "deny": [],
     "ask": []

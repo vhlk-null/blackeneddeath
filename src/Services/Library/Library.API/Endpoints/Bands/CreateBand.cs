@@ -1,9 +1,10 @@
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using Library.Application.Services.Bands.Commands.CreateBand;
 
 namespace Library.API.Endpoints.Bands;
 
-public record CreateBandRequest(BandDto Band);
-
+public record CreateBandRequest(string Band, IFormFile? Logo);
 public record CreateBandResponse(Guid Id);
 
 public class CreateBand : ICarterModule
@@ -11,21 +12,32 @@ public class CreateBand : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/bands",
-                async (CreateBandRequest request, ISender sender) =>
+                async ([FromForm] CreateBandRequest request, ISender sender) =>
                 {
-                    var command = request.Adapt<CreateBandCommand>();
+                    var bandDto = JsonSerializer.Deserialize<CreateBandDto>(request.Band,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true,
+                            Converters = { new JsonStringEnumConverter() }
+                        });
+
+                    var command = new CreateBandCommand(
+                        bandDto!,
+                        request.Logo?.OpenReadStream(),
+                        request.Logo?.ContentType,
+                        request.Logo?.FileName);
 
                     var result = await sender.Send(command);
 
-                    var response = result.Adapt<CreateBandResponse>();
-
-                    return Results.Created($"/bands/{response.Id}", response);
+                    return Results.Created($"/bands/{result.Id}", result.Adapt<CreateBandResponse>());
                 })
             .WithName("CreateBand")
+            .Accepts<CreateBandRequest>("multipart/form-data")
             .Produces<CreateBandResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Create Band")
             .WithDescription("Create Band")
-            .WithTags("Bands");
+            .WithTags("Bands")
+            .DisableAntiforgery();
     }
 }

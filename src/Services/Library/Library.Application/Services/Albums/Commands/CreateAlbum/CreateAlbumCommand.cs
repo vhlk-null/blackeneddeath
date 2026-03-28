@@ -1,6 +1,6 @@
 ﻿namespace Library.Application.Services.Albums.Commands.CreateAlbum;
 
-public record CreateAlbumCommand(AlbumDto Album, Stream? CoverImage = null, string? CoverImageContentType = null, string? CoverImageFileName = null) : BuildingBlocks.CQRS.ICommand<CreateAlbumResult>;
+public record CreateAlbumCommand(CreateAlbumDto Album, Stream? CoverImage = null, string? CoverImageContentType = null, string? CoverImageFileName = null) : BuildingBlocks.CQRS.ICommand<CreateAlbumResult>;
 
 public record CreateAlbumResult(Guid Id);
 
@@ -12,9 +12,8 @@ public class CreateAlbumCommandValidator : AbstractValidator<CreateAlbumCommand>
             .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
             .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
 
-        RuleFor(x => x.Album.Countries)
-            .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
-            .WithMessage(ValidationMessages.MaxLengthIsExceeded);
+        RuleFor(x => x.Album.CountryIds)
+            .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField);
 
         RuleFor(x => x.Album.ReleaseDate)
             .GreaterThan(0).WithMessage(ValidationMessages.ReleaseYearRequired)

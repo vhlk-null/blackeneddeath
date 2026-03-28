@@ -25,7 +25,7 @@ public class Album : Aggregate<AlbumId>
 
     private Album() { }
 
-    public static Album Create(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelId? labelId, AlbumId? id = null)
+    public static Album Create(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelId? labelId, AlbumId? id = null, string? slug = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentNullException.ThrowIfNull(albumRelease);
@@ -34,7 +34,7 @@ public class Album : Aggregate<AlbumId>
         {
             Id = id ?? AlbumId.Of(Guid.NewGuid()),
             Title = title,
-            Slug = SlugHelper.Generate(title),
+            Slug = slug ?? SlugHelper.Generate(title),
             Type = type,
             AlbumRelease = albumRelease,
             CoverUrl = coverUrl,

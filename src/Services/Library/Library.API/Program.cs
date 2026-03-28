@@ -1,6 +1,4 @@
-﻿using Library.API.Mappings;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddApplicationServices()

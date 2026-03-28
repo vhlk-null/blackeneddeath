@@ -1,4 +1,7 @@
-﻿namespace Library.Application.Services.Albums.Commands.CreateAlbum;
+using System.Text.RegularExpressions;
+using BuildingBlocks.Helpers;
+
+namespace Library.Application.Services.Albums.Commands.CreateAlbum;
 
 public class CreateAlbumHandler(ILibraryDbContext context, IStorageService storage) : BuildingBlocks.CQRS.ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
 {
@@ -9,20 +12,25 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
         string? coverKey = null;
         if (command.CoverImage is not null && command.CoverImageContentType is not null && command.CoverImageFileName is not null)
         {
+            var folder = $"albums/{Slugify(command.Album.Title)}";
             var extension = Path.GetExtension(command.CoverImageFileName);
-            coverKey = await storage.UploadFileAsync("album-images", $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
+            coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
         }
 
-        var album = CreateNewAlbum(command.Album with { CoverUrl = coverKey });
+        var slug = await GenerateUniqueSlugAsync(command.Album.Title, command.Album.ReleaseDate, cancellationToken);
+        var album = CreateNewAlbum(command.Album, coverKey, slug);
 
-        var tracks = command.Album.Tracks
-            .Select(t => Track.Create(TrackId.Of(Guid.NewGuid()), t.Title))
-            .ToList();
+        if (command.Album.Tracks is { Count: > 0 })
+        {
+            var tracks = command.Album.Tracks
+                .Select(t => Track.Create(TrackId.Of(Guid.NewGuid()), t.Title))
+                .ToList();
 
-        await context.Tracks.AddRangeAsync(tracks, cancellationToken);
+            await context.Tracks.AddRangeAsync(tracks, cancellationToken);
 
-        foreach (var (track, dto) in tracks.Zip(command.Album.Tracks))
-            album.AddTrack(track.Id, dto.TrackNumber);
+            foreach (var (track, dto) in tracks.Zip(command.Album.Tracks))
+                album.AddTrack(track.Id, dto.TrackNumber);
+        }
 
         context.Albums.Add(album);
         await context.SaveChangesAsync(cancellationToken);
@@ -30,65 +38,72 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
         return new CreateAlbumResult(album.Id.Value);
     }
 
-    private async Task ValidateReferencedEntitiesAsync(AlbumDto album, CancellationToken cancellationToken)
+    private async Task ValidateReferencedEntitiesAsync(CreateAlbumDto album, CancellationToken cancellationToken)
     {
-        foreach (var band in album.Bands)
+        foreach (var id in album.BandIds)
         {
-            if (!band.Id.HasValue || band.Id.Value == Guid.Empty) continue;
-
-            var bandId = BandId.Of(band.Id.Value);
-            if (!await context.Bands.AnyAsync(b => b.Id == bandId, cancellationToken))
-                throw new BandNotFoundException(band.Id.Value);
+            if (!await context.Bands.AnyAsync(b => b.Id == BandId.Of(id), cancellationToken))
+                throw new BandNotFoundException(id);
         }
 
-        foreach (var country in album.Countries)
+        foreach (var id in album.CountryIds)
         {
-            var countryId = CountryId.Of(country.Id);
-            if (!await context.Countries.AnyAsync(c => c.Id == countryId, cancellationToken))
-                throw new CountryNotFoundException(country.Id);
+            if (!await context.Countries.AnyAsync(c => c.Id == CountryId.Of(id), cancellationToken))
+                throw new CountryNotFoundException(id);
         }
 
-        foreach (var genre in album.Genres)
+        foreach (var id in album.GenreIds)
         {
-            var genreId = GenreId.Of(genre.Id);
-            if (!await context.Genres.AnyAsync(g => g.Id == genreId, cancellationToken))
-                throw new GenreNotFoundException(genre.Id);
+            if (!await context.Genres.AnyAsync(g => g.Id == GenreId.Of(id), cancellationToken))
+                throw new GenreNotFoundException(id);
         }
 
-        if (album.Label?.Id is Guid labelId && labelId != Guid.Empty)
+        if (album.LabelId is Guid labelId)
         {
-            var lid = LabelId.Of(labelId);
-            if (!await context.Labels.AnyAsync(l => l.Id == lid, cancellationToken))
+            if (!await context.Labels.AnyAsync(l => l.Id == LabelId.Of(labelId), cancellationToken))
                 throw new LabelNotFoundException(labelId);
+        }
+
+        foreach (var id in album.TagIds)
+        {
+            if (!await context.Tags.AnyAsync(t => t.Id == TagId.Of(id), cancellationToken))
+                throw new TagNotFoundException(id);
         }
     }
 
-    private Album CreateNewAlbum(AlbumDto album)
+    private async Task<string> GenerateUniqueSlugAsync(string title, int releaseYear, CancellationToken cancellationToken)
+    {
+        var baseSlug = $"{SlugHelper.Generate(title)}-{releaseYear}";
+        var slug = baseSlug;
+        var counter = 1;
+
+        while (await context.Albums.AnyAsync(a => a.Slug == slug, cancellationToken))
+            slug = $"{baseSlug}-{++counter}";
+
+        return slug;
+    }
+
+    private static string Slugify(string value) =>
+        Regex.Replace(value.ToLowerInvariant().Trim(), @"[^a-z0-9]+", "-").Trim('-');
+
+    private Album CreateNewAlbum(CreateAlbumDto album, string? coverKey, string slug)
     {
         var albumRelease = AlbumRelease.Of(album.ReleaseDate, album.Format);
-        var labelId = album.Label?.Id is Guid lid && lid != Guid.Empty ? LabelId.Of(lid) : null;
+        var labelId = album.LabelId is Guid lid ? LabelId.Of(lid) : null;
 
-        var newAlbum = Album.Create(album.Title, album.Type, albumRelease, album.CoverUrl, labelId);
+        var newAlbum = Album.Create(album.Title, album.Type, albumRelease, coverKey, labelId, slug: slug);
 
-        foreach (var band in album.Bands)
-        {
-            if (band.Id is not null && band.Id != Guid.Empty)
-            {
-                newAlbum.AddBand(BandId.Of(band.Id.Value));
-            }
-            else
-            {
-                var newBand = Band.Create(band.Name, null, null, BandActivity.Of(null, null), BandStatus.Unknown);
-                context.Bands.Add(newBand);
-                newAlbum.AddBand(newBand.Id);
-            }
-        }
+        foreach (var id in album.BandIds)
+            newAlbum.AddBand(BandId.Of(id));
 
-        foreach (var country in album.Countries)
-            newAlbum.AddCountry(CountryId.Of(country.Id));
+        foreach (var id in album.CountryIds)
+            newAlbum.AddCountry(CountryId.Of(id));
 
-        foreach (var genre in album.Genres)
-            newAlbum.AddGenre(GenreId.Of(genre.Id), isPrimary: genre.IsPrimary);
+        foreach (var id in album.GenreIds)
+            newAlbum.AddGenre(GenreId.Of(id), isPrimary: false);
+
+        foreach (var id in album.TagIds)
+            newAlbum.AddTag(TagId.Of(id));
 
         foreach (var link in album.StreamingLinks)
             newAlbum.AddStreamingLink(link.Platform, link.EmbedCode);
