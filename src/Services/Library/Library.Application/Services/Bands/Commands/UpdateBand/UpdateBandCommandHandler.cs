@@ -7,7 +7,7 @@ public class UpdateBandCommandHandler(ILibraryDbContext context) : BuildingBlock
         var band = await context.Bands
             .Include(b => b.BandCountries)
             .Include(b => b.BandGenres)
-            .FirstOrDefaultAsync(b => b.Id.Value == command.Band.Id, cancellationToken)
+            .FirstOrDefaultAsync(b => b.Id == BandId.Of(command.Band.Id), cancellationToken)
             ?? throw new BandNotFoundException(command.Band.Id);
 
         UpdateBand(band, command);
@@ -23,31 +23,38 @@ public class UpdateBandCommandHandler(ILibraryDbContext context) : BuildingBlock
 
         band.Update(command.Band.Name, command.Band.Bio, band.LogoUrl, activity, command.Band.Status);
 
-        ReconcileCountries(band, command.Band.Countries);
-        ReconcileGenres(band, command.Band.Genres);
+        ReconcileCountries(band, command.Band.CountryIds);
+        ReconcileGenres(band, command.Band.GenreId, command.Band.SubgenreIds);
     }
 
-    private static void ReconcileCountries(Band band, List<CountryDto> incomingCountries)
+    private static void ReconcileCountries(Band band, List<Guid> incomingIds)
     {
         var currentIds = band.BandCountries.Select(x => x.CountryId).ToHashSet();
-        var incomingIds = incomingCountries.Select(x => CountryId.Of(x.Id)).ToHashSet();
+        var incoming = incomingIds.Select(CountryId.Of).ToHashSet();
 
-        foreach (var id in currentIds.Except(incomingIds))
+        foreach (var id in currentIds.Except(incoming))
             band.RemoveCountry(id);
 
-        foreach (var id in incomingIds.Except(currentIds))
+        foreach (var id in incoming.Except(currentIds))
             band.AddCountry(id);
     }
 
-    private static void ReconcileGenres(Band band, List<GenreDto> incomingGenres)
+    private static void ReconcileGenres(Band band, Guid? genreId, List<Guid>? subgenreIds)
     {
         var currentIds = band.BandGenres.Select(x => x.GenreId).ToHashSet();
-        var incomingIds = incomingGenres.Select(x => GenreId.Of(x.Id)).ToHashSet();
 
-        foreach (var id in currentIds.Except(incomingIds))
+        var incomingPrimary = genreId is Guid pid ? GenreId.Of(pid) : null;
+        var incomingSubs = (subgenreIds ?? []).Select(GenreId.Of).ToHashSet();
+        var allIncoming = incomingSubs.ToHashSet();
+        if (incomingPrimary != null) allIncoming.Add(incomingPrimary);
+
+        foreach (var id in currentIds.Except(allIncoming))
             band.RemoveGenre(id);
 
-        foreach (var genre in incomingGenres.Where(g => !currentIds.Contains(GenreId.Of(g.Id))))
-            band.AddGenre(GenreId.Of(genre.Id), genre.IsPrimary);
+        if (incomingPrimary != null && !currentIds.Contains(incomingPrimary))
+            band.AddGenre(incomingPrimary, isPrimary: true);
+
+        foreach (var id in incomingSubs.Where(id => !currentIds.Contains(id)))
+            band.AddGenre(id, isPrimary: false);
     }
 }

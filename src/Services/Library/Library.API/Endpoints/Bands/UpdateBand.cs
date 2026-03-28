@@ -2,22 +2,20 @@ using Library.Application.Services.Bands.Commands.UpdateBand;
 
 namespace Library.API.Endpoints.Bands;
 
-public record UpdateBandRequest(BandDto Band);
-
 public record UpdateBandResponse(bool IsSuccess);
 
 public class UpdateBand : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/bands/{id:guid}",
-                async (Guid id, UpdateBandRequest request, ISender sender) =>
+        app.MapPut("/bands",
+                async (UpdateBandDto request, ISender sender) =>
                 {
-                    var command = request.Adapt<UpdateBandCommand>();
+                    var command = new UpdateBandCommand(request);
 
                     var result = await sender.Send(command);
 
-                    return Results.Ok(result.Adapt<UpdateBandResponse>());
+                    return Results.Ok(new UpdateBandResponse(result.IsSuccess));
                 })
             .WithName("UpdateBand")
             .Produces<UpdateBandResponse>(StatusCodes.Status200OK)

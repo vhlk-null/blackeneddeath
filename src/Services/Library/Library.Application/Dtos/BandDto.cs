@@ -11,4 +11,5 @@ public record BandDto(
     BandStatus Status,
     List<CountryDto> Countries,
     List<AlbumSummaryDto> Albums,
-    List<GenreDto> Genres);
+    GenreDto? ParentGenre,
+    List<GenreDto> Subgenres);

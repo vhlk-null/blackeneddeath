@@ -1,6 +1,7 @@
 namespace Library.Application.Dtos;
 
-public record CreateBandDto(
+public record UpdateBandDto(
+    Guid Id,
     string Name,
     string? Bio,
     int? FormedYear,

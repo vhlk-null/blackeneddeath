@@ -32,7 +32,10 @@ public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService
         foreach (var id in command.Band.CountryIds)
             band.AddCountry(CountryId.Of(id));
 
-        foreach (var id in command.Band.GenreIds)
+        if (command.Band.GenreId is Guid primaryGenreId)
+            band.AddGenre(GenreId.Of(primaryGenreId), isPrimary: true);
+
+        foreach (var id in command.Band.SubgenreIds ?? [])
             band.AddGenre(GenreId.Of(id), isPrimary: false);
 
         return band;
