@@ -1,6 +1,7 @@
 namespace Library.Application.Dtos;
 
-public record CreateAlbumDto(
+public record UpdateAlbumDto(
+    Guid Id,
     string Title,
     int ReleaseDate,
     AlbumType Type,
@@ -12,5 +13,3 @@ public record CreateAlbumDto(
     List<Guid> TagIds,
     List<StreamingLinkDto> StreamingLinks,
     List<TrackInputDto>? Tracks);
-
-public record TrackInputDto(string Title, int TrackNumber);

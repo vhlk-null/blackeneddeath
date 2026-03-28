@@ -3,7 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Library.API.Endpoints.Albums;
 
-public record CreateAlbumRequest(string Album, IFormFile? CoverImage);
+public record CreateAlbumRequest
+{
+    public string Album { get; init; } = string.Empty;
+    public IFormFile? CoverImage { get; init; }
+}
 public record CreateAlbumResponse(Guid Id);
 
 public class CreateAlbum : ICarterModule
@@ -20,8 +24,11 @@ public class CreateAlbum : ICarterModule
                             Converters = { new JsonStringEnumConverter() }
                         });
 
+                    if (albumDto is null)
+                        return Results.Problem("Could not deserialize album data.", instance: "/albums", statusCode: StatusCodes.Status400BadRequest);
+
                     var command = new CreateAlbumCommand(
-                        albumDto!,
+                        albumDto,
                         request.CoverImage?.OpenReadStream(),
                         request.CoverImage?.ContentType,
                         request.CoverImage?.FileName);

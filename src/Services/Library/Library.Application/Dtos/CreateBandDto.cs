@@ -7,6 +7,4 @@ public record CreateBandDto(
     int? DisbandedYear,
     BandStatus Status,
     List<Guid> CountryIds,
-    List<BandGenreInputDto> Genres);
-
-public record BandGenreInputDto(Guid Id, bool IsPrimary);
+    List<Guid> GenreIds);

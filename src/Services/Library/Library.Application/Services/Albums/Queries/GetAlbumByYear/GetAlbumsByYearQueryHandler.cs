@@ -11,6 +11,7 @@ public class GetAlbumsByYearQueryHandler(ILibraryDbContext context, IStorageUrlR
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
             .Include(a => a.AlbumTracks)
+            .Include(a => a.AlbumTags)
             .Include(a => a.StreamingLinks)
             .Where(a => a.AlbumRelease.ReleaseYear == query.ReleaseDate)
             .ToListAsync(cancellationToken);
@@ -20,6 +21,7 @@ public class GetAlbumsByYearQueryHandler(ILibraryDbContext context, IStorageUrlR
         var countryIds = albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)).Distinct().ToList();
         var trackIds = albums.SelectMany(a => a.AlbumTracks.Select(at => at.TrackId)).Distinct().ToList();
         var labelIds = albums.Where(a => a.LabelId != null).Select(a => a.LabelId!).Distinct().ToList();
+        var tagIds = albums.SelectMany(a => a.AlbumTags.Select(at => at.TagId)).Distinct().ToList();
 
         var bands = await context.Bands.AsNoTracking()
             .Where(b => bandIds.Contains(b.Id))
@@ -41,8 +43,14 @@ public class GetAlbumsByYearQueryHandler(ILibraryDbContext context, IStorageUrlR
             .Where(l => labelIds.Contains(l.Id))
             .ToDictionaryAsync(l => l.Id, cancellationToken);
 
+        var tags = tagIds.Count > 0
+            ? await context.Tags.AsNoTracking()
+                .Where(t => tagIds.Contains(t.Id))
+                .ToDictionaryAsync(t => t.Id, cancellationToken)
+            : new Dictionary<TagId, Tag>();
+
         var albumDtos = albums
-            .Select(a => a.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels))
+            .Select(a => a.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels, tags))
             .ToList();
 
         return new GetAlbumsByYearResult(albumDtos);

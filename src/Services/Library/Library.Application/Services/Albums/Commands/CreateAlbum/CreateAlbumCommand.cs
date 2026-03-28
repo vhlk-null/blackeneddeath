@@ -8,16 +8,21 @@ public class CreateAlbumCommandValidator : AbstractValidator<CreateAlbumCommand>
 {
     public CreateAlbumCommandValidator()
     {
-        RuleFor(x => x.Album.Title)
-            .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
-            .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
+        RuleFor(x => x.Album).NotNull();
 
-        RuleFor(x => x.Album.CountryIds)
-            .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField);
+        When(x => x.Album is not null, () =>
+        {
+            RuleFor(x => x.Album.Title)
+                .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField)
+                .MaximumLength(200).WithMessage(ValidationMessages.MaxLengthIsExceeded);
 
-        RuleFor(x => x.Album.ReleaseDate)
-            .GreaterThan(0).WithMessage(ValidationMessages.ReleaseYearRequired)
-            .GreaterThan(1900).WithMessage(ValidationMessages.ReleaseYearTooOld)
-            .LessThanOrEqualTo(DateTime.UtcNow.Year).WithMessage(ValidationMessages.ReleaseYearInFuture);
+            RuleFor(x => x.Album.CountryIds)
+                .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField);
+
+            RuleFor(x => x.Album.ReleaseDate)
+                .GreaterThan(0).WithMessage(ValidationMessages.ReleaseYearRequired)
+                .GreaterThan(1900).WithMessage(ValidationMessages.ReleaseYearTooOld)
+                .LessThanOrEqualTo(DateTime.UtcNow.Year).WithMessage(ValidationMessages.ReleaseYearInFuture);
+        });
     }
 }

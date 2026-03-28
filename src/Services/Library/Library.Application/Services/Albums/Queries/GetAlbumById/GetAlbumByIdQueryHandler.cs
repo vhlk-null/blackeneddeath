@@ -12,6 +12,7 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
             .Include(a => a.AlbumTracks)
+            .Include(a => a.AlbumTags)
             .Include(a => a.StreamingLinks)
             .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
             ?? throw new AlbumNotFoundException(query.Id);
@@ -38,6 +39,13 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
                 .ToDictionaryAsync(l => l.Id, cancellationToken)
             : new Dictionary<LabelId, Label>();
 
-        return new GetAlbumByIdResult(album.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels));
+        var tagIds = album.AlbumTags.Select(at => at.TagId).ToList();
+        var tags = tagIds.Count > 0
+            ? await context.Tags.AsNoTracking()
+                .Where(t => tagIds.Contains(t.Id))
+                .ToDictionaryAsync(t => t.Id, cancellationToken)
+            : new Dictionary<TagId, Tag>();
+
+        return new GetAlbumByIdResult(album.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels, tags));
     }
 }

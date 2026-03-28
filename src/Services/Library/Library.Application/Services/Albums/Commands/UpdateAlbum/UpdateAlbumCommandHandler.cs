@@ -12,44 +12,37 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context) : BuildingBloc
             .Include(a => a.AlbumCountries)
             .Include(a => a.StreamingLinks)
             .Include(a => a.AlbumTracks)
+            .Include(a => a.AlbumTags)
             .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
             ?? throw new AlbumNotFoundException(command.Album.Id);
 
-        if (command.Album.Label?.Id is Guid labelGuid && labelGuid != Guid.Empty)
+        if (command.Album.LabelIds is { Count: > 0 })
         {
-            var lid = LabelId.Of(labelGuid);
-            if (!await context.Labels.AnyAsync(l => l.Id == lid, cancellationToken))
+            var labelGuid = command.Album.LabelIds[0];
+            if (!await context.Labels.AnyAsync(l => l.Id == LabelId.Of(labelGuid), cancellationToken))
                 throw new LabelNotFoundException(labelGuid);
         }
 
-        UpdateAlbum(album, command.Album);
+        var albumRelease = AlbumRelease.Of(command.Album.ReleaseDate, command.Album.Format);
+        var labelId = command.Album.LabelIds is { Count: > 0 } ? LabelId.Of(command.Album.LabelIds[0]) : null;
+
+        album.Update(command.Album.Title, command.Album.Type, albumRelease, album.CoverUrl, labelId);
+
+        ReconcileBands(album, command.Album);
+        ReconcileCountries(album, command.Album);
+        ReconcileGenres(album, command.Album);
+        ReconcileTags(album, command.Album);
+        ReconcileStreamingLinks(album, command.Album);
 
         await context.SaveChangesAsync(cancellationToken);
 
         return new UpdateAlbumResult(true);
     }
 
-    private static void UpdateAlbum(Album album, AlbumDto dto)
-    {
-        var albumRelease = AlbumRelease.Of(dto.ReleaseDate, dto.Format);
-        var labelId = dto.Label?.Id is Guid lid && lid != Guid.Empty ? LabelId.Of(lid) : null;
-
-        album.Update(dto.Title, dto.Type, albumRelease, dto.CoverUrl, labelId);
-
-        ReconcileBands(album, dto);
-        ReconcileCountries(album, dto);
-        ReconcileGenres(album, dto);
-        ReconcileStreamingLinks(album, dto);
-        ReconcileTracks(album, dto);
-    }
-
-    private static void ReconcileBands(Album album, AlbumDto dto)
+    private static void ReconcileBands(Album album, UpdateAlbumDto dto)
     {
         var currentIds = album.AlbumBands.Select(x => x.BandId).ToHashSet();
-        var incomingIds = dto.Bands
-            .Where(x => x.Id.HasValue && x.Id.Value != Guid.Empty)
-            .Select(x => BandId.Of(x.Id!.Value))
-            .ToHashSet();
+        var incomingIds = dto.BandIds.Select(BandId.Of).ToHashSet();
 
         foreach (var id in currentIds.Except(incomingIds))
             album.RemoveBand(id);
@@ -58,10 +51,10 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context) : BuildingBloc
             album.AddBand(id);
     }
 
-    private static void ReconcileCountries(Album album, AlbumDto dto)
+    private static void ReconcileCountries(Album album, UpdateAlbumDto dto)
     {
         var currentIds = album.AlbumCountries.Select(x => x.CountryId).ToHashSet();
-        var incomingIds = dto.Countries.Select(x => CountryId.Of(x.Id)).ToHashSet();
+        var incomingIds = dto.CountryIds.Select(CountryId.Of).ToHashSet();
 
         foreach (var id in currentIds.Except(incomingIds))
             album.RemoveCountry(id);
@@ -70,19 +63,31 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context) : BuildingBloc
             album.AddCountry(id);
     }
 
-    private static void ReconcileGenres(Album album, AlbumDto dto)
+    private static void ReconcileGenres(Album album, UpdateAlbumDto dto)
     {
         var currentIds = album.AlbumGenres.Select(x => x.GenreId).ToHashSet();
-        var incomingIds = dto.Genres.Select(x => GenreId.Of(x.Id)).ToHashSet();
+        var incomingIds = dto.GenreIds.Select(GenreId.Of).ToHashSet();
 
         foreach (var id in currentIds.Except(incomingIds))
             album.RemoveGenre(id);
 
-        foreach (var genre in dto.Genres.Where(g => !currentIds.Contains(GenreId.Of(g.Id))))
-            album.AddGenre(GenreId.Of(genre.Id), genre.IsPrimary);
+        foreach (var id in incomingIds.Except(currentIds))
+            album.AddGenre(id, isPrimary: false);
     }
 
-    private static void ReconcileStreamingLinks(Album album, AlbumDto dto)
+    private static void ReconcileTags(Album album, UpdateAlbumDto dto)
+    {
+        var currentIds = album.AlbumTags.Select(x => x.TagId).ToHashSet();
+        var incomingIds = dto.TagIds.Select(TagId.Of).ToHashSet();
+
+        foreach (var id in currentIds.Except(incomingIds))
+            album.RemoveTag(id);
+
+        foreach (var id in incomingIds.Except(currentIds))
+            album.AddTag(id);
+    }
+
+    private static void ReconcileStreamingLinks(Album album, UpdateAlbumDto dto)
     {
         var currentPlatforms = album.StreamingLinks.Select(x => x.Platform).ToHashSet();
         var incomingPlatforms = dto.StreamingLinks.Select(x => x.Platform).ToHashSet();
@@ -92,17 +97,5 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context) : BuildingBloc
 
         foreach (var link in dto.StreamingLinks.Where(l => !currentPlatforms.Contains(l.Platform)))
             album.AddStreamingLink(link.Platform, link.EmbedCode);
-    }
-
-    private static void ReconcileTracks(Album album, AlbumDto dto)
-    {
-        var currentIds = album.AlbumTracks.Select(x => x.TrackId).ToHashSet();
-        var incomingIds = dto.Tracks.Select(x => TrackId.Of(x.Id)).ToHashSet();
-
-        foreach (var id in currentIds.Except(incomingIds))
-            album.RemoveTrack(id);
-
-        foreach (var track in dto.Tracks.Where(t => !currentIds.Contains(TrackId.Of(t.Id))))
-            album.AddTrack(TrackId.Of(track.Id), track.TrackNumber);
     }
 }

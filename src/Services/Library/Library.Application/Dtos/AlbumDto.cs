@@ -13,4 +13,5 @@ public record AlbumDto(
     List<CountryDto> Countries,
     List<StreamingLinkDto> StreamingLinks,
     List<TrackDto> Tracks,
-    List<GenreDto> Genres);
+    List<GenreDto> Genres,
+    List<TagDto> Tags);

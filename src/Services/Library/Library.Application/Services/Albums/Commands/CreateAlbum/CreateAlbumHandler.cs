@@ -58,8 +58,9 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
                 throw new GenreNotFoundException(id);
         }
 
-        if (album.LabelId is Guid labelId)
+        if (album.LabelIds is { Count: > 0 })
         {
+            var labelId = album.LabelIds[0];
             if (!await context.Labels.AnyAsync(l => l.Id == LabelId.Of(labelId), cancellationToken))
                 throw new LabelNotFoundException(labelId);
         }
@@ -89,7 +90,7 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
     private Album CreateNewAlbum(CreateAlbumDto album, string? coverKey, string slug)
     {
         var albumRelease = AlbumRelease.Of(album.ReleaseDate, album.Format);
-        var labelId = album.LabelId is Guid lid ? LabelId.Of(lid) : null;
+        var labelId = album.LabelIds is { Count: > 0 } ? LabelId.Of(album.LabelIds[0]) : null;
 
         var newAlbum = Album.Create(album.Title, album.Type, albumRelease, coverKey, labelId, slug: slug);
 

@@ -10,10 +10,20 @@ public class GetBandsQueryHandler(ILibraryDbContext context, IStorageUrlResolver
 
         var totalCount = await context.Bands.LongCountAsync(cancellationToken);
 
-        var bands = await context.Bands
+        var bandsQuery = context.Bands
             .AsNoTracking()
             .Include(b => b.BandCountries)
-            .Include(b => b.BandGenres)
+            .Include(b => b.BandGenres);
+
+        var sorted = query.SortBy switch
+        {
+            BandSortBy.Oldest     => bandsQuery.OrderBy(b => b.CreatedAt),
+            BandSortBy.Name       => bandsQuery.OrderBy(b => b.Name),
+            BandSortBy.FormedYear => bandsQuery.OrderByDescending(b => b.Activity.FormedYear),
+            _                     => bandsQuery.OrderByDescending(b => b.CreatedAt)
+        };
+
+        var bands = await sorted
             .Skip(pageSize * pageIndex)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

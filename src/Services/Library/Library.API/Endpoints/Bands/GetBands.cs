@@ -5,9 +5,9 @@ public class GetBands : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/bands", async ([AsParameters] PaginationRequest paginationRequest, ISender sender) =>
+        app.MapGet("/bands", async ([AsParameters] PaginationRequest paginationRequest, ISender sender, BandSortBy sortBy = BandSortBy.Newest) =>
             {
-                var query = new GetBandsQuery(paginationRequest);
+                var query = new GetBandsQuery(paginationRequest, sortBy);
                 var result = await sender.Send(query);
                 var response = result.Adapt<GetBandsResult>();
                 return Results.Ok(response);

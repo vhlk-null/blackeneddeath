@@ -9,7 +9,8 @@ public static class AlbumExtensions
         IReadOnlyDictionary<CountryId, Country> countries,
         IReadOnlyDictionary<TrackId, Track> tracks,
         IStorageUrlResolver urlResolver,
-        IReadOnlyDictionary<LabelId, Label> labels) => new(
+        IReadOnlyDictionary<LabelId, Label> labels,
+        IReadOnlyDictionary<TagId, Tag> tags) => new(
             album.Id.Value,
             album.Title,
             album.Slug,
@@ -35,6 +36,10 @@ public static class AlbumExtensions
                 .ToList(),
             album.AlbumGenres
                 .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
+                .ToList(),
+            album.AlbumTags
+                .Where(at => tags.ContainsKey(at.TagId))
+                .Select(at => new TagDto(tags[at.TagId].Id.Value, tags[at.TagId].Name))
                 .ToList()
         );
 }

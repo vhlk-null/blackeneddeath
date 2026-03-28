@@ -4,7 +4,11 @@ using Library.Application.Services.Bands.Commands.CreateBand;
 
 namespace Library.API.Endpoints.Bands;
 
-public record CreateBandRequest(string Band, IFormFile? Logo);
+public record CreateBandRequest
+{
+    public string Band { get; init; } = string.Empty;
+    public IFormFile? Logo { get; init; }
+}
 public record CreateBandResponse(Guid Id);
 
 public class CreateBand : ICarterModule
