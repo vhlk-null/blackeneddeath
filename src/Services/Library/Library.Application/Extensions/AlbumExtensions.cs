@@ -10,7 +10,8 @@ public static class AlbumExtensions
         IReadOnlyDictionary<TrackId, Track> tracks,
         IStorageUrlResolver urlResolver,
         IReadOnlyDictionary<LabelId, Label> labels,
-        IReadOnlyDictionary<TagId, Tag> tags) => new(
+        IReadOnlyDictionary<TagId, Tag> tags,
+        ILookup<BandId, Album> discographyByBand) => new(
             album.Id.Value,
             album.Title,
             album.Slug,
@@ -21,7 +22,20 @@ public static class AlbumExtensions
             album.LabelId != null && labels.TryGetValue(album.LabelId, out var label) ? label.ToLabelDto() : null,
             album.AlbumBands
                 .Select(ab => bands[ab.BandId])
-                .Select(b => new BandSummaryDto((Guid?)b.Id.Value, b.Name, b.Slug))
+                .Select(b => new BandSummaryDto(
+                    b.Id.Value,
+                    b.Name,
+                    b.Slug,
+                    discographyByBand[b.Id]
+                        .OrderBy(a => a.AlbumRelease.ReleaseYear)
+                        .Select(a => new AlbumSummaryDto(
+                            a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear,
+                            urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
+                            a.AlbumGenres
+                                .Where(ag => genres.ContainsKey(ag.GenreId))
+                                .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
+                                .ToList()))
+                        .ToList()))
                 .ToList(),
             album.AlbumCountries
                 .Select(ac => countries[ac.CountryId])

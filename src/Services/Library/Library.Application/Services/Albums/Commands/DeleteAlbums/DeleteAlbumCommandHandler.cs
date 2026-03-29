@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Albums.Commands.DeleteAlbums;
 
-public class DeleteAlbumCommandHandler(ILibraryDbContext context)
+public class DeleteAlbumCommandHandler(ILibraryDbContext context, IStorageService storage)
     : BuildingBlocks.CQRS.ICommandHandler<DeleteAlbumCommand, DeleteAlbumResult>
 {
     public async ValueTask<DeleteAlbumResult> Handle(
@@ -9,6 +9,9 @@ public class DeleteAlbumCommandHandler(ILibraryDbContext context)
     {
         var album = await context.Albums.FindAsync([AlbumId.Of(command.AlbumId)], cancellationToken)
             ?? throw new AlbumNotFoundException(command.AlbumId);
+
+        if (album.CoverUrl is not null)
+            await storage.DeleteFileAsync(album.CoverUrl, cancellationToken);
 
         album.Delete();
         context.Albums.Remove(album);

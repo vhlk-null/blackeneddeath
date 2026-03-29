@@ -17,7 +17,6 @@ public class GetAlbumsByYearQueryHandler(ILibraryDbContext context, IStorageUrlR
             .ToListAsync(cancellationToken);
 
         var bandIds = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
-        var genreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)).Distinct().ToList();
         var countryIds = albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)).Distinct().ToList();
         var trackIds = albums.SelectMany(a => a.AlbumTracks.Select(at => at.TrackId)).Distinct().ToList();
         var labelIds = albums.Where(a => a.LabelId != null).Select(a => a.LabelId!).Distinct().ToList();
@@ -26,6 +25,20 @@ public class GetAlbumsByYearQueryHandler(ILibraryDbContext context, IStorageUrlR
         var bands = await context.Bands.AsNoTracking()
             .Where(b => bandIds.Contains(b.Id))
             .ToDictionaryAsync(b => b.Id, cancellationToken);
+
+        var discographyAlbums = await context.Albums.AsNoTracking()
+            .Include(a => a.AlbumBands)
+            .Include(a => a.AlbumGenres)
+            .Where(a => a.AlbumBands.Any(ab => bandIds.Contains(ab.BandId)))
+            .ToListAsync(cancellationToken);
+
+        var discographyByBand = discographyAlbums
+            .SelectMany(a => a.AlbumBands.Select(ab => (ab.BandId, a)))
+            .ToLookup(x => x.BandId, x => x.a);
+
+        var genreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId))
+            .Concat(discographyAlbums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)))
+            .Distinct().ToList();
 
         var genres = await context.Genres.AsNoTracking()
             .Where(g => genreIds.Contains(g.Id))
@@ -50,7 +63,7 @@ public class GetAlbumsByYearQueryHandler(ILibraryDbContext context, IStorageUrlR
             : new Dictionary<TagId, Tag>();
 
         var albumDtos = albums
-            .Select(a => a.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels, tags))
+            .Select(a => a.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels, tags, discographyByBand))
             .ToList();
 
         return new GetAlbumsByYearResult(albumDtos);

@@ -57,6 +57,7 @@ public class Album : Aggregate<AlbumId>
         ArgumentNullException.ThrowIfNull(albumRelease);
 
         Title = title;
+        Slug = SlugHelper.Generate(title);
         Type = type;
         AlbumRelease = albumRelease;
         CoverUrl = coverUrl;

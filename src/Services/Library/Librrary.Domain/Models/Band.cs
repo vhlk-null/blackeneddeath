@@ -44,6 +44,7 @@ public class Band : Aggregate<BandId>
         ArgumentNullException.ThrowIfNull(activity);
 
         Name = name;
+        Slug = SlugHelper.Generate(name);
         Bio = bio;
         LogoUrl = logoUrl;
         Activity = activity;

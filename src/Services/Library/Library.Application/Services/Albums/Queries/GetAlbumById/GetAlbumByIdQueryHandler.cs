@@ -17,12 +17,28 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
             .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
             ?? throw new AlbumNotFoundException(query.Id);
 
+        var bandIds = album.AlbumBands.Select(ab => ab.BandId).ToList();
+
         var bands = await context.Bands.AsNoTracking()
-            .Where(b => album.AlbumBands.Select(ab => ab.BandId).Contains(b.Id))
+            .Where(b => bandIds.Contains(b.Id))
             .ToDictionaryAsync(b => b.Id, cancellationToken);
 
+        var discographyAlbums = await context.Albums.AsNoTracking()
+            .Include(a => a.AlbumBands)
+            .Include(a => a.AlbumGenres)
+            .Where(a => a.AlbumBands.Any(ab => bandIds.Contains(ab.BandId)))
+            .ToListAsync(cancellationToken);
+
+        var discographyByBand = discographyAlbums
+            .SelectMany(a => a.AlbumBands.Select(ab => (ab.BandId, a)))
+            .ToLookup(x => x.BandId, x => x.a);
+
+        var genreIds = album.AlbumGenres.Select(ag => ag.GenreId)
+            .Concat(discographyAlbums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)))
+            .Distinct().ToList();
+
         var genres = await context.Genres.AsNoTracking()
-            .Where(g => album.AlbumGenres.Select(ag => ag.GenreId).Contains(g.Id))
+            .Where(g => genreIds.Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, cancellationToken);
 
         var countries = await context.Countries.AsNoTracking()
@@ -46,6 +62,6 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
                 .ToDictionaryAsync(t => t.Id, cancellationToken)
             : new Dictionary<TagId, Tag>();
 
-        return new GetAlbumByIdResult(album.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels, tags));
+        return new GetAlbumByIdResult(album.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels, tags, discographyByBand));
     }
 }

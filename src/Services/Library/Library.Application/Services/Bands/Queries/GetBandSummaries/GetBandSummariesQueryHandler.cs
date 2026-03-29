@@ -5,10 +5,12 @@ public class GetBandSummariesQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetBandSummariesResult> Handle(GetBandSummariesQuery query, CancellationToken cancellationToken)
     {
-        var bands = await context.Bands
+        var bands = (await context.Bands
             .AsNoTracking()
-            .Select(b => new BandSummaryDto(b.Id.Value, b.Name, b.Slug))
-            .ToListAsync(cancellationToken);
+            .Select(b => new { b.Id, b.Name, b.Slug })
+            .ToListAsync(cancellationToken))
+            .Select(b => new BandSummaryDto(b.Id.Value, b.Name, b.Slug, []))
+            .ToList();
 
         return new GetBandSummariesResult(bands);
     }

@@ -17,4 +17,10 @@ public class CloudinaryStorageService(Cloudinary cloudinary) : IStorageService
 
         return result.PublicId;
     }
+
+    public async Task DeleteFileAsync(string publicId, CancellationToken cancellationToken = default)
+    {
+        var deleteParams = new DeletionParams(publicId);
+        await cloudinary.DestroyAsync(deleteParams);
+    }
 }
