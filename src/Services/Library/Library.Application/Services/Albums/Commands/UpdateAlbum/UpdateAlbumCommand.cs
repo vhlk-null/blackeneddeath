@@ -1,6 +1,11 @@
 namespace Library.Application.Services.Albums.Commands.UpdateAlbum;
 
-public record UpdateAlbumCommand(UpdateAlbumDto Album) : BuildingBlocks.CQRS.ICommand<UpdateAlbumResult>;
+public record UpdateAlbumCommand(
+    UpdateAlbumDto Album,
+    Stream? CoverImage = null,
+    string? CoverImageContentType = null,
+    string? CoverImageFileName = null)
+    : BuildingBlocks.CQRS.ICommand<UpdateAlbumResult>;
 
 public record UpdateAlbumResult(bool IsSuccess);
 

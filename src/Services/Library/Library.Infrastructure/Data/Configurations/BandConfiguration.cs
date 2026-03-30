@@ -41,6 +41,12 @@ public class BandConfiguration : IEntityTypeConfiguration<Band>
             .HasMaxLength(500)
             .HasColumnName("logo_url");
 
+        entity.Property(e => e.Facebook).HasMaxLength(500).HasColumnName("facebook");
+        entity.Property(e => e.Youtube).HasMaxLength(500).HasColumnName("youtube");
+        entity.Property(e => e.Instagram).HasMaxLength(500).HasColumnName("instagram");
+        entity.Property(e => e.Twitter).HasMaxLength(500).HasColumnName("twitter");
+        entity.Property(e => e.Website).HasMaxLength(500).HasColumnName("website");
+
         entity.ComplexProperty(e => e.Activity, ba =>
         {
             ba.Property(a => a.FormedYear).HasColumnName("formed_year");

@@ -23,7 +23,7 @@ public class DeleteGenreCardHandlerTests
         _contextMock = new Mock<ILibraryDbContext>();
         _contextMock.Setup(x => x.GenreCards).Returns(_genreCardsDbSetMock.Object);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
-        _handler = new DeleteGenreCardCommandHandler(_contextMock.Object);
+        _handler = new DeleteGenreCardCommandHandler(_contextMock.Object, Mock.Of<IStorageService>());
     }
 
     [Fact]

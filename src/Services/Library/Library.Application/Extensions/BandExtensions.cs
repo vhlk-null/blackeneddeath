@@ -33,6 +33,11 @@ public static class BandExtensions
             band.BandGenres
                 .Where(bg => !bg.IsPrimary && genres.ContainsKey(bg.GenreId))
                 .Select(bg => new GenreDto(genres[bg.GenreId].Id.Value, genres[bg.GenreId].Name, genres[bg.GenreId].Slug, bg.IsPrimary))
-                .ToList()
+                .ToList(),
+            band.Facebook,
+            band.Youtube,
+            band.Instagram,
+            band.Twitter,
+            band.Website
         );
 }

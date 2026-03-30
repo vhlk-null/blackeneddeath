@@ -1,6 +1,11 @@
 namespace Library.Application.Services.Bands.Commands.UpdateBand;
 
-public record UpdateBandCommand(UpdateBandDto Band) : BuildingBlocks.CQRS.ICommand<UpdateBandResult>;
+public record UpdateBandCommand(
+    UpdateBandDto Band,
+    Stream? Logo = null,
+    string? LogoContentType = null,
+    string? LogoFileName = null)
+    : BuildingBlocks.CQRS.ICommand<UpdateBandResult>;
 
 public record UpdateBandResult(bool IsSuccess);
 

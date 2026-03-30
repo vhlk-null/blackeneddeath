@@ -12,4 +12,9 @@ public record BandDto(
     List<CountryDto> Countries,
     List<AlbumSummaryDto> Albums,
     GenreDto? ParentGenre,
-    List<GenreDto> Subgenres);
+    List<GenreDto> Subgenres,
+    string? Facebook,
+    string? Youtube,
+    string? Instagram,
+    string? Twitter,
+    string? Website);

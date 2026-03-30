@@ -8,6 +8,11 @@ public class Band : Aggregate<BandId>
     public string? LogoUrl { get; private set; }
     public BandActivity Activity { get; private set; } = null!;
     public BandStatus Status { get; private set; }
+    public string? Facebook { get; private set; }
+    public string? Youtube { get; private set; }
+    public string? Instagram { get; private set; }
+    public string? Twitter { get; private set; }
+    public string? Website { get; private set; }
 
     private readonly List<BandCountry> _bandCountries = [];
     private readonly List<BandGenre> _bandGenres = [];
@@ -17,7 +22,8 @@ public class Band : Aggregate<BandId>
 
     private Band() { }
 
-    public static Band Create(string name, string? bio, string? logoUrl, BandActivity activity, BandStatus status, BandId? id = null)
+    public static Band Create(string name, string? bio, string? logoUrl, BandActivity activity, BandStatus status, BandId? id = null,
+        string? facebook = null, string? youtube = null, string? instagram = null, string? twitter = null, string? website = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(activity);
@@ -30,7 +36,12 @@ public class Band : Aggregate<BandId>
             Bio = bio,
             LogoUrl = logoUrl,
             Activity = activity,
-            Status = status
+            Status = status,
+            Facebook = facebook,
+            Youtube = youtube,
+            Instagram = instagram,
+            Twitter = twitter,
+            Website = website
         };
 
         band.AddDomainEvent(new BandCreatedEvent(band));
@@ -38,7 +49,8 @@ public class Band : Aggregate<BandId>
         return band;
     }
 
-    public Band Update(string name, string? bio, string? logoUrl, BandActivity activity, BandStatus status)
+    public Band Update(string name, string? bio, string? logoUrl, BandActivity activity, BandStatus status,
+        string? facebook = null, string? youtube = null, string? instagram = null, string? twitter = null, string? website = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(activity);
@@ -49,6 +61,11 @@ public class Band : Aggregate<BandId>
         LogoUrl = logoUrl;
         Activity = activity;
         Status = status;
+        Facebook = facebook;
+        Youtube = youtube;
+        Instagram = instagram;
+        Twitter = twitter;
+        Website = website;
 
         AddDomainEvent(new BandUpdatedEvent(this));
 

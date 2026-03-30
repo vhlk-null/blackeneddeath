@@ -27,7 +27,9 @@ public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService
     {
         var activity = BandActivity.Of(command.Band.FormedYear, command.Band.DisbandedYear);
 
-        var band = Band.Create(command.Band.Name, command.Band.Bio, logoKey, activity, command.Band.Status);
+        var band = Band.Create(command.Band.Name, command.Band.Bio, logoKey, activity, command.Band.Status,
+            facebook: command.Band.Facebook, youtube: command.Band.Youtube, instagram: command.Band.Instagram,
+            twitter: command.Band.Twitter, website: command.Band.Website);
 
         foreach (var id in command.Band.CountryIds)
             band.AddCountry(CountryId.Of(id));

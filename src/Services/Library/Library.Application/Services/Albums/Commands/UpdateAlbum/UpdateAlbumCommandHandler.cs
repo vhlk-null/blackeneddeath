@@ -1,6 +1,8 @@
+using System.Text.RegularExpressions;
+
 namespace Library.Application.Services.Albums.Commands.UpdateAlbum;
 
-public class UpdateAlbumCommandHandler(ILibraryDbContext context) : BuildingBlocks.CQRS.ICommandHandler<UpdateAlbumCommand, UpdateAlbumResult>
+public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageService storage) : BuildingBlocks.CQRS.ICommandHandler<UpdateAlbumCommand, UpdateAlbumResult>
 {
     public async ValueTask<UpdateAlbumResult> Handle(UpdateAlbumCommand command, CancellationToken cancellationToken)
     {
@@ -23,10 +25,21 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context) : BuildingBloc
                 throw new LabelNotFoundException(labelGuid);
         }
 
+        var coverKey = album.CoverUrl;
+        if (command.CoverImage is not null && command.CoverImageContentType is not null && command.CoverImageFileName is not null)
+        {
+            if (album.CoverUrl is not null)
+                await storage.DeleteFileAsync(album.CoverUrl, cancellationToken);
+
+            var folder = $"albums/{Slugify(command.Album.Title)}";
+            var extension = Path.GetExtension(command.CoverImageFileName);
+            coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
+        }
+
         var albumRelease = AlbumRelease.Of(command.Album.ReleaseDate, command.Album.Format);
         var labelId = command.Album.LabelIds is { Count: > 0 } ? LabelId.Of(command.Album.LabelIds[0]) : null;
 
-        album.Update(command.Album.Title, command.Album.Type, albumRelease, album.CoverUrl, labelId);
+        album.Update(command.Album.Title, command.Album.Type, albumRelease, coverKey, labelId);
 
         ReconcileBands(album, command.Album);
         ReconcileCountries(album, command.Album);
@@ -98,4 +111,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context) : BuildingBloc
         foreach (var link in dto.StreamingLinks.Where(l => !currentPlatforms.Contains(l.Platform)))
             album.AddStreamingLink(link.Platform, link.EmbedCode);
     }
+
+    private static string Slugify(string value) =>
+        Regex.Replace(value.ToLowerInvariant().Trim(), @"[^a-z0-9]+", "-").Trim('-');
 }

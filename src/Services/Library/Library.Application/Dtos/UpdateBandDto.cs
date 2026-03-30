@@ -9,4 +9,9 @@ public record UpdateBandDto(
     BandStatus Status,
     List<Guid> CountryIds,
     Guid? GenreId,
-    List<Guid>? SubgenreIds);
+    List<Guid>? SubgenreIds,
+    string? Facebook = null,
+    string? Youtube = null,
+    string? Instagram = null,
+    string? Twitter = null,
+    string? Website = null);
