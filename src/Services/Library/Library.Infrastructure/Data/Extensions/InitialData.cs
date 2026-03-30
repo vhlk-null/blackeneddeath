@@ -1309,5 +1309,6 @@ internal static class InitialData
         GenreCard.Create(GenreCardIds.Brutal,          "Brutal",          "Brutal",         orderNumber: 14),
         GenreCard.Create(GenreCardIds.SludgeCrust,     "Sludge/Crust",    "Sludge/Crust",   orderNumber: 15),
         GenreCard.Create(GenreCardIds.FolkOriental,    "Folk/Oriental",   "Folk/Oriental",  orderNumber: 16),
+
     ];
 }

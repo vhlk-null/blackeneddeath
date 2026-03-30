@@ -28,7 +28,7 @@ public class UpdateGenreCardCommandHandler(ILibraryDbContext context, IStorageSe
         card.Update(command.Name, command.Description, coverKey, command.OrderNumber);
 
         // Sync genres
-        var desiredGenreIds = command.GenreIds.Select(GenreId.Of).ToHashSet();
+        var desiredGenreIds = (command.GenreIds ?? []).Select(GenreId.Of).ToHashSet();
         var currentGenreIds = card.GenreCardGenres.Select(g => g.GenreId).ToHashSet();
         foreach (var id in currentGenreIds.Except(desiredGenreIds)) card.RemoveGenre(id);
         foreach (var id in desiredGenreIds.Except(currentGenreIds))
@@ -38,7 +38,7 @@ public class UpdateGenreCardCommandHandler(ILibraryDbContext context, IStorageSe
         }
 
         // Sync tags
-        var desiredTagIds = command.TagIds.Select(TagId.Of).ToHashSet();
+        var desiredTagIds = (command.TagIds ?? []).Select(TagId.Of).ToHashSet();
         var currentTagIds = card.GenreCardTags.Select(t => t.TagId).ToHashSet();
         foreach (var id in currentTagIds.Except(desiredTagIds)) card.RemoveTag(id);
         foreach (var id in desiredTagIds.Except(currentTagIds))
