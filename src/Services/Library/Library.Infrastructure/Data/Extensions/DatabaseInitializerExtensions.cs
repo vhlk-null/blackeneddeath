@@ -73,6 +73,7 @@ public static class DatabaseInitializerExtensions
         await SeedAlbumsAsync(context, logger);
         await SeedAlbumCoverUrlsAsync(context, logger);
         await SeedStreamingLinksAsync(context, logger);
+        await SeedGenreCardsAsync(context, logger);
     }
 
     private static async Task SeedTagsAsync(LibraryContext context, ILogger logger)
@@ -155,6 +156,15 @@ public static class DatabaseInitializerExtensions
                 .Where(a => a.Id == id && a.CoverUrl == null)
                 .ExecuteUpdateAsync(s => s.SetProperty(a => a.CoverUrl, coverUrl));
         }
+    }
+
+    private static async Task SeedGenreCardsAsync(LibraryContext context, ILogger logger)
+    {
+        if (await context.GenreCards.AnyAsync()) return;
+
+        logger.LogInformation("Seeding genre cards...");
+        await context.GenreCards.AddRangeAsync(InitialData.GenreCards);
+        await context.SaveChangesAsync();
     }
 
     private static async Task SeedStreamingLinksAsync(LibraryContext context, ILogger logger)

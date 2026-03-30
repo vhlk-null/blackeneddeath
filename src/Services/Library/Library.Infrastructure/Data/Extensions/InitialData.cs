@@ -62,6 +62,27 @@ internal static class InitialData
         public static readonly BandId Vider             = BandId.Of(Guid.Parse("b0000000-0000-0000-0000-00000000000b"));
     }
 
+    // ── GenreCard IDs ─────────────────────────────────────────────────────────
+    private static class GenreCardIds
+    {
+        public static readonly GenreCardId Classic         = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-000000000001"));
+        public static readonly GenreCardId WarMetal        = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-000000000002"));
+        public static readonly GenreCardId Cavernous       = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-000000000003"));
+        public static readonly GenreCardId BlackenedDeath  = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-000000000004"));
+        public static readonly GenreCardId Melodic         = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-000000000005"));
+        public static readonly GenreCardId Symphonic       = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-000000000006"));
+        public static readonly GenreCardId Doom            = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-000000000007"));
+        public static readonly GenreCardId Thrash          = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-000000000008"));
+        public static readonly GenreCardId Dissonant       = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-000000000009"));
+        public static readonly GenreCardId Progressive     = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-00000000000a"));
+        public static readonly GenreCardId Technical       = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-00000000000b"));
+        public static readonly GenreCardId AvantGarde      = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-00000000000c"));
+        public static readonly GenreCardId Grind           = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-00000000000d"));
+        public static readonly GenreCardId Brutal          = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-00000000000e"));
+        public static readonly GenreCardId SludgeCrust     = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-00000000000f"));
+        public static readonly GenreCardId FolkOriental    = GenreCardId.Of(Guid.Parse("ec000000-0000-0000-0000-000000000010"));
+    }
+
     // ── Album IDs ──────────────────────────────────────────────────────────────
     private static class AlbumIds
     {
@@ -1269,4 +1290,24 @@ internal static class InitialData
                     bloodhymns, darkside, dawnOfDamned, deathToAll, inTheTwilightGrey, markOfNecrogram, nocturnalSilence];
         }
     }
+
+    public static IReadOnlyList<GenreCard> GenreCards =>
+    [
+        GenreCard.Create(GenreCardIds.Classic,        "Classic",        "Classic"),
+        GenreCard.Create(GenreCardIds.WarMetal,        "War Metal",       "War Metal"),
+        GenreCard.Create(GenreCardIds.Cavernous,       "Cavernous",       "Cavernous"),
+        GenreCard.Create(GenreCardIds.BlackenedDeath,  "Blackened Death", "Blackened Death"),
+        GenreCard.Create(GenreCardIds.Melodic,         "Melodic",         "Melodic"),
+        GenreCard.Create(GenreCardIds.Symphonic,       "Symphonic",       "Symphonic"),
+        GenreCard.Create(GenreCardIds.Doom,            "Doom",            "Doom"),
+        GenreCard.Create(GenreCardIds.Thrash,          "Thrash",          "Thrash"),
+        GenreCard.Create(GenreCardIds.Dissonant,       "Dissonant",       "Dissonant"),
+        GenreCard.Create(GenreCardIds.Progressive,     "Progressive",     "Progressive"),
+        GenreCard.Create(GenreCardIds.Technical,       "Technical",       "Technical"),
+        GenreCard.Create(GenreCardIds.AvantGarde,      "Avant-Garde",     "Avant-Garde"),
+        GenreCard.Create(GenreCardIds.Grind,           "Grind",           "Grind"),
+        GenreCard.Create(GenreCardIds.Brutal,          "Brutal",          "Brutal"),
+        GenreCard.Create(GenreCardIds.SludgeCrust,     "Sludge/Crust",    "Sludge/Crust"),
+        GenreCard.Create(GenreCardIds.FolkOriental,    "Folk/Oriental",   "Folk/Oriental"),
+    ];
 }

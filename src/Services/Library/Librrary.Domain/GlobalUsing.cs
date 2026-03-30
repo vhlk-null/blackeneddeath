@@ -4,6 +4,7 @@ global using Library.Domain.Enums;
 global using Library.Domain.Events.Album;
 global using Library.Domain.Events.Band;
 global using Library.Domain.Events.Genre;
+global using Library.Domain.Events.GenreCard;
 global using Library.Domain.Exceptions;
 global using Library.Domain.Models.JoinTables;
 global using Library.Domain.ValueObjects;

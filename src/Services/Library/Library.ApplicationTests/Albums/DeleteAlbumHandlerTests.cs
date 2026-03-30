@@ -25,7 +25,7 @@ public class DeleteAlbumHandlerTests
         _contextMock = new Mock<ILibraryDbContext>();
         _contextMock.Setup(x => x.Albums).Returns(_albumsDbSetMock.Object);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
-        _handler = new DeleteAlbumCommandHandler(_contextMock.Object);
+        _handler = new DeleteAlbumCommandHandler(_contextMock.Object, Mock.Of<IStorageService>());
     }
 
     [Fact]

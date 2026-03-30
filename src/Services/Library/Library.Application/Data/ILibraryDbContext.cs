@@ -10,6 +10,7 @@ public interface ILibraryDbContext
     DbSet<Label> Labels { get; }
     DbSet<Tag> Tags { get; }
     DbSet<StreamingLink> StreamingLinks { get; }
+    DbSet<GenreCard> GenreCards { get; }
 
     DbSet<AlbumBand> AlbumBands { get; }
     DbSet<AlbumGenre> AlbumGenres { get; }
@@ -18,6 +19,8 @@ public interface ILibraryDbContext
     DbSet<BandGenre> BandGenres { get; }
     DbSet<BandCountry> BandCountries { get; }
     DbSet<AlbumCountry> AlbumCountries { get; }
+    DbSet<GenreCardGenre> GenreCardGenres { get; }
+    DbSet<GenreCardTag> GenreCardTags { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

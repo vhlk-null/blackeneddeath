@@ -21,6 +21,7 @@ public class LibraryContext : DbContext, ILibraryDbContext
     public virtual DbSet<Label> Labels { get; set; }
     public virtual DbSet<Tag> Tags { get; set; }
     public virtual DbSet<StreamingLink> StreamingLinks { get; set; }
+    public virtual DbSet<GenreCard> GenreCards { get; set; }
 
     // Junction tables (Many-to-Many)
     public virtual DbSet<AlbumBand> AlbumBands { get; set; }
@@ -30,6 +31,8 @@ public class LibraryContext : DbContext, ILibraryDbContext
     public virtual DbSet<BandGenre> BandGenres { get; set; }
     public virtual DbSet<BandCountry> BandCountries { get; set; }
     public virtual DbSet<AlbumCountry> AlbumCountries { get; set; }
+    public virtual DbSet<GenreCardGenre> GenreCardGenres { get; set; }
+    public virtual DbSet<GenreCardTag> GenreCardTags { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
