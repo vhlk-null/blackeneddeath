@@ -20,8 +20,6 @@ public class GenreCardConfiguration : IEntityTypeConfiguration<GenreCard>
             .HasColumnName("name")
             .IsRequired();
 
-        entity.HasIndex(g => g.Name).IsUnique();
-
         entity.Property(g => g.Description)
             .HasMaxLength(1000)
             .HasColumnName("description")
