@@ -5,7 +5,6 @@ using Library.Application.Services.GenreCards.Commands.UpdateGenreCard;
 using Library.ApplicationTests.Utils;
 using Library.Domain.Models;
 using Library.Domain.ValueObjects.Ids;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 
@@ -15,15 +14,15 @@ public class UpdateGenreCardHandlerTests
 {
     private readonly Mock<ILibraryDbContext> _contextMock;
     private readonly Mock<IStorageService> _storageMock;
-    private readonly Mock<DbSet<GenreCard>> _genreCardsDbSetMock;
     private readonly UpdateGenreCardCommandHandler _handler;
 
     public UpdateGenreCardHandlerTests()
     {
-        _genreCardsDbSetMock = MockDbSetFactory.Create<GenreCard>();
         _contextMock = new Mock<ILibraryDbContext>();
         _storageMock = new Mock<IStorageService>();
-        _contextMock.Setup(x => x.GenreCards).Returns(_genreCardsDbSetMock.Object);
+        _contextMock.Setup(x => x.GenreCards).Returns(MockDbSetFactory.Create<GenreCard>().Object);
+        _contextMock.Setup(x => x.Genres).Returns(MockDbSetFactory.Create<Genre>().Object);
+        _contextMock.Setup(x => x.Tags).Returns(MockDbSetFactory.Create<Tag>().Object);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
         _handler = new UpdateGenreCardCommandHandler(_contextMock.Object, _storageMock.Object);
     }
@@ -33,12 +32,10 @@ public class UpdateGenreCardHandlerTests
     {
         var cardId = Guid.NewGuid();
         var card = GenreCard.Create(GenreCardId.Of(cardId), "Old Name", "Old description", "genres/old/existing-key");
-        _genreCardsDbSetMock
-            .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
-            .Returns(ValueTask.FromResult<GenreCard?>(card));
+        _contextMock.Setup(x => x.GenreCards).Returns(MockDbSetFactory.Create(card).Object);
 
         var result = await _handler.Handle(
-            new UpdateGenreCardCommand(cardId, "New Name", "New description"),
+            new UpdateGenreCardCommand(cardId, "New Name", "New description", [], []),
             CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -55,15 +52,13 @@ public class UpdateGenreCardHandlerTests
         const string oldKey = "genres/doom/old-key";
         const string newKey = "genres/doom/new-key";
         var card = GenreCard.Create(GenreCardId.Of(cardId), "Doom", "Heavy", oldKey);
-        _genreCardsDbSetMock
-            .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
-            .Returns(ValueTask.FromResult<GenreCard?>(card));
+        _contextMock.Setup(x => x.GenreCards).Returns(MockDbSetFactory.Create(card).Object);
         _storageMock
             .Setup(x => x.UploadFileAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(newKey);
 
         await _handler.Handle(
-            new UpdateGenreCardCommand(cardId, "Doom", "Heavy", Stream.Null, "image/jpeg", "new.jpg"),
+            new UpdateGenreCardCommand(cardId, "Doom", "Heavy", [], [], Stream.Null, "image/jpeg", "new.jpg"),
             CancellationToken.None);
 
         _storageMock.Verify(x => x.DeleteFileAsync(oldKey, It.IsAny<CancellationToken>()), Times.Once);
@@ -76,15 +71,13 @@ public class UpdateGenreCardHandlerTests
     {
         var cardId = Guid.NewGuid();
         var card = GenreCard.Create(GenreCardId.Of(cardId), "Thrash", "Fast", null);
-        _genreCardsDbSetMock
-            .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
-            .Returns(ValueTask.FromResult<GenreCard?>(card));
+        _contextMock.Setup(x => x.GenreCards).Returns(MockDbSetFactory.Create(card).Object);
         _storageMock
             .Setup(x => x.UploadFileAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync("genres/thrash/new-key");
 
         await _handler.Handle(
-            new UpdateGenreCardCommand(cardId, "Thrash", "Fast", Stream.Null, "image/jpeg", "cover.jpg"),
+            new UpdateGenreCardCommand(cardId, "Thrash", "Fast", [], [], Stream.Null, "image/jpeg", "cover.jpg"),
             CancellationToken.None);
 
         _storageMock.Verify(x => x.DeleteFileAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -94,12 +87,8 @@ public class UpdateGenreCardHandlerTests
     [Fact]
     public async Task Handle_NonExistingCard_ThrowsGenreCardNotFoundException()
     {
-        _genreCardsDbSetMock
-            .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
-            .Returns(ValueTask.FromResult<GenreCard?>(null));
-
         var act = async () => await _handler.Handle(
-            new UpdateGenreCardCommand(Guid.NewGuid(), "Name", "Desc"),
+            new UpdateGenreCardCommand(Guid.NewGuid(), "Name", "Desc", [], []),
             CancellationToken.None);
 
         await act.Should().ThrowAsync<GenreCardNotFoundException>();

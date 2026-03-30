@@ -7,6 +7,8 @@ public record UpdateGenreCardRequest
 {
     public string Name { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
+    public List<Guid> GenreIds { get; init; } = [];
+    public List<Guid> TagIds { get; init; } = [];
     public IFormFile? CoverImage { get; init; }
 }
 
@@ -23,6 +25,8 @@ public class UpdateGenreCard : ICarterModule
                         id,
                         request.Name,
                         request.Description,
+                        request.GenreIds,
+                        request.TagIds,
                         request.CoverImage?.OpenReadStream(),
                         request.CoverImage?.ContentType,
                         request.CoverImage?.FileName);
