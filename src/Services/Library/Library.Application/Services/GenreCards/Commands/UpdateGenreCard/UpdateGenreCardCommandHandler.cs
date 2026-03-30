@@ -25,7 +25,7 @@ public class UpdateGenreCardCommandHandler(ILibraryDbContext context, IStorageSe
             coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
         }
 
-        card.Update(command.Name, command.Description, coverKey);
+        card.Update(command.Name, command.Description, coverKey, command.OrderNumber);
 
         // Sync genres
         var desiredGenreIds = command.GenreIds.Select(GenreId.Of).ToHashSet();

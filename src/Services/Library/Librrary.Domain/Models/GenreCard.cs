@@ -5,6 +5,7 @@ public class GenreCard : Aggregate<GenreCardId>
     public string Name { get; private set; } = null!;
     public string Description { get; private set; } = null!;
     public string? CoverUrl { get; private set; }
+    public int OrderNumber { get; private set; }
 
     private readonly List<GenreCardGenre> _genreCardGenres = [];
     private readonly List<GenreCardTag> _genreCardTags = [];
@@ -14,7 +15,7 @@ public class GenreCard : Aggregate<GenreCardId>
 
     private GenreCard() { }
 
-    public static GenreCard Create(GenreCardId id, string name, string description, string? coverUrl = null)
+    public static GenreCard Create(GenreCardId id, string name, string description, string? coverUrl = null, int orderNumber = 0)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentException.ThrowIfNullOrWhiteSpace(description);
@@ -24,7 +25,8 @@ public class GenreCard : Aggregate<GenreCardId>
             Id = id,
             Name = name,
             Description = description,
-            CoverUrl = coverUrl
+            CoverUrl = coverUrl,
+            OrderNumber = orderNumber
         };
 
         card.AddDomainEvent(new GenreCardCreatedEvent(card));
@@ -32,7 +34,7 @@ public class GenreCard : Aggregate<GenreCardId>
         return card;
     }
 
-    public GenreCard Update(string name, string description, string? coverUrl)
+    public GenreCard Update(string name, string description, string? coverUrl, int orderNumber)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentException.ThrowIfNullOrWhiteSpace(description);
@@ -40,6 +42,7 @@ public class GenreCard : Aggregate<GenreCardId>
         Name = name;
         Description = description;
         CoverUrl = coverUrl;
+        OrderNumber = orderNumber;
 
         AddDomainEvent(new GenreCardUpdatedEvent(this));
 

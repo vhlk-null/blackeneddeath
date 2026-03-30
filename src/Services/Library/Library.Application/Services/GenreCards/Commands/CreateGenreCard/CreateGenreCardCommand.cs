@@ -3,6 +3,7 @@ namespace Library.Application.Services.GenreCards.Commands.CreateGenreCard;
 public record CreateGenreCardCommand(
     string Name,
     string Description,
+    int OrderNumber,
     Stream? CoverImage = null,
     string? CoverImageContentType = null,
     string? CoverImageFileName = null)

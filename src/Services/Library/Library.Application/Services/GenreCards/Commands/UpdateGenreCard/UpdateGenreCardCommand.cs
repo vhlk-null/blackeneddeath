@@ -4,6 +4,7 @@ public record UpdateGenreCardCommand(
     Guid Id,
     string Name,
     string Description,
+    int OrderNumber,
     List<Guid> GenreIds,
     List<Guid> TagIds,
     Stream? CoverImage = null,

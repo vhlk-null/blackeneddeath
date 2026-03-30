@@ -7,6 +7,7 @@ public class GetGenreCardsQueryHandler(ILibraryDbContext context, IStorageUrlRes
     {
         var cards = await context.GenreCards
             .AsNoTracking()
+            .OrderBy(c => c.OrderNumber)
             .ToListAsync(cancellationToken);
 
         var dtos = cards

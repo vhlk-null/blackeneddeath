@@ -15,7 +15,7 @@ public class CreateGenreCardCommandHandler(ILibraryDbContext context, IStorageSe
             coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
         }
 
-        var card = GenreCard.Create(GenreCardId.Of(Guid.NewGuid()), command.Name, command.Description, coverKey);
+        var card = GenreCard.Create(GenreCardId.Of(Guid.NewGuid()), command.Name, command.Description, coverKey, command.OrderNumber);
 
         context.GenreCards.Add(card);
         await context.SaveChangesAsync(cancellationToken);

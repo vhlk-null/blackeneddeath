@@ -29,7 +29,7 @@ public class CreateGenreCardHandlerTests
     [Fact]
     public async Task Handle_WithoutCoverImage_AddsCardWithNullCoverUrl()
     {
-        var command = new CreateGenreCardCommand("Classic", "Classic heavy metal vibes");
+        var command = new CreateGenreCardCommand("Classic", "Classic heavy metal vibes", 1);
 
         var result = await _handler.Handle(command, CancellationToken.None);
 
@@ -47,7 +47,7 @@ public class CreateGenreCardHandlerTests
             .Setup(x => x.UploadFileAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(publicId);
 
-        var command = new CreateGenreCardCommand("War Metal", "Bestial and primitive",
+        var command = new CreateGenreCardCommand("War Metal", "Bestial and primitive", 2,
             Stream.Null, "image/jpeg", "cover.jpg");
 
         await _handler.Handle(command, CancellationToken.None);
@@ -64,7 +64,7 @@ public class CreateGenreCardHandlerTests
             .Setup(x => x.UploadFileAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync("genres/folk-oriental/xyz");
 
-        var command = new CreateGenreCardCommand("Folk/Oriental", "Folk vibes",
+        var command = new CreateGenreCardCommand("Folk/Oriental", "Folk vibes", 3,
             Stream.Null, "image/png", "cover.png");
 
         await _handler.Handle(command, CancellationToken.None);

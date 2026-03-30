@@ -7,6 +7,7 @@ public record CreateGenreCardRequest
 {
     public string Name { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
+    public int OrderNumber { get; init; }
     public IFormFile? CoverImage { get; init; }
 }
 
@@ -22,6 +23,7 @@ public class CreateGenreCard : ICarterModule
                     var command = new CreateGenreCardCommand(
                         request.Name,
                         request.Description,
+                        request.OrderNumber,
                         request.CoverImage?.OpenReadStream(),
                         request.CoverImage?.ContentType,
                         request.CoverImage?.FileName);

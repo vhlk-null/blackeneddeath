@@ -4,4 +4,5 @@ public record GenreCardDto(
     Guid Id,
     string Name,
     string Description,
-    string? CoverUrl);
+    string? CoverUrl,
+    int OrderNumber);

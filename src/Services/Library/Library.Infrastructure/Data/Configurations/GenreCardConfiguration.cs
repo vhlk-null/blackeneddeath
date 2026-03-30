@@ -30,5 +30,9 @@ public class GenreCardConfiguration : IEntityTypeConfiguration<GenreCard>
         entity.Property(g => g.CoverUrl)
             .HasMaxLength(500)
             .HasColumnName("cover_url");
+
+        entity.Property(g => g.OrderNumber)
+            .HasColumnName("order_number")
+            .IsRequired();
     }
 }

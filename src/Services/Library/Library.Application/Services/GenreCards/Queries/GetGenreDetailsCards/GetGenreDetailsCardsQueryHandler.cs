@@ -9,6 +9,7 @@ public class GetGenreDetailsCardsQueryHandler(ILibraryDbContext context, IStorag
             .AsNoTracking()
             .Include(a => a.GenreCardTags)
             .Include(a => a.GenreCardGenres)
+            .OrderBy(c => c.OrderNumber)
             .ToListAsync(cancellationToken);
 
         var tagIds = cards.SelectMany(c => c.GenreCardTags.Select(t => t.TagId)).Distinct().ToList();

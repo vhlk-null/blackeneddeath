@@ -6,7 +6,8 @@ public static class GenreCardExtensions
         card.Id.Value,
         card.Name,
         card.Description,
-        urlResolver.Resolve(card.CoverUrl));
+        urlResolver.Resolve(card.CoverUrl),
+        card.OrderNumber);
 
 
     public static GenreCardDetailDto ToGenreCardDetailsDto(
@@ -20,5 +21,6 @@ public static class GenreCardExtensions
             card.Description,
             card.GenreCardTags.Select(t => tagMap[t.TagId]).Select(t => new TagDto(t.Id.Value, t.Name)).ToList(),
             card.GenreCardGenres.Select(g => genreMap[g.GenreId]).Select(g => new GenreDto(g.Id.Value, g.Name, g.Slug, g.ParentGenreId is null)).ToList(),
-            urlResolver.Resolve(card.CoverUrl));
+            urlResolver.Resolve(card.CoverUrl),
+            card.OrderNumber);
 }

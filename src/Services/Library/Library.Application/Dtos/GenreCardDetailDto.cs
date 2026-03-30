@@ -6,4 +6,5 @@ public record GenreCardDetailDto(
     string Description,
     List<TagDto> Tags,
     List<GenreDto> Genres,
-    string? CoverUrl);
+    string? CoverUrl,
+    int OrderNumber);

@@ -35,7 +35,7 @@ public class UpdateGenreCardHandlerTests
         _contextMock.Setup(x => x.GenreCards).Returns(MockDbSetFactory.Create(card).Object);
 
         var result = await _handler.Handle(
-            new UpdateGenreCardCommand(cardId, "New Name", "New description", [], []),
+            new UpdateGenreCardCommand(cardId, "New Name", "New description", 1, [], []),
             CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -58,7 +58,7 @@ public class UpdateGenreCardHandlerTests
             .ReturnsAsync(newKey);
 
         await _handler.Handle(
-            new UpdateGenreCardCommand(cardId, "Doom", "Heavy", [], [], Stream.Null, "image/jpeg", "new.jpg"),
+            new UpdateGenreCardCommand(cardId, "Doom", "Heavy", 1, [], [], Stream.Null, "image/jpeg", "new.jpg"),
             CancellationToken.None);
 
         _storageMock.Verify(x => x.DeleteFileAsync(oldKey, It.IsAny<CancellationToken>()), Times.Once);
@@ -77,7 +77,7 @@ public class UpdateGenreCardHandlerTests
             .ReturnsAsync("genres/thrash/new-key");
 
         await _handler.Handle(
-            new UpdateGenreCardCommand(cardId, "Thrash", "Fast", [], [], Stream.Null, "image/jpeg", "cover.jpg"),
+            new UpdateGenreCardCommand(cardId, "Thrash", "Fast", 1, [], [], Stream.Null, "image/jpeg", "cover.jpg"),
             CancellationToken.None);
 
         _storageMock.Verify(x => x.DeleteFileAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -88,7 +88,7 @@ public class UpdateGenreCardHandlerTests
     public async Task Handle_NonExistingCard_ThrowsGenreCardNotFoundException()
     {
         var act = async () => await _handler.Handle(
-            new UpdateGenreCardCommand(Guid.NewGuid(), "Name", "Desc", [], []),
+            new UpdateGenreCardCommand(Guid.NewGuid(), "Name", "Desc", 1, [], []),
             CancellationToken.None);
 
         await act.Should().ThrowAsync<GenreCardNotFoundException>();
