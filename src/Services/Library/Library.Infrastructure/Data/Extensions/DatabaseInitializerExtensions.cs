@@ -14,7 +14,9 @@ public static class DatabaseInitializerExtensions
         var logger  = scope.ServiceProvider.GetRequiredService<ILogger<LibraryContext>>();
 
         await ApplyMigrationsAsync(context, logger);
-        await SeedAsync(context, logger);
+
+        if (app.Environment.IsDevelopment())
+            await SeedAsync(context, logger);
     }
 
     private static async Task ApplyMigrationsAsync(LibraryContext context, ILogger logger)

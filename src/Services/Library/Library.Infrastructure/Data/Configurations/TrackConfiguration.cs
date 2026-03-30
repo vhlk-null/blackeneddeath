@@ -19,5 +19,8 @@ public class TrackConfiguration : IEntityTypeConfiguration<Track>
             .IsRequired()
             .HasMaxLength(200)
             .HasColumnName("title");
+
+        entity.Property(e => e.Duration)
+            .HasColumnName("duration");
     }
 }

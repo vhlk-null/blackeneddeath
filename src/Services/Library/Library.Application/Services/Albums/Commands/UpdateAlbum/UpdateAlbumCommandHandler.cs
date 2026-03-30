@@ -18,6 +18,11 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
             .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
             ?? throw new AlbumNotFoundException(command.Album.Id);
 
+        var albumTrackIds = album.AlbumTracks.Select(x => x.TrackId).ToList();
+        var albumTracks = await context.Tracks
+            .Where(t => albumTrackIds.Contains(t.Id))
+            .ToListAsync(cancellationToken);
+
         if (command.Album.LabelIds is { Count: > 0 })
         {
             var labelGuid = command.Album.LabelIds[0];
@@ -46,6 +51,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
         ReconcileGenres(album, command.Album);
         ReconcileTags(album, command.Album);
         ReconcileStreamingLinks(album, command.Album);
+        await ReconcileTracksAsync(album, albumTracks, command.Album, cancellationToken);
 
         await context.SaveChangesAsync(cancellationToken);
 
@@ -102,14 +108,68 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
 
     private static void ReconcileStreamingLinks(Album album, UpdateAlbumDto dto)
     {
-        var currentPlatforms = album.StreamingLinks.Select(x => x.Platform).ToHashSet();
-        var incomingPlatforms = dto.StreamingLinks.Select(x => x.Platform).ToHashSet();
+        var incomingByPlatform = dto.StreamingLinks.ToDictionary(x => x.Platform);
 
-        foreach (var link in album.StreamingLinks.Where(l => !incomingPlatforms.Contains(l.Platform)).ToList())
-            album.RemoveStreamingLink(link.Id);
+        foreach (var link in album.StreamingLinks.ToList())
+        {
+            if (!incomingByPlatform.ContainsKey(link.Platform))
+                album.RemoveStreamingLink(link.Id);
+        }
 
-        foreach (var link in dto.StreamingLinks.Where(l => !currentPlatforms.Contains(l.Platform)))
-            album.AddStreamingLink(link.Platform, link.EmbedCode);
+        var currentByPlatform = album.StreamingLinks.ToDictionary(x => x.Platform);
+
+        foreach (var incoming in dto.StreamingLinks)
+        {
+            if (currentByPlatform.TryGetValue(incoming.Platform, out var existing))
+            {
+                if (existing.EmbedCode != incoming.EmbedCode)
+                    album.UpdateStreamingLink(existing.Id, incoming.EmbedCode);
+            }
+            else
+            {
+                album.AddStreamingLink(incoming.Platform, incoming.EmbedCode);
+            }
+        }
+    }
+
+    private async Task ReconcileTracksAsync(Album album, List<Track> currentTracks, UpdateAlbumDto dto, CancellationToken cancellationToken)
+    {
+        if (dto.Tracks is null or { Count: 0 })
+            return;
+
+        var incomingByNumber = dto.Tracks.ToDictionary(t => t.TrackNumber);
+        var currentByNumber  = album.AlbumTracks.ToDictionary(
+            at => at.TrackNumber,
+            at => currentTracks.First(t => t.Id == at.TrackId));
+
+        // Remove tracks no longer in the list
+        foreach (var (number, track) in currentByNumber)
+        {
+            if (!incomingByNumber.ContainsKey(number))
+            {
+                album.RemoveTrack(track.Id);
+                context.Tracks.Remove(track);
+            }
+        }
+
+        // Update existing or add new
+        foreach (var incoming in dto.Tracks)
+        {
+            if (currentByNumber.TryGetValue(incoming.TrackNumber, out var existing))
+            {
+                if (existing.Title != incoming.Title)
+                    existing.UpdateTitle(incoming.Title);
+
+                if (existing.Duration != incoming.Duration)
+                    existing.UpdateDuration(incoming.Duration);
+            }
+            else
+            {
+                var newTrack = Track.Create(TrackId.Of(Guid.NewGuid()), incoming.Title, incoming.Duration);
+                await context.Tracks.AddAsync(newTrack, cancellationToken);
+                album.AddTrack(newTrack.Id, incoming.TrackNumber);
+            }
+        }
     }
 
     private static string Slugify(string value) =>

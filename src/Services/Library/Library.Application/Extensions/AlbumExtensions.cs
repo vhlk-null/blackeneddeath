@@ -48,7 +48,7 @@ public static class AlbumExtensions
                 .ToList(),
             album.AlbumTracks
                 .OrderBy(at => at.TrackNumber)
-                .Select(at => new TrackDto(tracks[at.TrackId].Id.Value, tracks[at.TrackId].Title, at.TrackNumber))
+                .Select(at => new TrackDto(tracks[at.TrackId].Id.Value, tracks[at.TrackId].Title, at.TrackNumber, tracks[at.TrackId].Duration))
                 .ToList(),
             album.AlbumGenres
                 .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))

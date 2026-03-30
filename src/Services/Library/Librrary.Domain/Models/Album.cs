@@ -162,6 +162,15 @@ public class Album : Aggregate<AlbumId>
         _streamingLinks.Add(new StreamingLink(platform, embedCode));
     }
 
+    public void UpdateStreamingLink(StreamingLinkId streamingLinkId, string embedCode)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(embedCode);
+        var entry = _streamingLinks.FirstOrDefault(x => x.Id == streamingLinkId)
+            ?? throw new DomainException("Streaming link not found.");
+
+        entry.UpdateEmbedCode(embedCode);
+    }
+
     public void RemoveStreamingLink(StreamingLinkId streamingLinkId)
     {
         var entry = _streamingLinks.FirstOrDefault(x => x.Id == streamingLinkId)

@@ -13,4 +13,4 @@ public record CreateAlbumDto(
     List<StreamingLinkDto> StreamingLinks,
     List<TrackInputDto>? Tracks);
 
-public record TrackInputDto(string Title, int TrackNumber);
+public record TrackInputDto(string Title, int TrackNumber, string? Duration = null);

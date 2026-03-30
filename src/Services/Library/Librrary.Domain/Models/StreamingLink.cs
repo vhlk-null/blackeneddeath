@@ -13,4 +13,6 @@ public class StreamingLink : Entity<StreamingLinkId>
         Platform = platform;
         EmbedCode = embedCode;
     }
+
+    internal void UpdateEmbedCode(string embedCode) => EmbedCode = embedCode;
 }

@@ -23,7 +23,7 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
         if (command.Album.Tracks is { Count: > 0 })
         {
             var tracks = command.Album.Tracks
-                .Select(t => Track.Create(TrackId.Of(Guid.NewGuid()), t.Title))
+                .Select(t => Track.Create(TrackId.Of(Guid.NewGuid()), t.Title, t.Duration))
                 .ToList();
 
             await context.Tracks.AddRangeAsync(tracks, cancellationToken);
