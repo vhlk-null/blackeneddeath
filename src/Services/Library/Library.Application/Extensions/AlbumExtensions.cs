@@ -2,6 +2,37 @@
 
 public static class AlbumExtensions
 {
+    private static string? ComputeTotalDuration(IEnumerable<string?> durations)
+    {
+        var total = TimeSpan.Zero;
+        var hasAny = false;
+
+        foreach (var raw in durations)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) continue;
+
+            var parts = raw.Trim().Split(':');
+            var parsed = parts.Length switch
+            {
+                2 when int.TryParse(parts[0], out var m) && int.TryParse(parts[1], out var s)
+                    => (TimeSpan?)TimeSpan.FromSeconds(m * 60 + s),
+                3 when int.TryParse(parts[0], out var h) && int.TryParse(parts[1], out var m) && int.TryParse(parts[2], out var s)
+                    => TimeSpan.FromSeconds(h * 3600 + m * 60 + s),
+                _ => null
+            };
+
+            if (parsed is null) continue;
+            total += parsed.Value;
+            hasAny = true;
+        }
+
+        if (!hasAny) return null;
+
+        return total.TotalHours >= 1
+            ? $"{(int)total.TotalHours}:{total.Minutes:D2}:{total.Seconds:D2}"
+            : $"{total.Minutes}:{total.Seconds:D2}";
+    }
+
     public static AlbumDto ToAlbumDto(
         this Album album,
         IReadOnlyDictionary<BandId, Band> bands,
@@ -56,6 +87,8 @@ public static class AlbumExtensions
             album.AlbumTags
                 .Where(at => tags.ContainsKey(at.TagId))
                 .Select(at => new TagDto(tags[at.TagId].Id.Value, tags[at.TagId].Name))
-                .ToList()
+                .ToList(),
+            ComputeTotalDuration(
+                album.AlbumTracks.Select(at => tracks.TryGetValue(at.TrackId, out var t) ? t.Duration : null))
         );
 }

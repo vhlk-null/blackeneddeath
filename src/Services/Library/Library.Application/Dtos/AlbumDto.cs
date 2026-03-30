@@ -14,4 +14,5 @@ public record AlbumDto(
     List<StreamingLinkDto> StreamingLinks,
     List<TrackDto> Tracks,
     List<GenreDto> Genres,
-    List<TagDto> Tags);
+    List<TagDto> Tags,
+    string? TotalDuration);
