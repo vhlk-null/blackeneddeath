@@ -2,7 +2,7 @@
 
 builder.Services
     .AddApplicationServices()
-    .AddInfrastructureServices(builder.Configuration)
+    .AddInfrastructureServices(builder.Configuration, builder.Environment)
     .AddApiServices(builder.Configuration);
 
 MappingConfig.RegisterMappings();

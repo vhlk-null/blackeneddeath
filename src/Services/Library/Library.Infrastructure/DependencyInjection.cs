@@ -2,7 +2,7 @@ namespace Library.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         var connectionString = configuration.GetConnectionString("LibraryDb");
 
@@ -11,8 +11,11 @@ public static class DependencyInjection
             configuration["Storage:ApiKey"],
             configuration["Storage:ApiSecret"]);
 
+        var environmentPrefix = environment.IsProduction() ? "production" : "local";
+
         services.AddSingleton(new Cloudinary(cloudinaryAccount) { Api = { Secure = true } });
-        services.AddScoped<IStorageService, CloudinaryStorageService>();
+        services.AddScoped<IStorageService>(sp => new CloudinaryStorageService(
+            sp.GetRequiredService<Cloudinary>(), environmentPrefix));
         services.AddSingleton<IStorageUrlResolver, StorageUrlResolver>();
 
         services.AddScoped<AuditableEntityInterceptor>();

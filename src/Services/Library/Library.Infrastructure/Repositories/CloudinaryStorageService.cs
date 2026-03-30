@@ -1,6 +1,6 @@
 namespace Library.Infrastructure.Repositories;
 
-public class CloudinaryStorageService(Cloudinary cloudinary) : IStorageService
+public class CloudinaryStorageService(Cloudinary cloudinary, string environmentPrefix) : IStorageService
 {
     public async Task<string> UploadFileAsync(string folder, string fileName, Stream stream, string contentType, CancellationToken cancellationToken = default)
     {
@@ -9,7 +9,7 @@ public class CloudinaryStorageService(Cloudinary cloudinary) : IStorageService
         var uploadParams = new ImageUploadParams
         {
             File = new FileDescription(fileName, stream),
-            Folder = folder,
+            Folder = $"{environmentPrefix}/{folder}",
             PublicId = publicId
         };
 
