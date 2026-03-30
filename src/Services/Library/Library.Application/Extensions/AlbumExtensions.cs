@@ -27,6 +27,8 @@ public static class AlbumExtensions
                     b.Name,
                     b.Slug,
                     discographyByBand[b.Id]
+                        .DistinctBy(a => a.Id)
+                        .Where(a => a.Id != album.Id)
                         .OrderBy(a => a.AlbumRelease.ReleaseYear)
                         .Select(a => new AlbumSummaryDto(
                             a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear,
