@@ -8,10 +8,14 @@ public class GetBandsQueryHandler(ILibraryDbContext context, IStorageUrlResolver
         var pageIndex = query.PaginationRequest.PageIndex;
         var pageSize = query.PaginationRequest.PageSize;
 
-        var totalCount = await context.Bands.LongCountAsync(cancellationToken);
+        var filteredQuery = context.Bands.AsNoTracking();
 
-        var bandsQuery = context.Bands
-            .AsNoTracking()
+        if (query.Filter is not null)
+            filteredQuery = filteredQuery.Where(query.Filter.Criteria);
+
+        var totalCount = await filteredQuery.LongCountAsync(cancellationToken);
+
+        var bandsQuery = filteredQuery
             .Include(b => b.BandCountries)
             .Include(b => b.BandGenres);
 

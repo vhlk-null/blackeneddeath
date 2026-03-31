@@ -1,4 +1,7 @@
 ﻿global using BuildingBlocks.Behaviors;
+global using BuildingBlocks.Specifications;
+global using Library.Application.Services.Albums.Specifications;
+global using Library.Application.Services.Bands.Specifications;
 global using BuildingBlocks.Exceptions;
 global using BuildingBlocks.Messaging.Events.Albums;
 global using BuildingBlocks.Messaging.Events.Bands;

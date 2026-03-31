@@ -8,10 +8,14 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
         var pageIndex = query.PaginationRequest.PageIndex;
         var pageSize = query.PaginationRequest.PageSize;
 
-        var totalCount = await context.Albums.LongCountAsync(cancellationToken);
+        var filteredQuery = context.Albums.AsNoTracking();
 
-        var albumsQuery = context.Albums
-            .AsNoTracking()
+        if (query.Filter is not null)
+            filteredQuery = filteredQuery.Where(query.Filter.Criteria);
+
+        var totalCount = await filteredQuery.LongCountAsync(cancellationToken);
+
+        var albumsQuery = filteredQuery
             .Include(a => a.AlbumBands)
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
@@ -32,11 +36,11 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        var bandIds = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
+        var bandIds    = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
         var countryIds = albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)).Distinct().ToList();
-        var trackIds = albums.SelectMany(a => a.AlbumTracks.Select(at => at.TrackId)).Distinct().ToList();
-        var labelIds = albums.Where(a => a.LabelId != null).Select(a => a.LabelId!).Distinct().ToList();
-        var tagIds = albums.SelectMany(a => a.AlbumTags.Select(at => at.TagId)).Distinct().ToList();
+        var trackIds   = albums.SelectMany(a => a.AlbumTracks.Select(at => at.TrackId)).Distinct().ToList();
+        var labelIds   = albums.Where(a => a.LabelId != null).Select(a => a.LabelId!).Distinct().ToList();
+        var tagIds     = albums.SelectMany(a => a.AlbumTags.Select(at => at.TagId)).Distinct().ToList();
 
         var bands = await context.Bands.AsNoTracking()
             .Where(b => bandIds.Contains(b.Id))
