@@ -29,7 +29,11 @@ public static class DependencyInjection
                 sp.GetRequiredService<DispatchDomainEventsInterceptor>(),
                 sp.GetRequiredService<SlowQueryInterceptor>()
             );
-            options.UseNpgsql(connectionString);
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+                npgsqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 3,
+                    maxRetryDelay: TimeSpan.FromSeconds(5),
+                    errorCodesToAdd: null));
         });
 
         services.AddScoped<ILibraryDbContext, LibraryContext>();

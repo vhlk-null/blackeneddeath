@@ -22,11 +22,9 @@ file sealed class AndSpecification<T>(ISpecification<T> left, ISpecification<T> 
     {
         get
         {
-            var param = Expression.Parameter(typeof(T));
-            var body = Expression.AndAlso(
-                Expression.Invoke(left.Criteria, param),
-                Expression.Invoke(right.Criteria, param));
-            return Expression.Lambda<Func<T, bool>>(body, param);
+            var leftExpr  = left.Criteria;
+            var rightExpr = ParameterReplacer.Replace(right.Criteria, right.Criteria.Parameters[0], leftExpr.Parameters[0]);
+            return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(leftExpr.Body, rightExpr.Body), leftExpr.Parameters[0]);
         }
     }
 }
@@ -37,11 +35,9 @@ file sealed class OrSpecification<T>(ISpecification<T> left, ISpecification<T> r
     {
         get
         {
-            var param = Expression.Parameter(typeof(T));
-            var body = Expression.OrElse(
-                Expression.Invoke(left.Criteria, param),
-                Expression.Invoke(right.Criteria, param));
-            return Expression.Lambda<Func<T, bool>>(body, param);
+            var leftExpr  = left.Criteria;
+            var rightExpr = ParameterReplacer.Replace(right.Criteria, right.Criteria.Parameters[0], leftExpr.Parameters[0]);
+            return Expression.Lambda<Func<T, bool>>(Expression.OrElse(leftExpr.Body, rightExpr.Body), leftExpr.Parameters[0]);
         }
     }
 }
@@ -52,9 +48,20 @@ file sealed class NotSpecification<T>(ISpecification<T> inner) : Specification<T
     {
         get
         {
-            var param = Expression.Parameter(typeof(T));
-            var body = Expression.Not(Expression.Invoke(inner.Criteria, param));
-            return Expression.Lambda<Func<T, bool>>(body, param);
+            var expr = inner.Criteria;
+            return Expression.Lambda<Func<T, bool>>(Expression.Not(expr.Body), expr.Parameters[0]);
         }
     }
+}
+
+file sealed class ParameterReplacer(ParameterExpression from, ParameterExpression to) : ExpressionVisitor
+{
+    public static Expression<Func<T, bool>> Replace<T>(
+        Expression<Func<T, bool>> expr,
+        ParameterExpression from,
+        ParameterExpression to) =>
+        (Expression<Func<T, bool>>)new ParameterReplacer(from, to).Visit(expr)!;
+
+    protected override Expression VisitParameter(ParameterExpression node) =>
+        node == from ? to : base.VisitParameter(node);
 }

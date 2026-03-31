@@ -46,7 +46,8 @@
       "Bash(grep -oP \"\\(?<=src\\\\\\\\\\).*?\\(?= \\\\[\\)\")",
       "Bash(xargs sed:*)",
       "Bash(dotnet tool:*)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(grep -E \"\\\\.cs$\")"
     ],
     "deny": [],
     "ask": []

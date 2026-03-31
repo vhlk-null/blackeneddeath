@@ -17,6 +17,7 @@ public static class BandExtensions
             band.Activity.DisbandedYear,
             band.Status,
             band.BandCountries
+                .Where(bc => countries.ContainsKey(bc.CountryId))
                 .Select(bc => countries[bc.CountryId])
                 .Select(c => new CountryDto(c.Id.Value, c.Name, c.Code))
                 .ToList(),

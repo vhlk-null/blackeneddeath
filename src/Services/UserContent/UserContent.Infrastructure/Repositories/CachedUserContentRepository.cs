@@ -128,10 +128,16 @@ public class CachedUserContentRepository(
     public void Update<T>(T entity) where T : class
     {
         inner.Update(entity);
+        InvalidateCacheForUser(ExtractUserIdFromEntity(entity));
     }
 
     public void UpdateRange<T>(IEnumerable<T> entities) where T : class
-        => inner.UpdateRange(entities);
+    {
+        var list = entities as IList<T> ?? entities.ToList();
+        inner.UpdateRange(list);
+        foreach (var entity in list)
+            InvalidateCacheForUser(ExtractUserIdFromEntity(entity));
+    }
 
     public Task<int> CountAsync<T>(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default) where T : class
         => inner.CountAsync(expression, cancellationToken);

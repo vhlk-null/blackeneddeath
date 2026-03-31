@@ -7,6 +7,8 @@ public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService
 {
     public async ValueTask<CreateBandResult> Handle(CreateBandCommand command, CancellationToken cancellationToken)
     {
+        await ValidateReferencedEntitiesAsync(command.Band, cancellationToken);
+
         string? logoKey = null;
         if (command.Logo is not null && command.LogoContentType is not null && command.LogoFileName is not null)
         {
@@ -21,6 +23,27 @@ public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService
         await context.SaveChangesAsync(cancellationToken);
 
         return new CreateBandResult(band.Id.Value);
+    }
+
+    private async Task ValidateReferencedEntitiesAsync(CreateBandDto band, CancellationToken cancellationToken)
+    {
+        foreach (var id in band.CountryIds)
+        {
+            if (!await context.Countries.AnyAsync(c => c.Id == CountryId.Of(id), cancellationToken))
+                throw new CountryNotFoundException(id);
+        }
+
+        if (band.GenreId is Guid primaryGenreId)
+        {
+            if (!await context.Genres.AnyAsync(g => g.Id == GenreId.Of(primaryGenreId), cancellationToken))
+                throw new GenreNotFoundException(primaryGenreId);
+        }
+
+        foreach (var id in band.SubgenreIds ?? [])
+        {
+            if (!await context.Genres.AnyAsync(g => g.Id == GenreId.Of(id), cancellationToken))
+                throw new GenreNotFoundException(id);
+        }
     }
 
     private static Band CreateNewBand(CreateBandCommand command, string? logoKey)

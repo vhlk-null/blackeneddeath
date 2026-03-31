@@ -30,7 +30,7 @@ public static class AlbumExtensions
 
         return total.TotalHours >= 1
             ? $"{(int)total.TotalHours}:{total.Minutes:D2}:{total.Seconds:D2}"
-            : $"{total.Minutes}:{total.Seconds:D2}";
+            : $"{(int)total.TotalMinutes}:{total.Seconds:D2}";
     }
 
     public static AlbumDto ToAlbumDto(
@@ -52,6 +52,7 @@ public static class AlbumExtensions
             album.AlbumRelease.Format,
             album.LabelId != null && labels.TryGetValue(album.LabelId, out var label) ? label.ToLabelDto() : null,
             album.AlbumBands
+                .Where(ab => bands.ContainsKey(ab.BandId))
                 .Select(ab => bands[ab.BandId])
                 .Select(b => new BandSummaryDto(
                     b.Id.Value,
@@ -71,6 +72,7 @@ public static class AlbumExtensions
                         .ToList()))
                 .ToList(),
             album.AlbumCountries
+                .Where(ac => countries.ContainsKey(ac.CountryId))
                 .Select(ac => countries[ac.CountryId])
                 .Select(c => new CountryDto(c.Id.Value, c.Name, c.Code))
                 .ToList(),
@@ -78,10 +80,12 @@ public static class AlbumExtensions
                 .Select(sl => new StreamingLinkDto(sl.Platform, sl.EmbedCode))
                 .ToList(),
             album.AlbumTracks
+                .Where(at => tracks.ContainsKey(at.TrackId))
                 .OrderBy(at => at.TrackNumber)
                 .Select(at => new TrackDto(tracks[at.TrackId].Id.Value, tracks[at.TrackId].Title, at.TrackNumber, tracks[at.TrackId].Duration))
                 .ToList(),
             album.AlbumGenres
+                .Where(ag => genres.ContainsKey(ag.GenreId))
                 .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
                 .ToList(),
             album.AlbumTags

@@ -138,9 +138,10 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
             return;
 
         var incomingByNumber = dto.Tracks.ToDictionary(t => t.TrackNumber);
-        var currentByNumber  = album.AlbumTracks.ToDictionary(
-            at => at.TrackNumber,
-            at => currentTracks.First(t => t.Id == at.TrackId));
+        var tracksById       = currentTracks.ToDictionary(t => t.Id);
+        var currentByNumber  = album.AlbumTracks
+            .Where(at => tracksById.ContainsKey(at.TrackId))
+            .ToDictionary(at => at.TrackNumber, at => tracksById[at.TrackId]);
 
         // Remove tracks no longer in the list
         foreach (var (number, track) in currentByNumber)
