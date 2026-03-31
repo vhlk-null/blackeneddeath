@@ -7,7 +7,7 @@ namespace Library.API.Endpoints.Bands;
 public record CreateBandRequest
 {
     public string Band { get; init; } = string.Empty;
-    public IFormFile? Logo { get; init; }
+    public IFormFile? LogoUrl { get; init; }
 }
 public record CreateBandResponse(Guid Id);
 
@@ -27,9 +27,9 @@ public class CreateBand : ICarterModule
 
                     var command = new CreateBandCommand(
                         bandDto!,
-                        request.Logo?.OpenReadStream(),
-                        request.Logo?.ContentType,
-                        request.Logo?.FileName);
+                        request.LogoUrl?.OpenReadStream(),
+                        request.LogoUrl?.ContentType,
+                        request.LogoUrl?.FileName);
 
                     var result = await sender.Send(command);
 

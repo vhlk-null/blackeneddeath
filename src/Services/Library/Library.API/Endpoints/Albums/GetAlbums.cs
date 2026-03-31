@@ -1,4 +1,3 @@
-using BuildingBlocks.Specifications;
 using Library.Application.Services.Albums.Specifications;
 
 namespace Library.API.Endpoints.Albums;
@@ -19,14 +18,7 @@ public class GetAlbums : ICarterModule
                 AlbumType? type = null,
                 int? year = null) =>
             {
-                ISpecification<Album>? filter = null;
-
-                if (genreId.HasValue)   filter = Combine(filter, new AlbumByGenreSpec(genreId.Value));
-                if (labelId.HasValue)   filter = Combine(filter, new AlbumByLabelSpec(labelId.Value));
-                if (countryId.HasValue) filter = Combine(filter, new AlbumByCountrySpec(countryId.Value));
-                if (type.HasValue)      filter = Combine(filter, new AlbumByTypeSpec(type.Value));
-                if (year.HasValue)      filter = Combine(filter, new AlbumByYearSpec(year.Value));
-
+                var filter = AlbumFilterBuilder.Build(genreId, labelId, countryId, type, year);
                 var result = await sender.Send(new GetAlbumsQuery(paginationRequest, sortBy, filter));
                 return Results.Ok(result.Adapt<GetAlbumsResult>());
             })
@@ -37,7 +29,4 @@ public class GetAlbums : ICarterModule
             .WithDescription("Get Albums with optional filters: genreId, labelId, countryId, type, year")
             .WithTags("Albums");
     }
-
-    private static ISpecification<Album> Combine(ISpecification<Album>? current, ISpecification<Album> next) =>
-        current is null ? next : current.And(next);
 }

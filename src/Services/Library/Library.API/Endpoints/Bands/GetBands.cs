@@ -1,4 +1,3 @@
-using BuildingBlocks.Specifications;
 using Library.Application.Services.Bands.Specifications;
 
 namespace Library.API.Endpoints.Bands;
@@ -17,12 +16,7 @@ public class GetBands : ICarterModule
                 Guid? countryId = null,
                 BandStatus? status = null) =>
             {
-                ISpecification<Band>? filter = null;
-
-                if (genreId.HasValue)   filter = Combine(filter, new BandByGenreSpec(genreId.Value));
-                if (countryId.HasValue) filter = Combine(filter, new BandByCountrySpec(countryId.Value));
-                if (status.HasValue)    filter = Combine(filter, new BandByStatusSpec(status.Value));
-
+                var filter = BandFilterBuilder.Build(genreId, countryId, status);
                 var result = await sender.Send(new GetBandsQuery(paginationRequest, sortBy, filter));
                 return Results.Ok(result.Adapt<GetBandsResult>());
             })
@@ -33,7 +27,4 @@ public class GetBands : ICarterModule
             .WithDescription("Get Bands with optional filters: genreId, countryId, status")
             .WithTags("Bands");
     }
-
-    private static ISpecification<Band> Combine(ISpecification<Band>? current, ISpecification<Band> next) =>
-        current is null ? next : current.And(next);
 }
