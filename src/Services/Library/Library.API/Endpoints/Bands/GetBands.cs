@@ -14,9 +14,10 @@ public class GetBands : ICarterModule
                 BandSortBy sortBy = BandSortBy.Newest,
                 Guid? genreId = null,
                 Guid? countryId = null,
-                BandStatus? status = null) =>
+                BandStatus? status = null,
+                int? formedYear = null) =>
             {
-                var filter = BandFilterBuilder.Build(genreId, countryId, status);
+                var filter = BandFilterBuilder.Build(genreId, countryId, status, formedYear);
                 var result = await sender.Send(new GetBandsQuery(paginationRequest, sortBy, filter));
                 return Results.Ok(result.Adapt<GetBandsResult>());
             })
