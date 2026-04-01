@@ -15,7 +15,7 @@ public class UpdateAlbum : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/albums", async ([FromForm] UpdateAlbumRequest request, ISender sender) =>
+        app.MapPut("/albums/{id:guid}", async (Guid id, [FromForm] UpdateAlbumRequest request, ISender sender) =>
             {
                 var albumDto = JsonSerializer.Deserialize<UpdateAlbumDto>(request.Album,
                     new JsonSerializerOptions
@@ -28,7 +28,7 @@ public class UpdateAlbum : ICarterModule
                     return Results.Problem("Could not deserialize album data.", instance: "/albums", statusCode: StatusCodes.Status400BadRequest);
 
                 var command = new UpdateAlbumCommand(
-                    albumDto,
+                    albumDto with { Id = id },
                     request.CoverImage?.OpenReadStream(),
                     request.CoverImage?.ContentType,
                     request.CoverImage?.FileName);
