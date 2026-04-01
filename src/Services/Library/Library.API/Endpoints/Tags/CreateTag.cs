@@ -1,5 +1,3 @@
-using Library.Application.Services.Tags.Commands.CreateTag;
-
 namespace Library.API.Endpoints.Tags;
 
 public record CreateTagRequest(string Name);

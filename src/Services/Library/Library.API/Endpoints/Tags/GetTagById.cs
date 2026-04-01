@@ -1,6 +1,3 @@
-using Library.Application.Dtos;
-using Library.Application.Services.Tags.Queries.GetTagById;
-
 namespace Library.API.Endpoints.Tags;
 
 public record GetTagByIdResponse(TagDto Tag);

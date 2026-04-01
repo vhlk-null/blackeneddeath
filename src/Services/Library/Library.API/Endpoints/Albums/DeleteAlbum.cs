@@ -1,6 +1,4 @@
-﻿using Library.Application.Services.Albums.Commands.DeleteAlbums;
-
-namespace Library.API.Endpoints.Albums;
+﻿namespace Library.API.Endpoints.Albums;
 
 //public record DeleteAlbumRequest(Guid Id);
 public record DeleteAlbumResponse(bool IsSuccess);

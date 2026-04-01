@@ -1,7 +1,3 @@
-using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
-using Library.Application.Services.Bands.Commands.CreateBand;
-
 namespace Library.API.Endpoints.Bands;
 
 public record CreateBandRequest
@@ -25,9 +21,17 @@ public class CreateBand : ICarterModule
                             Converters = { new JsonStringEnumConverter() }
                         });
 
+                    Stream? logoStream = null;
+                    if (request.LogoUrl is not null)
+                    {
+                        logoStream = new MemoryStream();
+                        await request.LogoUrl.CopyToAsync(logoStream);
+                        logoStream.Position = 0;
+                    }
+
                     var command = new CreateBandCommand(
                         bandDto!,
-                        request.LogoUrl?.OpenReadStream(),
+                        logoStream,
                         request.LogoUrl?.ContentType,
                         request.LogoUrl?.FileName);
 

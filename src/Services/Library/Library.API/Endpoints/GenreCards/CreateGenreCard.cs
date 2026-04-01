@@ -1,6 +1,3 @@
-using Library.Application.Services.GenreCards.Commands.CreateGenreCard;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Library.API.Endpoints.GenreCards;
 
 public record CreateGenreCardRequest
@@ -20,11 +17,19 @@ public class CreateGenreCard : ICarterModule
         app.MapPost("/genre-cards",
                 async ([FromForm] CreateGenreCardRequest request, ISender sender) =>
                 {
+                    Stream? coverImageStream = null;
+                    if (request.CoverImage is not null)
+                    {
+                        coverImageStream = new MemoryStream();
+                        await request.CoverImage.CopyToAsync(coverImageStream);
+                        coverImageStream.Position = 0;
+                    }
+
                     var command = new CreateGenreCardCommand(
                         request.Name,
                         request.Description,
                         request.OrderNumber,
-                        request.CoverImage?.OpenReadStream(),
+                        coverImageStream,
                         request.CoverImage?.ContentType,
                         request.CoverImage?.FileName);
 

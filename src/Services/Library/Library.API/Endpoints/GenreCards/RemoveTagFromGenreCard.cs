@@ -1,5 +1,3 @@
-using Library.Application.Services.GenreCards.Commands.RemoveTagFromGenreCard;
-
 namespace Library.API.Endpoints.GenreCards;
 
 public record RemoveTagFromGenreCardResponse(bool IsSuccess);

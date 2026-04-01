@@ -1,5 +1,3 @@
-using Library.Application.Services.Labels.Commands.DeleteLabel;
-
 namespace Library.API.Endpoints.Labels;
 
 public record DeleteLabelResponse(bool IsSuccess);

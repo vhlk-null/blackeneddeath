@@ -1,5 +1,3 @@
-using Library.Application.Services.Labels.Commands.UpdateLabel;
-
 namespace Library.API.Endpoints.Labels;
 
 public record UpdateLabelRequest(string Name);

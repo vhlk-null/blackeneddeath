@@ -1,5 +1,3 @@
-using Library.Application.Services.Countries.Commands.CreateCountry;
-
 namespace Library.API.Endpoints.Countries;
 
 public record CreateCountryRequest(string Name, string Code);

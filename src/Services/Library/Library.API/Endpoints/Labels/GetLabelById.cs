@@ -1,5 +1,3 @@
-using Library.Application.Services.Labels.Queries.GetLabelById;
-
 namespace Library.API.Endpoints.Labels;
 
 public record GetLabelByIdResponse(LabelDto Label);

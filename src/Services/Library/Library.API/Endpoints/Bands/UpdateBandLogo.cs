@@ -1,6 +1,3 @@
-using Library.Application.Services.Bands.Commands.UpdateBandLogo;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Library.API.Endpoints.Bands;
 
 public record UpdateBandLogoRequest
@@ -22,9 +19,13 @@ public class UpdateBandLogo : ICarterModule
                     if (logo is null)
                         return Results.Problem("Logo file is required.", instance: $"/bands/{id}/logo", statusCode: StatusCodes.Status400BadRequest);
 
+                    var logoStream = new MemoryStream();
+                    await logo.CopyToAsync(logoStream);
+                    logoStream.Position = 0;
+
                     var command = new UpdateBandLogoCommand(
                         id,
-                        logo.OpenReadStream(),
+                        logoStream,
                         logo.ContentType,
                         logo.FileName);
 

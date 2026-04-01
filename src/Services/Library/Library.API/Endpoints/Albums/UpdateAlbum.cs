@@ -1,6 +1,3 @@
-using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Library.API.Endpoints.Albums;
 
 public record UpdateAlbumRequest
@@ -10,7 +7,6 @@ public record UpdateAlbumRequest
 }
 
 public record UpdateAlbumResponse(bool IsSuccess);
-
 public class UpdateAlbum : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -27,9 +23,17 @@ public class UpdateAlbum : ICarterModule
                 if (albumDto is null)
                     return Results.Problem("Could not deserialize album data.", instance: "/albums", statusCode: StatusCodes.Status400BadRequest);
 
+                Stream? coverImageStream = null;
+                if (request.CoverImage is not null)
+                {
+                    coverImageStream = new MemoryStream();
+                    await request.CoverImage.CopyToAsync(coverImageStream);
+                    coverImageStream.Position = 0;
+                }
+
                 var command = new UpdateAlbumCommand(
                     albumDto with { Id = id },
-                    request.CoverImage?.OpenReadStream(),
+                    coverImageStream,
                     request.CoverImage?.ContentType,
                     request.CoverImage?.FileName);
 

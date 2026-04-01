@@ -1,7 +1,3 @@
-using System.Text.Json;
-using Library.Application.Services.Bands.Commands.UpdateBand;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Library.API.Endpoints.Bands;
 
 public record UpdateBandRequest
@@ -31,9 +27,17 @@ public class UpdateBand : ICarterModule
 
                     bandDto = bandDto with { Id = id };
 
+                    Stream? logoStream = null;
+                    if (request.LogoUrl is not null)
+                    {
+                        logoStream = new MemoryStream();
+                        await request.LogoUrl.CopyToAsync(logoStream);
+                        logoStream.Position = 0;
+                    }
+
                     var command = new UpdateBandCommand(
                         bandDto,
-                        request.LogoUrl?.OpenReadStream(),
+                        logoStream,
                         request.LogoUrl?.ContentType,
                         request.LogoUrl?.FileName);
 

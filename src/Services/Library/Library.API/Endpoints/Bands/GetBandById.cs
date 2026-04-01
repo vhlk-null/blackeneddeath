@@ -1,5 +1,3 @@
-using Library.Application.Services.Bands.Queries.GetBandsBy.GetBandById;
-
 namespace Library.API.Endpoints.Bands;
 
 public record GetBandByIdResponse(BandDto Band);

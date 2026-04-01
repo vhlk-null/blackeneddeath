@@ -1,5 +1,3 @@
-using Library.Application.Services.Countries.Queries.GetCountries;
-
 namespace Library.API.Endpoints.Countries;
 
 public record GetCountriesResult(IReadOnlyList<CountryDto> Countries);

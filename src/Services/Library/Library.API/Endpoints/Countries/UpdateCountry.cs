@@ -1,5 +1,3 @@
-using Library.Application.Services.Countries.Commands.UpdateCountry;
-
 namespace Library.API.Endpoints.Countries;
 
 public record UpdateCountryRequest(string Name, string Code);

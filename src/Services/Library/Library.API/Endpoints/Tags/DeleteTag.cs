@@ -1,5 +1,3 @@
-using Library.Application.Services.Tags.Commands.DeleteTag;
-
 namespace Library.API.Endpoints.Tags;
 
 public record DeleteTagResponse(bool IsSuccess);

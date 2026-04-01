@@ -1,9 +1,6 @@
-using Library.Application.Services.Albums.Specifications;
-
 namespace Library.API.Endpoints.Albums;
 
 public record GetAlbumsResult(PaginatedResult<AlbumCardDto> Albums);
-
 public class GetAlbums : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)

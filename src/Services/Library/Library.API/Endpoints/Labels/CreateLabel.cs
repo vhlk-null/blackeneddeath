@@ -1,5 +1,3 @@
-using Library.Application.Services.Labels.Commands.CreateLabel;
-
 namespace Library.API.Endpoints.Labels;
 
 public record CreateLabelRequest(string Name);

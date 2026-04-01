@@ -1,6 +1,3 @@
-using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Library.API.Endpoints.Albums;
 
 public record CreateAlbumRequest
@@ -27,9 +24,17 @@ public class CreateAlbum : ICarterModule
                     if (albumDto is null)
                         return Results.Problem("Could not deserialize album data.", instance: "/albums", statusCode: StatusCodes.Status400BadRequest);
 
+                    Stream? coverImageStream = null;
+                    if (request.CoverImage is not null)
+                    {
+                        coverImageStream = new MemoryStream();
+                        await request.CoverImage.CopyToAsync(coverImageStream);
+                        coverImageStream.Position = 0;
+                    }
+
                     var command = new CreateAlbumCommand(
                         albumDto,
-                        request.CoverImage?.OpenReadStream(),
+                        coverImageStream,
                         request.CoverImage?.ContentType,
                         request.CoverImage?.FileName);
                     var result = await sender.Send(command);

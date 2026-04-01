@@ -1,5 +1,3 @@
-using Library.Application.Services.Tags.Commands.UpdateTag;
-
 namespace Library.API.Endpoints.Tags;
 
 public record UpdateTagRequest(string Name);

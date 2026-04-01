@@ -1,6 +1,3 @@
-using Library.Application.Services.GenreCards.Commands.UpdateGenreCardCover;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Library.API.Endpoints.GenreCards;
 
 public record UpdateGenreCardCoverRequest
@@ -17,9 +14,13 @@ public class UpdateGenreCardCover : ICarterModule
         app.MapPut("/genre-cards/{id:guid}/cover",
                 async (Guid id, [FromForm] UpdateGenreCardCoverRequest request, ISender sender) =>
                 {
+                    var coverImageStream = new MemoryStream();
+                    await request.CoverImage.CopyToAsync(coverImageStream);
+                    coverImageStream.Position = 0;
+
                     var command = new UpdateGenreCardCoverCommand(
                         id,
-                        request.CoverImage.OpenReadStream(),
+                        coverImageStream,
                         request.CoverImage.ContentType,
                         request.CoverImage.FileName);
 

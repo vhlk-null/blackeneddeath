@@ -1,5 +1,3 @@
-using Library.Application.Services.GenreCards.Commands.AddGenreToGenreCard;
-
 namespace Library.API.Endpoints.GenreCards;
 
 public record AddGenreToGenreCardResponse(bool IsSuccess);

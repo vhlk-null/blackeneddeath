@@ -1,5 +1,3 @@
-using Library.Application.Services.Tags.Queries.GetTags;
-
 namespace Library.API.Endpoints.Tags;
 
 public record GetTagsResponse(IReadOnlyList<TagDto> Tags);

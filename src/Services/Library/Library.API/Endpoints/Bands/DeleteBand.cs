@@ -1,5 +1,3 @@
-using Library.Application.Services.Bands.Commands.DeleteBand;
-
 namespace Library.API.Endpoints.Bands;
 
 public record DeleteBandResponse(bool IsSuccess);

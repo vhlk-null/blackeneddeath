@@ -1,6 +1,3 @@
-using Library.Application.Services.Albums.Commands.UpdateAlbumCover;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Library.API.Endpoints.Albums;
 
 public record UpdateAlbumCoverRequest
@@ -17,9 +14,13 @@ public class UpdateAlbumCover : ICarterModule
         app.MapPut("/albums/{id:guid}/cover",
                 async (Guid id, [FromForm] UpdateAlbumCoverRequest request, ISender sender) =>
                 {
+                    var coverImageStream = new MemoryStream();
+                    await request.CoverImage.CopyToAsync(coverImageStream);
+                    coverImageStream.Position = 0;
+
                     var command = new UpdateAlbumCoverCommand(
                         id,
-                        request.CoverImage.OpenReadStream(),
+                        coverImageStream,
                         request.CoverImage.ContentType,
                         request.CoverImage.FileName);
 

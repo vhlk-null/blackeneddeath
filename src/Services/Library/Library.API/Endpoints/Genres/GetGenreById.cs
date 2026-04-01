@@ -1,5 +1,3 @@
-using Library.Application.Services.Genres.Queries.GetGenreById;
-
 namespace Library.API.Endpoints.Genres;
 
 public record GetGenreByIdResponse(GenreDto Genre);

@@ -1,6 +1,4 @@
-﻿using Library.Application.Services.Albums.Queries.GetAlbumById;
-
-namespace Library.API.Endpoints.Albums;
+﻿namespace Library.API.Endpoints.Albums;
 
 public record GetAlbumByIdResponse(AlbumDto Album);
 

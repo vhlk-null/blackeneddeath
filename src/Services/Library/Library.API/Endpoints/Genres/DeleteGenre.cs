@@ -1,5 +1,3 @@
-using Library.Application.Services.Genres.Commands.DeleteGenre;
-
 namespace Library.API.Endpoints.Genres;
 
 public record DeleteGenreResponse(bool IsSuccess);

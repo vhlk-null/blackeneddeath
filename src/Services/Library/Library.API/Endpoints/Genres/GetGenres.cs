@@ -1,5 +1,3 @@
-using Library.Application.Services.Genres.Queries.GetGenres;
-
 namespace Library.API.Endpoints.Genres;
 
 public record GetGenresResult(IReadOnlyList<GenreDto> Genres);

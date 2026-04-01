@@ -1,5 +1,3 @@
-using Library.Application.Services.GenreCards.Queries.GetAlbumsByGenreCard;
-
 namespace Library.API.Endpoints.GenreCards;
 
 public class GetAlbumsByGenreCard : ICarterModule

@@ -1,5 +1,3 @@
-using Library.Application.Services.GenreCards.Queries.GetGenreCardById;
-
 namespace Library.API.Endpoints.GenreCards;
 
 public class GetGenreCardById : ICarterModule

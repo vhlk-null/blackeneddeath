@@ -1,5 +1,3 @@
-using Library.Application.Services.Countries.Queries.GetCountryById;
-
 namespace Library.API.Endpoints.Countries;
 
 public record GetCountryByIdResponse(CountryDto Country);

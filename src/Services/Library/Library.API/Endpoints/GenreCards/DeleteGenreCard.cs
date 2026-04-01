@@ -1,5 +1,3 @@
-using Library.Application.Services.GenreCards.Commands.DeleteGenreCard;
-
 namespace Library.API.Endpoints.GenreCards;
 
 public record DeleteGenreCardResponse(bool IsSuccess);

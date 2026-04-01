@@ -1,6 +1,3 @@
-using Library.Application.Services.GenreCards.Commands.UpdateGenreCard;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Library.API.Endpoints.GenreCards;
 
 public record UpdateGenreCardRequest
@@ -22,6 +19,14 @@ public class UpdateGenreCard : ICarterModule
         app.MapPut("/genre-cards/{id:guid}",
                 async (Guid id, [FromForm] UpdateGenreCardRequest request, ISender sender) =>
                 {
+                    Stream? coverImageStream = null;
+                    if (request.CoverImage is not null)
+                    {
+                        coverImageStream = new MemoryStream();
+                        await request.CoverImage.CopyToAsync(coverImageStream);
+                        coverImageStream.Position = 0;
+                    }
+
                     var command = new UpdateGenreCardCommand(
                         id,
                         request.Name,
@@ -29,7 +34,7 @@ public class UpdateGenreCard : ICarterModule
                         request.OrderNumber,
                         request.GenreIds,
                         request.TagIds,
-                        request.CoverImage?.OpenReadStream(),
+                        coverImageStream,
                         request.CoverImage?.ContentType,
                         request.CoverImage?.FileName);
 

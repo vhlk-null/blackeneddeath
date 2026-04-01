@@ -1,5 +1,3 @@
-using Library.Application.Services.Labels.Queries.GetLabels;
-
 namespace Library.API.Endpoints.Labels;
 
 public record GetLabelsResult(IReadOnlyList<LabelDto> Labels);

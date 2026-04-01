@@ -1,5 +1,3 @@
-using Library.Application.Services.Genres.Commands.CreateGenre;
-
 namespace Library.API.Endpoints.Genres;
 
 public record CreateGenreRequest(string Name, Guid? ParentGenreId);
