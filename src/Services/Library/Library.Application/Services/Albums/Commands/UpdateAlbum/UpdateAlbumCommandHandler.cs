@@ -85,13 +85,17 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
     private static void ReconcileGenres(Album album, UpdateAlbumDto dto)
     {
         var currentIds = album.AlbumGenres.Select(x => x.GenreId).ToHashSet();
-        var incomingIds = dto.GenreIds.Select(GenreId.Of).ToHashSet();
+        var incomingOrdered = dto.GenreIds.Select(GenreId.Of).ToList();
+        var incomingIds = incomingOrdered.ToHashSet();
 
         foreach (var id in currentIds.Except(incomingIds))
             album.RemoveGenre(id);
 
-        foreach (var id in incomingIds.Except(currentIds))
-            album.AddGenre(id, isPrimary: false);
+        foreach (var (genreId, index) in incomingOrdered.Select((id, i) => (id, i)))
+        {
+            if (!currentIds.Contains(genreId))
+                album.AddGenre(genreId, isPrimary: index == 0);
+        }
     }
 
     private static void ReconcileTags(Album album, UpdateAlbumDto dto)

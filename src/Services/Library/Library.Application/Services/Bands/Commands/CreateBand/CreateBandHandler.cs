@@ -33,13 +33,7 @@ public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService
                 throw new CountryNotFoundException(id);
         }
 
-        if (band.GenreId is Guid primaryGenreId)
-        {
-            if (!await context.Genres.AnyAsync(g => g.Id == GenreId.Of(primaryGenreId), cancellationToken))
-                throw new GenreNotFoundException(primaryGenreId);
-        }
-
-        foreach (var id in band.SubgenreIds ?? [])
+        foreach (var id in band.GenreIds)
         {
             if (!await context.Genres.AnyAsync(g => g.Id == GenreId.Of(id), cancellationToken))
                 throw new GenreNotFoundException(id);
@@ -57,11 +51,8 @@ public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService
         foreach (var id in command.Band.CountryIds)
             band.AddCountry(CountryId.Of(id));
 
-        if (command.Band.GenreId is Guid primaryGenreId)
-            band.AddGenre(GenreId.Of(primaryGenreId), isPrimary: true);
-
-        foreach (var id in command.Band.SubgenreIds ?? [])
-            band.AddGenre(GenreId.Of(id), isPrimary: false);
+        foreach (var (id, index) in command.Band.GenreIds.Select((id, i) => (id, i)))
+            band.AddGenre(GenreId.Of(id), isPrimary: index == 0);
 
         return band;
     }

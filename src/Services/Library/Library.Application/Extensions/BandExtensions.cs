@@ -29,11 +29,8 @@ public static class BandExtensions
                         .ToList()))
                 .ToList(),
             band.BandGenres
-                .Where(bg => bg.IsPrimary && genres.ContainsKey(bg.GenreId))
-                .Select(bg => new GenreDto(genres[bg.GenreId].Id.Value, genres[bg.GenreId].Name, genres[bg.GenreId].Slug, bg.IsPrimary))
-                .FirstOrDefault(),
-            band.BandGenres
-                .Where(bg => !bg.IsPrimary && genres.ContainsKey(bg.GenreId))
+                .Where(bg => genres.ContainsKey(bg.GenreId))
+                .OrderByDescending(bg => bg.IsPrimary)
                 .Select(bg => new GenreDto(genres[bg.GenreId].Id.Value, genres[bg.GenreId].Name, genres[bg.GenreId].Slug, bg.IsPrimary))
                 .ToList(),
             band.Facebook,

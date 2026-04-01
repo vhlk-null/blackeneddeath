@@ -100,8 +100,8 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
         foreach (var id in album.CountryIds)
             newAlbum.AddCountry(CountryId.Of(id));
 
-        foreach (var id in album.GenreIds)
-            newAlbum.AddGenre(GenreId.Of(id), isPrimary: false);
+        foreach (var (id, index) in album.GenreIds.Select((id, i) => (id, i)))
+            newAlbum.AddGenre(GenreId.Of(id), isPrimary: index == 0);
 
         foreach (var id in album.TagIds)
             newAlbum.AddTag(TagId.Of(id));

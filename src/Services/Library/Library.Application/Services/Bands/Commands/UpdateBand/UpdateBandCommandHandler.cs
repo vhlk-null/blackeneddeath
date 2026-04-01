@@ -28,7 +28,7 @@ public class UpdateBandCommandHandler(ILibraryDbContext context, IStorageService
             command.Band.Facebook, command.Band.Youtube, command.Band.Instagram, command.Band.Twitter, command.Band.Website);
 
         ReconcileCountries(band, command.Band.CountryIds);
-        ReconcileGenres(band, command.Band.GenreId, command.Band.SubgenreIds);
+        ReconcileGenres(band, command.Band.GenreIds);
 
         await context.SaveChangesAsync(cancellationToken);
 
@@ -47,23 +47,20 @@ public class UpdateBandCommandHandler(ILibraryDbContext context, IStorageService
             band.AddCountry(id);
     }
 
-    private static void ReconcileGenres(Band band, Guid? genreId, List<Guid>? subgenreIds)
+    private static void ReconcileGenres(Band band, List<Guid> genreIds)
     {
         var currentIds = band.BandGenres.Select(x => x.GenreId).ToHashSet();
+        var incomingOrdered = genreIds.Select(GenreId.Of).ToList();
+        var incomingIds = incomingOrdered.ToHashSet();
 
-        var incomingPrimary = genreId is Guid pid ? GenreId.Of(pid) : null;
-        var incomingSubs = (subgenreIds ?? []).Select(GenreId.Of).ToHashSet();
-        var allIncoming = incomingSubs.ToHashSet();
-        if (incomingPrimary != null) allIncoming.Add(incomingPrimary);
-
-        foreach (var id in currentIds.Except(allIncoming))
+        foreach (var id in currentIds.Except(incomingIds))
             band.RemoveGenre(id);
 
-        if (incomingPrimary != null && !currentIds.Contains(incomingPrimary))
-            band.AddGenre(incomingPrimary, isPrimary: true);
-
-        foreach (var id in incomingSubs.Where(id => !currentIds.Contains(id)))
-            band.AddGenre(id, isPrimary: false);
+        foreach (var (genreId, index) in incomingOrdered.Select((id, i) => (id, i)))
+        {
+            if (!currentIds.Contains(genreId))
+                band.AddGenre(genreId, isPrimary: index == 0);
+        }
     }
 
     private static string Slugify(string value) =>
