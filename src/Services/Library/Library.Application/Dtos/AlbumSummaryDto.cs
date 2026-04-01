@@ -8,4 +8,5 @@ public record AlbumSummaryDto(
     string? CoverUrl,
     AlbumType Type,
     AlbumFormat Format,
-    IReadOnlyList<GenreDto> Genres);
+    IReadOnlyList<GenreDto> Genres,
+    IReadOnlyList<CountryDto> Countries);

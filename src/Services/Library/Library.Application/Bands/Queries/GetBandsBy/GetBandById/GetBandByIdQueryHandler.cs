@@ -23,11 +23,17 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context)
         var genreIds = band.BandGenres.Select(bg => bg.GenreId).ToList();
 
         var albums = await context.Albums.AsNoTracking()
+            .Include(a => a.AlbumGenres)
+            .Include(a => a.AlbumCountries)
             .Where(a => albumIds.Contains(a.Id))
             .ToListAsync(cancellationToken);
 
+        var allCountryIds = countryIds
+            .Concat(albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)))
+            .Distinct().ToList();
+
         var countries = await context.Countries.AsNoTracking()
-            .Where(c => countryIds.Contains(c.Id))
+            .Where(c => allCountryIds.Contains(c.Id))
             .ToDictionaryAsync(c => c.Id, cancellationToken);
 
         var genres = await context.Genres.AsNoTracking()

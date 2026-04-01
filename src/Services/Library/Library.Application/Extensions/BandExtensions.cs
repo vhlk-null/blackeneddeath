@@ -26,6 +26,9 @@ public static class BandExtensions
                 .Select(a => new AlbumSummaryDto(a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear, urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
                     a.AlbumGenres.Where(ag => genres.ContainsKey(ag.GenreId))
                         .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
+                        .ToList(),
+                    a.AlbumCountries.Where(ac => countries.ContainsKey(ac.CountryId))
+                        .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
                         .ToList()))
                 .ToList(),
             band.BandGenres
