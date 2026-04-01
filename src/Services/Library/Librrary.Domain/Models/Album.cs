@@ -94,6 +94,14 @@ public class Album : Aggregate<AlbumId>
         _albumGenres.Add(new AlbumGenre(Id, genreId, isPrimary));
     }
 
+    public void UpdateGenrePrimary(GenreId genreId, bool isPrimary)
+    {
+        var entry = _albumGenres.FirstOrDefault(x => x.GenreId == genreId)
+            ?? throw new DomainException("Genre is not associated with this album.");
+
+        entry.IsPrimary = isPrimary;
+    }
+
     public void RemoveGenre(GenreId genreId)
     {
         var entry = _albumGenres.FirstOrDefault(x => x.GenreId == genreId)

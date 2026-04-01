@@ -86,6 +86,14 @@ public class Band : Aggregate<BandId>
         _bandGenres.Add(new BandGenre(Id, genreId, isPrimary));
     }
 
+    public void UpdateGenrePrimary(GenreId genreId, bool isPrimary)
+    {
+        var entry = _bandGenres.FirstOrDefault(x => x.GenreId == genreId)
+            ?? throw new DomainException("Genre is not associated with this band.");
+
+        entry.IsPrimary = isPrimary;
+    }
+
     public void RemoveGenre(GenreId genreId)
     {
         var entry = _bandGenres.FirstOrDefault(x => x.GenreId == genreId)

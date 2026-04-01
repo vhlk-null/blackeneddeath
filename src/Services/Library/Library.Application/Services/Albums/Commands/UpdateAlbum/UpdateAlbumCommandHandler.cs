@@ -93,7 +93,9 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
 
         foreach (var (genreId, index) in incomingOrdered.Select((id, i) => (id, i)))
         {
-            if (!currentIds.Contains(genreId))
+            if (currentIds.Contains(genreId))
+                album.UpdateGenrePrimary(genreId, isPrimary: index == 0);
+            else
                 album.AddGenre(genreId, isPrimary: index == 0);
         }
     }

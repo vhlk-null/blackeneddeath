@@ -4,7 +4,7 @@ public class AlbumGenre : JoinEntity
 {
     public AlbumId AlbumId { get; private set; } = null!;
     public GenreId GenreId { get; private set; } = null!;
-    public bool IsPrimary { get; private set; }
+    public bool IsPrimary { get; internal set; }
 
     private AlbumGenre() { }
 
