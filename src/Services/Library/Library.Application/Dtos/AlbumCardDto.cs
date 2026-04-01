@@ -9,4 +9,5 @@ public record AlbumCardDto(
     AlbumType Type,
     AlbumFormat Format,
     GenreDto? PrimaryGenre,
-    List<BandRefDto> Bands);
+    List<BandRefDto> Bands,
+    List<CountryDto> Countries);

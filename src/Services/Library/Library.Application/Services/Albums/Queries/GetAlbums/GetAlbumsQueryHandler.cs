@@ -36,12 +36,19 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
         var genreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)).Distinct().ToList();
 
         var bands = await context.Bands.AsNoTracking()
+            .Include(b => b.BandCountries)
             .Where(b => bandIds.Contains(b.Id))
             .ToDictionaryAsync(b => b.Id, cancellationToken);
 
         var genres = await context.Genres.AsNoTracking()
             .Where(g => genreIds.Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, cancellationToken);
+
+        var countryIds = bands.Values.SelectMany(b => b.BandCountries.Select(bc => bc.CountryId)).Distinct().ToList();
+
+        var countries = await context.Countries.AsNoTracking()
+            .Where(c => countryIds.Contains(c.Id))
+            .ToDictionaryAsync(c => c.Id, cancellationToken);
 
         var albumDtos = albums.Select(a => new AlbumCardDto(
             a.Id.Value,
@@ -58,6 +65,14 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
             a.AlbumBands
                 .Where(ab => bands.ContainsKey(ab.BandId))
                 .Select(ab => new BandRefDto(bands[ab.BandId].Id.Value, bands[ab.BandId].Name, bands[ab.BandId].Slug))
+                .ToList(),
+            a.AlbumBands
+                .Where(ab => bands.ContainsKey(ab.BandId))
+                .SelectMany(ab => bands[ab.BandId].BandCountries)
+                .Select(bc => bc.CountryId)
+                .Distinct()
+                .Where(cid => countries.ContainsKey(cid))
+                .Select(cid => new CountryDto(countries[cid].Id.Value, countries[cid].Name, countries[cid].Code))
                 .ToList()
         )).ToList();
 
