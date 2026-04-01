@@ -32,19 +32,8 @@ public class GetBandsQueryHandler(ILibraryDbContext context, IStorageUrlResolver
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        var bandIds = bands.Select(b => b.Id).ToList();
         var countryIds = bands.SelectMany(b => b.BandCountries.Select(bc => bc.CountryId)).Distinct().ToList();
-        var genreIds = bands.SelectMany(b => b.BandGenres.Select(bg => bg.GenreId)).Distinct().ToList();
-
-        var albumBands = await context.AlbumBands.AsNoTracking()
-            .Where(ab => bandIds.Contains(ab.BandId))
-            .ToListAsync(cancellationToken);
-
-        var albumIds = albumBands.Select(ab => ab.AlbumId).Distinct().ToList();
-
-        var albums = await context.Albums.AsNoTracking()
-            .Where(a => albumIds.Contains(a.Id))
-            .ToListAsync(cancellationToken);
+        var genreIds   = bands.SelectMany(b => b.BandGenres.Select(bg => bg.GenreId)).Distinct().ToList();
 
         var countries = await context.Countries.AsNoTracking()
             .Where(c => countryIds.Contains(c.Id))
@@ -54,13 +43,24 @@ public class GetBandsQueryHandler(ILibraryDbContext context, IStorageUrlResolver
             .Where(g => genreIds.Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, cancellationToken);
 
-        var albumsById = albums.ToDictionary(a => a.Id);
-        var albumsByBand = albumBands.ToLookup(ab => ab.BandId, ab => albumsById[ab.AlbumId]);
+        var bandDtos = bands.Select(b => new BandCardDto(
+            b.Id.Value,
+            b.Name,
+            b.Slug,
+            urlResolver.Resolve(b.LogoUrl),
+            b.Status,
+            b.Activity.FormedYear,
+            b.Activity.DisbandedYear,
+            b.BandGenres
+                .Where(bg => bg.IsPrimary && genres.ContainsKey(bg.GenreId))
+                .Select(bg => new GenreDto(genres[bg.GenreId].Id.Value, genres[bg.GenreId].Name, genres[bg.GenreId].Slug, bg.IsPrimary))
+                .FirstOrDefault(),
+            b.BandCountries
+                .Where(bc => countries.ContainsKey(bc.CountryId))
+                .Select(bc => new CountryDto(countries[bc.CountryId].Id.Value, countries[bc.CountryId].Name, countries[bc.CountryId].Code))
+                .ToList()
+        )).ToList();
 
-        var bandDtos = bands
-            .Select(b => b.ToBandDto(countries, genres, albumsByBand, urlResolver))
-            .ToList();
-
-        return new GetBandsResult(new PaginatedResult<BandDto>(pageIndex, pageSize, totalCount, bandDtos));
+        return new GetBandsResult(new PaginatedResult<BandCardDto>(pageIndex, pageSize, totalCount, bandDtos));
     }
 }

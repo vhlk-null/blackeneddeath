@@ -2,7 +2,7 @@ using Library.Application.Services.Bands.Specifications;
 
 namespace Library.API.Endpoints.Bands;
 
-public record GetBandsResult(PaginatedResult<BandDto> Bands);
+public record GetBandsResult(PaginatedResult<BandCardDto> Bands);
 
 public class GetBands : ICarterModule
 {

@@ -7,4 +7,4 @@ public record GetAlbumsQuery(
     AlbumSortBy SortBy = AlbumSortBy.Newest,
     ISpecification<Album>? Filter = null) : BuildingBlocks.CQRS.IQuery<GetAlbumsResult>;
 
-public record GetAlbumsResult(PaginatedResult<AlbumDto> Albums);
+public record GetAlbumsResult(PaginatedResult<AlbumCardDto> Albums);

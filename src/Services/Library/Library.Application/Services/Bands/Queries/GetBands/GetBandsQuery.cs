@@ -7,4 +7,4 @@ public record GetBandsQuery(
     BandSortBy SortBy = BandSortBy.Newest,
     ISpecification<Band>? Filter = null) : BuildingBlocks.CQRS.IQuery<GetBandsResult>;
 
-public record GetBandsResult(PaginatedResult<BandDto> Bands);
+public record GetBandsResult(PaginatedResult<BandCardDto> Bands);
