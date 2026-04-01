@@ -14,7 +14,7 @@ public class GetAlbumsByGenreCard : ICarterModule
                     return Results.Ok(result.Albums);
                 })
             .WithName("GetAlbumsByGenreCard")
-            .Produces<PaginatedResult<AlbumDto>>(StatusCodes.Status200OK)
+            .Produces<PaginatedResult<AlbumCardDto>>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Get Albums by GenreCard")
             .WithDescription("Returns albums matching any genre or tag from the card (OR logic)")
