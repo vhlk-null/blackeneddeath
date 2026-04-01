@@ -5,7 +5,8 @@ namespace Library.API.Endpoints.Bands;
 
 public record UpdateBandLogoRequest
 {
-    public IFormFile Logo { get; init; } = null!;
+    public IFormFile? Logo { get; init; }
+    public IFormFile? LogoUrl { get; init; }
 }
 
 public record UpdateBandLogoResponse(bool IsSuccess);
@@ -17,11 +18,15 @@ public class UpdateBandLogo : ICarterModule
         app.MapPut("/bands/{id:guid}/logo",
                 async (Guid id, [FromForm] UpdateBandLogoRequest request, ISender sender) =>
                 {
+                    var logo = request.Logo ?? request.LogoUrl;
+                    if (logo is null)
+                        return Results.Problem("Logo file is required.", instance: $"/bands/{id}/logo", statusCode: StatusCodes.Status400BadRequest);
+
                     var command = new UpdateBandLogoCommand(
                         id,
-                        request.Logo.OpenReadStream(),
-                        request.Logo.ContentType,
-                        request.Logo.FileName);
+                        logo.OpenReadStream(),
+                        logo.ContentType,
+                        logo.FileName);
 
                     var result = await sender.Send(command);
 

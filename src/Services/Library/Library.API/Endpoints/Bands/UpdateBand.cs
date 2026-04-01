@@ -16,8 +16,8 @@ public class UpdateBand : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/bands",
-                async ([FromForm] UpdateBandRequest request, ISender sender) =>
+        app.MapPut("/bands/{id:guid}",
+                async ([FromRoute] Guid id, [FromForm] UpdateBandRequest request, ISender sender) =>
                 {
                     var bandDto = JsonSerializer.Deserialize<UpdateBandDto>(request.Band,
                         new JsonSerializerOptions
@@ -28,6 +28,8 @@ public class UpdateBand : ICarterModule
 
                     if (bandDto is null)
                         return Results.Problem("Could not deserialize band data.", instance: "/bands", statusCode: StatusCodes.Status400BadRequest);
+
+                    bandDto = bandDto with { Id = id };
 
                     var command = new UpdateBandCommand(
                         bandDto,
