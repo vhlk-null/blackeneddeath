@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace Library.Application.Services.Albums.Commands.UpdateAlbumCover;
 
 public class UpdateAlbumCoverCommandHandler(ILibraryDbContext context, IStorageService storage)
@@ -17,7 +15,7 @@ public class UpdateAlbumCoverCommandHandler(ILibraryDbContext context, IStorageS
         var extension = Path.GetExtension(command.CoverImageFileName);
         var coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
 
-        album.Update(album.Title, album.Type, album.AlbumRelease, coverKey, album.LabelId);
+        album.Update(album.Title, album.Slug, album.Type, album.AlbumRelease, coverKey, album.LabelId);
         await context.SaveChangesAsync(cancellationToken);
 
         return new UpdateAlbumCoverResult(true);

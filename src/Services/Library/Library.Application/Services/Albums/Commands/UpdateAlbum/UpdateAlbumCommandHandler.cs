@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace Library.Application.Services.Albums.Commands.UpdateAlbum;
 
 public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageService storage) : BuildingBlocks.CQRS.ICommandHandler<UpdateAlbumCommand, UpdateAlbumResult>
@@ -44,7 +42,11 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
         var albumRelease = AlbumRelease.Of(command.Album.ReleaseDate, command.Album.Format);
         var labelId = command.Album.LabelIds is { Count: > 0 } ? LabelId.Of(command.Album.LabelIds[0]) : null;
 
-        album.Update(command.Album.Title, command.Album.Type, albumRelease, coverKey, labelId);
+        var newSlug = album.Title != command.Album.Title
+            ? await GenerateUniqueSlugAsync(command.Album.Title, command.Album.ReleaseDate, album.Id, cancellationToken)
+            : album.Slug;
+
+        album.Update(command.Album.Title, newSlug, command.Album.Type, albumRelease, coverKey, labelId);
 
         ReconcileBands(album, command.Album);
         ReconcileCountries(album, command.Album);
@@ -56,6 +58,16 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
         await context.SaveChangesAsync(cancellationToken);
 
         return new UpdateAlbumResult(true);
+    }
+
+    private async Task<string> GenerateUniqueSlugAsync(string title, int releaseYear, AlbumId excludeId, CancellationToken ct)
+    {
+        var baseSlug = $"{SlugHelper.Generate(title)}-{releaseYear}";
+        var slug = baseSlug;
+        var counter = 1;
+        while (await context.Albums.AnyAsync(a => a.Slug == slug && a.Id != excludeId, ct))
+            slug = $"{baseSlug}-{++counter}";
+        return slug;
     }
 
     private static void ReconcileBands(Album album, UpdateAlbumDto dto)
@@ -167,7 +179,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
                 if (existing.Title != incoming.Title)
                     existing.UpdateTitle(incoming.Title);
 
-                if (existing.Duration != incoming.Duration)
+                if (existing.Duration != incoming.Duration) 
                     existing.UpdateDuration(incoming.Duration);
             }
             else

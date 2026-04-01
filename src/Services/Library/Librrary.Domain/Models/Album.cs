@@ -51,13 +51,14 @@ public class Album : Aggregate<AlbumId>
         AddDomainEvent(new AlbumRemovedEvent(this));
     }
 
-    public Album Update(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelId? labelId)
+    public Album Update(string title, string slug, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelId? labelId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        ArgumentException.ThrowIfNullOrWhiteSpace(slug);
         ArgumentNullException.ThrowIfNull(albumRelease);
 
         Title = title;
-        Slug = SlugHelper.Generate(title);
+        Slug = slug;
         Type = type;
         AlbumRelease = albumRelease;
         CoverUrl = coverUrl;

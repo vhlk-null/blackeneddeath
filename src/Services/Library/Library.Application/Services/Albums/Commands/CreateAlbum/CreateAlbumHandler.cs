@@ -9,7 +9,7 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
         string? coverKey = null;
         if (command.CoverImage is not null && command.CoverImageContentType is not null && command.CoverImageFileName is not null)
         {
-            var folder = $"albums/{Slugify(command.Album.Title)}";
+            var folder = $"albums/{SlugHelper.Generate(command.Album.Title)}";
             var extension = Path.GetExtension(command.CoverImageFileName);
             coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
         }
@@ -80,9 +80,6 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
 
         return slug;
     }
-
-    private static string Slugify(string value) =>
-        Regex.Replace(value.ToLowerInvariant().Trim(), @"[^a-z0-9]+", "-").Trim('-');
 
     private Album CreateNewAlbum(CreateAlbumDto album, string? coverKey, string slug)
     {
