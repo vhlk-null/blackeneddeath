@@ -4,16 +4,19 @@
     <File Path="ci.yml" />
   </Folder>
   <Folder Name="/APIGateways/">
-    <Project Path="ApiGateways/YarpApiGateway/YarpApiGateway.csproj" />
     <Project Path="ApiGateways/YarpApiGateway.Tests/YarpApiGateway.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
     </Project>
+    <Project Path="ApiGateways/YarpApiGateway/YarpApiGateway.csproj" />
   </Folder>
   <Folder Name="/BuildingBlocks/">
     <Project Path="BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj" Id="64b989a7-1e04-400f-8ff9-20b0b8292d3e" />
     <Project Path="BuildingBlocks/BuildingBlocks/BuildingBlocks.csproj" Id="360266db-31f0-4e2f-9490-f5622bdc9f17" />
   </Folder>
   <Folder Name="/Services/" />
+  <Folder Name="/Services/Identity/">
+    <Project Path="Services/Identity/IdentityServer/IdentityServer.csproj" Id="0f0792c3-f5fc-43a0-bf8e-41c79b9948be" />
+  </Folder>
   <Folder Name="/Services/Library/">
     <Project Path="Services/Library/Library.API/Library.API.csproj" />
     <Project Path="Services/Library/Library.APITests/Library.APITests.csproj">

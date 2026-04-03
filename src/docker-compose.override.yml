@@ -33,7 +33,7 @@ services:
       timeout: 5s
       retries: 5
 
-  messagebroker: 
+  messagebroker:
     container_name: messagebroker
     hostname: blackenddeath
     environment:
@@ -61,6 +61,45 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  identitydb:
+    container_name: identitydb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=IdentityDb
+    restart: always
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_identity:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  identity.server:
+    container_name: identity.server
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=DevPassword123!
+      - ConnectionStrings__IdentityDb=Host=identitydb;Port=5432;Database=IdentityDb;Username=postgres;Password=postgres
+    restart: always
+    ports:
+      - "6020:8080"
+      - "6021:8081"
+    depends_on:
+      identitydb:
+        condition: service_healthy
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   library.api:
     environment:
@@ -115,7 +154,7 @@ services:
         condition: service_started
     ports:
       - "6010:8080"
-      - "6011:8081"   
+      - "6011:8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -142,6 +181,8 @@ services:
       library.api:
         condition: service_started
       usercontent.api:
+        condition: service_started
+      identity.server:
         condition: service_started
     ports:
       - "6050:8080"

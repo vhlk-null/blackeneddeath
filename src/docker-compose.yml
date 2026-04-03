@@ -4,6 +4,9 @@ services:
 
   usercontentdb:
     image: postgres:16
+    
+  identitydb:
+    image: postgres:16
 
   messagebroker:
     image: rabbitmq:management
@@ -23,6 +26,12 @@ services:
       context: .
       dockerfile: Services/Library/Library.API/Dockerfile
 
+  identity.server:
+    image: ${DOCKER_REGISTRY-}identityserver
+    build:
+      context: .
+      dockerfile: Services/Identity/IdentityServer/Dockerfile
+
   yarpapigateway:
     image: ${DOCKER_REGISTRY-}yarpapigateway
     build:
@@ -38,4 +47,5 @@ services:
 volumes:
   postgres_library:
   postgres_usercontent:
+  postgres_identity:
   rabbitmq_data:
