@@ -885,7 +885,7 @@ internal static class InitialData
                 "Norwegian black metal band formed in 1991 in Notodden. Pioneers of symphonic black metal, renowned for their complex compositions that merged aggressive black metal with orchestral arrangements and progressive structures.",
                 null,
                 BandActivity.Of(1991, 2001),
-                BandStatus.SplitUp,
+                BandStatus.Disbanded,
                 BandIds.Emperor);
             emperor.AddGenre(GenreIds.BlackMetal,         isPrimary: true);
             emperor.AddGenre(GenreIds.SymphonicBlackMetal, isPrimary: false);
@@ -906,7 +906,7 @@ internal static class InitialData
                 "Swedish melodic black/death metal band formed in 1989 in Strömstad by Jon Nödtveidt. Known for their sophisticated blend of melodic death metal with black metal atmospherics, considered pioneers of the Scandinavian melodic extreme metal sound.",
                 null,
                 BandActivity.Of(1989, 2006),
-                BandStatus.SplitUp,
+                BandStatus.Disbanded,
                 BandIds.Dissection);
             dissection.AddGenre(GenreIds.BlackMetal,        isPrimary: true);
             dissection.AddGenre(GenreIds.MelodicBlackMetal, isPrimary: false);

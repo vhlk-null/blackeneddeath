@@ -3,7 +3,8 @@ namespace Library.Domain.Enums;
 public enum BandStatus
 {
     Active,
-    SplitUp,
+    Disbanded,
     OnHold,
-    Unknown
+    Unknown,
+    ChangedName
 }
