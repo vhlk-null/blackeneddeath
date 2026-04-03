@@ -58,6 +58,7 @@ public static class AlbumExtensions
                     b.Id.Value,
                     b.Name,
                     b.Slug,
+                    b.Status,
                     discographyByBand[b.Id]
                         .DistinctBy(a => a.Id)
                         .Where(a => a.Id != album.Id)
