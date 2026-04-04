@@ -23,6 +23,7 @@ public static class BandExtensions
                 .ToList(),
             albumsByBand[band.Id]
                 .DistinctBy(a => a.Id)
+                .OrderByDescending(a => a.AlbumRelease.ReleaseYear)
                 .Select(a => new AlbumSummaryDto(a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear, urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
                     a.AlbumGenres.Where(ag => genres.ContainsKey(ag.GenreId))
                         .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
