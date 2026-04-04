@@ -55,5 +55,6 @@ public class BandConfiguration : IEntityTypeConfiguration<Band>
 
         entity.Navigation(e => e.BandCountries).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.BandGenres).UsePropertyAccessMode(PropertyAccessMode.Field);
+        entity.Navigation(e => e.VideoBands).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

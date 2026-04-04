@@ -47,7 +47,7 @@ public class VideoBandConfiguration : IEntityTypeConfiguration<VideoBand>
             .HasColumnName("info");
 
         entity.HasOne<Band>()
-            .WithMany()
+            .WithMany(b => b.VideoBands)
             .HasForeignKey(e => e.BandId)
             .OnDelete(DeleteBehavior.Cascade);
 

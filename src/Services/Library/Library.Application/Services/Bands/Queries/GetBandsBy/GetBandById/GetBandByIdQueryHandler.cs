@@ -11,6 +11,7 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
             .AsNoTracking()
             .Include(b => b.BandCountries)
             .Include(b => b.BandGenres)
+            .Include(b => b.VideoBands)
             .FirstOrDefaultAsync(b => b.Id == bandId, cancellationToken)
             ?? throw new BandNotFoundException(query.Id);
 
@@ -90,12 +91,20 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
                 .Select(bc => new CountryDto(countries[bc.CountryId].Id.Value, countries[bc.CountryId].Name, countries[bc.CountryId].Code))
                 .ToList())).ToList();
 
+        var videos = band.VideoBands
+            .OrderByDescending(vb => vb.Year)
+            .Select(vb => new VideoBandDto(
+                vb.Id.Value, vb.BandId.Value, vb.Name, vb.Year,
+                vb.CountryId != null ? vb.CountryId.Value : null,
+                vb.VideoType, vb.YoutubeLink, vb.Info))
+            .ToList();
+
         return new GetBandByIdResult(new BandDetailDto(
             bandDto.Id, bandDto.Name, bandDto.Slug, bandDto.Bio,
             bandDto.LogoUrl, bandDto.FormedYear, bandDto.DisbandedYear,
             bandDto.Status, bandDto.Countries, bandDto.Albums, bandDto.Genres,
             bandDto.Facebook, bandDto.Youtube, bandDto.Instagram,
             bandDto.Twitter, bandDto.Website,
-            similarBandDtos));
+            videos, similarBandDtos));
     }
 }

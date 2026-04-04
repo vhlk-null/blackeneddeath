@@ -16,9 +16,11 @@ public class Band : Aggregate<BandId>
 
     private readonly List<BandCountry> _bandCountries = [];
     private readonly List<BandGenre> _bandGenres = [];
+    private readonly List<VideoBand> _videoBands = [];
 
     public IReadOnlyList<BandCountry> BandCountries => _bandCountries.AsReadOnly();
     public IReadOnlyList<BandGenre> BandGenres => _bandGenres.AsReadOnly();
+    public IReadOnlyList<VideoBand> VideoBands => _videoBands.AsReadOnly();
 
     private Band() { }
 
