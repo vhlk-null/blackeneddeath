@@ -23,7 +23,8 @@ file sealed class AndSpecification<T>(ISpecification<T> left, ISpecification<T> 
         get
         {
             var leftExpr  = left.Criteria;
-            var rightExpr = ParameterReplacer.Replace(right.Criteria, right.Criteria.Parameters[0], leftExpr.Parameters[0]);
+            var rightCriteria = right.Criteria;
+            var rightExpr = ParameterReplacer.Replace(rightCriteria, rightCriteria.Parameters[0], leftExpr.Parameters[0]);
             return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(leftExpr.Body, rightExpr.Body), leftExpr.Parameters[0]);
         }
     }
@@ -36,7 +37,8 @@ file sealed class OrSpecification<T>(ISpecification<T> left, ISpecification<T> r
         get
         {
             var leftExpr  = left.Criteria;
-            var rightExpr = ParameterReplacer.Replace(right.Criteria, right.Criteria.Parameters[0], leftExpr.Parameters[0]);
+            var rightCriteria = right.Criteria;
+            var rightExpr = ParameterReplacer.Replace(rightCriteria, rightCriteria.Parameters[0], leftExpr.Parameters[0]);
             return Expression.Lambda<Func<T, bool>>(Expression.OrElse(leftExpr.Body, rightExpr.Body), leftExpr.Parameters[0]);
         }
     }
