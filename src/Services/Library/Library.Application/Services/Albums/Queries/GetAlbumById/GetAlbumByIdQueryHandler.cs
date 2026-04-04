@@ -34,16 +34,32 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
             .SelectMany(a => a.AlbumBands.Select(ab => (ab.BandId, a)))
             .ToLookup(x => x.BandId, x => x.a);
 
-        var genreIds = album.AlbumGenres.Select(ag => ag.GenreId)
+        var genreIds = album.AlbumGenres.Select(ag => ag.GenreId).ToList();
+
+        // Similar albums: same genre, exclude current + discography, random 4
+        var excludeAlbumIds = discographyAlbums.Select(a => a.Id).Append(albumId).Distinct().ToHashSet();
+
+        var similarAlbums = await context.Albums.AsNoTracking()
+            .Include(a => a.AlbumGenres)
+            .Include(a => a.AlbumCountries)
+            .Where(a => !excludeAlbumIds.Contains(a.Id))
+            .Where(a => a.AlbumGenres.Any(ag => genreIds.Contains(ag.GenreId)))
+            .OrderBy(_ => EF.Functions.Random())
+            .Take(4)
+            .ToListAsync(cancellationToken);
+
+        var allGenreIds = genreIds
             .Concat(discographyAlbums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)))
+            .Concat(similarAlbums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)))
             .Distinct().ToList();
 
         var genres = await context.Genres.AsNoTracking()
-            .Where(g => genreIds.Contains(g.Id))
+            .Where(g => allGenreIds.Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, cancellationToken);
 
         var allCountryIds = album.AlbumCountries.Select(ac => ac.CountryId)
             .Concat(discographyAlbums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)))
+            .Concat(similarAlbums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)))
             .Distinct().ToList();
 
         var countries = await context.Countries.AsNoTracking()
@@ -67,6 +83,25 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
                 .ToDictionaryAsync(t => t.Id, cancellationToken)
             : new Dictionary<TagId, Tag>();
 
-        return new GetAlbumByIdResult(album.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels, tags, discographyByBand));
+        var albumDto = album.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels, tags, discographyByBand);
+
+        var similarAlbumDtos = similarAlbums.Select(a => new AlbumSummaryDto(
+            a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear,
+            urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
+            a.AlbumGenres
+                .Where(ag => genres.ContainsKey(ag.GenreId))
+                .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
+                .ToList(),
+            a.AlbumCountries
+                .Where(ac => countries.ContainsKey(ac.CountryId))
+                .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
+                .ToList())).ToList();
+
+        return new GetAlbumByIdResult(new AlbumDetailDto(
+            albumDto.Id, albumDto.Title, albumDto.Slug, albumDto.ReleaseDate,
+            albumDto.CoverUrl, albumDto.Type, albumDto.Format, albumDto.Label,
+            albumDto.Bands, albumDto.Countries, albumDto.StreamingLinks,
+            albumDto.Tracks, albumDto.Genres, albumDto.Tags, albumDto.TotalDuration,
+            similarAlbumDtos));
     }
 }

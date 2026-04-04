@@ -1,6 +1,6 @@
 ﻿namespace Library.API.Endpoints.Albums;
 
-public record GetAlbumByIdResponse(AlbumDto Album);
+public record GetAlbumByIdResponse(AlbumDetailDto Album);
 
 public class GetAlbumById : ICarterModule
 {

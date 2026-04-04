@@ -1,6 +1,6 @@
 namespace Library.API.Endpoints.Bands;
 
-public record GetBandByIdResponse(BandDto Band);
+public record GetBandByIdResponse(BandDetailDto Band);
 
 public class GetBandById : ICarterModule
 {

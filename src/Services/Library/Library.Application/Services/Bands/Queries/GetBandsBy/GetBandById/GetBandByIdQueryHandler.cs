@@ -28,7 +28,22 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
             .Where(a => albumIds.Contains(a.Id))
             .ToListAsync(cancellationToken);
 
-        var albumGenreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)).Distinct().ToList();
+        // Similar bands: same genre, not this band, random 3
+        var similarBands = await context.Bands.AsNoTracking()
+            .Include(b => b.BandGenres)
+            .Where(b => b.Id != bandId)
+            .Where(b => b.BandGenres.Any(bg => genreIds.Contains(bg.GenreId)))
+            .OrderBy(_ => EF.Functions.Random())
+            .Take(3)
+            .ToListAsync(cancellationToken);
+
+        var albumGenreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId));
+        var similarBandGenreIds = similarBands.SelectMany(b => b.BandGenres.Select(bg => bg.GenreId));
+
+        var allGenreIds = genreIds
+            .Concat(albumGenreIds)
+            .Concat(similarBandGenreIds)
+            .Distinct().ToList();
 
         var allCountryIds = countryIds
             .Concat(albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)))
@@ -39,11 +54,22 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
             .ToDictionaryAsync(c => c.Id, cancellationToken);
 
         var genres = await context.Genres.AsNoTracking()
-            .Where(g => genreIds.Concat(albumGenreIds).Contains(g.Id))
+            .Where(g => allGenreIds.Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, cancellationToken);
 
         var albumsByBand = albums.ToLookup(_ => band.Id);
 
-        return new GetBandByIdResult(band.ToBandDto(countries, genres, albumsByBand, urlResolver));
+        var bandDto = band.ToBandDto(countries, genres, albumsByBand, urlResolver);
+
+        var similarBandDtos = similarBands.Select(b => new BandSummaryDto(
+            b.Id.Value, b.Name, b.Slug, b.Status, [])).ToList();
+
+        return new GetBandByIdResult(new BandDetailDto(
+            bandDto.Id, bandDto.Name, bandDto.Slug, bandDto.Bio,
+            bandDto.LogoUrl, bandDto.FormedYear, bandDto.DisbandedYear,
+            bandDto.Status, bandDto.Countries, bandDto.Albums, bandDto.Genres,
+            bandDto.Facebook, bandDto.Youtube, bandDto.Instagram,
+            bandDto.Twitter, bandDto.Website,
+            similarBandDtos));
     }
 }
