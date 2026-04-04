@@ -35,4 +35,4 @@ public record BandDetailDto(
     string? Instagram,
     string? Twitter,
     string? Website,
-    List<BandSummaryDto> SimilarBands);
+    List<BandCardDto> SimilarBands);

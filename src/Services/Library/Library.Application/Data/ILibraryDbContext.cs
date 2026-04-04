@@ -11,6 +11,7 @@ public interface ILibraryDbContext
     DbSet<Tag> Tags { get; }
     DbSet<StreamingLink> StreamingLinks { get; }
     DbSet<GenreCard> GenreCards { get; }
+    DbSet<VideoBand> VideoBands { get; }
 
     DbSet<AlbumBand> AlbumBands { get; }
     DbSet<AlbumGenre> AlbumGenres { get; }

@@ -31,6 +31,7 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
         // Similar bands: same genre, not this band, random 3
         var similarBands = await context.Bands.AsNoTracking()
             .Include(b => b.BandGenres)
+            .Include(b => b.BandCountries)
             .Where(b => b.Id != bandId)
             .Where(b => b.BandGenres.Any(bg => genreIds.Contains(bg.GenreId)))
             .OrderBy(_ => EF.Functions.Random())
@@ -61,8 +62,33 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
 
         var bandDto = band.ToBandDto(countries, genres, albumsByBand, urlResolver);
 
-        var similarBandDtos = similarBands.Select(b => new BandSummaryDto(
-            b.Id.Value, b.Name, b.Slug, b.Status, [])).ToList();
+        var similarBandCountryIds = similarBands
+            .SelectMany(b => b.BandCountries.Select(bc => bc.CountryId))
+            .Except(allCountryIds)
+            .Distinct().ToList();
+
+        foreach (var entry in await context.Countries.AsNoTracking()
+            .Where(c => similarBandCountryIds.Contains(c.Id))
+            .ToDictionaryAsync(c => c.Id, cancellationToken))
+        {
+            countries[entry.Key] = entry.Value;
+        }
+
+        var similarBandDtos = similarBands.Select(b => new BandCardDto(
+            b.Id.Value,
+            b.Name,
+            b.Slug,
+            urlResolver.Resolve(b.LogoUrl),
+            b.Status,
+            b.Activity.FormedYear,
+            b.Activity.DisbandedYear,
+            b.BandGenres.Where(bg => bg.IsPrimary && genres.ContainsKey(bg.GenreId))
+                .Select(bg => new GenreDto(genres[bg.GenreId].Id.Value, genres[bg.GenreId].Name, genres[bg.GenreId].Slug, bg.IsPrimary))
+                .FirstOrDefault(),
+            b.BandCountries
+                .Where(bc => countries.ContainsKey(bc.CountryId))
+                .Select(bc => new CountryDto(countries[bc.CountryId].Id.Value, countries[bc.CountryId].Name, countries[bc.CountryId].Code))
+                .ToList())).ToList();
 
         return new GetBandByIdResult(new BandDetailDto(
             bandDto.Id, bandDto.Name, bandDto.Slug, bandDto.Bio,

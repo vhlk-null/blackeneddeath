@@ -22,6 +22,7 @@ public class LibraryContext : DbContext, ILibraryDbContext
     public virtual DbSet<Tag> Tags { get; set; }
     public virtual DbSet<StreamingLink> StreamingLinks { get; set; }
     public virtual DbSet<GenreCard> GenreCards { get; set; }
+    public virtual DbSet<VideoBand> VideoBands { get; set; }
 
     // Junction tables (Many-to-Many)
     public virtual DbSet<AlbumBand> AlbumBands { get; set; }
