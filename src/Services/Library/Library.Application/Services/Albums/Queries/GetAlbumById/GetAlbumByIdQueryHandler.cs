@@ -97,11 +97,20 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
                 .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
                 .ToList())).ToList();
 
+        var videos = await context.VideoBands.AsNoTracking()
+            .Where(vb => bandIds.Contains(vb.BandId))
+            .OrderByDescending(vb => vb.Year)
+            .Select(vb => new VideoBandDto(
+                vb.Id.Value, vb.BandId.Value, vb.Name, vb.Year,
+                vb.CountryId != null ? vb.CountryId.Value : null,
+                vb.VideoType, vb.YoutubeLink, vb.Info))
+            .ToListAsync(cancellationToken);
+
         return new GetAlbumByIdResult(new AlbumDetailDto(
             albumDto.Id, albumDto.Title, albumDto.Slug, albumDto.ReleaseDate,
             albumDto.CoverUrl, albumDto.Type, albumDto.Format, albumDto.Label,
             albumDto.Bands, albumDto.Countries, albumDto.StreamingLinks,
             albumDto.Tracks, albumDto.Genres, albumDto.Tags, albumDto.TotalDuration,
-            similarAlbumDtos));
+            videos, similarAlbumDtos));
     }
 }

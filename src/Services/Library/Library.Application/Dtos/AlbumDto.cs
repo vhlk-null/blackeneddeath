@@ -33,4 +33,5 @@ public record AlbumDetailDto(
     List<GenreDto> Genres,
     List<TagDto> Tags,
     string? TotalDuration,
+    List<VideoBandDto> Videos,
     List<AlbumSummaryDto> SimilarAlbums);
