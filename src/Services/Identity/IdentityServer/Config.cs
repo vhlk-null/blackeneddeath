@@ -7,12 +7,13 @@
             new()
             {
                 ClientId = "libraryClient",
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
                 ClientSecrets = { new Secret("secret".Sha256()) },
                 AllowedScopes = { "libraryAPI" }
             }
         ];
 
-        public static IEnumerable<ApiScope> ApiScopes =>
+        public static List<ApiScope> ApiScopes =>
         [
             new("libraryAPI","Library API")
         ];
