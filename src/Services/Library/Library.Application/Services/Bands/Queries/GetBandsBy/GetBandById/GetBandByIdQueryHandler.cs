@@ -94,7 +94,7 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
         var videos = band.VideoBands
             .OrderByDescending(vb => vb.Year)
             .Select(vb => new VideoBandDto(
-                vb.Id.Value, vb.BandId.Value, vb.Name, vb.Year,
+                vb.Id.Value, vb.BandId.Value, band.Name, vb.Name, vb.Year,
                 vb.CountryId != null ? vb.CountryId.Value : null,
                 vb.VideoType, vb.YoutubeLink, vb.Info))
             .ToList();

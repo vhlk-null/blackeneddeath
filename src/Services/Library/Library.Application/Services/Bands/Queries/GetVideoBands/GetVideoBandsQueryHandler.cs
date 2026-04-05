@@ -13,18 +13,20 @@ public class GetVideoBandsQueryHandler(ILibraryDbContext context)
         var totalCount = await baseQuery.LongCountAsync(cancellationToken);
 
         var videoBands = await baseQuery
-            .OrderByDescending(vb => vb.Year)
+            .Join(context.Bands, vb => vb.BandId, b => b.Id, (vb, b) => new { vb, BandName = b.Name })
+            .OrderByDescending(x => x.vb.Year)
             .Skip(pageSize * pageIndex)
             .Take(pageSize)
-            .Select(vb => new VideoBandDto(
-                vb.Id.Value,
-                vb.BandId.Value,
-                vb.Name,
-                vb.Year,
-                vb.CountryId != null ? vb.CountryId.Value : null,
-                vb.VideoType,
-                vb.YoutubeLink,
-                vb.Info))
+            .Select(x => new VideoBandDto(
+                x.vb.Id.Value,
+                x.vb.BandId.Value,
+                x.BandName,
+                x.vb.Name,
+                x.vb.Year,
+                x.vb.CountryId != null ? x.vb.CountryId.Value : null,
+                x.vb.VideoType,
+                x.vb.YoutubeLink,
+                x.vb.Info))
             .ToListAsync(cancellationToken);
 
         return new GetVideoBandsResult(

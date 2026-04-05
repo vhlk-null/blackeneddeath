@@ -99,11 +99,12 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
 
         var videos = await context.VideoBands.AsNoTracking()
             .Where(vb => bandIds.Contains(vb.BandId))
-            .OrderByDescending(vb => vb.Year)
-            .Select(vb => new VideoBandDto(
-                vb.Id.Value, vb.BandId.Value, vb.Name, vb.Year,
-                vb.CountryId != null ? vb.CountryId.Value : null,
-                vb.VideoType, vb.YoutubeLink, vb.Info))
+            .Join(context.Bands, vb => vb.BandId, b => b.Id, (vb, b) => new { vb, BandName = b.Name })
+            .OrderByDescending(x => x.vb.Year)
+            .Select(x => new VideoBandDto(
+                x.vb.Id.Value, x.vb.BandId.Value, x.BandName, x.vb.Name, x.vb.Year,
+                x.vb.CountryId != null ? x.vb.CountryId.Value : null,
+                x.vb.VideoType, x.vb.YoutubeLink, x.vb.Info))
             .ToListAsync(cancellationToken);
 
         return new GetAlbumByIdResult(new AlbumDetailDto(

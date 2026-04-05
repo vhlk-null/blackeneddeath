@@ -7,9 +7,11 @@ public class GetVideoBandsByBandIdQueryHandler(ILibraryDbContext context)
     {
         var bandId = BandId.Of(query.BandId);
 
-        var bandExists = await context.Bands.AnyAsync(b => b.Id == bandId, cancellationToken);
-        if (!bandExists)
-            throw new BandNotFoundException(query.BandId);
+        var bandName = await context.Bands
+            .Where(b => b.Id == bandId)
+            .Select(b => b.Name)
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? throw new BandNotFoundException(query.BandId);
 
         var pageIndex = query.PaginationRequest.PageIndex;
         var pageSize = query.PaginationRequest.PageSize;
@@ -27,6 +29,7 @@ public class GetVideoBandsByBandIdQueryHandler(ILibraryDbContext context)
             .Select(vb => new VideoBandDto(
                 vb.Id.Value,
                 vb.BandId.Value,
+                bandName,
                 vb.Name,
                 vb.Year,
                 vb.CountryId != null ? vb.CountryId.Value : null,
