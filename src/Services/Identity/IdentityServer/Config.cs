@@ -30,8 +30,8 @@
 
         public static List<TestUser> TestUsers =>
         [
-            new TestUser { SubjectId = "1", Username = "Alice", Password = "password" },
-            new TestUser { SubjectId = "2", Username = "Bob", Password = "password" }
+            new() { SubjectId = "1", Username = "Alice", Password = "password" },
+            new() { SubjectId = "2", Username = "Bob", Password = "password" }
         ];
 
     }

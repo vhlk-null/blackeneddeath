@@ -1,22 +1,14 @@
-namespace Library.Application.Services.Bands.Queries.GetVideoBandsByBandId;
+namespace Library.Application.Services.Bands.Queries.GetVideoBands;
 
-public class GetVideoBandsByBandIdQueryHandler(ILibraryDbContext context)
-    : BuildingBlocks.CQRS.IQueryHandler<GetVideoBandsByBandIdQuery, GetVideoBandsByBandIdResult>
+public class GetVideoBandsQueryHandler(ILibraryDbContext context)
+    : BuildingBlocks.CQRS.IQueryHandler<GetVideoBandsQuery, GetVideoBandsResult>
 {
-    public async ValueTask<GetVideoBandsByBandIdResult> Handle(GetVideoBandsByBandIdQuery query, CancellationToken cancellationToken)
+    public async ValueTask<GetVideoBandsResult> Handle(GetVideoBandsQuery query, CancellationToken cancellationToken)
     {
-        var bandId = BandId.Of(query.BandId);
-
-        var bandExists = await context.Bands.AnyAsync(b => b.Id == bandId, cancellationToken);
-        if (!bandExists)
-            throw new BandNotFoundException(query.BandId);
-
         var pageIndex = query.PaginationRequest.PageIndex;
         var pageSize = query.PaginationRequest.PageSize;
 
-        var baseQuery = context.VideoBands
-            .AsNoTracking()
-            .Where(vb => vb.BandId == bandId);
+        var baseQuery = context.VideoBands.AsNoTracking();
 
         var totalCount = await baseQuery.LongCountAsync(cancellationToken);
 
@@ -35,7 +27,7 @@ public class GetVideoBandsByBandIdQueryHandler(ILibraryDbContext context)
                 vb.Info))
             .ToListAsync(cancellationToken);
 
-        return new GetVideoBandsByBandIdResult(
+        return new GetVideoBandsResult(
             new PaginatedResult<VideoBandDto>(pageIndex, pageSize, totalCount, videoBands));
     }
 }

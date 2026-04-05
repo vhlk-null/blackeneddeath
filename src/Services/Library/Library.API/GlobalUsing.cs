@@ -30,6 +30,7 @@ global using Library.Application.Services.Bands.Commands.UpdateBandLogo;
 global using Library.Application.Services.Bands.Commands.CreateVideoBand;
 global using Library.Application.Services.Bands.Commands.UpdateVideoBand;
 global using Library.Application.Services.Bands.Commands.DeleteVideoBand;
+global using Library.Application.Services.Bands.Queries.GetVideoBands;
 global using Library.Application.Services.Bands.Queries.GetVideoBandsByBandId;
 global using Library.Application.Services.Bands.Queries.GetBands;
 global using Library.Application.Services.Bands.Queries.GetBandsBy.GetBandById;
