@@ -88,6 +88,7 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=DevPassword123!
       - ConnectionStrings__IdentityDb=Host=identitydb;Port=5432;Database=IdentityDb;Username=postgres;Password=postgres
+      - IdentityServer__IssuerUri=https://localhost:6021
     restart: always
     ports:
       - "6020:8080"
@@ -118,11 +119,14 @@ services:
       - Storage__CloudName=dledijbyt
       - Storage__ApiKey=695255835435442
       - Storage__ApiSecret=IfARU4chBqqo_usv7spAL76YOL4
+      - IdentityServer__Authority=http://identity.server:8080
     depends_on:
       librarydb:
         condition: service_healthy
       messagebroker:
         condition: service_healthy
+      identity.server:
+        condition: service_started
     ports:
       - "6000:8080"
       - "6001:8081"

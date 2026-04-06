@@ -24,6 +24,10 @@ public class GetAlbums : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Albums")
             .WithDescription("Get Albums with optional filters: genreId, labelId, countryId, type, year")
-            .WithTags("Albums");
+            .WithTags("Albums")
+            //.ProducesProblem(StatusCodes.Status401Unauthorized)
+            //.ProducesProblem(StatusCodes.Status403Forbidden)
+            //.RequireAuthorization("ClientIdPolicy")
+            ;
     }
 }

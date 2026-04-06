@@ -1,41 +1,65 @@
-    namespace Library.API;
+using Microsoft.IdentityModel.Tokens;
 
-    public static class DependencyInjection
+namespace Library.API;
+
+public static class DependencyInjection
+{
+    public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.ConfigureHttpJsonOptions(options =>
-                options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+        services.ConfigureHttpJsonOptions(options =>
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-            services.AddOpenApi();
-            services.AddMessageBroker(configuration);
-            services.AddCarter();
-            services.AddExceptionHandler<GlobalExceptionHandler>();
-            services.AddProblemDetails();
-            services.AddGrpc();
+        services.AddOpenApi();
+        services.AddMessageBroker(configuration);
+        services.AddCarter();
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
+        services.AddGrpc();
 
-            var connectionString = configuration.GetConnectionString(ConnectionStrings.LibraryDatabase);
-            services.AddHealthChecks()
-                .AddNpgSql(connectionString ?? string.Empty, name: "postgresql");
-
-            return services;
-        }
-
-        public static WebApplication UseApiServices(this WebApplication app)
-        {
-            if (app.Environment.IsDevelopment())
+        services.AddAuthentication("Bearer")
+            .AddJwtBearer("Bearer", opt =>
             {
-                app.MapOpenApi();
-                app.MapScalarApiReference();
-            }
-
-            app.UseExceptionHandler();
-            app.MapCarter();
-            app.MapGrpcService<LibraryService>();
-            app.MapHealthChecks("/health", new HealthCheckOptions
-            {
-                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                opt.Authority = configuration["IdentityServer:Authority"];
+                opt.RequireHttpsMetadata = false;
+                opt.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateAudience = false,
+                    ValidateIssuer = false
+                };
             });
-            return app;
-        }
+
+        services.AddAuthorization(opt =>
+        {
+            opt.AddPolicy("ClientIdPolicy", policy => policy.RequireClaim("client_id", "libraryClient"));
+        });
+
+        services.AddAuthorization();
+
+        var connectionString = configuration.GetConnectionString(ConnectionStrings.LibraryDatabase);
+        services.AddHealthChecks()
+            .AddNpgSql(connectionString ?? string.Empty, name: "postgresql");
+
+        return services;
     }
+
+    public static WebApplication UseApiServices(this WebApplication app)
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            app.MapOpenApi();
+            app.MapScalarApiReference();
+        }
+
+        app.UseExceptionHandler();
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapCarter();
+        app.MapGrpcService<LibraryService>();
+        app.MapHealthChecks("/health", new HealthCheckOptions
+        {
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+        return app;
+    }
+}

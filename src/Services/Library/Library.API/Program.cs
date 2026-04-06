@@ -10,7 +10,6 @@ MappingConfig.RegisterMappings();
 var app = builder.Build();
 
 app.UseApiServices();
-app.UseRouting();
 
 await app.InitializeDatabaseAsync();
 

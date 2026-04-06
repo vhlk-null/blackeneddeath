@@ -26,6 +26,9 @@ RUN dotnet publish "./IdentityServer.csproj" -c $BUILD_CONFIGURATION -o /app/pub
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
+USER root
 WORKDIR /app
 COPY --from=publish /app/publish .
+RUN mkdir -p /app/keys && chown -R $APP_UID /app/keys
+USER $APP_UID
 ENTRYPOINT ["dotnet", "IdentityServer.dll"]

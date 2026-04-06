@@ -47,6 +47,9 @@ public class CreateAlbum : ICarterModule
             .WithSummary("Create Album")
             .WithDescription("Create Album")
             .WithTags("Albums")
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization();
     }
 }

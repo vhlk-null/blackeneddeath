@@ -2,10 +2,16 @@ using IdentityServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddIdentityServer()
+var issuerUri = builder.Configuration["IdentityServer:IssuerUri"];
+
+builder.Services.AddIdentityServer(options =>
+    {
+        if (!string.IsNullOrEmpty(issuerUri))
+            options.IssuerUri = issuerUri;
+    })
     .AddInMemoryClients(Config.Clients)
     .AddInMemoryApiScopes(Config.ApiScopes)
-    .AddDeveloperSigningCredential();
+    .AddDeveloperSigningCredential(persistKey: false);
 
 
 var app = builder.Build();
