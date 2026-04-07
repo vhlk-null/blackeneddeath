@@ -1,10 +1,3 @@
-using Duende.IdentityServer.Services;
-using Duende.IdentityServer.Test;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Security.Claims;
-
 namespace IdentityServer.Pages.Account;
 
 public class LoginModel(
@@ -47,13 +40,14 @@ public class LoginModel(
 
         var claims = new List<Claim>
         {
-            new(System.Security.Claims.ClaimTypes.Name, user.Username)
+            new(JwtClaimTypes.Subject, user.SubjectId),
+            new(JwtClaimTypes.Name, user.Username)
         };
         claims.AddRange(user.Claims.Select(c => new Claim(c.Type, c.Value)));
 
         var principal = new ClaimsPrincipal(new ClaimsIdentity(
             claims,
-            Duende.IdentityServer.IdentityServerConstants.DefaultCookieAuthenticationScheme));
+            IdentityServerConstants.DefaultCookieAuthenticationScheme));
 
         var props = new AuthenticationProperties();
         if (RememberMe)

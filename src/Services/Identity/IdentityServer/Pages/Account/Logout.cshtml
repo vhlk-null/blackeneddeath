@@ -155,10 +155,6 @@
 </head>
 <body>
 
-  <header class="site-header">
-    <a class="site-header__logo" href="http://localhost:4200">Blackened Death Metal</a>
-  </header>
-
   <main class="page">
     <div class="logout-card">
 
@@ -178,7 +174,7 @@
 
         @if (Model.PostLogoutRedirectUri != null)
         {
-          <a class="logout-card__link" href="@Model.PostLogoutRedirectUri">Return to site</a>
+          <meta http-equiv="refresh" content="0;url=@Model.PostLogoutRedirectUri" />
         }
       }
       else

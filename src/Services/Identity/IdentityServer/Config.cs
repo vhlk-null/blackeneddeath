@@ -49,18 +49,19 @@
             {
                 SubjectId = "1",
                 Username = "alice",
-                Password = "Password1!",
+                Password = "alice",
                 Claims =
                 [
                     new(JwtClaimTypes.Name, "Alice Smith"),
                     new(JwtClaimTypes.Email, "alice@example.com")
+                    
                 ]
             },
             new()
             {
                 SubjectId = "2",
                 Username = "bob",
-                Password = "Password1!",
+                Password = "bob",
                 Claims =
                 [
                     new(JwtClaimTypes.Name, "Bob Jones"),

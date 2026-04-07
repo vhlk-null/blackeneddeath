@@ -47,6 +47,9 @@ public class UpdateAlbum : ICarterModule
             .WithSummary("Update Album")
             .WithDescription("Update Album")
             .WithTags("Albums")
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization();
     }
 }
