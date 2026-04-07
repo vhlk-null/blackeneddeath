@@ -35,6 +35,9 @@
         public IEnumerable<ApiResource> ApiResources =>
         [
             new(Scopes.LibraryApi, "Library API")
+            {
+                Scopes = { Scopes.LibraryApi }
+            }
         ];
 
         public IEnumerable<IdentityResource> IdentityResources =>

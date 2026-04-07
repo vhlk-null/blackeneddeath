@@ -30,10 +30,9 @@ public static class DependencyInjection
 
         services.AddAuthorization(opt =>
         {
-            opt.AddPolicy("ClientIdPolicy", policy => policy.RequireClaim("client_id", "libraryClient"));
+            opt.AddPolicy("LibraryApiScope", policy =>
+                policy.RequireClaim("scope", "libraryAPI"));
         });
-
-        services.AddAuthorization();
 
         var connectionString = configuration.GetConnectionString(ConnectionStrings.LibraryDatabase);
         services.AddHealthChecks()
