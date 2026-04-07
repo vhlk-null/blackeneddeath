@@ -2,6 +2,7 @@ using IdentityServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var config = new Config(builder.Configuration);
 var issuerUri = builder.Configuration["IdentityServer:IssuerUri"];
 
 builder.Services.AddRazorPages();
@@ -14,11 +15,11 @@ builder.Services.AddIdentityServer(options =>
         options.UserInteraction.LoginUrl = "/Account/Login";
         options.UserInteraction.LogoutUrl = "/Account/Logout";
     })
-    .AddInMemoryClients(Config.Clients)
-    .AddInMemoryApiScopes(Config.ApiScopes)
-    .AddInMemoryApiResources(Config.ApiResources)
-    .AddInMemoryIdentityResources(Config.IdentityResources)
-    .AddTestUsers(Config.TestUsers)
+    .AddInMemoryClients(config.Clients)
+    .AddInMemoryApiScopes(config.ApiScopes)
+    .AddInMemoryApiResources(config.ApiResources)
+    .AddInMemoryIdentityResources(config.IdentityResources)
+    .AddTestUsers(config.TestUsers)
     .AddDeveloperSigningCredential(persistKey: false);
 
 var app = builder.Build();

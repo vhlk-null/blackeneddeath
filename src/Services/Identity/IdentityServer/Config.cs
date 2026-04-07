@@ -1,41 +1,49 @@
 ﻿namespace IdentityServer
 {
-    public static class Config
+    public class Config(IConfiguration configuration)
     {
-        public static IEnumerable<Client> Clients =>
-        [
-            new()
+        public IEnumerable<Client> Clients
+        {
+            get
             {
-                ClientId = "angular",
-                ClientName = "Angular Client",
-                AllowedGrantTypes = GrantTypes.Code,
-                RequirePkce = true,
-                RequireClientSecret = false,
-                AllowedCorsOrigins = { "http://localhost:4200" },
-                RedirectUris = { "http://localhost:4200/auth/callback" },
-                PostLogoutRedirectUris = { "http://localhost:4200" },
-                AllowedScopes = { "openid", "profile", "libraryAPI" },
-                AllowOfflineAccess = true
+                var clients = new List<Client>();
+                configuration.GetSection("IdentityServer:Clients").Bind(clients);
+
+                foreach (var client in clients)
+                {
+                    client.AllowedGrantTypes = GrantTypes.Code;
+                    client.RequirePkce = true;
+                    client.RequireClientSecret = false;
+                    client.AllowOfflineAccess = true;
+                    client.AllowedScopes =
+                    [
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        Scopes.LibraryApi
+                    ];
+                }
+
+                return clients;
             }
-        ];
+        }
 
-        public static List<ApiScope> ApiScopes =>
+        public List<ApiScope> ApiScopes =>
         [
-            new("libraryAPI", "Library API")
+            new(Scopes.LibraryApi, "Library API")
         ];
 
-        public static IEnumerable<ApiResource> ApiResources =>
+        public IEnumerable<ApiResource> ApiResources =>
         [
-            new("libraryAPI", "Library API")
+            new(Scopes.LibraryApi, "Library API")
         ];
 
-        public static IEnumerable<IdentityResource> IdentityResources =>
+        public IEnumerable<IdentityResource> IdentityResources =>
         [
             new IdentityResources.OpenId(),
             new IdentityResources.Profile()
         ];
 
-        public static List<TestUser> TestUsers =>
+        public List<TestUser> TestUsers =>
         [
             new()
             {
