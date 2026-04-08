@@ -23,7 +23,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-
 IIdentityServerBuilder identityServerBuilder = builder.Services.AddIdentityServer(options =>
     {
         if (!string.IsNullOrEmpty(issuerUri))
