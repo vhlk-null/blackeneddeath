@@ -50,6 +50,6 @@ public class UpdateAlbum : ICarterModule
             .DisableAntiforgery()
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status403Forbidden)
-            .RequireAuthorization();
+            .RequireAuthorization("AdminOnly");
     }
 }

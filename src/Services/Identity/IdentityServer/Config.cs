@@ -19,6 +19,8 @@
                     [
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.Email,
+                        Scopes.Roles,
                         Scopes.LibraryApi
                     ];
                 }
@@ -36,14 +38,18 @@
         [
             new(Scopes.LibraryApi, "Library API")
             {
-                Scopes = { Scopes.LibraryApi }
+                Scopes = { Scopes.LibraryApi },
+                UserClaims = { JwtClaimTypes.Role }
             }
         ];
 
         public IEnumerable<IdentityResource> IdentityResources =>
         [
             new IdentityResources.OpenId(),
-            new IdentityResources.Profile()
+            new IdentityResources.Profile(),
+            new IdentityResources.Email(),
+            new IdentityResource(
+                "roles","Your role(s)", new List<string>() {"role"})
         ];
 
         public List<TestUser> TestUsers =>
@@ -56,8 +62,9 @@
                 Claims =
                 [
                     new(JwtClaimTypes.Name, "Alice Smith"),
-                    new(JwtClaimTypes.Email, "alice@example.com")
-                    
+                    new(JwtClaimTypes.Email, "alice@example.com"),
+                    new Claim(JwtClaimTypes.Role, "user")
+
                 ]
             },
             new()
@@ -68,7 +75,8 @@
                 Claims =
                 [
                     new(JwtClaimTypes.Name, "Bob Jones"),
-                    new(JwtClaimTypes.Email, "bob@example.com")
+                    new(JwtClaimTypes.Email, "bob@example.com"),
+                    new Claim(JwtClaimTypes.Role, "admin")
                 ]
             }
         ];

@@ -35,6 +35,9 @@ public class UpdateAlbumCover : ICarterModule
             .WithSummary("Update Album Cover")
             .WithDescription("Upload or replace the cover image for an album")
             .WithTags("Albums")
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

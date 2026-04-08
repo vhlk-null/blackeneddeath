@@ -10,6 +10,7 @@ global using FluentValidation;
 global using Grpc.Core;
 global using HealthChecks.UI.Client;
 global using Library.API;
+global using BuildingBlocks.Authentication;
 global using Library.API.Extensions;
 global using Library.API.gRPC.Services;
 global using Library.API.Mappings;

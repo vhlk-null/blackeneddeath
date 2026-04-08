@@ -1,5 +1,3 @@
-using Microsoft.IdentityModel.Tokens;
-
 namespace Library.API;
 
 public static class DependencyInjection
@@ -16,22 +14,15 @@ public static class DependencyInjection
         services.AddProblemDetails();
         services.AddGrpc();
 
-        services.AddAuthentication("Bearer")
-            .AddJwtBearer("Bearer", opt =>
-            {
-                opt.Authority = configuration["IdentityServer:Authority"];
-                opt.RequireHttpsMetadata = false;
-                opt.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateAudience = false,
-                    ValidateIssuer = false
-                };
-            });
+        // Auth is handled by YARP gateway; here we only check forwarded role header
+        services.AddAuthentication("GatewayHeader")
+            .AddScheme<GatewayHeaderAuthenticationOptions, GatewayHeaderAuthenticationHandler>(
+                "GatewayHeader", _ => { });
 
         services.AddAuthorization(opt =>
         {
-            opt.AddPolicy("LibraryApiScope", policy =>
-                policy.RequireClaim("scope", "libraryAPI"));
+            opt.AddPolicy("AdminOnly", policy =>
+                policy.RequireRole("admin"));
         });
 
         var connectionString = configuration.GetConnectionString(ConnectionStrings.LibraryDatabase);

@@ -20,6 +20,9 @@ public class DeleteAlbum : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Delete Album")
             .WithDescription("Delete Album")
-            .WithTags("Albums");
+            .WithTags("Albums")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }
