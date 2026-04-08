@@ -11,9 +11,9 @@ public class UpdateCountry : ICarterModule
         app.MapPut("/countries/{id:guid}",
                 async (Guid id, UpdateCountryRequest request, ISender sender) =>
                 {
-                    var command = request.Adapt<UpdateCountryCommand>() with { Id = id };
+                    UpdateCountryCommand command = request.Adapt<UpdateCountryCommand>() with { Id = id };
 
-                    var result = await sender.Send(command);
+                    UpdateCountryResult result = await sender.Send(command);
 
                     return Results.Ok(result.Adapt<UpdateCountryResponse>());
                 })

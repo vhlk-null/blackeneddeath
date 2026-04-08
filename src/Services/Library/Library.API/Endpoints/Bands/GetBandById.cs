@@ -8,9 +8,9 @@ public class GetBandById : ICarterModule
     {
         app.MapGet("/bands/{id:guid}", async (Guid id, ISender sender) =>
         {
-            var query = new GetBandByIdQuery(id);
-            var result = await sender.Send(query);
-            var response = result.Adapt<GetBandByIdResponse>();
+            GetBandByIdQuery query = new GetBandByIdQuery(id);
+            GetBandByIdResult result = await sender.Send(query);
+            GetBandByIdResponse response = result.Adapt<GetBandByIdResponse>();
             return Results.Ok(response);
         })
         .WithName("GetBandById")

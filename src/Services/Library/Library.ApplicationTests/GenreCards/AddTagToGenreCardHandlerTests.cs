@@ -27,17 +27,17 @@ public class AddTagToGenreCardHandlerTests
     [Fact]
     public async Task Handle_ValidCommand_AddsTagAndReturnsSuccess()
     {
-        var cardId = Guid.NewGuid();
-        var tagId = Guid.NewGuid();
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Cavernous", "Deep cave sounds");
-        var tag = Tag.Create(TagId.Of(tagId), "Raw");
+        Guid cardId = Guid.NewGuid();
+        Guid tagId = Guid.NewGuid();
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Cavernous", "Deep cave sounds");
+        Tag tag = Tag.Create(TagId.Of(tagId), "Raw");
 
-        var cardsDbSet = MockDbSetFactory.Create(card);
-        var tagsDbSet = MockDbSetFactory.Create(tag);
+        Mock<DbSet<GenreCard>> cardsDbSet = MockDbSetFactory.Create(card);
+        Mock<DbSet<Tag>> tagsDbSet = MockDbSetFactory.Create(tag);
         _contextMock.Setup(x => x.GenreCards).Returns(cardsDbSet.Object);
         _contextMock.Setup(x => x.Tags).Returns(tagsDbSet.Object);
 
-        var result = await _handler.Handle(
+        AddTagToGenreCardResult result = await _handler.Handle(
             new AddTagToGenreCardCommand(cardId, tagId), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -48,13 +48,13 @@ public class AddTagToGenreCardHandlerTests
     [Fact]
     public async Task Handle_CardNotFound_ThrowsGenreCardNotFoundException()
     {
-        var tagId = Guid.NewGuid();
-        var cardsDbSet = MockDbSetFactory.Create<GenreCard>();
-        var tagsDbSet = MockDbSetFactory.Create(Tag.Create(TagId.Of(tagId), "Epic"));
+        Guid tagId = Guid.NewGuid();
+        Mock<DbSet<GenreCard>> cardsDbSet = MockDbSetFactory.Create<GenreCard>();
+        Mock<DbSet<Tag>> tagsDbSet = MockDbSetFactory.Create(Tag.Create(TagId.Of(tagId), "Epic"));
         _contextMock.Setup(x => x.GenreCards).Returns(cardsDbSet.Object);
         _contextMock.Setup(x => x.Tags).Returns(tagsDbSet.Object);
 
-        var act = async () => await _handler.Handle(
+        Func<Task<AddTagToGenreCardResult>> act = async () => await _handler.Handle(
             new AddTagToGenreCardCommand(Guid.NewGuid(), tagId), CancellationToken.None);
 
         await act.Should().ThrowAsync<GenreCardNotFoundException>();
@@ -63,14 +63,14 @@ public class AddTagToGenreCardHandlerTests
     [Fact]
     public async Task Handle_TagNotFound_ThrowsTagNotFoundException()
     {
-        var cardId = Guid.NewGuid();
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Progressive", "Prog vibes");
-        var cardsDbSet = MockDbSetFactory.Create(card);
-        var tagsDbSet = MockDbSetFactory.Create<Tag>();
+        Guid cardId = Guid.NewGuid();
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Progressive", "Prog vibes");
+        Mock<DbSet<GenreCard>> cardsDbSet = MockDbSetFactory.Create(card);
+        Mock<DbSet<Tag>> tagsDbSet = MockDbSetFactory.Create<Tag>();
         _contextMock.Setup(x => x.GenreCards).Returns(cardsDbSet.Object);
         _contextMock.Setup(x => x.Tags).Returns(tagsDbSet.Object);
 
-        var act = async () => await _handler.Handle(
+        Func<Task<AddTagToGenreCardResult>> act = async () => await _handler.Handle(
             new AddTagToGenreCardCommand(cardId, Guid.NewGuid()), CancellationToken.None);
 
         await act.Should().ThrowAsync<TagNotFoundException>();
@@ -79,18 +79,18 @@ public class AddTagToGenreCardHandlerTests
     [Fact]
     public async Task Handle_DuplicateTag_ThrowsDomainException()
     {
-        var cardId = Guid.NewGuid();
-        var tagId = Guid.NewGuid();
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Blackened Death", "Extreme metal");
+        Guid cardId = Guid.NewGuid();
+        Guid tagId = Guid.NewGuid();
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Blackened Death", "Extreme metal");
         card.AddTag(TagId.Of(tagId));
 
-        var tag = Tag.Create(TagId.Of(tagId), "Atmospheric");
-        var cardsDbSet = MockDbSetFactory.Create(card);
-        var tagsDbSet = MockDbSetFactory.Create(tag);
+        Tag tag = Tag.Create(TagId.Of(tagId), "Atmospheric");
+        Mock<DbSet<GenreCard>> cardsDbSet = MockDbSetFactory.Create(card);
+        Mock<DbSet<Tag>> tagsDbSet = MockDbSetFactory.Create(tag);
         _contextMock.Setup(x => x.GenreCards).Returns(cardsDbSet.Object);
         _contextMock.Setup(x => x.Tags).Returns(tagsDbSet.Object);
 
-        var act = async () => await _handler.Handle(
+        Func<Task<AddTagToGenreCardResult>> act = async () => await _handler.Handle(
             new AddTagToGenreCardCommand(cardId, tagId), CancellationToken.None);
 
         await act.Should().ThrowAsync<DomainException>();

@@ -7,7 +7,7 @@ public class GetGenreCardById : ICarterModule
         app.MapGet("/genre-cards/{id:guid}",
                 async (Guid id, ISender sender) =>
                 {
-                    var result = await sender.Send(new GetGenreCardByIdQuery(id));
+                    GetGenreCardByIdResult result = await sender.Send(new GetGenreCardByIdQuery(id));
 
                     return Results.Ok(result.GenreCard);
                 })

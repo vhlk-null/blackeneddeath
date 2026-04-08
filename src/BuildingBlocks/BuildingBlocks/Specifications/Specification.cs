@@ -22,9 +22,9 @@ file sealed class AndSpecification<T>(ISpecification<T> left, ISpecification<T> 
     {
         get
         {
-            var leftExpr  = left.Criteria;
-            var rightCriteria = right.Criteria;
-            var rightExpr = ParameterReplacer.Replace(rightCriteria, rightCriteria.Parameters[0], leftExpr.Parameters[0]);
+            Expression<Func<T, bool>> leftExpr  = left.Criteria;
+            Expression<Func<T, bool>> rightCriteria = right.Criteria;
+            Expression<Func<T, bool>> rightExpr = ParameterReplacer.Replace(rightCriteria, rightCriteria.Parameters[0], leftExpr.Parameters[0]);
             return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(leftExpr.Body, rightExpr.Body), leftExpr.Parameters[0]);
         }
     }
@@ -36,9 +36,9 @@ file sealed class OrSpecification<T>(ISpecification<T> left, ISpecification<T> r
     {
         get
         {
-            var leftExpr  = left.Criteria;
-            var rightCriteria = right.Criteria;
-            var rightExpr = ParameterReplacer.Replace(rightCriteria, rightCriteria.Parameters[0], leftExpr.Parameters[0]);
+            Expression<Func<T, bool>> leftExpr  = left.Criteria;
+            Expression<Func<T, bool>> rightCriteria = right.Criteria;
+            Expression<Func<T, bool>> rightExpr = ParameterReplacer.Replace(rightCriteria, rightCriteria.Parameters[0], leftExpr.Parameters[0]);
             return Expression.Lambda<Func<T, bool>>(Expression.OrElse(leftExpr.Body, rightExpr.Body), leftExpr.Parameters[0]);
         }
     }
@@ -50,7 +50,7 @@ file sealed class NotSpecification<T>(ISpecification<T> inner) : Specification<T
     {
         get
         {
-            var expr = inner.Criteria;
+            Expression<Func<T, bool>> expr = inner.Criteria;
             return Expression.Lambda<Func<T, bool>>(Expression.Not(expr.Body), expr.Parameters[0]);
         }
     }

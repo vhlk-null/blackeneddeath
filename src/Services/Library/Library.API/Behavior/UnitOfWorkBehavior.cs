@@ -12,7 +12,7 @@ public class UnitOfWorkBehavior<TRequest, TResponse>(LibraryContext repo)
         if (message is IQuery<TResponse> query)
             return await next(message, cancellationToken);
 
-        var response = await next(message, cancellationToken);
+        TResponse response = await next(message, cancellationToken);
 
         await repo.SaveChangesAsync(cancellationToken);
 

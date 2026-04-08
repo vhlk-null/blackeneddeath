@@ -9,7 +9,7 @@ public class RemoveGenreFromGenreCard : ICarterModule
         app.MapDelete("/genre-cards/{id:guid}/genres/{genreId:guid}",
                 async (Guid id, Guid genreId, ISender sender) =>
                 {
-                    var result = await sender.Send(new RemoveGenreFromGenreCardCommand(id, genreId));
+                    RemoveGenreFromGenreCardResult result = await sender.Send(new RemoveGenreFromGenreCardCommand(id, genreId));
 
                     return Results.Ok(result.Adapt<RemoveGenreFromGenreCardResponse>());
                 })

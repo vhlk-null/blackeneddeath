@@ -9,9 +9,9 @@ public class DeleteAlbum : ICarterModule
     {
         app.MapDelete("/albums/{id:guid}", async (Guid id, ISender sender) =>
             {
-                var command = new DeleteAlbumCommand(id);
-                var result = await sender.Send(command);
-                var response = result.Adapt<DeleteAlbumResponse>();
+                DeleteAlbumCommand command = new DeleteAlbumCommand(id);
+                DeleteAlbumResult result = await sender.Send(command);
+                DeleteAlbumResponse response = result.Adapt<DeleteAlbumResponse>();
                 return Results.Ok(response);
             })
             .WithName("DeleteAlbum")

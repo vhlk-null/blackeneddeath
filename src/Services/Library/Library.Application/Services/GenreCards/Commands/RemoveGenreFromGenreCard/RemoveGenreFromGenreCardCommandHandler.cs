@@ -5,12 +5,12 @@ public class RemoveGenreFromGenreCardCommandHandler(ILibraryDbContext context)
 {
     public async ValueTask<RemoveGenreFromGenreCardResult> Handle(RemoveGenreFromGenreCardCommand command, CancellationToken cancellationToken)
     {
-        var cardId = GenreCardId.Of(command.GenreCardId);
+        GenreCardId cardId = GenreCardId.Of(command.GenreCardId);
 
-        var card = await context.GenreCards
-            .Include(c => c.GenreCardGenres)
-            .FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken)
-            ?? throw new GenreCardNotFoundException(command.GenreCardId);
+        GenreCard card = await context.GenreCards
+                             .Include(c => c.GenreCardGenres)
+                             .FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken)
+                         ?? throw new GenreCardNotFoundException(command.GenreCardId);
 
         card.RemoveGenre(GenreId.Of(command.GenreId));
         await context.SaveChangesAsync(cancellationToken);

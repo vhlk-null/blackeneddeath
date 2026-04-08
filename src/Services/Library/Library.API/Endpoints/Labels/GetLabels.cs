@@ -8,8 +8,8 @@ public class GetLabels : ICarterModule
     {
         app.MapGet("/labels", async (ISender sender) =>
             {
-                var result = await sender.Send(new GetLabelsQuery());
-                var response = result.Adapt<GetLabelsResult>();
+                Application.Services.Labels.Queries.GetLabels.GetLabelsResult result = await sender.Send(new GetLabelsQuery());
+                GetLabelsResult response = result.Adapt<GetLabelsResult>();
                 return Results.Ok(response);
             })
             .WithName("GetLabels")

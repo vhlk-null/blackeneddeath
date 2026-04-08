@@ -4,7 +4,7 @@ public class AlbumUpdatedConsumer(IRepository<UserContentContext> repo) : IConsu
 {
     public async Task Consume(ConsumeContext<AlbumUpdatedIntegrationEvent> consumeContext)
     {
-        var album = await repo.GetByAsync<Album>(
+        Album? album = await repo.GetByAsync<Album>(
             a => a.Id == consumeContext.Message.AlbumId,
             cancellationToken: consumeContext.CancellationToken);
 

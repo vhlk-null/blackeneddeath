@@ -9,7 +9,7 @@ public class LibraryGrpcService(
     {
         try
         {
-            var response = await client.GetAlbumByIdAsync(
+            GetAlbumResponse? response = await client.GetAlbumByIdAsync(
                 new GetAlbumRequest { Id = albumId.ToString() },
                 cancellationToken: ct);
 

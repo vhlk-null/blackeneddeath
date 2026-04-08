@@ -14,7 +14,7 @@ public class CreateBand : ICarterModule
         app.MapPost("/bands",
                 async ([FromForm] CreateBandRequest request, ISender sender) =>
                 {
-                    var bandDto = JsonSerializer.Deserialize<CreateBandDto>(request.Band,
+                    CreateBandDto? bandDto = JsonSerializer.Deserialize<CreateBandDto>(request.Band,
                         new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true,
@@ -29,13 +29,13 @@ public class CreateBand : ICarterModule
                         logoStream.Position = 0;
                     }
 
-                    var command = new CreateBandCommand(
+                    CreateBandCommand command = new CreateBandCommand(
                         bandDto!,
                         logoStream,
                         request.LogoUrl?.ContentType,
                         request.LogoUrl?.FileName);
 
-                    var result = await sender.Send(command);
+                    CreateBandResult result = await sender.Send(command);
 
                     return Results.Created($"/bands/{result.Id}", result.Adapt<CreateBandResponse>());
                 })

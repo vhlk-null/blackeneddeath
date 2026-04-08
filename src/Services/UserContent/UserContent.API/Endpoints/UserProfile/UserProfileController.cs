@@ -10,7 +10,7 @@ public class UserProfileController(IUserContentService service) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserProfile(Guid userId, CancellationToken ct)
     {
-        var profile = await service.GetUserProfileAsync(userId, ct);
+        UserProfileDto profile = await service.GetUserProfileAsync(userId, ct);
         return Ok(profile);
     }
 }

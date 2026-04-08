@@ -8,9 +8,9 @@ public class GetCountryById : ICarterModule
     {
         app.MapGet("/countries/{id:guid}", async (Guid id, ISender sender) =>
             {
-                var query = new GetCountryByIdQuery(id);
-                var result = await sender.Send(query);
-                var response = result.Adapt<GetCountryByIdResponse>();
+                GetCountryByIdQuery query = new GetCountryByIdQuery(id);
+                GetCountryByIdResult result = await sender.Send(query);
+                GetCountryByIdResponse response = result.Adapt<GetCountryByIdResponse>();
                 return Results.Ok(response);
             })
             .WithName("GetCountryById")

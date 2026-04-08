@@ -9,7 +9,7 @@ public class AddGenreToGenreCard : ICarterModule
         app.MapPost("/genre-cards/{id:guid}/genres/{genreId:guid}",
                 async (Guid id, Guid genreId, ISender sender) =>
                 {
-                    var result = await sender.Send(new AddGenreToGenreCardCommand(id, genreId));
+                    AddGenreToGenreCardResult result = await sender.Send(new AddGenreToGenreCardCommand(id, genreId));
 
                     return Results.Ok(result.Adapt<AddGenreToGenreCardResponse>());
                 })

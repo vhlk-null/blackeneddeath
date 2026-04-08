@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Microsoft.Extensions.Primitives;
 
 namespace BuildingBlocks.Authentication;
 
@@ -23,26 +24,26 @@ public class GatewayHeaderAuthenticationHandler(
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.TryGetValue("X-User-Id", out var userId))
+        if (!Request.Headers.TryGetValue("X-User-Id", out StringValues userId))
         {
             Logger.LogDebug("GatewayHeader: Missing X-User-Id header — treating as anonymous");
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
-        var claims = new List<Claim>
+        List<Claim> claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, userId.ToString())
         };
 
-        if (Request.Headers.TryGetValue("X-User-Role", out var roles))
+        if (Request.Headers.TryGetValue("X-User-Role", out StringValues roles))
         {
-            foreach (var role in roles.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            foreach (string role in roles.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                 claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
-        var identity = new ClaimsIdentity(claims, Scheme.Name);
-        var principal = new ClaimsPrincipal(identity);
-        var ticket = new AuthenticationTicket(principal, Scheme.Name);
+        ClaimsIdentity identity = new ClaimsIdentity(claims, Scheme.Name);
+        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+        AuthenticationTicket ticket = new AuthenticationTicket(principal, Scheme.Name);
 
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }

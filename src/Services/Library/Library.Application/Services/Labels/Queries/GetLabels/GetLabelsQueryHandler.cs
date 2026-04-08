@@ -5,12 +5,12 @@ public class GetLabelsQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetLabelsResult> Handle(GetLabelsQuery query, CancellationToken cancellationToken)
     {
-        var labels = await context.Labels
+        List<Label> labels = await context.Labels
             .AsNoTracking()
             .OrderBy(l => l.Name)
             .ToListAsync(cancellationToken);
 
-        var labelDtos = labels.Select(l => l.ToLabelDto()).ToList();
+        List<LabelDto> labelDtos = labels.Select(l => l.ToLabelDto()).ToList();
 
         return new GetLabelsResult(labelDtos);
     }

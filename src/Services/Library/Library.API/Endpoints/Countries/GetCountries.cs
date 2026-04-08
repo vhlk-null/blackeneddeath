@@ -8,8 +8,8 @@ public class GetCountries : ICarterModule
     {
         app.MapGet("/countries", async (ISender sender) =>
             {
-                var result = await sender.Send(new GetCountriesQuery());
-                var response = result.Adapt<GetCountriesResult>();
+                Application.Services.Countries.Queries.GetCountries.GetCountriesResult result = await sender.Send(new GetCountriesQuery());
+                GetCountriesResult response = result.Adapt<GetCountriesResult>();
                 return Results.Ok(response);
             })
             .WithName("GetCountries")

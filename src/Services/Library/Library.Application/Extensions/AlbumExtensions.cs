@@ -4,19 +4,19 @@ public static class AlbumExtensions
 {
     private static string? ComputeTotalDuration(IEnumerable<string?> durations)
     {
-        var total = TimeSpan.Zero;
-        var hasAny = false;
+        TimeSpan total = TimeSpan.Zero;
+        bool hasAny = false;
 
-        foreach (var raw in durations)
+        foreach (string? raw in durations)
         {
             if (string.IsNullOrWhiteSpace(raw)) continue;
 
-            var parts = raw.Trim().Split(':');
-            var parsed = parts.Length switch
+            string[] parts = raw.Trim().Split(':');
+            TimeSpan? parsed = parts.Length switch
             {
-                2 when int.TryParse(parts[0], out var m) && int.TryParse(parts[1], out var s)
+                2 when int.TryParse(parts[0], out int m) && int.TryParse(parts[1], out int s)
                     => (TimeSpan?)TimeSpan.FromSeconds(m * 60 + s),
-                3 when int.TryParse(parts[0], out var h) && int.TryParse(parts[1], out var m) && int.TryParse(parts[2], out var s)
+                3 when int.TryParse(parts[0], out int h) && int.TryParse(parts[1], out int m) && int.TryParse(parts[2], out int s)
                     => TimeSpan.FromSeconds(h * 3600 + m * 60 + s),
                 _ => null
             };
@@ -50,7 +50,7 @@ public static class AlbumExtensions
             urlResolver.Resolve(album.CoverUrl),
             album.Type,
             album.AlbumRelease.Format,
-            album.LabelId != null && labels.TryGetValue(album.LabelId, out var label) ? label.ToLabelDto() : null,
+            album.LabelId != null && labels.TryGetValue(album.LabelId, out Label? label) ? label.ToLabelDto() : null,
             album.AlbumBands
                 .Where(ab => bands.ContainsKey(ab.BandId))
                 .Select(ab => bands[ab.BandId])
@@ -98,6 +98,6 @@ public static class AlbumExtensions
                 .Select(at => new TagDto(tags[at.TagId].Id.Value, tags[at.TagId].Name))
                 .ToList(),
             ComputeTotalDuration(
-                album.AlbumTracks.Select(at => tracks.TryGetValue(at.TrackId, out var t) ? t.Duration : null))
+                album.AlbumTracks.Select(at => tracks.TryGetValue(at.TrackId, out Track? t) ? t.Duration : null))
         );
 }

@@ -5,7 +5,7 @@ public class GetAlbumsByYearQueryHandler(ILibraryDbContext context, IStorageUrlR
 {
     public async ValueTask<GetAlbumsByYearResult> Handle(GetAlbumsByYearQuery query, CancellationToken cancellationToken)
     {
-        var albums = await context.Albums
+        List<Album> albums = await context.Albums
             .AsNoTracking()
             .Include(a => a.AlbumBands)
             .Include(a => a.AlbumGenres)
@@ -16,58 +16,58 @@ public class GetAlbumsByYearQueryHandler(ILibraryDbContext context, IStorageUrlR
             .Where(a => a.AlbumRelease.ReleaseYear == query.ReleaseDate)
             .ToListAsync(cancellationToken);
 
-        var bandIds = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
-        var countryIds = albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)).Distinct().ToList();
-        var trackIds = albums.SelectMany(a => a.AlbumTracks.Select(at => at.TrackId)).Distinct().ToList();
-        var labelIds = albums.Where(a => a.LabelId != null).Select(a => a.LabelId!).Distinct().ToList();
-        var tagIds = albums.SelectMany(a => a.AlbumTags.Select(at => at.TagId)).Distinct().ToList();
+        List<BandId> bandIds = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
+        List<CountryId> countryIds = albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)).Distinct().ToList();
+        List<TrackId> trackIds = albums.SelectMany(a => a.AlbumTracks.Select(at => at.TrackId)).Distinct().ToList();
+        List<LabelId> labelIds = albums.Where(a => a.LabelId != null).Select(a => a.LabelId!).Distinct().ToList();
+        List<TagId> tagIds = albums.SelectMany(a => a.AlbumTags.Select(at => at.TagId)).Distinct().ToList();
 
-        var bands = await context.Bands.AsNoTracking()
+        Dictionary<BandId, Band> bands = await context.Bands.AsNoTracking()
             .Where(b => bandIds.Contains(b.Id))
             .ToDictionaryAsync(b => b.Id, cancellationToken);
 
-        var discographyAlbums = await context.Albums.AsNoTracking()
+        List<Album> discographyAlbums = await context.Albums.AsNoTracking()
             .Include(a => a.AlbumBands)
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
             .Where(a => a.AlbumBands.Any(ab => bandIds.Contains(ab.BandId)))
             .ToListAsync(cancellationToken);
 
-        var discographyByBand = discographyAlbums
+        ILookup<BandId, Album> discographyByBand = discographyAlbums
             .SelectMany(a => a.AlbumBands.Select(ab => (ab.BandId, a)))
             .ToLookup(x => x.BandId, x => x.a);
 
-        var genreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId))
+        List<GenreId> genreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId))
             .Concat(discographyAlbums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)))
             .Distinct().ToList();
 
-        var genres = await context.Genres.AsNoTracking()
+        Dictionary<GenreId, Genre> genres = await context.Genres.AsNoTracking()
             .Where(g => genreIds.Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, cancellationToken);
 
-        var allCountryIds = countryIds
+        List<CountryId> allCountryIds = countryIds
             .Concat(discographyAlbums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)))
             .Distinct().ToList();
 
-        var countries = await context.Countries.AsNoTracking()
+        Dictionary<CountryId, Country> countries = await context.Countries.AsNoTracking()
             .Where(c => allCountryIds.Contains(c.Id))
             .ToDictionaryAsync(c => c.Id, cancellationToken);
 
-        var tracks = await context.Tracks.AsNoTracking()
+        Dictionary<TrackId, Track> tracks = await context.Tracks.AsNoTracking()
             .Where(t => trackIds.Contains(t.Id))
             .ToDictionaryAsync(t => t.Id, cancellationToken);
 
-        var labels = await context.Labels.AsNoTracking()
+        Dictionary<LabelId, Label> labels = await context.Labels.AsNoTracking()
             .Where(l => labelIds.Contains(l.Id))
             .ToDictionaryAsync(l => l.Id, cancellationToken);
 
-        var tags = tagIds.Count > 0
+        Dictionary<TagId, Tag> tags = tagIds.Count > 0
             ? await context.Tags.AsNoTracking()
                 .Where(t => tagIds.Contains(t.Id))
                 .ToDictionaryAsync(t => t.Id, cancellationToken)
             : new Dictionary<TagId, Tag>();
 
-        var albumDtos = albums
+        List<AlbumDto> albumDtos = albums
             .Select(a => a.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels, tags, discographyByBand))
             .ToList();
 

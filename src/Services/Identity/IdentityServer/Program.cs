@@ -1,12 +1,14 @@
-using IdentityServer;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-var config = new Config(builder.Configuration);
-var issuerUri = builder.Configuration["IdentityServer:IssuerUri"];
+Config config = new Config(builder.Configuration);
+string? issuerUri = builder.Configuration["IdentityServer:IssuerUri"];
 
 builder.Services.AddRazorPages();
+
+string? migrationsAssembly = typeof(Program).Assembly.GetName().Name;
+string? connectionString = builder.Configuration.GetConnectionString("IdentityDb");
 
 builder.Services.AddIdentityServer(options =>
     {
@@ -16,10 +18,17 @@ builder.Services.AddIdentityServer(options =>
         options.UserInteraction.LoginUrl = "/Account/Login";
         options.UserInteraction.LogoutUrl = "/Account/Logout";
     })
-    .AddInMemoryClients(config.Clients)
-    .AddInMemoryApiScopes(config.ApiScopes)
-    .AddInMemoryApiResources(config.ApiResources)
-    .AddInMemoryIdentityResources(config.IdentityResources)
+    //.AddInMemoryClients(config.Clients)
+    //.AddInMemoryApiScopes(config.ApiScopes)
+    //.AddInMemoryApiResources(config.ApiResources)
+    //.AddInMemoryIdentityResources(config.IdentityResources)
+    .AddConfigurationStore(opt =>
+    {
+        opt.ConfigureDbContext = b => b.UseNpgsql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+    }).AddOperationalStore(opt =>
+    {
+        opt.ConfigureDbContext = b => b.UseNpgsql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+    })
     .AddTestUsers(config.TestUsers)
     .AddDeveloperSigningCredential(persistKey: false);
 
@@ -32,12 +41,15 @@ if (!builder.Environment.IsDevelopment())
     });
 }
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseStaticFiles();
 app.UseRouting();
 app.UseIdentityServer();
 app.UseAuthorization();
 app.MapRazorPages();
+
+if (app.Environment.IsDevelopment())
+    await app.InitializeDatabaseAsync();
 
 app.Run();

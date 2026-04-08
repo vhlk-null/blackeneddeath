@@ -5,7 +5,7 @@ public class GetTagsQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetTagsResult> Handle(GetTagsQuery query, CancellationToken cancellationToken)
     {
-        var tags = await context.Tags
+        List<Tag> tags = await context.Tags
             .AsNoTracking()
             .OrderBy(t => t.Name)
             .ToListAsync(cancellationToken);

@@ -27,17 +27,17 @@ public class AddGenreToGenreCardHandlerTests
     [Fact]
     public async Task Handle_ValidCommand_AddsGenreAndReturnsSuccess()
     {
-        var cardId = Guid.NewGuid();
-        var genreId = Guid.NewGuid();
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Melodic", "Melodic metal");
-        var genre = Genre.Create(GenreId.Of(genreId), "Melodic Black Metal");
+        Guid cardId = Guid.NewGuid();
+        Guid genreId = Guid.NewGuid();
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Melodic", "Melodic metal");
+        Genre genre = Genre.Create(GenreId.Of(genreId), "Melodic Black Metal");
 
-        var cardsDbSet = MockDbSetFactory.Create(card);
-        var genresDbSet = MockDbSetFactory.Create(genre);
+        Mock<DbSet<GenreCard>> cardsDbSet = MockDbSetFactory.Create(card);
+        Mock<DbSet<Genre>> genresDbSet = MockDbSetFactory.Create(genre);
         _contextMock.Setup(x => x.GenreCards).Returns(cardsDbSet.Object);
         _contextMock.Setup(x => x.Genres).Returns(genresDbSet.Object);
 
-        var result = await _handler.Handle(
+        AddGenreToGenreCardResult result = await _handler.Handle(
             new AddGenreToGenreCardCommand(cardId, genreId), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -48,13 +48,13 @@ public class AddGenreToGenreCardHandlerTests
     [Fact]
     public async Task Handle_CardNotFound_ThrowsGenreCardNotFoundException()
     {
-        var genreId = Guid.NewGuid();
-        var cardsDbSet = MockDbSetFactory.Create<GenreCard>();
-        var genresDbSet = MockDbSetFactory.Create(Genre.Create(GenreId.Of(genreId), "Some Genre"));
+        Guid genreId = Guid.NewGuid();
+        Mock<DbSet<GenreCard>> cardsDbSet = MockDbSetFactory.Create<GenreCard>();
+        Mock<DbSet<Genre>> genresDbSet = MockDbSetFactory.Create(Genre.Create(GenreId.Of(genreId), "Some Genre"));
         _contextMock.Setup(x => x.GenreCards).Returns(cardsDbSet.Object);
         _contextMock.Setup(x => x.Genres).Returns(genresDbSet.Object);
 
-        var act = async () => await _handler.Handle(
+        Func<Task<AddGenreToGenreCardResult>> act = async () => await _handler.Handle(
             new AddGenreToGenreCardCommand(Guid.NewGuid(), genreId), CancellationToken.None);
 
         await act.Should().ThrowAsync<GenreCardNotFoundException>();
@@ -63,14 +63,14 @@ public class AddGenreToGenreCardHandlerTests
     [Fact]
     public async Task Handle_GenreNotFound_ThrowsGenreNotFoundException()
     {
-        var cardId = Guid.NewGuid();
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Brutal", "Brutal death");
-        var cardsDbSet = MockDbSetFactory.Create(card);
-        var genresDbSet = MockDbSetFactory.Create<Genre>();
+        Guid cardId = Guid.NewGuid();
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Brutal", "Brutal death");
+        Mock<DbSet<GenreCard>> cardsDbSet = MockDbSetFactory.Create(card);
+        Mock<DbSet<Genre>> genresDbSet = MockDbSetFactory.Create<Genre>();
         _contextMock.Setup(x => x.GenreCards).Returns(cardsDbSet.Object);
         _contextMock.Setup(x => x.Genres).Returns(genresDbSet.Object);
 
-        var act = async () => await _handler.Handle(
+        Func<Task<AddGenreToGenreCardResult>> act = async () => await _handler.Handle(
             new AddGenreToGenreCardCommand(cardId, Guid.NewGuid()), CancellationToken.None);
 
         await act.Should().ThrowAsync<GenreNotFoundException>();
@@ -79,18 +79,18 @@ public class AddGenreToGenreCardHandlerTests
     [Fact]
     public async Task Handle_DuplicateGenre_ThrowsDomainException()
     {
-        var cardId = Guid.NewGuid();
-        var genreId = Guid.NewGuid();
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Symphonic", "Symphonic metal");
+        Guid cardId = Guid.NewGuid();
+        Guid genreId = Guid.NewGuid();
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Symphonic", "Symphonic metal");
         card.AddGenre(GenreId.Of(genreId));
 
-        var genre = Genre.Create(GenreId.Of(genreId), "Symphonic Black Metal");
-        var cardsDbSet = MockDbSetFactory.Create(card);
-        var genresDbSet = MockDbSetFactory.Create(genre);
+        Genre genre = Genre.Create(GenreId.Of(genreId), "Symphonic Black Metal");
+        Mock<DbSet<GenreCard>> cardsDbSet = MockDbSetFactory.Create(card);
+        Mock<DbSet<Genre>> genresDbSet = MockDbSetFactory.Create(genre);
         _contextMock.Setup(x => x.GenreCards).Returns(cardsDbSet.Object);
         _contextMock.Setup(x => x.Genres).Returns(genresDbSet.Object);
 
-        var act = async () => await _handler.Handle(
+        Func<Task<AddGenreToGenreCardResult>> act = async () => await _handler.Handle(
             new AddGenreToGenreCardCommand(cardId, genreId), CancellationToken.None);
 
         await act.Should().ThrowAsync<DomainException>();

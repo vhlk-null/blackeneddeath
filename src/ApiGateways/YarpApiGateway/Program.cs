@@ -4,17 +4,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using Yarp.ReverseProxy.Transforms;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var authority = builder.Configuration["IdentityServer:Authority"]!;
-        var jwksUri = builder.Configuration["IdentityServer:JwksUri"];
+        string authority = builder.Configuration["IdentityServer:Authority"]!;
+        string? jwksUri = builder.Configuration["IdentityServer:JwksUri"];
         options.RequireHttpsMetadata = false;
         options.MapInboundClaims = false;
         options.TokenValidationParameters = new()
@@ -24,12 +25,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true
         };
 
-        var metadataAddress = $"{authority}/.well-known/openid-configuration";
-        var httpHandler = new HttpClientHandler
+        string metadataAddress = $"{authority}/.well-known/openid-configuration";
+        HttpClientHandler httpHandler = new HttpClientHandler
         {
             ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
         };
-        var retriever = new HttpDocumentRetriever(new HttpClient(httpHandler)) { RequireHttps = false };
+        HttpDocumentRetriever retriever = new HttpDocumentRetriever(new HttpClient(httpHandler)) { RequireHttps = false };
 
         if (jwksUri is not null)
         {
@@ -41,8 +42,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
             options.TokenValidationParameters.IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
             {
-                var jwks = new HttpClient(httpHandler).GetStringAsync(jwksUri).GetAwaiter().GetResult();
-                var keySet = new Microsoft.IdentityModel.Tokens.JsonWebKeySet(jwks);
+                string jwks = new HttpClient(httpHandler).GetStringAsync(jwksUri).GetAwaiter().GetResult();
+                JsonWebKeySet keySet = new Microsoft.IdentityModel.Tokens.JsonWebKeySet(jwks);
                 return keySet.GetSigningKeys();
             };
         }
@@ -65,19 +66,19 @@ builder.Services.AddReverseProxy()
     {
         context.AddRequestTransform(async transformContext =>
         {
-            var httpContext = transformContext.HttpContext;
-            var authResult = await httpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
+            HttpContext httpContext = transformContext.HttpContext;
+            AuthenticateResult authResult = await httpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
 
             if (!authResult.Succeeded)
                 return;
 
-            var user = authResult.Principal;
+            ClaimsPrincipal user = authResult.Principal;
 
-            var userId = user.FindFirst("sub")?.Value;
+            string? userId = user.FindFirst("sub")?.Value;
             if (userId is not null)
                 transformContext.ProxyRequest.Headers.TryAddWithoutValidation("X-User-Id", userId);
 
-            var roles = user.FindAll("role").Select(c => c.Value).ToList();
+            List<string> roles = user.FindAll("role").Select(c => c.Value).ToList();
             if (roles.Count > 0)
                 transformContext.ProxyRequest.Headers.TryAddWithoutValidation("X-User-Role", string.Join(",", roles));
         });
@@ -95,18 +96,18 @@ builder.Services.AddRateLimiter(rateLimiterOptions =>
 
 builder.Services.AddCors(options =>
 {
-    var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+    string[] origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
     options.AddDefaultPolicy(policy =>
         policy.SetIsOriginAllowed(origin =>
               {
-                  var uri = new Uri(origin);
+                  Uri uri = new Uri(origin);
                   return uri.Host == "localhost" || origins.Contains(origin);
               })
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseCors();
 app.UseAuthentication();

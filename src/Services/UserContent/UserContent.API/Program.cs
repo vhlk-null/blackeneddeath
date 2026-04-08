@@ -1,4 +1,4 @@
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // ===== SERVICES =====
 builder.Services
@@ -14,7 +14,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 MappingConfig.RegisterMappings();
 
 // ===== APP =====
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {

@@ -25,7 +25,7 @@ public class LoginModel(
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var context = await interaction.GetAuthorizationContextAsync(ReturnUrl);
+        AuthorizationRequest? context = await interaction.GetAuthorizationContextAsync(ReturnUrl);
 
         if (!ModelState.IsValid)
             return Page();
@@ -36,20 +36,20 @@ public class LoginModel(
             return Page();
         }
 
-        var user = users.FindByUsername(Username)!;
+        TestUser user = users.FindByUsername(Username)!;
 
-        var claims = new List<Claim>
+        List<Claim> claims = new List<Claim>
         {
             new(JwtClaimTypes.Subject, user.SubjectId),
             new(JwtClaimTypes.Name, user.Username)
         };
         claims.AddRange(user.Claims.Select(c => new Claim(c.Type, c.Value)));
 
-        var principal = new ClaimsPrincipal(new ClaimsIdentity(
+        ClaimsPrincipal principal = new ClaimsPrincipal(new ClaimsIdentity(
             claims,
             IdentityServerConstants.DefaultCookieAuthenticationScheme));
 
-        var props = new AuthenticationProperties();
+        AuthenticationProperties props = new AuthenticationProperties();
         if (RememberMe)
         {
             props.IsPersistent = true;

@@ -5,7 +5,7 @@ public class GetBandNamesQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetBandNamesResult> Handle(GetBandNamesQuery query, CancellationToken cancellationToken)
     {
-        var bands = await context.Bands
+        List<NameIdDto> bands = await context.Bands
             .AsNoTracking()
             .Select(b => new NameIdDto(b.Id.Value, b.Name))
             .ToListAsync(cancellationToken);

@@ -15,7 +15,7 @@ public class UpdateBand : ICarterModule
         app.MapPut("/bands/{id:guid}",
                 async ([FromRoute] Guid id, [FromForm] UpdateBandRequest request, ISender sender) =>
                 {
-                    var bandDto = JsonSerializer.Deserialize<UpdateBandDto>(request.Band,
+                    UpdateBandDto? bandDto = JsonSerializer.Deserialize<UpdateBandDto>(request.Band,
                         new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true,
@@ -35,13 +35,13 @@ public class UpdateBand : ICarterModule
                         logoStream.Position = 0;
                     }
 
-                    var command = new UpdateBandCommand(
+                    UpdateBandCommand command = new UpdateBandCommand(
                         bandDto,
                         logoStream,
                         request.LogoUrl?.ContentType,
                         request.LogoUrl?.FileName);
 
-                    var result = await sender.Send(command);
+                    UpdateBandResult result = await sender.Send(command);
                     return Results.Ok(new UpdateBandResponse(result.IsSuccess));
                 })
             .WithName("UpdateBand")

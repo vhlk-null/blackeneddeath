@@ -15,45 +15,45 @@ public class FavoriteBandsControllerTests(UserContentWebAppFactory factory) : IC
     [Fact]
     public async Task AddBandToFavorite_ValidRequest_Returns201WithUserId()
     {
-        var userId = Guid.NewGuid();
-        var request = new AddBandToFavoriteRequest(Guid.NewGuid(), userId);
+        Guid userId = Guid.NewGuid();
+        AddBandToFavoriteRequest request = new AddBandToFavoriteRequest(Guid.NewGuid(), userId);
         factory.ServiceMock
             .Setup(s => s.AddFavoriteBandAsync(userId, request.BandId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(userId);
 
-        var response = await _client.PostAsJsonAsync("/favoriteBands", request, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/favoriteBands", request, TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var body = await response.Content.ReadFromJsonAsync<AddBandToFavoriteResponse>(TestContext.Current.CancellationToken);
+        AddBandToFavoriteResponse? body = await response.Content.ReadFromJsonAsync<AddBandToFavoriteResponse>(TestContext.Current.CancellationToken);
         body!.UserId.Should().Be(userId);
     }
 
     [Fact]
     public async Task DeleteFavoriteBand_ValidRequest_Returns200WithSuccess()
     {
-        var userId = Guid.NewGuid();
-        var bandId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+        Guid bandId = Guid.NewGuid();
         factory.ServiceMock
             .Setup(s => s.DeleteFavoriteBandAsync(userId, bandId, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
-        var response = await _client.DeleteAsync($"/favoriteBands?userId={userId}&bandId={bandId}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await _client.DeleteAsync($"/favoriteBands?userId={userId}&bandId={bandId}", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<DeleteFavoriteBandResponse>(TestContext.Current.CancellationToken);
+        DeleteFavoriteBandResponse? body = await response.Content.ReadFromJsonAsync<DeleteFavoriteBandResponse>(TestContext.Current.CancellationToken);
         body!.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
     public async Task DeleteFavoriteBand_ServiceThrowsNotFound_Returns404()
     {
-        var userId = Guid.NewGuid();
-        var bandId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+        Guid bandId = Guid.NewGuid();
         factory.ServiceMock
             .Setup(s => s.DeleteFavoriteBandAsync(userId, bandId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new NotFoundException("FavoriteBand", bandId));
 
-        var response = await _client.DeleteAsync($"/favoriteBands?userId={userId}&bandId={bandId}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await _client.DeleteAsync($"/favoriteBands?userId={userId}&bandId={bandId}", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }

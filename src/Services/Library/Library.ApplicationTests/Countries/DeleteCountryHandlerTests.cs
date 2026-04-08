@@ -31,13 +31,13 @@ public class DeleteCountryHandlerTests
     [Fact]
     public async Task Handle_ExistingCountry_RemovesCountryAndReturnsSuccess()
     {
-        var countryId = Guid.NewGuid();
-        var country = Country.Create(CountryId.Of(countryId), "Norway", "NO");
+        Guid countryId = Guid.NewGuid();
+        Country country = Country.Create(CountryId.Of(countryId), "Norway", "NO");
         _countriesDbSetMock
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<Country?>(country));
 
-        var result = await _handler.Handle(new DeleteCountryCommand(countryId), CancellationToken.None);
+        DeleteCountryResult result = await _handler.Handle(new DeleteCountryCommand(countryId), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         _countriesDbSetMock.Verify(x => x.Remove(country), Times.Once);
@@ -51,7 +51,7 @@ public class DeleteCountryHandlerTests
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<Country?>(null));
 
-        var act = async () => await _handler.Handle(
+        Func<Task<DeleteCountryResult>> act = async () => await _handler.Handle(
             new DeleteCountryCommand(Guid.NewGuid()), CancellationToken.None);
 
         await act.Should().ThrowAsync<CountryNotFoundException>();

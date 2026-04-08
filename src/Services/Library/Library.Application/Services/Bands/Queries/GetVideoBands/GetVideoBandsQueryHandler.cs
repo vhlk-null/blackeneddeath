@@ -5,14 +5,14 @@ public class GetVideoBandsQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetVideoBandsResult> Handle(GetVideoBandsQuery query, CancellationToken cancellationToken)
     {
-        var pageIndex = query.PaginationRequest.PageIndex;
-        var pageSize = query.PaginationRequest.PageSize;
+        int pageIndex = query.PaginationRequest.PageIndex;
+        int pageSize = query.PaginationRequest.PageSize;
 
-        var baseQuery = context.VideoBands.AsNoTracking();
+        IQueryable<VideoBand> baseQuery = context.VideoBands.AsNoTracking();
 
-        var totalCount = await baseQuery.LongCountAsync(cancellationToken);
+        long totalCount = await baseQuery.LongCountAsync(cancellationToken);
 
-        var videoBands = await baseQuery
+        List<VideoBandDto> videoBands = await baseQuery
             .Join(context.Bands, vb => vb.BandId, b => b.Id, (vb, b) => new { vb, BandName = b.Name })
             .OrderByDescending(x => x.vb.Year)
             .Skip(pageSize * pageIndex)

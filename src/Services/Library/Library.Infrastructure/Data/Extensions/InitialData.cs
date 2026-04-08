@@ -524,11 +524,11 @@ internal static class InitialData
     {
         get
         {
-            var metal      = Genre.Create(GenreIds.Metal,      "Metal");
-            var blackMetal = Genre.Create(GenreIds.BlackMetal, "Black Metal",  metal.Id);
-            var deathMetal = Genre.Create(GenreIds.DeathMetal, "Death Metal",  metal.Id);
-            var doomMetal  = Genre.Create(GenreIds.DoomMetal,  "Doom Metal",   metal.Id);
-            var thrash     = Genre.Create(GenreIds.ThrashMetal,"Thrash Metal", metal.Id);
+            Genre metal      = Genre.Create(GenreIds.Metal,      "Metal");
+            Genre blackMetal = Genre.Create(GenreIds.BlackMetal, "Black Metal",  metal.Id);
+            Genre deathMetal = Genre.Create(GenreIds.DeathMetal, "Death Metal",  metal.Id);
+            Genre doomMetal  = Genre.Create(GenreIds.DoomMetal,  "Doom Metal",   metal.Id);
+            Genre thrash     = Genre.Create(GenreIds.ThrashMetal,"Thrash Metal", metal.Id);
 
             return
             [
@@ -858,7 +858,7 @@ internal static class InitialData
     {
         get
         {
-            var darkthrone = Band.Create(
+            Band darkthrone = Band.Create(
                 "Darkthrone",
                 "Norwegian black metal band formed in 1986 in Kolbotn. One of the seminal acts of the second wave of black metal, known for their raw, lo-fi production and prolific output spanning over three decades.",
                 null,
@@ -869,7 +869,7 @@ internal static class InitialData
             darkthrone.AddGenre(GenreIds.RawBlackMetal, isPrimary: false);
             darkthrone.AddCountry(CountryIds.Norway);
 
-            var burzum = Band.Create(
+            Band burzum = Band.Create(
                 "Burzum",
                 "Solo black metal project by Varg Vikernes, founded in Bergen, Norway in 1991. One of the most influential and controversial acts in black metal history, pioneering the atmospheric and ambient black metal style.",
                 null,
@@ -880,7 +880,7 @@ internal static class InitialData
             burzum.AddGenre(GenreIds.AtmosphericBlackMetal, isPrimary: false);
             burzum.AddCountry(CountryIds.Norway);
 
-            var emperor = Band.Create(
+            Band emperor = Band.Create(
                 "Emperor",
                 "Norwegian black metal band formed in 1991 in Notodden. Pioneers of symphonic black metal, renowned for their complex compositions that merged aggressive black metal with orchestral arrangements and progressive structures.",
                 null,
@@ -891,7 +891,7 @@ internal static class InitialData
             emperor.AddGenre(GenreIds.SymphonicBlackMetal, isPrimary: false);
             emperor.AddCountry(CountryIds.Norway);
 
-            var mayhem = Band.Create(
+            Band mayhem = Band.Create(
                 "Mayhem",
                 "Norwegian black metal band founded in 1984 in Oslo. One of the founders and most notorious acts of the Norwegian black metal scene, whose turbulent history and extreme ideology left an indelible mark on extreme metal.",
                 null,
@@ -901,7 +901,7 @@ internal static class InitialData
             mayhem.AddGenre(GenreIds.BlackMetal, isPrimary: true);
             mayhem.AddCountry(CountryIds.Norway);
 
-            var dissection = Band.Create(
+            Band dissection = Band.Create(
                 "Dissection",
                 "Swedish melodic black/death metal band formed in 1989 in Strömstad by Jon Nödtveidt. Known for their sophisticated blend of melodic death metal with black metal atmospherics, considered pioneers of the Scandinavian melodic extreme metal sound.",
                 null,
@@ -912,7 +912,7 @@ internal static class InitialData
             dissection.AddGenre(GenreIds.MelodicBlackMetal, isPrimary: false);
             dissection.AddCountry(CountryIds.Sweden);
 
-            var behemoth = Band.Create(
+            Band behemoth = Band.Create(
                 "Behemoth",
                 "Polish extreme metal band formed in 1991 in Gdańsk by Nergal. Evolved from their early black metal roots into one of the world's foremost blackened death metal acts, known for their intense live performances and provocative imagery.",
                 null,
@@ -923,7 +923,7 @@ internal static class InitialData
             behemoth.AddGenre(GenreIds.DeathMetal, isPrimary: false);
             behemoth.AddCountry(CountryIds.Poland);
 
-            var abuser = Band.Create(
+            Band abuser = Band.Create(
                 "Abuser",
                 "American black metal outfit known for hypnotic, dissonant riffing and occult lyricism. Their discography spans from raw early recordings to a more expansive atmospheric sound.",
                 null,
@@ -934,7 +934,7 @@ internal static class InitialData
             abuser.AddGenre(GenreIds.DeathMetal, isPrimary: false);
             abuser.AddCountry(CountryIds.UnitedStates);
 
-            var bloodCoven = Band.Create(
+            Band bloodCoven = Band.Create(
                 "Blood Coven",
                 "American black metal band rooted in orthodox darkness and ritualistic atmospheres. Their albums blend cold tremolo-picked aggression with dense, ceremonial structures.",
                 null,
@@ -944,7 +944,7 @@ internal static class InitialData
             bloodCoven.AddGenre(GenreIds.BlackMetal, isPrimary: true);
             bloodCoven.AddCountry(CountryIds.UnitedStates);
 
-            var deathwinds = Band.Create(
+            Band deathwinds = Band.Create(
                 "Deathwinds",
                 "Polish black metal force drawing on Slavic mythology and martial themes. Their sound is relentless and austere, combining raw aggression with an unmistakable Eastern European coldness.",
                 null,
@@ -955,7 +955,7 @@ internal static class InitialData
             deathwinds.AddGenre(GenreIds.AtmosphericBlackMetal, isPrimary: false);
             deathwinds.AddCountry(CountryIds.Poland);
 
-            var morsVoidDiscipline = Band.Create(
+            Band morsVoidDiscipline = Band.Create(
                 "Mors.Void.Discipline",
                 "French black metal entity steeped in occult theology and anti-cosmic philosophy. Operating under a doctrine of absolute negation, their works are dense and uncompromising ritual pieces.",
                 null,
@@ -965,7 +965,7 @@ internal static class InitialData
             morsVoidDiscipline.AddGenre(GenreIds.BlackMetal, isPrimary: true);
             morsVoidDiscipline.AddCountry(CountryIds.France);
 
-            var vider = Band.Create(
+            Band vider = Band.Create(
                 "Vider",
                 "Swedish black metal band who helped define the Scandinavian second wave sound. Known for icy guitar textures, minimalist song structures, and an unwavering devotion to darkness.",
                 null,
@@ -985,7 +985,7 @@ internal static class InitialData
     {
         get
         {
-            var transilvanianHunger = Album.Create(
+            Album transilvanianHunger = Album.Create(
                 "Transilvanian Hunger",
                 AlbumType.FullLength,
                 AlbumRelease.Of(1994, AlbumFormat.CD),
@@ -1007,7 +1007,7 @@ internal static class InitialData
             transilvanianHunger.AddTrack(TrackIds.TH7, 7);
             transilvanianHunger.AddTrack(TrackIds.TH8, 8);
 
-            var filosofem = Album.Create(
+            Album filosofem = Album.Create(
                 "Filosofem",
                 AlbumType.FullLength,
                 AlbumRelease.Of(1996, AlbumFormat.CD),
@@ -1025,7 +1025,7 @@ internal static class InitialData
             filosofem.AddTrack(TrackIds.F3, 3);
             filosofem.AddTrack(TrackIds.F4, 4);
 
-            var nightsideEclipse = Album.Create(
+            Album nightsideEclipse = Album.Create(
                 "In the Nightside Eclipse",
                 AlbumType.FullLength,
                 AlbumRelease.Of(1994, AlbumFormat.CD),
@@ -1047,7 +1047,7 @@ internal static class InitialData
             nightsideEclipse.AddTrack(TrackIds.NE7, 7);
             nightsideEclipse.AddTrack(TrackIds.NE8, 8);
 
-            var deMysteriis = Album.Create(
+            Album deMysteriis = Album.Create(
                 "De Mysteriis Dom Sathanas",
                 AlbumType.FullLength,
                 AlbumRelease.Of(1994, AlbumFormat.CD),
@@ -1068,7 +1068,7 @@ internal static class InitialData
             deMysteriis.AddTrack(TrackIds.DM7, 7);
             deMysteriis.AddTrack(TrackIds.DM8, 8);
 
-            var stormOfLightsBane = Album.Create(
+            Album stormOfLightsBane = Album.Create(
                 "Storm of the Light's Bane",
                 AlbumType.FullLength,
                 AlbumRelease.Of(1995, AlbumFormat.CD),
@@ -1090,7 +1090,7 @@ internal static class InitialData
             stormOfLightsBane.AddTrack(TrackIds.SL7, 7);
             stormOfLightsBane.AddTrack(TrackIds.SL8, 8);
 
-            var theSatanist = Album.Create(
+            Album theSatanist = Album.Create(
                 "The Satanist",
                 AlbumType.FullLength,
                 AlbumRelease.Of(2014, AlbumFormat.CD),
@@ -1114,171 +1114,171 @@ internal static class InitialData
             theSatanist.AddTrack(TrackIds.TS9, 9);
 
             // ── Abuser ────────────────────────────────────────────────────────────
-            var a1585 = Album.Create("1585-1646", AlbumType.FullLength, AlbumRelease.Of(2009, AlbumFormat.CD), null, null, AlbumIds.Abuser_1585);
+            Album a1585 = Album.Create("1585-1646", AlbumType.FullLength, AlbumRelease.Of(2009, AlbumFormat.CD), null, null, AlbumIds.Abuser_1585);
             a1585.AddBand(BandIds.Abuser); a1585.AddGenre(GenreIds.BlackMetal, isPrimary: true); a1585.AddCountry(CountryIds.UnitedStates);
             a1585.AddTrack(TrackIds.A1_1, 1); a1585.AddTrack(TrackIds.A1_2, 2); a1585.AddTrack(TrackIds.A1_3, 3); a1585.AddTrack(TrackIds.A1_4, 4);
 
-            var aGreatWork = Album.Create("A Great Work of Ages", AlbumType.FullLength, AlbumRelease.Of(2019, AlbumFormat.CD), null, null, AlbumIds.Abuser_GreatWork);
+            Album aGreatWork = Album.Create("A Great Work of Ages", AlbumType.FullLength, AlbumRelease.Of(2019, AlbumFormat.CD), null, null, AlbumIds.Abuser_GreatWork);
             aGreatWork.AddBand(BandIds.Abuser); aGreatWork.AddGenre(GenreIds.BlackMetal, isPrimary: true); aGreatWork.AddCountry(CountryIds.UnitedStates);
             aGreatWork.AddTrack(TrackIds.A2_1, 1); aGreatWork.AddTrack(TrackIds.A2_2, 2); aGreatWork.AddTrack(TrackIds.A2_3, 3); aGreatWork.AddTrack(TrackIds.A2_4, 4);
 
-            var aMerging = Album.Create("A Merging to the Boundless", AlbumType.FullLength, AlbumRelease.Of(2013, AlbumFormat.CD), null, null, AlbumIds.Abuser_Merging);
+            Album aMerging = Album.Create("A Merging to the Boundless", AlbumType.FullLength, AlbumRelease.Of(2013, AlbumFormat.CD), null, null, AlbumIds.Abuser_Merging);
             aMerging.AddBand(BandIds.Abuser); aMerging.AddGenre(GenreIds.BlackMetal, isPrimary: true); aMerging.AddCountry(CountryIds.UnitedStates);
             aMerging.AddTrack(TrackIds.A3_1, 1); aMerging.AddTrack(TrackIds.A3_2, 2); aMerging.AddTrack(TrackIds.A3_3, 3); aMerging.AddTrack(TrackIds.A3_4, 4);
 
-            var anneliese = Album.Create("Anneliese", AlbumType.FullLength, AlbumRelease.Of(2011, AlbumFormat.CD), null, null, AlbumIds.Abuser_Anneliese);
+            Album anneliese = Album.Create("Anneliese", AlbumType.FullLength, AlbumRelease.Of(2011, AlbumFormat.CD), null, null, AlbumIds.Abuser_Anneliese);
             anneliese.AddBand(BandIds.Abuser); anneliese.AddGenre(GenreIds.BlackMetal, isPrimary: true); anneliese.AddCountry(CountryIds.UnitedStates);
             anneliese.AddTrack(TrackIds.A4_1, 1); anneliese.AddTrack(TrackIds.A4_2, 2); anneliese.AddTrack(TrackIds.A4_3, 3); anneliese.AddTrack(TrackIds.A4_4, 4);
 
-            var boundBySpells = Album.Create("Bound by Spells", AlbumType.FullLength, AlbumRelease.Of(2016, AlbumFormat.CD), null, null, AlbumIds.Abuser_BoundBySpells);
+            Album boundBySpells = Album.Create("Bound by Spells", AlbumType.FullLength, AlbumRelease.Of(2016, AlbumFormat.CD), null, null, AlbumIds.Abuser_BoundBySpells);
             boundBySpells.AddBand(BandIds.Abuser); boundBySpells.AddGenre(GenreIds.BlackMetal, isPrimary: true); boundBySpells.AddCountry(CountryIds.UnitedStates);
             boundBySpells.AddTrack(TrackIds.A5_1, 1); boundBySpells.AddTrack(TrackIds.A5_2, 2); boundBySpells.AddTrack(TrackIds.A5_3, 3); boundBySpells.AddTrack(TrackIds.A5_4, 4);
 
-            var conduit = Album.Create("Conduit", AlbumType.FullLength, AlbumRelease.Of(2021, AlbumFormat.CD), null, null, AlbumIds.Abuser_Conduit);
+            Album conduit = Album.Create("Conduit", AlbumType.FullLength, AlbumRelease.Of(2021, AlbumFormat.CD), null, null, AlbumIds.Abuser_Conduit);
             conduit.AddBand(BandIds.Abuser); conduit.AddGenre(GenreIds.BlackMetal, isPrimary: true); conduit.AddCountry(CountryIds.UnitedStates);
             conduit.AddTrack(TrackIds.A6_1, 1); conduit.AddTrack(TrackIds.A6_2, 2); conduit.AddTrack(TrackIds.A6_3, 3); conduit.AddTrack(TrackIds.A6_4, 4);
 
-            var desolateDivine = Album.Create("Desolate Divine", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), null, null, AlbumIds.Abuser_DesolateDivine);
+            Album desolateDivine = Album.Create("Desolate Divine", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), null, null, AlbumIds.Abuser_DesolateDivine);
             desolateDivine.AddBand(BandIds.Abuser); desolateDivine.AddGenre(GenreIds.BlackMetal, isPrimary: true); desolateDivine.AddCountry(CountryIds.UnitedStates);
             desolateDivine.AddTrack(TrackIds.A7_1, 1); desolateDivine.AddTrack(TrackIds.A7_2, 2); desolateDivine.AddTrack(TrackIds.A7_3, 3); desolateDivine.AddTrack(TrackIds.A7_4, 4);
 
-            var hisBestDeceit = Album.Create("His Best Deceit", AlbumType.FullLength, AlbumRelease.Of(2007, AlbumFormat.CD), null, null, AlbumIds.Abuser_HisBestDeceit);
+            Album hisBestDeceit = Album.Create("His Best Deceit", AlbumType.FullLength, AlbumRelease.Of(2007, AlbumFormat.CD), null, null, AlbumIds.Abuser_HisBestDeceit);
             hisBestDeceit.AddBand(BandIds.Abuser); hisBestDeceit.AddGenre(GenreIds.BlackMetal, isPrimary: true); hisBestDeceit.AddCountry(CountryIds.UnitedStates);
             hisBestDeceit.AddTrack(TrackIds.A8_1, 1); hisBestDeceit.AddTrack(TrackIds.A8_2, 2); hisBestDeceit.AddTrack(TrackIds.A8_3, 3); hisBestDeceit.AddTrack(TrackIds.A8_4, 4);
 
-            var psychicSecretions = Album.Create("Psychic Secretions", AlbumType.FullLength, AlbumRelease.Of(2022, AlbumFormat.CD), null, null, AlbumIds.Abuser_PsychicSecretions);
+            Album psychicSecretions = Album.Create("Psychic Secretions", AlbumType.FullLength, AlbumRelease.Of(2022, AlbumFormat.CD), null, null, AlbumIds.Abuser_PsychicSecretions);
             psychicSecretions.AddBand(BandIds.Abuser); psychicSecretions.AddGenre(GenreIds.BlackMetal, isPrimary: true); psychicSecretions.AddCountry(CountryIds.UnitedStates);
             psychicSecretions.AddTrack(TrackIds.A9_1, 1); psychicSecretions.AddTrack(TrackIds.A9_2, 2); psychicSecretions.AddTrack(TrackIds.A9_3, 3); psychicSecretions.AddTrack(TrackIds.A9_4, 4);
 
             // ── Blood Coven ───────────────────────────────────────────────────────
-            var caughtInUnlight = Album.Create("Caught in the Unlight!", AlbumType.FullLength, AlbumRelease.Of(2003, AlbumFormat.CD), null, null, AlbumIds.BC_CaughtInTheUnlight);
+            Album caughtInUnlight = Album.Create("Caught in the Unlight!", AlbumType.FullLength, AlbumRelease.Of(2003, AlbumFormat.CD), null, null, AlbumIds.BC_CaughtInTheUnlight);
             caughtInUnlight.AddBand(BandIds.BloodCoven); caughtInUnlight.AddGenre(GenreIds.BlackMetal, isPrimary: true); caughtInUnlight.AddCountry(CountryIds.UnitedStates);
             caughtInUnlight.AddTrack(TrackIds.BC1_1, 1); caughtInUnlight.AddTrack(TrackIds.BC1_2, 2); caughtInUnlight.AddTrack(TrackIds.BC1_3, 3); caughtInUnlight.AddTrack(TrackIds.BC1_4, 4);
 
-            var forTheHolyLord = Album.Create("For the Holy Lord", AlbumType.FullLength, AlbumRelease.Of(2007, AlbumFormat.CD), null, null, AlbumIds.BC_ForTheHolyLord);
+            Album forTheHolyLord = Album.Create("For the Holy Lord", AlbumType.FullLength, AlbumRelease.Of(2007, AlbumFormat.CD), null, null, AlbumIds.BC_ForTheHolyLord);
             forTheHolyLord.AddBand(BandIds.BloodCoven); forTheHolyLord.AddGenre(GenreIds.BlackMetal, isPrimary: true); forTheHolyLord.AddCountry(CountryIds.UnitedStates);
             forTheHolyLord.AddTrack(TrackIds.BC2_1, 1); forTheHolyLord.AddTrack(TrackIds.BC2_2, 2); forTheHolyLord.AddTrack(TrackIds.BC2_3, 3); forTheHolyLord.AddTrack(TrackIds.BC2_4, 4);
 
-            var continuumHypothesis = Album.Create("The Continuum Hypothesis", AlbumType.FullLength, AlbumRelease.Of(2012, AlbumFormat.CD), null, null, AlbumIds.BC_ContinuumHypothesis);
+            Album continuumHypothesis = Album.Create("The Continuum Hypothesis", AlbumType.FullLength, AlbumRelease.Of(2012, AlbumFormat.CD), null, null, AlbumIds.BC_ContinuumHypothesis);
             continuumHypothesis.AddBand(BandIds.BloodCoven); continuumHypothesis.AddGenre(GenreIds.BlackMetal, isPrimary: true); continuumHypothesis.AddCountry(CountryIds.UnitedStates);
             continuumHypothesis.AddTrack(TrackIds.BC3_1, 1); continuumHypothesis.AddTrack(TrackIds.BC3_2, 2); continuumHypothesis.AddTrack(TrackIds.BC3_3, 3); continuumHypothesis.AddTrack(TrackIds.BC3_4, 4);
 
-            var molecularScythe = Album.Create("The Molecular Scythe", AlbumType.FullLength, AlbumRelease.Of(2015, AlbumFormat.CD), null, null, AlbumIds.BC_MolecularScythe);
+            Album molecularScythe = Album.Create("The Molecular Scythe", AlbumType.FullLength, AlbumRelease.Of(2015, AlbumFormat.CD), null, null, AlbumIds.BC_MolecularScythe);
             molecularScythe.AddBand(BandIds.BloodCoven); molecularScythe.AddGenre(GenreIds.BlackMetal, isPrimary: true); molecularScythe.AddCountry(CountryIds.UnitedStates);
             molecularScythe.AddTrack(TrackIds.BC4_1, 1); molecularScythe.AddTrack(TrackIds.BC4_2, 2); molecularScythe.AddTrack(TrackIds.BC4_3, 3); molecularScythe.AddTrack(TrackIds.BC4_4, 4);
 
-            var screamToreSky = Album.Create("The Scream That Tore the Sky", AlbumType.FullLength, AlbumRelease.Of(2009, AlbumFormat.CD), null, null, AlbumIds.BC_ScreamToreSky);
+            Album screamToreSky = Album.Create("The Scream That Tore the Sky", AlbumType.FullLength, AlbumRelease.Of(2009, AlbumFormat.CD), null, null, AlbumIds.BC_ScreamToreSky);
             screamToreSky.AddBand(BandIds.BloodCoven); screamToreSky.AddGenre(GenreIds.BlackMetal, isPrimary: true); screamToreSky.AddCountry(CountryIds.UnitedStates);
             screamToreSky.AddTrack(TrackIds.BC5_1, 1); screamToreSky.AddTrack(TrackIds.BC5_2, 2); screamToreSky.AddTrack(TrackIds.BC5_3, 3); screamToreSky.AddTrack(TrackIds.BC5_4, 4);
 
-            var whatWillBe = Album.Create("What Will Be Has Been", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), null, null, AlbumIds.BC_WhatWillBe);
+            Album whatWillBe = Album.Create("What Will Be Has Been", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), null, null, AlbumIds.BC_WhatWillBe);
             whatWillBe.AddBand(BandIds.BloodCoven); whatWillBe.AddGenre(GenreIds.BlackMetal, isPrimary: true); whatWillBe.AddCountry(CountryIds.UnitedStates);
             whatWillBe.AddTrack(TrackIds.BC6_1, 1); whatWillBe.AddTrack(TrackIds.BC6_2, 2); whatWillBe.AddTrack(TrackIds.BC6_3, 3); whatWillBe.AddTrack(TrackIds.BC6_4, 4);
 
             // ── Deathwinds ────────────────────────────────────────────────────────
-            var auricGates = Album.Create("Auric Gates of Veles", AlbumType.FullLength, AlbumRelease.Of(2015, AlbumFormat.CD), null, null, AlbumIds.DW_AuricGates);
+            Album auricGates = Album.Create("Auric Gates of Veles", AlbumType.FullLength, AlbumRelease.Of(2015, AlbumFormat.CD), null, null, AlbumIds.DW_AuricGates);
             auricGates.AddBand(BandIds.Deathwinds); auricGates.AddGenre(GenreIds.BlackMetal, isPrimary: true); auricGates.AddCountry(CountryIds.Poland);
             auricGates.AddTrack(TrackIds.DW1_1, 1); auricGates.AddTrack(TrackIds.DW1_2, 2); auricGates.AddTrack(TrackIds.DW1_3, 3); auricGates.AddTrack(TrackIds.DW1_4, 4);
 
-            var bellumRegiis = Album.Create("Bellum Regiis", AlbumType.FullLength, AlbumRelease.Of(2012, AlbumFormat.CD), null, null, AlbumIds.DW_BellumRegiis);
+            Album bellumRegiis = Album.Create("Bellum Regiis", AlbumType.FullLength, AlbumRelease.Of(2012, AlbumFormat.CD), null, null, AlbumIds.DW_BellumRegiis);
             bellumRegiis.AddBand(BandIds.Deathwinds); bellumRegiis.AddGenre(GenreIds.BlackMetal, isPrimary: true); bellumRegiis.AddCountry(CountryIds.Poland);
             bellumRegiis.AddTrack(TrackIds.DW2_1, 1); bellumRegiis.AddTrack(TrackIds.DW2_2, 2); bellumRegiis.AddTrack(TrackIds.DW2_3, 3); bellumRegiis.AddTrack(TrackIds.DW2_4, 4);
 
-            var crvsade = Album.Create("Crvsade - Zero", AlbumType.FullLength, AlbumRelease.Of(2017, AlbumFormat.CD), null, null, AlbumIds.DW_Crvsade);
+            Album crvsade = Album.Create("Crvsade - Zero", AlbumType.FullLength, AlbumRelease.Of(2017, AlbumFormat.CD), null, null, AlbumIds.DW_Crvsade);
             crvsade.AddBand(BandIds.Deathwinds); crvsade.AddGenre(GenreIds.BlackMetal, isPrimary: true); crvsade.AddCountry(CountryIds.Poland);
             crvsade.AddTrack(TrackIds.DW3_1, 1); crvsade.AddTrack(TrackIds.DW3_2, 2); crvsade.AddTrack(TrackIds.DW3_3, 3); crvsade.AddTrack(TrackIds.DW3_4, 4);
 
-            var erebos = Album.Create("Erebos", AlbumType.FullLength, AlbumRelease.Of(2008, AlbumFormat.CD), null, null, AlbumIds.DW_Erebos);
+            Album erebos = Album.Create("Erebos", AlbumType.FullLength, AlbumRelease.Of(2008, AlbumFormat.CD), null, null, AlbumIds.DW_Erebos);
             erebos.AddBand(BandIds.Deathwinds); erebos.AddGenre(GenreIds.BlackMetal, isPrimary: true); erebos.AddCountry(CountryIds.Poland);
             erebos.AddTrack(TrackIds.DW4_1, 1); erebos.AddTrack(TrackIds.DW4_2, 2); erebos.AddTrack(TrackIds.DW4_3, 3); erebos.AddTrack(TrackIds.DW4_4, 4);
 
-            var misanthropicPath = Album.Create("Misanthropic Path of Carnal Deliverance", AlbumType.FullLength, AlbumRelease.Of(2006, AlbumFormat.CD), null, null, AlbumIds.DW_Misanthropic);
+            Album misanthropicPath = Album.Create("Misanthropic Path of Carnal Deliverance", AlbumType.FullLength, AlbumRelease.Of(2006, AlbumFormat.CD), null, null, AlbumIds.DW_Misanthropic);
             misanthropicPath.AddBand(BandIds.Deathwinds); misanthropicPath.AddGenre(GenreIds.BlackMetal, isPrimary: true); misanthropicPath.AddCountry(CountryIds.Poland);
             misanthropicPath.AddTrack(TrackIds.DW5_1, 1); misanthropicPath.AddTrack(TrackIds.DW5_2, 2); misanthropicPath.AddTrack(TrackIds.DW5_3, 3); misanthropicPath.AddTrack(TrackIds.DW5_4, 4);
 
-            var rugia = Album.Create("Rugia", AlbumType.FullLength, AlbumRelease.Of(2019, AlbumFormat.CD), null, null, AlbumIds.DW_Rugia);
+            Album rugia = Album.Create("Rugia", AlbumType.FullLength, AlbumRelease.Of(2019, AlbumFormat.CD), null, null, AlbumIds.DW_Rugia);
             rugia.AddBand(BandIds.Deathwinds); rugia.AddGenre(GenreIds.BlackMetal, isPrimary: true); rugia.AddCountry(CountryIds.Poland);
             rugia.AddTrack(TrackIds.DW6_1, 1); rugia.AddTrack(TrackIds.DW6_2, 2); rugia.AddTrack(TrackIds.DW6_3, 3); rugia.AddTrack(TrackIds.DW6_4, 4);
 
-            var solarflesh = Album.Create("Solarflesh", AlbumType.FullLength, AlbumRelease.Of(2013, AlbumFormat.CD), null, null, AlbumIds.DW_Solarflesh);
+            Album solarflesh = Album.Create("Solarflesh", AlbumType.FullLength, AlbumRelease.Of(2013, AlbumFormat.CD), null, null, AlbumIds.DW_Solarflesh);
             solarflesh.AddBand(BandIds.Deathwinds); solarflesh.AddGenre(GenreIds.BlackMetal, isPrimary: true); solarflesh.AddCountry(CountryIds.Poland);
             solarflesh.AddTrack(TrackIds.DW7_1, 1); solarflesh.AddTrack(TrackIds.DW7_2, 2); solarflesh.AddTrack(TrackIds.DW7_3, 3); solarflesh.AddTrack(TrackIds.DW7_4, 4);
 
-            var tremendum = Album.Create("Tremendum", AlbumType.FullLength, AlbumRelease.Of(2010, AlbumFormat.CD), null, null, AlbumIds.DW_Tremendum);
+            Album tremendum = Album.Create("Tremendum", AlbumType.FullLength, AlbumRelease.Of(2010, AlbumFormat.CD), null, null, AlbumIds.DW_Tremendum);
             tremendum.AddBand(BandIds.Deathwinds); tremendum.AddGenre(GenreIds.BlackMetal, isPrimary: true); tremendum.AddCountry(CountryIds.Poland);
             tremendum.AddTrack(TrackIds.DW8_1, 1); tremendum.AddTrack(TrackIds.DW8_2, 2); tremendum.AddTrack(TrackIds.DW8_3, 3); tremendum.AddTrack(TrackIds.DW8_4, 4);
 
             // ── Mors.Void.Discipline ──────────────────────────────────────────────
-            var exorkizein = Album.Create("Exorkizein", AlbumType.FullLength, AlbumRelease.Of(2013, AlbumFormat.CD), null, null, AlbumIds.MVD_Exorkizein);
+            Album exorkizein = Album.Create("Exorkizein", AlbumType.FullLength, AlbumRelease.Of(2013, AlbumFormat.CD), null, null, AlbumIds.MVD_Exorkizein);
             exorkizein.AddBand(BandIds.MorsVoidDiscipline); exorkizein.AddGenre(GenreIds.BlackMetal, isPrimary: true); exorkizein.AddCountry(CountryIds.France);
             exorkizein.AddTrack(TrackIds.M1_1, 1); exorkizein.AddTrack(TrackIds.M1_2, 2); exorkizein.AddTrack(TrackIds.M1_3, 3); exorkizein.AddTrack(TrackIds.M1_4, 4);
 
-            var malignancy = Album.Create("Malignancy", AlbumType.FullLength, AlbumRelease.Of(2006, AlbumFormat.CD), null, null, AlbumIds.MVD_Malignancy);
+            Album malignancy = Album.Create("Malignancy", AlbumType.FullLength, AlbumRelease.Of(2006, AlbumFormat.CD), null, null, AlbumIds.MVD_Malignancy);
             malignancy.AddBand(BandIds.MorsVoidDiscipline); malignancy.AddGenre(GenreIds.BlackMetal, isPrimary: true); malignancy.AddCountry(CountryIds.France);
             malignancy.AddTrack(TrackIds.M2_1, 1); malignancy.AddTrack(TrackIds.M2_2, 2); malignancy.AddTrack(TrackIds.M2_3, 3); malignancy.AddTrack(TrackIds.M2_4, 4);
 
-            var onslaughtKommand = Album.Create("Onslaught Kommand", AlbumType.FullLength, AlbumRelease.Of(2009, AlbumFormat.CD), null, null, AlbumIds.MVD_OnslaughtKommand);
+            Album onslaughtKommand = Album.Create("Onslaught Kommand", AlbumType.FullLength, AlbumRelease.Of(2009, AlbumFormat.CD), null, null, AlbumIds.MVD_OnslaughtKommand);
             onslaughtKommand.AddBand(BandIds.MorsVoidDiscipline); onslaughtKommand.AddGenre(GenreIds.BlackMetal, isPrimary: true); onslaughtKommand.AddCountry(CountryIds.France);
             onslaughtKommand.AddTrack(TrackIds.M3_1, 1); onslaughtKommand.AddTrack(TrackIds.M3_2, 2); onslaughtKommand.AddTrack(TrackIds.M3_3, 3); onslaughtKommand.AddTrack(TrackIds.M3_4, 4);
 
-            var passioChristiI = Album.Create("Passio Christi Part I", AlbumType.FullLength, AlbumRelease.Of(2015, AlbumFormat.CD), null, null, AlbumIds.MVD_PassioChristiI);
+            Album passioChristiI = Album.Create("Passio Christi Part I", AlbumType.FullLength, AlbumRelease.Of(2015, AlbumFormat.CD), null, null, AlbumIds.MVD_PassioChristiI);
             passioChristiI.AddBand(BandIds.MorsVoidDiscipline); passioChristiI.AddGenre(GenreIds.BlackMetal, isPrimary: true); passioChristiI.AddCountry(CountryIds.France);
             passioChristiI.AddTrack(TrackIds.M4_1, 1); passioChristiI.AddTrack(TrackIds.M4_2, 2); passioChristiI.AddTrack(TrackIds.M4_3, 3); passioChristiI.AddTrack(TrackIds.M4_4, 4);
 
-            var passioChristiII = Album.Create("Passio Christi Part II", AlbumType.FullLength, AlbumRelease.Of(2016, AlbumFormat.CD), null, null, AlbumIds.MVD_PassioChristiII);
+            Album passioChristiII = Album.Create("Passio Christi Part II", AlbumType.FullLength, AlbumRelease.Of(2016, AlbumFormat.CD), null, null, AlbumIds.MVD_PassioChristiII);
             passioChristiII.AddBand(BandIds.MorsVoidDiscipline); passioChristiII.AddGenre(GenreIds.BlackMetal, isPrimary: true); passioChristiII.AddCountry(CountryIds.France);
             passioChristiII.AddTrack(TrackIds.M5_1, 1); passioChristiII.AddTrack(TrackIds.M5_2, 2); passioChristiII.AddTrack(TrackIds.M5_3, 3); passioChristiII.AddTrack(TrackIds.M5_4, 4);
 
-            var possession = Album.Create("Possession", AlbumType.FullLength, AlbumRelease.Of(2004, AlbumFormat.CD), null, null, AlbumIds.MVD_Possession);
+            Album possession = Album.Create("Possession", AlbumType.FullLength, AlbumRelease.Of(2004, AlbumFormat.CD), null, null, AlbumIds.MVD_Possession);
             possession.AddBand(BandIds.MorsVoidDiscipline); possession.AddGenre(GenreIds.BlackMetal, isPrimary: true); possession.AddCountry(CountryIds.France);
             possession.AddTrack(TrackIds.M6_1, 1); possession.AddTrack(TrackIds.M6_2, 2); possession.AddTrack(TrackIds.M6_3, 3); possession.AddTrack(TrackIds.M6_4, 4);
 
-            var seidr = Album.Create("Seiðr", AlbumType.FullLength, AlbumRelease.Of(2011, AlbumFormat.CD), null, null, AlbumIds.MVD_Seidr);
+            Album seidr = Album.Create("Seiðr", AlbumType.FullLength, AlbumRelease.Of(2011, AlbumFormat.CD), null, null, AlbumIds.MVD_Seidr);
             seidr.AddBand(BandIds.MorsVoidDiscipline); seidr.AddGenre(GenreIds.BlackMetal, isPrimary: true); seidr.AddCountry(CountryIds.France);
             seidr.AddTrack(TrackIds.M7_1, 1); seidr.AddTrack(TrackIds.M7_2, 2); seidr.AddTrack(TrackIds.M7_3, 3); seidr.AddTrack(TrackIds.M7_4, 4);
 
-            var theCall = Album.Create("The Call", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), null, null, AlbumIds.MVD_TheCall);
+            Album theCall = Album.Create("The Call", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), null, null, AlbumIds.MVD_TheCall);
             theCall.AddBand(BandIds.MorsVoidDiscipline); theCall.AddGenre(GenreIds.BlackMetal, isPrimary: true); theCall.AddCountry(CountryIds.France);
             theCall.AddTrack(TrackIds.M8_1, 1); theCall.AddTrack(TrackIds.M8_2, 2); theCall.AddTrack(TrackIds.M8_3, 3); theCall.AddTrack(TrackIds.M8_4, 4);
 
-            var motherOfDarkness = Album.Create("The Mother of Darkness", AlbumType.FullLength, AlbumRelease.Of(2008, AlbumFormat.CD), null, null, AlbumIds.MVD_MotherOfDarkness);
+            Album motherOfDarkness = Album.Create("The Mother of Darkness", AlbumType.FullLength, AlbumRelease.Of(2008, AlbumFormat.CD), null, null, AlbumIds.MVD_MotherOfDarkness);
             motherOfDarkness.AddBand(BandIds.MorsVoidDiscipline); motherOfDarkness.AddGenre(GenreIds.BlackMetal, isPrimary: true); motherOfDarkness.AddCountry(CountryIds.France);
             motherOfDarkness.AddTrack(TrackIds.M9_1, 1); motherOfDarkness.AddTrack(TrackIds.M9_2, 2); motherOfDarkness.AddTrack(TrackIds.M9_3, 3); motherOfDarkness.AddTrack(TrackIds.M9_4, 4);
 
-            var thirdAntichrist = Album.Create("The Third Antichrist", AlbumType.FullLength, AlbumRelease.Of(2020, AlbumFormat.CD), null, null, AlbumIds.MVD_ThirdAntichrist);
+            Album thirdAntichrist = Album.Create("The Third Antichrist", AlbumType.FullLength, AlbumRelease.Of(2020, AlbumFormat.CD), null, null, AlbumIds.MVD_ThirdAntichrist);
             thirdAntichrist.AddBand(BandIds.MorsVoidDiscipline); thirdAntichrist.AddGenre(GenreIds.BlackMetal, isPrimary: true); thirdAntichrist.AddCountry(CountryIds.France);
             thirdAntichrist.AddTrack(TrackIds.M10_1, 1); thirdAntichrist.AddTrack(TrackIds.M10_2, 2); thirdAntichrist.AddTrack(TrackIds.M10_3, 3); thirdAntichrist.AddTrack(TrackIds.M10_4, 4);
 
-            var wombOfLilithu = Album.Create("Womb of Lilithu", AlbumType.FullLength, AlbumRelease.Of(2002, AlbumFormat.CD), null, null, AlbumIds.MVD_WombOfLilithu);
+            Album wombOfLilithu = Album.Create("Womb of Lilithu", AlbumType.FullLength, AlbumRelease.Of(2002, AlbumFormat.CD), null, null, AlbumIds.MVD_WombOfLilithu);
             wombOfLilithu.AddBand(BandIds.MorsVoidDiscipline); wombOfLilithu.AddGenre(GenreIds.BlackMetal, isPrimary: true); wombOfLilithu.AddCountry(CountryIds.France);
             wombOfLilithu.AddTrack(TrackIds.M11_1, 1); wombOfLilithu.AddTrack(TrackIds.M11_2, 2); wombOfLilithu.AddTrack(TrackIds.M11_3, 3); wombOfLilithu.AddTrack(TrackIds.M11_4, 4);
 
             // ── Vider ─────────────────────────────────────────────────────────────
-            var bloodhymns = Album.Create("Bloodhymns", AlbumType.FullLength, AlbumRelease.Of(2002, AlbumFormat.CD), null, null, AlbumIds.Vider_Bloodhymns);
+            Album bloodhymns = Album.Create("Bloodhymns", AlbumType.FullLength, AlbumRelease.Of(2002, AlbumFormat.CD), null, null, AlbumIds.Vider_Bloodhymns);
             bloodhymns.AddBand(BandIds.Vider); bloodhymns.AddGenre(GenreIds.BlackMetal, isPrimary: true); bloodhymns.AddCountry(CountryIds.Sweden);
             bloodhymns.AddTrack(TrackIds.V1_1, 1); bloodhymns.AddTrack(TrackIds.V1_2, 2); bloodhymns.AddTrack(TrackIds.V1_3, 3); bloodhymns.AddTrack(TrackIds.V1_4, 4);
 
-            var darkside = Album.Create("Darkside", AlbumType.FullLength, AlbumRelease.Of(1997, AlbumFormat.CD), null, null, AlbumIds.Vider_Darkside);
+            Album darkside = Album.Create("Darkside", AlbumType.FullLength, AlbumRelease.Of(1997, AlbumFormat.CD), null, null, AlbumIds.Vider_Darkside);
             darkside.AddBand(BandIds.Vider); darkside.AddGenre(GenreIds.BlackMetal, isPrimary: true); darkside.AddCountry(CountryIds.Sweden);
             darkside.AddTrack(TrackIds.V2_1, 1); darkside.AddTrack(TrackIds.V2_2, 2); darkside.AddTrack(TrackIds.V2_3, 3); darkside.AddTrack(TrackIds.V2_4, 4);
 
-            var dawnOfDamned = Album.Create("Dawn of the Damned", AlbumType.FullLength, AlbumRelease.Of(2004, AlbumFormat.CD), null, null, AlbumIds.Vider_DawnOfDamned);
+            Album dawnOfDamned = Album.Create("Dawn of the Damned", AlbumType.FullLength, AlbumRelease.Of(2004, AlbumFormat.CD), null, null, AlbumIds.Vider_DawnOfDamned);
             dawnOfDamned.AddBand(BandIds.Vider); dawnOfDamned.AddGenre(GenreIds.BlackMetal, isPrimary: true); dawnOfDamned.AddCountry(CountryIds.Sweden);
             dawnOfDamned.AddTrack(TrackIds.V3_1, 1); dawnOfDamned.AddTrack(TrackIds.V3_2, 2); dawnOfDamned.AddTrack(TrackIds.V3_3, 3); dawnOfDamned.AddTrack(TrackIds.V3_4, 4);
 
-            var deathToAll = Album.Create("Death to All", AlbumType.FullLength, AlbumRelease.Of(2012, AlbumFormat.CD), null, null, AlbumIds.Vider_DeathToAll);
+            Album deathToAll = Album.Create("Death to All", AlbumType.FullLength, AlbumRelease.Of(2012, AlbumFormat.CD), null, null, AlbumIds.Vider_DeathToAll);
             deathToAll.AddBand(BandIds.Vider); deathToAll.AddGenre(GenreIds.BlackMetal, isPrimary: true); deathToAll.AddCountry(CountryIds.Sweden);
             deathToAll.AddTrack(TrackIds.V4_1, 1); deathToAll.AddTrack(TrackIds.V4_2, 2); deathToAll.AddTrack(TrackIds.V4_3, 3); deathToAll.AddTrack(TrackIds.V4_4, 4);
 
-            var inTheTwilightGrey = Album.Create("In the Twilight Grey", AlbumType.FullLength, AlbumRelease.Of(1999, AlbumFormat.CD), null, null, AlbumIds.Vider_InTheTwilightGrey);
+            Album inTheTwilightGrey = Album.Create("In the Twilight Grey", AlbumType.FullLength, AlbumRelease.Of(1999, AlbumFormat.CD), null, null, AlbumIds.Vider_InTheTwilightGrey);
             inTheTwilightGrey.AddBand(BandIds.Vider); inTheTwilightGrey.AddGenre(GenreIds.BlackMetal, isPrimary: true); inTheTwilightGrey.AddCountry(CountryIds.Sweden);
             inTheTwilightGrey.AddTrack(TrackIds.V5_1, 1); inTheTwilightGrey.AddTrack(TrackIds.V5_2, 2); inTheTwilightGrey.AddTrack(TrackIds.V5_3, 3); inTheTwilightGrey.AddTrack(TrackIds.V5_4, 4);
 
-            var markOfNecrogram = Album.Create("Mark of the Necrogram", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), null, null, AlbumIds.Vider_MarkOfNecrogram);
+            Album markOfNecrogram = Album.Create("Mark of the Necrogram", AlbumType.FullLength, AlbumRelease.Of(2018, AlbumFormat.CD), null, null, AlbumIds.Vider_MarkOfNecrogram);
             markOfNecrogram.AddBand(BandIds.Vider); markOfNecrogram.AddGenre(GenreIds.BlackMetal, isPrimary: true); markOfNecrogram.AddCountry(CountryIds.Sweden);
             markOfNecrogram.AddTrack(TrackIds.V6_1, 1); markOfNecrogram.AddTrack(TrackIds.V6_2, 2); markOfNecrogram.AddTrack(TrackIds.V6_3, 3); markOfNecrogram.AddTrack(TrackIds.V6_4, 4);
 
-            var nocturnalSilence = Album.Create("The Nocturnal Silence", AlbumType.FullLength, AlbumRelease.Of(1994, AlbumFormat.CD), null, null, AlbumIds.Vider_NocturnalSilence);
+            Album nocturnalSilence = Album.Create("The Nocturnal Silence", AlbumType.FullLength, AlbumRelease.Of(1994, AlbumFormat.CD), null, null, AlbumIds.Vider_NocturnalSilence);
             nocturnalSilence.AddBand(BandIds.Vider); nocturnalSilence.AddGenre(GenreIds.BlackMetal, isPrimary: true); nocturnalSilence.AddCountry(CountryIds.Sweden);
             nocturnalSilence.AddTrack(TrackIds.V7_1, 1); nocturnalSilence.AddTrack(TrackIds.V7_2, 2); nocturnalSilence.AddTrack(TrackIds.V7_3, 3); nocturnalSilence.AddTrack(TrackIds.V7_4, 4);
 

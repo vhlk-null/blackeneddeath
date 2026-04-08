@@ -12,7 +12,7 @@ public class LogoutModel(IIdentityServerInteractionService interaction) : PageMo
 
     public async Task<IActionResult> OnGetAsync(string? logoutId)
     {
-        var context = await interaction.GetLogoutContextAsync(logoutId);
+        LogoutRequest? context = await interaction.GetLogoutContextAsync(logoutId);
 
         await HttpContext.SignOutAsync(
             Duende.IdentityServer.IdentityServerConstants.DefaultCookieAuthenticationScheme);

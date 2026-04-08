@@ -9,8 +9,8 @@ public class DeleteVideoBand : ICarterModule
         app.MapDelete("/bands/{bandId:guid}/videos/{id:guid}",
                 async ([FromRoute] Guid bandId, [FromRoute] Guid id, ISender sender) =>
                 {
-                    var command = new DeleteVideoBandCommand(id);
-                    var result = await sender.Send(command);
+                    DeleteVideoBandCommand command = new DeleteVideoBandCommand(id);
+                    DeleteVideoBandResult result = await sender.Send(command);
                     return Results.Ok(result.Adapt<DeleteVideoBandResponse>());
                 })
             .WithName("DeleteVideoBand")

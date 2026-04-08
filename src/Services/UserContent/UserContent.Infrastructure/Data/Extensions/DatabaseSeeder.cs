@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using UserContent.Infrastructure.Data.Seed;
@@ -10,8 +11,8 @@ public static class DatabaseSeeder
         IServiceProvider serviceProvider,
         ILogger logger)
     {
-        using var scope = serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<UserContentContext>();
+        using IServiceScope scope = serviceProvider.CreateScope();
+        UserContentContext context = scope.ServiceProvider.GetRequiredService<UserContentContext>();
 
         try
         {
@@ -25,7 +26,7 @@ public static class DatabaseSeeder
 
             logger.LogInformation("Starting UserContent database seeding...");
 
-            await using var transaction = await context.Database.BeginTransactionAsync();
+            await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
 
             try
             {
@@ -50,9 +51,9 @@ public static class DatabaseSeeder
 
     private static async Task<bool> IsAlreadySeededAsync(UserContentContext context)
     {
-        var hasUserProfiles = await context.UserProfiles.AnyAsync();
-        var hasAlbums = await context.Albums.AnyAsync();
-        var hasBands = await context.Bands.AnyAsync();
+        bool hasUserProfiles = await context.UserProfiles.AnyAsync();
+        bool hasAlbums = await context.Albums.AnyAsync();
+        bool hasBands = await context.Bands.AnyAsync();
 
         return hasUserProfiles && hasAlbums && hasBands;
     }

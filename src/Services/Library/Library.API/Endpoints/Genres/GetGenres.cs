@@ -10,8 +10,8 @@ public class GetGenres : ICarterModule
     {
         app.MapGet("/genres", async (ISender sender) =>
             {
-                var result = await sender.Send(new GetGenresQuery());
-                var response = result.Adapt<GetGenresResult>();
+                Application.Services.Genres.Queries.GetGenres.GetGenresResult result = await sender.Send(new GetGenresQuery());
+                GetGenresResult response = result.Adapt<GetGenresResult>();
                 return Results.Ok(response);
             })
             .WithName("GetGenres")

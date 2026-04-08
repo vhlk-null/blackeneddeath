@@ -29,9 +29,9 @@ public class CreateTagHandlerTests
     [Fact]
     public async Task Handle_ValidCommand_AddsTagAndReturnsId()
     {
-        var command = new CreateTagCommand("Atmospheric");
+        CreateTagCommand command = new CreateTagCommand("Atmospheric");
 
-        var result = await _handler.Handle(command, CancellationToken.None);
+        CreateTagResult result = await _handler.Handle(command, CancellationToken.None);
 
         result.Id.Should().NotBeEmpty();
         _tagsDbSetMock.Verify(x => x.Add(It.IsAny<Tag>()), Times.Once);
@@ -41,7 +41,7 @@ public class CreateTagHandlerTests
     [Fact]
     public async Task Handle_ValidCommand_CreatesTagWithCorrectName()
     {
-        var command = new CreateTagCommand("Progressive");
+        CreateTagCommand command = new CreateTagCommand("Progressive");
 
         await _handler.Handle(command, CancellationToken.None);
 

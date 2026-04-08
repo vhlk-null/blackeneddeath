@@ -31,13 +31,13 @@ public class DeleteTagHandlerTests
     [Fact]
     public async Task Handle_ExistingTag_RemovesTagAndReturnsSuccess()
     {
-        var tagId = Guid.NewGuid();
-        var tag = Tag.Create(TagId.Of(tagId), "Atmospheric");
+        Guid tagId = Guid.NewGuid();
+        Tag tag = Tag.Create(TagId.Of(tagId), "Atmospheric");
         _tagsDbSetMock
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<Tag?>(tag));
 
-        var result = await _handler.Handle(new DeleteTagCommand(tagId), CancellationToken.None);
+        DeleteTagResult result = await _handler.Handle(new DeleteTagCommand(tagId), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         _tagsDbSetMock.Verify(x => x.Remove(tag), Times.Once);
@@ -51,7 +51,7 @@ public class DeleteTagHandlerTests
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<Tag?>(null));
 
-        var act = async () => await _handler.Handle(
+        Func<Task<DeleteTagResult>> act = async () => await _handler.Handle(
             new DeleteTagCommand(Guid.NewGuid()), CancellationToken.None);
 
         await act.Should().ThrowAsync<TagNotFoundException>();

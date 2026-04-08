@@ -6,10 +6,10 @@
         {
             get
             {
-                var clients = new List<Client>();
+                List<Client> clients = new List<Client>();
                 configuration.GetSection("IdentityServer:Clients").Bind(clients);
 
-                foreach (var client in clients)
+                foreach (Client client in clients)
                 {
                     client.AllowedGrantTypes = GrantTypes.Code;
                     client.RequirePkce = true;

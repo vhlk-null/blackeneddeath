@@ -8,8 +8,8 @@ public class DeleteTag : ICarterModule
     {
         app.MapDelete("/tags/{id:guid}", async (Guid id, ISender sender) =>
             {
-                var result = await sender.Send(new DeleteTagCommand(id));
-                var response = result.Adapt<DeleteTagResponse>();
+                DeleteTagResult result = await sender.Send(new DeleteTagCommand(id));
+                DeleteTagResponse response = result.Adapt<DeleteTagResponse>();
                 return Results.Ok(response);
             })
             .WithName("DeleteTag")

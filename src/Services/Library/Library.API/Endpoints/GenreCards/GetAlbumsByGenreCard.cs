@@ -7,7 +7,7 @@ public class GetAlbumsByGenreCard : ICarterModule
         app.MapGet("/genre-cards/{id:guid}/albums",
                 async (Guid id, [AsParameters] PaginationRequest pagination, ISender sender) =>
                 {
-                    var result = await sender.Send(new GetAlbumsByGenreCardQuery(id, pagination));
+                    GetAlbumsByGenreCardResult result = await sender.Send(new GetAlbumsByGenreCardQuery(id, pagination));
 
                     return Results.Ok(result.Albums);
                 })

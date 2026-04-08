@@ -9,8 +9,8 @@ public class GetVideoBandsByBandId : ICarterModule
         app.MapGet("/bands/{bandId:guid}/videos",
                 async ([FromRoute] Guid bandId, [AsParameters] PaginationRequest paginationRequest, ISender sender) =>
                 {
-                    var query = new GetVideoBandsByBandIdQuery(bandId, paginationRequest);
-                    var result = await sender.Send(query);
+                    GetVideoBandsByBandIdQuery query = new GetVideoBandsByBandIdQuery(bandId, paginationRequest);
+                    GetVideoBandsByBandIdResult result = await sender.Send(query);
                     return Results.Ok(result.Adapt<GetVideoBandsByBandIdResponse>());
                 })
             .WithName("GetVideoBandsByBandId")

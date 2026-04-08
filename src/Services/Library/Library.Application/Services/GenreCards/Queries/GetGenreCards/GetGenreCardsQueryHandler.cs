@@ -5,12 +5,12 @@ public class GetGenreCardsQueryHandler(ILibraryDbContext context, IStorageUrlRes
 {
     public async ValueTask<GetGenreCardsResult> Handle(GetGenreCardsQuery query, CancellationToken cancellationToken)
     {
-        var cards = await context.GenreCards
+        List<GenreCard> cards = await context.GenreCards
             .AsNoTracking()
             .OrderBy(c => c.OrderNumber)
             .ToListAsync(cancellationToken);
 
-        var dtos = cards
+        List<GenreCardDto> dtos = cards
             .Select(c => c.ToGenreCardDto(urlResolver))
             .ToList();
 

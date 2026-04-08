@@ -7,8 +7,8 @@ public class DeleteAlbumCommandHandler(ILibraryDbContext context, IStorageServic
         DeleteAlbumCommand command,
         CancellationToken cancellationToken)
     {
-        var album = await context.Albums.FindAsync([AlbumId.Of(command.AlbumId)], cancellationToken)
-            ?? throw new AlbumNotFoundException(command.AlbumId);
+        Album album = await context.Albums.FindAsync([AlbumId.Of(command.AlbumId)], cancellationToken)
+                      ?? throw new AlbumNotFoundException(command.AlbumId);
 
         if (album.CoverUrl is not null)
             await storage.DeleteFileAsync(album.CoverUrl, cancellationToken);

@@ -7,7 +7,7 @@ public sealed class BandUpdatedEventHandler(ILogger<BandUpdatedEventHandler> log
     {
         logger.LogInformation("Domain Event handled: {DomainEvent}", domainEvent.GetType().Name);
 
-        var integrationEvent = new BandUpdatedIntegrationEvent
+        BandUpdatedIntegrationEvent integrationEvent = new BandUpdatedIntegrationEvent
         {
             BandId = domainEvent.Band.Id.Value,
             Name = domainEvent.Band.Name,

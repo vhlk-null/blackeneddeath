@@ -13,7 +13,7 @@ public class UpdateAlbum : ICarterModule
     {
         app.MapPut("/albums/{id:guid}", async (Guid id, [FromForm] UpdateAlbumRequest request, ISender sender) =>
             {
-                var albumDto = JsonSerializer.Deserialize<UpdateAlbumDto>(request.Album,
+                UpdateAlbumDto? albumDto = JsonSerializer.Deserialize<UpdateAlbumDto>(request.Album,
                     new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true,
@@ -31,13 +31,13 @@ public class UpdateAlbum : ICarterModule
                     coverImageStream.Position = 0;
                 }
 
-                var command = new UpdateAlbumCommand(
+                UpdateAlbumCommand command = new UpdateAlbumCommand(
                     albumDto with { Id = id },
                     coverImageStream,
                     request.CoverImage?.ContentType,
                     request.CoverImage?.FileName);
 
-                var result = await sender.Send(command);
+                UpdateAlbumResult result = await sender.Send(command);
                 return Results.Ok(result.Adapt<UpdateAlbumResponse>());
             })
             .WithName("UpdateAlbum")

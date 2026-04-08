@@ -7,43 +7,43 @@ public class UpdateGenreCardCommandHandler(ILibraryDbContext context, IStorageSe
 {
     public async ValueTask<UpdateGenreCardResult> Handle(UpdateGenreCardCommand command, CancellationToken cancellationToken)
     {
-        var card = await context.GenreCards
-            .Include(c => c.GenreCardGenres)
-            .Include(c => c.GenreCardTags)
-            .FirstOrDefaultAsync(c => c.Id == GenreCardId.Of(command.Id), cancellationToken)
-            ?? throw new GenreCardNotFoundException(command.Id);
+        GenreCard card = await context.GenreCards
+                             .Include(c => c.GenreCardGenres)
+                             .Include(c => c.GenreCardTags)
+                             .FirstOrDefaultAsync(c => c.Id == GenreCardId.Of(command.Id), cancellationToken)
+                         ?? throw new GenreCardNotFoundException(command.Id);
 
-        var coverKey = card.CoverUrl;
+        string? coverKey = card.CoverUrl;
 
         if (command.CoverImage is not null && command.CoverImageContentType is not null && command.CoverImageFileName is not null)
         {
             if (card.CoverUrl is not null)
                 await storage.DeleteFileAsync(card.CoverUrl, cancellationToken);
 
-            var folder = $"genres/{Slugify(command.Name)}";
-            var extension = Path.GetExtension(command.CoverImageFileName);
+            string folder = $"genres/{Slugify(command.Name)}";
+            string extension = Path.GetExtension(command.CoverImageFileName);
             coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
         }
 
         card.Update(command.Name, command.Description, coverKey, command.OrderNumber);
 
         // Sync genres
-        var desiredGenreIds = (command.GenreIds ?? []).Select(GenreId.Of).ToHashSet();
-        var currentGenreIds = card.GenreCardGenres.Select(g => g.GenreId).ToHashSet();
-        foreach (var id in currentGenreIds.Except(desiredGenreIds)) card.RemoveGenre(id);
-        foreach (var id in desiredGenreIds.Except(currentGenreIds))
+        HashSet<GenreId> desiredGenreIds = (command.GenreIds ?? []).Select(GenreId.Of).ToHashSet();
+        HashSet<GenreId> currentGenreIds = card.GenreCardGenres.Select(g => g.GenreId).ToHashSet();
+        foreach (GenreId id in currentGenreIds.Except(desiredGenreIds)) card.RemoveGenre(id);
+        foreach (GenreId id in desiredGenreIds.Except(currentGenreIds))
         {
-            var exists = await context.Genres.AnyAsync(g => g.Id == id, cancellationToken);
+            bool exists = await context.Genres.AnyAsync(g => g.Id == id, cancellationToken);
             if (exists) card.AddGenre(id);
         }
 
         // Sync tags
-        var desiredTagIds = (command.TagIds ?? []).Select(TagId.Of).ToHashSet();
-        var currentTagIds = card.GenreCardTags.Select(t => t.TagId).ToHashSet();
-        foreach (var id in currentTagIds.Except(desiredTagIds)) card.RemoveTag(id);
-        foreach (var id in desiredTagIds.Except(currentTagIds))
+        HashSet<TagId> desiredTagIds = (command.TagIds ?? []).Select(TagId.Of).ToHashSet();
+        HashSet<TagId> currentTagIds = card.GenreCardTags.Select(t => t.TagId).ToHashSet();
+        foreach (TagId id in currentTagIds.Except(desiredTagIds)) card.RemoveTag(id);
+        foreach (TagId id in desiredTagIds.Except(currentTagIds))
         {
-            var exists = await context.Tags.AnyAsync(t => t.Id == id, cancellationToken);
+            bool exists = await context.Tags.AnyAsync(t => t.Id == id, cancellationToken);
             if (exists) card.AddTag(id);
         }
 

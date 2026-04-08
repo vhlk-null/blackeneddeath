@@ -11,11 +11,11 @@ public class CreateLabel : ICarterModule
         app.MapPost("/labels",
                 async (CreateLabelRequest request, ISender sender) =>
                 {
-                    var command = request.Adapt<CreateLabelCommand>();
+                    CreateLabelCommand command = request.Adapt<CreateLabelCommand>();
 
-                    var result = await sender.Send(command);
+                    CreateLabelResult result = await sender.Send(command);
 
-                    var response = result.Adapt<CreateLabelResponse>();
+                    CreateLabelResponse response = result.Adapt<CreateLabelResponse>();
 
                     return Results.Created($"/labels/{response.Id}", response);
                 })

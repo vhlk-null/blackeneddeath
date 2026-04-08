@@ -14,7 +14,7 @@ public class FavoriteBandsController(IUserContentService service) : ControllerBa
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AddBandToFavorite(AddBandToFavoriteRequest request, CancellationToken ct)
     {
-        var userId = await service.AddFavoriteBandAsync(request.UserId, request.BandId, ct);
+        Guid userId = await service.AddFavoriteBandAsync(request.UserId, request.BandId, ct);
         return Created($"/favoriteBands/{userId}", new AddBandToFavoriteResponse(userId));
     }
 

@@ -25,7 +25,7 @@ public class CreateGenreCard : ICarterModule
                         coverImageStream.Position = 0;
                     }
 
-                    var command = new CreateGenreCardCommand(
+                    CreateGenreCardCommand command = new CreateGenreCardCommand(
                         request.Name,
                         request.Description,
                         request.OrderNumber,
@@ -33,7 +33,7 @@ public class CreateGenreCard : ICarterModule
                         request.CoverImage?.ContentType,
                         request.CoverImage?.FileName);
 
-                    var result = await sender.Send(command);
+                    CreateGenreCardResult result = await sender.Send(command);
 
                     return Results.Created($"/genre-cards/{result.Id}", result.Adapt<CreateGenreCardResponse>());
                 })

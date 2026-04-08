@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using Mediator;
 
 namespace BuildingBlocks.Behaviors;
@@ -13,12 +14,12 @@ public sealed class ValidationBehavior<TMessage, TResponse>(IEnumerable<IValidat
         if (!validators.Any())
             return await next(message, cancellationToken);
 
-        var context = new ValidationContext<TMessage>(message);
+        ValidationContext<TMessage> context = new ValidationContext<TMessage>(message);
 
-        var validationResults = await Task.WhenAll(
+        ValidationResult[] validationResults = await Task.WhenAll(
             validators.Select(v => v.ValidateAsync(context, cancellationToken)));
 
-        var failures = validationResults
+        List<ValidationFailure> failures = validationResults
             .Where(r => r.Errors.Any())
             .SelectMany(r => r.Errors)
             .ToList();

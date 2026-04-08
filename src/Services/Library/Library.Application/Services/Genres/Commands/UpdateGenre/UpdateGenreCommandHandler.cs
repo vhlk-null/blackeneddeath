@@ -5,10 +5,10 @@ public class UpdateGenreCommandHandler(ILibraryDbContext context)
 {
     public async ValueTask<UpdateGenreResult> Handle(UpdateGenreCommand command, CancellationToken cancellationToken)
     {
-        var genre = await context.Genres.FindAsync([GenreId.Of(command.Id)], cancellationToken)
-            ?? throw new GenreNotFoundException(command.Id);
+        Genre genre = await context.Genres.FindAsync([GenreId.Of(command.Id)], cancellationToken)
+                      ?? throw new GenreNotFoundException(command.Id);
 
-        var parentGenreId = command.ParentGenreId.HasValue
+        GenreId? parentGenreId = command.ParentGenreId.HasValue
             ? GenreId.Of(command.ParentGenreId.Value)
             : null;
 

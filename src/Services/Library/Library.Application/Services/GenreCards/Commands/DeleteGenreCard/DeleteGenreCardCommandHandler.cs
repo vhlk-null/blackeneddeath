@@ -5,8 +5,8 @@ public class DeleteGenreCardCommandHandler(ILibraryDbContext context, IStorageSe
 {
     public async ValueTask<DeleteGenreCardResult> Handle(DeleteGenreCardCommand command, CancellationToken cancellationToken)
     {
-        var card = await context.GenreCards.FindAsync([GenreCardId.Of(command.Id)], cancellationToken)
-            ?? throw new GenreCardNotFoundException(command.Id);
+        GenreCard card = await context.GenreCards.FindAsync([GenreCardId.Of(command.Id)], cancellationToken)
+                         ?? throw new GenreCardNotFoundException(command.Id);
 
         if (card.CoverUrl is not null)
             await storage.DeleteFileAsync(card.CoverUrl, cancellationToken);

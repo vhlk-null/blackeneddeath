@@ -12,7 +12,7 @@ public sealed class AlbumCreatedEventHandler(
         // Feature flag: FeatureFlags.AlbumFulfillment
         // if (await featureManager.IsEnabledAsync(FeatureFlags.AlbumFulfillment))
 
-        var integrationEvent = new AlbumCreatedIntegrationEvent
+        AlbumCreatedIntegrationEvent integrationEvent = new AlbumCreatedIntegrationEvent
         {
             AlbumId = domainEvent.Album.Id.Value,
             Title = domainEvent.Album.Title,

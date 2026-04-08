@@ -10,9 +10,9 @@ public class UpdateTag : ICarterModule
     {
         app.MapPut("/tags/{id:guid}", async (Guid id, UpdateTagRequest request, ISender sender) =>
             {
-                var command = new UpdateTagCommand(id, request.Name);
-                var result = await sender.Send(command);
-                var response = result.Adapt<UpdateTagResponse>();
+                UpdateTagCommand command = new UpdateTagCommand(id, request.Name);
+                UpdateTagResult result = await sender.Send(command);
+                UpdateTagResponse response = result.Adapt<UpdateTagResponse>();
                 return Results.Ok(response);
             })
             .WithName("UpdateTag")

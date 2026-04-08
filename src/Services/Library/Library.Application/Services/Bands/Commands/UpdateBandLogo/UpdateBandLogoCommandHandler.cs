@@ -7,15 +7,15 @@ public class UpdateBandLogoCommandHandler(ILibraryDbContext context, IStorageSer
 {
     public async ValueTask<UpdateBandLogoResult> Handle(UpdateBandLogoCommand command, CancellationToken cancellationToken)
     {
-        var band = await context.Bands.FindAsync([BandId.Of(command.BandId)], cancellationToken)
-            ?? throw new BandNotFoundException(command.BandId);
+        Band band = await context.Bands.FindAsync([BandId.Of(command.BandId)], cancellationToken)
+                    ?? throw new BandNotFoundException(command.BandId);
 
         if (band.LogoUrl is not null)
             await storage.DeleteFileAsync(band.LogoUrl, cancellationToken);
 
-        var folder = $"bands/{Slugify(band.Name)}/logo";
-        var extension = Path.GetExtension(command.LogoFileName);
-        var logoKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.Logo, command.LogoContentType, cancellationToken);
+        string folder = $"bands/{Slugify(band.Name)}/logo";
+        string extension = Path.GetExtension(command.LogoFileName);
+        string logoKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.Logo, command.LogoContentType, cancellationToken);
 
         band.Update(band.Name, band.Bio, logoKey, band.Activity, band.Status);
         await context.SaveChangesAsync(cancellationToken);

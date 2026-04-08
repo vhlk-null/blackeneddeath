@@ -11,9 +11,9 @@ public class UpdateGenre : ICarterModule
         app.MapPut("/genres/{id:guid}",
                 async (Guid id, UpdateGenreRequest request, ISender sender) =>
                 {
-                    var command = request.Adapt<UpdateGenreCommand>() with { Id = id };
+                    UpdateGenreCommand command = request.Adapt<UpdateGenreCommand>() with { Id = id };
 
-                    var result = await sender.Send(command);
+                    UpdateGenreResult result = await sender.Send(command);
 
                     return Results.Ok(result.Adapt<UpdateGenreResponse>());
                 })

@@ -25,7 +25,7 @@ public static class DependencyInjection
                 policy.RequireRole("admin"));
         });
 
-        var connectionString = configuration.GetConnectionString(ConnectionStrings.LibraryDatabase);
+        string? connectionString = configuration.GetConnectionString(ConnectionStrings.LibraryDatabase);
         services.AddHealthChecks()
             .AddNpgSql(connectionString ?? string.Empty, name: "postgresql");
 

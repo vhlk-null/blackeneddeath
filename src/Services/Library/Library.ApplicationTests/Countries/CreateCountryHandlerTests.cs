@@ -29,9 +29,9 @@ public class CreateCountryHandlerTests
     [Fact]
     public async Task Handle_ValidCommand_AddsCountryAndReturnsId()
     {
-        var command = new CreateCountryCommand("Norway", "NO");
+        CreateCountryCommand command = new CreateCountryCommand("Norway", "NO");
 
-        var result = await _handler.Handle(command, CancellationToken.None);
+        CreateCountryResult result = await _handler.Handle(command, CancellationToken.None);
 
         result.Id.Should().NotBeEmpty();
         _countriesDbSetMock.Verify(x => x.Add(It.IsAny<Country>()), Times.Once);
@@ -41,7 +41,7 @@ public class CreateCountryHandlerTests
     [Fact]
     public async Task Handle_ValidCommand_CreatesCountryWithCorrectValues()
     {
-        var command = new CreateCountryCommand("Sweden", "SE");
+        CreateCountryCommand command = new CreateCountryCommand("Sweden", "SE");
 
         await _handler.Handle(command, CancellationToken.None);
 

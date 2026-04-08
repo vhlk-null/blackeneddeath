@@ -19,42 +19,42 @@ public class TagEndpointsTests(LibraryWebAppFactory factory) : IClassFixture<Lib
     [Fact]
     public async Task CreateTag_ValidRequest_Returns201WithId()
     {
-        var tagId = Guid.NewGuid();
+        Guid tagId = Guid.NewGuid();
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<CreateTagCommand>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<CreateTagResult>(new CreateTagResult(tagId)));
 
-        var response = await _client.PostAsJsonAsync("/tags", new { Name = "Atmospheric" });
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/tags", new { Name = "Atmospheric" });
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var body = await response.Content.ReadFromJsonAsync<CreateTagResponse>();
+        CreateTagResponse? body = await response.Content.ReadFromJsonAsync<CreateTagResponse>();
         body!.Id.Should().Be(tagId);
     }
 
     [Fact]
     public async Task DeleteTag_ValidId_Returns200WithSuccess()
     {
-        var tagId = Guid.NewGuid();
+        Guid tagId = Guid.NewGuid();
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<DeleteTagCommand>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<DeleteTagResult>(new DeleteTagResult(true)));
 
-        var response = await _client.DeleteAsync($"/tags/{tagId}");
+        HttpResponseMessage response = await _client.DeleteAsync($"/tags/{tagId}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<DeleteTagResponse>();
+        DeleteTagResponse? body = await response.Content.ReadFromJsonAsync<DeleteTagResponse>();
         body!.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
     public async Task GetTags_Returns200WithList()
     {
-        var appResult = new GetTagsResult([]);
+        GetTagsResult appResult = new GetTagsResult([]);
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<GetTagsQuery>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<GetTagsResult>(appResult));
 
-        var response = await _client.GetAsync("/tags");
+        HttpResponseMessage response = await _client.GetAsync("/tags");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }

@@ -39,8 +39,8 @@ namespace UserContent.InfrastructureTests.Utils
     {
         public static Mock<DbSet<T>> Create<T>(params T[] data) where T : class
         {
-            var queryable = data.AsQueryable();
-            var mockDbSet = new Mock<DbSet<T>>();
+            IQueryable<T> queryable = data.AsQueryable();
+            Mock<DbSet<T>> mockDbSet = new Mock<DbSet<T>>();
 
             mockDbSet.As<IQueryable<T>>().Setup(x => x.Provider).Returns(new TestAsyncQueryProvider<T>(queryable.Provider));
             mockDbSet.As<IQueryable<T>>().Setup(x => x.Expression).Returns(queryable.Expression);
@@ -61,7 +61,7 @@ namespace UserContent.InfrastructureTests.Utils
         public TResult Execute<TResult>(Expression expression) => inner.Execute<TResult>(expression);
         public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default)
         {
-            var result = inner.Execute(expression);
+            object? result = inner.Execute(expression);
             return (TResult)typeof(Task).GetMethod(nameof(Task.FromResult))!
                 .MakeGenericMethod(typeof(TResult).GetGenericArguments()[0])
                 .Invoke(null, [result])!;

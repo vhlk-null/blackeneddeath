@@ -8,8 +8,8 @@ public class GetGenresByParent : ICarterModule
     {
         app.MapGet("/genres/parent/{parentId}", async (Guid parentId, ISender sender) =>
             {
-                var query = new GetGenresByParentQuery(parentId);
-                var result = await sender.Send(query);
+                GetGenresByParentQuery query = new GetGenresByParentQuery(parentId);
+                GetGenresByParentResult result = await sender.Send(query);
                 return Results.Ok(result.Adapt<GetGenresByParentResponse>());
             })
             .WithName("GetGenresByParent")

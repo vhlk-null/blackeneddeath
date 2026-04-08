@@ -14,7 +14,7 @@ public class FavoriteAlbumsController(IUserContentService service) : ControllerB
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AddAlbumToFavorite(AddAlbumToFavoriteRequest request, CancellationToken ct)
     {
-        var userId = await service.AddFavoriteAlbumAsync(request.UserId, request.AlbumId, ct);
+        Guid userId = await service.AddFavoriteAlbumAsync(request.UserId, request.AlbumId, ct);
         return Created($"/favoriteAlbums/{userId}", new AddAlbumToFavoriteResponse(userId));
     }
 

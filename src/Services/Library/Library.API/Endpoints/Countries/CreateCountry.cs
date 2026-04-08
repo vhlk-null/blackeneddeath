@@ -11,11 +11,11 @@ public class CreateCountry : ICarterModule
         app.MapPost("/countries",
                 async (CreateCountryRequest request, ISender sender) =>
                 {
-                    var command = request.Adapt<CreateCountryCommand>();
+                    CreateCountryCommand command = request.Adapt<CreateCountryCommand>();
 
-                    var result = await sender.Send(command);
+                    CreateCountryResult result = await sender.Send(command);
 
-                    var response = result.Adapt<CreateCountryResponse>();
+                    CreateCountryResponse response = result.Adapt<CreateCountryResponse>();
 
                     return Results.Created($"/countries/{response.Id}", response);
                 })

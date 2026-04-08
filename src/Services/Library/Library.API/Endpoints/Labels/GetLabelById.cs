@@ -8,9 +8,9 @@ public class GetLabelById : ICarterModule
     {
         app.MapGet("/labels/{id:guid}", async (Guid id, ISender sender) =>
             {
-                var query = new GetLabelByIdQuery(id);
-                var result = await sender.Send(query);
-                var response = result.Adapt<GetLabelByIdResponse>();
+                GetLabelByIdQuery query = new GetLabelByIdQuery(id);
+                GetLabelByIdResult result = await sender.Send(query);
+                GetLabelByIdResponse response = result.Adapt<GetLabelByIdResponse>();
                 return Results.Ok(response);
             })
             .WithName("GetLabelById")

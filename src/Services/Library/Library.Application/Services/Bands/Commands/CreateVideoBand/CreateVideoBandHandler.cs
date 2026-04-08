@@ -5,20 +5,20 @@ public class CreateVideoBandHandler(ILibraryDbContext context)
 {
     public async ValueTask<CreateVideoBandResult> Handle(CreateVideoBandCommand command, CancellationToken cancellationToken)
     {
-        var dto = command.VideoBand;
+        CreateVideoBandDto dto = command.VideoBand;
 
-        var bandExists = await context.Bands.AnyAsync(b => b.Id == BandId.Of(dto.BandId), cancellationToken);
+        bool bandExists = await context.Bands.AnyAsync(b => b.Id == BandId.Of(dto.BandId), cancellationToken);
         if (!bandExists)
             throw new BandNotFoundException(dto.BandId);
 
         if (dto.CountryId.HasValue)
         {
-            var countryExists = await context.Countries.AnyAsync(c => c.Id == CountryId.Of(dto.CountryId.Value), cancellationToken);
+            bool countryExists = await context.Countries.AnyAsync(c => c.Id == CountryId.Of(dto.CountryId.Value), cancellationToken);
             if (!countryExists)
                 throw new CountryNotFoundException(dto.CountryId.Value);
         }
 
-        var videoBand = VideoBand.Create(
+        VideoBand videoBand = VideoBand.Create(
             BandId.Of(dto.BandId),
             dto.Name,
             dto.Year,

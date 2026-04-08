@@ -31,22 +31,22 @@ public class LibraryWebAppFactory : WebApplicationFactory<Program>
         builder.ConfigureServices(services =>
         {
             // Replace Mediator ISender with mock
-            var descriptors = services.Where(d => d.ServiceType == typeof(ISender)).ToList();
-            foreach (var d in descriptors)
+            List<ServiceDescriptor> descriptors = services.Where(d => d.ServiceType == typeof(ISender)).ToList();
+            foreach (ServiceDescriptor d in descriptors)
                 services.Remove(d);
             services.AddSingleton(SenderMock.Object);
 
             // Remove MassTransit hosted services to prevent RabbitMQ connection attempts
-            var hostedServiceDescriptors = services
+            List<ServiceDescriptor> hostedServiceDescriptors = services
                 .Where(d => d.ServiceType == typeof(IHostedService) &&
                             d.ImplementationType?.FullName?.Contains("MassTransit") == true)
                 .ToList();
-            foreach (var d in hostedServiceDescriptors)
+            foreach (ServiceDescriptor d in hostedServiceDescriptors)
                 services.Remove(d);
 
             // Replace IPublishEndpoint with a mock so MassTransit DI is satisfied
-            var publishDescriptors = services.Where(d => d.ServiceType == typeof(IPublishEndpoint)).ToList();
-            foreach (var d in publishDescriptors)
+            List<ServiceDescriptor> publishDescriptors = services.Where(d => d.ServiceType == typeof(IPublishEndpoint)).ToList();
+            foreach (ServiceDescriptor d in publishDescriptors)
                 services.Remove(d);
             services.AddSingleton(new Mock<IPublishEndpoint>().Object);
         });

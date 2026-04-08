@@ -1,3 +1,5 @@
+using Library.Domain.Models;
+using Library.Domain.ValueObjects.Ids;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
 using Npgsql;
@@ -8,10 +10,10 @@ public static class DatabaseInitializerExtensions
 {
     public static async Task InitializeDatabaseAsync(this WebApplication app)
     {
-        using var scope = app.Services.CreateScope();
+        using IServiceScope scope = app.Services.CreateScope();
 
-        var context = scope.ServiceProvider.GetRequiredService<LibraryContext>();
-        var logger  = scope.ServiceProvider.GetRequiredService<ILogger<LibraryContext>>();
+        LibraryContext context = scope.ServiceProvider.GetRequiredService<LibraryContext>();
+        ILogger<LibraryContext> logger  = scope.ServiceProvider.GetRequiredService<ILogger<LibraryContext>>();
 
         await ApplyMigrationsAsync(context, logger);
 
@@ -53,7 +55,7 @@ public static class DatabaseInitializerExtensions
             )
             """);
 
-        foreach (var migrationId in context.Database.GetMigrations())
+        foreach (string migrationId in context.Database.GetMigrations())
         {
             await context.Database.ExecuteSqlAsync(
                 $"""
@@ -143,7 +145,7 @@ public static class DatabaseInitializerExtensions
 
     private static async Task SeedAlbumCoverUrlsAsync(LibraryContext context, ILogger logger)
     {
-        var seedLookup = InitialData.Albums
+        Dictionary<AlbumId, string> seedLookup = InitialData.Albums
             .Where(a => a.CoverUrl != null)
             .ToDictionary(a => a.Id, a => a.CoverUrl!);
 
@@ -152,7 +154,7 @@ public static class DatabaseInitializerExtensions
 
         logger.LogInformation("Backfilling album cover URLs...");
 
-        foreach (var (id, coverUrl) in seedLookup)
+        foreach ((AlbumId id, string coverUrl) in seedLookup)
         {
             await context.Albums
                 .Where(a => a.Id == id && a.CoverUrl == null)
@@ -175,17 +177,17 @@ public static class DatabaseInitializerExtensions
 
         logger.LogInformation("Backfilling streaming links...");
 
-        var seedLookup = InitialData.Albums.ToDictionary(a => a.Id, a => a.StreamingLinks);
+        Dictionary<AlbumId, IReadOnlyList<StreamingLink>> seedLookup = InitialData.Albums.ToDictionary(a => a.Id, a => a.StreamingLinks);
 
-        var dbAlbums = await context.Albums
+        List<Album> dbAlbums = await context.Albums
             .Include(a => a.StreamingLinks)
             .ToListAsync();
 
-        foreach (var album in dbAlbums)
+        foreach (Album album in dbAlbums)
         {
-            if (!seedLookup.TryGetValue(album.Id, out var links)) continue;
+            if (!seedLookup.TryGetValue(album.Id, out IReadOnlyList<StreamingLink>? links)) continue;
 
-            foreach (var link in links)
+            foreach (StreamingLink link in links)
                 album.AddStreamingLink(link.Platform, link.EmbedCode);
         }
 

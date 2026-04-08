@@ -70,7 +70,7 @@ public class SlowQueryInterceptor(ILogger<SlowQueryInterceptor> logger, TimeSpan
         if (duration < _threshold)
             return;
 
-        var parameters = command.Parameters
+        List<string> parameters = command.Parameters
             .Cast<DbParameter>()
             .Select(p => $"{p.ParameterName} = {p.Value}")
             .ToList();

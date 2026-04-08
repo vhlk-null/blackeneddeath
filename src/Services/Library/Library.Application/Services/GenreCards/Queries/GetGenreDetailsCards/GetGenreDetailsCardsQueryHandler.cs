@@ -5,28 +5,28 @@ public class GetGenreDetailsCardsQueryHandler(ILibraryDbContext context, IStorag
 {
     public async ValueTask<GetGenreDetailsCardsResult> Handle(GetGenreDetailsCardsQuery query, CancellationToken cancellationToken)
     {
-        var cards = await context.GenreCards
+        List<GenreCard> cards = await context.GenreCards
             .AsNoTracking()
             .Include(a => a.GenreCardTags)
             .Include(a => a.GenreCardGenres)
             .OrderBy(c => c.OrderNumber)
             .ToListAsync(cancellationToken);
 
-        var tagIds = cards.SelectMany(c => c.GenreCardTags.Select(t => t.TagId)).Distinct().ToList();
-        var genreIds = cards.SelectMany(c => c.GenreCardGenres.Select(g => g.GenreId)).Distinct().ToList();
+        List<TagId> tagIds = cards.SelectMany(c => c.GenreCardTags.Select(t => t.TagId)).Distinct().ToList();
+        List<GenreId> genreIds = cards.SelectMany(c => c.GenreCardGenres.Select(g => g.GenreId)).Distinct().ToList();
 
-        var tags = await context.Tags
+        List<Tag> tags = await context.Tags
             .Where(t => tagIds.Contains(t.Id))
             .ToListAsync(cancellationToken);
 
-        var genres = await context.Genres
+        List<Genre> genres = await context.Genres
             .Where(g => genreIds.Contains(g.Id))
             .ToListAsync(cancellationToken);
 
-        var tagMap = tags.ToDictionary(t => t.Id);
-        var genreMap = genres.ToDictionary(g => g.Id);
+        Dictionary<TagId, Tag> tagMap = tags.ToDictionary(t => t.Id);
+        Dictionary<GenreId, Genre> genreMap = genres.ToDictionary(g => g.Id);
 
-        var dtos = cards
+        List<GenreCardDetailDto> dtos = cards
             .Select(c => c.ToGenreCardDetailsDto(urlResolver, tagMap, genreMap))
             .ToList();
 

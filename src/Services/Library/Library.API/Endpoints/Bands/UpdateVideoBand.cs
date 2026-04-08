@@ -9,9 +9,9 @@ public class UpdateVideoBand : ICarterModule
         app.MapPut("/bands/{bandId:guid}/videos/{id:guid}",
                 async ([FromRoute] Guid bandId, [FromRoute] Guid id, [FromBody] UpdateVideoBandDto body, ISender sender) =>
                 {
-                    var dto = body with { Id = id, BandId = bandId };
-                    var command = new UpdateVideoBandCommand(dto);
-                    var result = await sender.Send(command);
+                    UpdateVideoBandDto dto = body with { Id = id, BandId = bandId };
+                    UpdateVideoBandCommand command = new UpdateVideoBandCommand(dto);
+                    UpdateVideoBandResult result = await sender.Send(command);
                     return Results.Ok(result.Adapt<UpdateVideoBandResponse>());
                 })
             .WithName("UpdateVideoBand")

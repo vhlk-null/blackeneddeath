@@ -9,8 +9,8 @@ public class GetVideoBands : ICarterModule
         app.MapGet("/videos",
                 async ([AsParameters] PaginationRequest paginationRequest, ISender sender) =>
                 {
-                    var query = new GetVideoBandsQuery(paginationRequest);
-                    var result = await sender.Send(query);
+                    GetVideoBandsQuery query = new GetVideoBandsQuery(paginationRequest);
+                    GetVideoBandsResult result = await sender.Send(query);
                     return Results.Ok(result.Adapt<GetVideoBandsResponse>());
                 })
             .WithName("GetVideoBands")

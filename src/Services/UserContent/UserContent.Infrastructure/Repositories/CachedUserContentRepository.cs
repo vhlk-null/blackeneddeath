@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace UserContent.Infrastructure.Repositories;
 
 public class CachedUserContentRepository(
@@ -27,15 +29,15 @@ public class CachedUserContentRepository(
         if (typeof(T) != typeof(UserProfileInfo))
             return await inner.GetWithIncludesAsync(filter, includeBuilder, cancellationToken);
 
-        var userId = TryExtractUserIdFromFilter(filter as Expression<Func<UserProfileInfo, bool>>);
+        Guid? userId = TryExtractUserIdFromFilter(filter as Expression<Func<UserProfileInfo, bool>>);
         if (!userId.HasValue)
             return await inner.GetWithIncludesAsync(filter, includeBuilder, cancellationToken);
 
-        var cacheKey = $"{userId.Value}:UserProfileInfo";
+        string cacheKey = $"{userId.Value}:UserProfileInfo";
 
         try
         {
-            var cached = await cache.GetStringAsync(cacheKey, cancellationToken);
+            string? cached = await cache.GetStringAsync(cacheKey, cancellationToken);
             if (cached != null)
                 return JsonSerializer.Deserialize<T>(cached, JsonOptions);
         }
@@ -44,7 +46,7 @@ public class CachedUserContentRepository(
             logger.LogWarning(ex, "Cache read failed for key {CacheKey}", cacheKey);
         }
 
-        var result = await inner.GetWithIncludesAsync(filter, includeBuilder, cancellationToken);
+        T? result = await inner.GetWithIncludesAsync(filter, includeBuilder, cancellationToken);
 
         if (result != null)
         {
@@ -73,9 +75,9 @@ public class CachedUserContentRepository(
 
     public async Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default) where T : class
     {
-        var list = entities as IList<T> ?? entities.ToList();
+        IList<T> list = entities as IList<T> ?? entities.ToList();
         await inner.AddRangeAsync(list, cancellationToken);
-        foreach (var entity in list)
+        foreach (T entity in list)
             await InvalidateCacheForUserAsync(ExtractUserIdFromEntity(entity));
     }
 
@@ -87,9 +89,9 @@ public class CachedUserContentRepository(
 
     public void DeleteRange<T>(IEnumerable<T> entities) where T : class
     {
-        var list = entities as IList<T> ?? entities.ToList();
+        IList<T> list = entities as IList<T> ?? entities.ToList();
         inner.DeleteRange(list);
-        foreach (var entity in list)
+        foreach (T entity in list)
             InvalidateCacheForUser(ExtractUserIdFromEntity(entity));
     }
 
@@ -133,9 +135,9 @@ public class CachedUserContentRepository(
 
     public void UpdateRange<T>(IEnumerable<T> entities) where T : class
     {
-        var list = entities as IList<T> ?? entities.ToList();
+        IList<T> list = entities as IList<T> ?? entities.ToList();
         inner.UpdateRange(list);
-        foreach (var entity in list)
+        foreach (T entity in list)
             InvalidateCacheForUser(ExtractUserIdFromEntity(entity));
     }
 
@@ -147,10 +149,10 @@ public class CachedUserContentRepository(
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var hasModifiedAlbums = Context.ChangeTracker.Entries<Album>()
+        bool hasModifiedAlbums = Context.ChangeTracker.Entries<Album>()
             .Any(e => e.State is EntityState.Modified or EntityState.Deleted);
 
-        var result = await inner.SaveChangesAsync(cancellationToken);
+        int result = await inner.SaveChangesAsync(cancellationToken);
 
         if (hasModifiedAlbums)
             await InvalidateCacheForUserAsync(null);
@@ -176,7 +178,7 @@ public class CachedUserContentRepository(
 
         try
         {
-            var value = Expression.Lambda(valueSide).Compile().DynamicInvoke();
+            object? value = Expression.Lambda(valueSide).Compile().DynamicInvoke();
             return value is Guid g ? g : null;
         }
         catch
@@ -188,7 +190,7 @@ public class CachedUserContentRepository(
     private static Guid? ExtractUserIdFromEntity<T>(T? entity) where T : class
     {
         if (entity is null) return null;
-        var prop = typeof(T).GetProperty("UserId");
+        PropertyInfo? prop = typeof(T).GetProperty("UserId");
         if (prop?.PropertyType == typeof(Guid))
             return (Guid)prop.GetValue(entity)!;
         return null;
@@ -196,14 +198,14 @@ public class CachedUserContentRepository(
 
     private async Task InvalidateCacheForUserAsync(Guid? userId)
     {
-        var pattern = userId.HasValue
+        string pattern = userId.HasValue
             ? $"UserContent:{userId.Value}:*"
             : "UserContent:*";
 
         try
         {
-            var server = redis.GetServers().First();
-            var keys = server.Keys(pattern: pattern).ToArray();
+            IServer server = redis.GetServers().First();
+            RedisKey[] keys = server.Keys(pattern: pattern).ToArray();
             if (keys.Length > 0)
                 await redis.GetDatabase().KeyDeleteAsync(keys);
         }
@@ -215,14 +217,14 @@ public class CachedUserContentRepository(
 
     private void InvalidateCacheForUser(Guid? userId)
     {
-        var pattern = userId.HasValue
+        string pattern = userId.HasValue
             ? $"UserContent:{userId.Value}:*"
             : "UserContent:*";
 
         try
         {
-            var server = redis.GetServers().First();
-            var keys = server.Keys(pattern: pattern).ToArray();
+            IServer server = redis.GetServers().First();
+            RedisKey[] keys = server.Keys(pattern: pattern).ToArray();
             if (keys.Length > 0)
                 redis.GetDatabase().KeyDelete(keys);
         }

@@ -7,7 +7,7 @@ public sealed class AlbumUpdatedEventHandler(ILogger<AlbumUpdatedEventHandler> l
     {
         logger.LogInformation("Domain Event handled: {DomainEvent}", domainEvent.GetType().Name);
 
-        var integrationEvent = new AlbumUpdatedIntegrationEvent
+        AlbumUpdatedIntegrationEvent integrationEvent = new AlbumUpdatedIntegrationEvent
         {
             AlbumId = domainEvent.Album.Id.Value,
             Title = domainEvent.Album.Title,
