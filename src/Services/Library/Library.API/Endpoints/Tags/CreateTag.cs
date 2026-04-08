@@ -10,9 +10,9 @@ public class CreateTag : ICarterModule
     {
         app.MapPost("/tags", async (CreateTagRequest request, ISender sender) =>
             {
-                var command = request.Adapt<CreateTagCommand>();
-                var result = await sender.Send(command);
-                var response = result.Adapt<CreateTagResponse>();
+                CreateTagCommand command = request.Adapt<CreateTagCommand>();
+                CreateTagResult result = await sender.Send(command);
+                CreateTagResponse response = result.Adapt<CreateTagResponse>();
                 return Results.Created($"/tags/{response.Id}", response);
             })
             .WithName("CreateTag")

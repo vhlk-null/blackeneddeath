@@ -1,3 +1,5 @@
+using BuildingBlocks.Specifications;
+
 namespace Library.API.Endpoints.Bands;
 
 public record GetBandsResult(PaginatedResult<BandCardDto> Bands);
@@ -15,8 +17,8 @@ public class GetBands : ICarterModule
                 BandStatus? status = null,
                 int? formedYear = null) =>
             {
-                var filter = BandFilterBuilder.Build(genreId, countryId, status, formedYear);
-                var result = await sender.Send(new GetBandsQuery(paginationRequest, sortBy, filter));
+                ISpecification<Band>? filter = BandFilterBuilder.Build(genreId, countryId, status, formedYear);
+                Application.Services.Bands.Queries.GetBands.GetBandsResult result = await sender.Send(new GetBandsQuery(paginationRequest, sortBy, filter));
                 return Results.Ok(result.Adapt<GetBandsResult>());
             })
             .WithName("GetBands")

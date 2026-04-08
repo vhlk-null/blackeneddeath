@@ -27,7 +27,7 @@ public class UpdateGenreCard : ICarterModule
                         coverImageStream.Position = 0;
                     }
 
-                    var command = new UpdateGenreCardCommand(
+                    UpdateGenreCardCommand command = new UpdateGenreCardCommand(
                         id,
                         request.Name,
                         request.Description,
@@ -38,7 +38,7 @@ public class UpdateGenreCard : ICarterModule
                         request.CoverImage?.ContentType,
                         request.CoverImage?.FileName);
 
-                    var result = await sender.Send(command);
+                    UpdateGenreCardResult result = await sender.Send(command);
 
                     return Results.Ok(result.Adapt<UpdateGenreCardResponse>());
                 })

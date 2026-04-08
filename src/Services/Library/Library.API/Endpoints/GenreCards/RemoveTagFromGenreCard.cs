@@ -9,7 +9,7 @@ public class RemoveTagFromGenreCard : ICarterModule
         app.MapDelete("/genre-cards/{id:guid}/tags/{tagId:guid}",
                 async (Guid id, Guid tagId, ISender sender) =>
                 {
-                    var result = await sender.Send(new RemoveTagFromGenreCardCommand(id, tagId));
+                    RemoveTagFromGenreCardResult result = await sender.Send(new RemoveTagFromGenreCardCommand(id, tagId));
 
                     return Results.Ok(result.Adapt<RemoveTagFromGenreCardResponse>());
                 })

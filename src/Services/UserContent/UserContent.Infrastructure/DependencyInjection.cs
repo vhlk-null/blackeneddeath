@@ -6,11 +6,11 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var dbConnection = configuration.GetConnectionString("UserContentDB")
-            ?? throw new InvalidOperationException("UserContentDB connection string is missing");
+        string dbConnection = configuration.GetConnectionString("UserContentDB")
+                              ?? throw new InvalidOperationException("UserContentDB connection string is missing");
 
-        var redisConnection = configuration.GetConnectionString("Redis")
-            ?? throw new InvalidOperationException("Redis connection string is missing");
+        string redisConnection = configuration.GetConnectionString("Redis")
+                                 ?? throw new InvalidOperationException("Redis connection string is missing");
 
         // Database
         services.AddDbContext<UserContentContext>(options =>
@@ -20,13 +20,13 @@ public static class DependencyInjection
         services.Decorate<IRepository<UserContentContext>, CachedUserContentRepository>();
 
         // Redis
-        var redisOptions = ConfigurationOptions.Parse(redisConnection);
+        ConfigurationOptions redisOptions = ConfigurationOptions.Parse(redisConnection);
         redisOptions.AbortOnConnectFail = false;
         redisOptions.ConnectTimeout = 10000;
         redisOptions.ConnectRetry = 5;
         redisOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
 
-        var multiplexer = ConnectionMultiplexer.Connect(redisOptions);
+        ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect(redisOptions);
         services.AddSingleton<IConnectionMultiplexer>(multiplexer);
         services.AddStackExchangeRedisCache(options =>
         {

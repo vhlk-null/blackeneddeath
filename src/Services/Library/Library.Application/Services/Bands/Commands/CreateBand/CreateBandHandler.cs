@@ -12,12 +12,12 @@ public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService
         string? logoKey = null;
         if (command.Logo is not null && command.LogoContentType is not null && command.LogoFileName is not null)
         {
-            var folder = $"bands/{Slugify(command.Band.Name)}/logo";
-            var extension = Path.GetExtension(command.LogoFileName);
+            string folder = $"bands/{Slugify(command.Band.Name)}/logo";
+            string extension = Path.GetExtension(command.LogoFileName);
             logoKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.Logo, command.LogoContentType, cancellationToken);
         }
 
-        var band = CreateNewBand(command, logoKey);
+        Band band = CreateNewBand(command, logoKey);
 
         context.Bands.Add(band);
         await context.SaveChangesAsync(cancellationToken);
@@ -27,13 +27,13 @@ public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService
 
     private async Task ValidateReferencedEntitiesAsync(CreateBandDto band, CancellationToken cancellationToken)
     {
-        foreach (var id in band.CountryIds)
+        foreach (Guid id in band.CountryIds)
         {
             if (!await context.Countries.AnyAsync(c => c.Id == CountryId.Of(id), cancellationToken))
                 throw new CountryNotFoundException(id);
         }
 
-        foreach (var id in band.GenreIds)
+        foreach (Guid id in band.GenreIds)
         {
             if (!await context.Genres.AnyAsync(g => g.Id == GenreId.Of(id), cancellationToken))
                 throw new GenreNotFoundException(id);
@@ -42,16 +42,16 @@ public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService
 
     private static Band CreateNewBand(CreateBandCommand command, string? logoKey)
     {
-        var activity = BandActivity.Of(command.Band.FormedYear, command.Band.DisbandedYear);
+        BandActivity activity = BandActivity.Of(command.Band.FormedYear, command.Band.DisbandedYear);
 
-        var band = Band.Create(command.Band.Name, command.Band.Bio, logoKey, activity, command.Band.Status,
+        Band band = Band.Create(command.Band.Name, command.Band.Bio, logoKey, activity, command.Band.Status,
             facebook: command.Band.Facebook, youtube: command.Band.Youtube, instagram: command.Band.Instagram,
             twitter: command.Band.Twitter, website: command.Band.Website);
 
-        foreach (var id in command.Band.CountryIds)
+        foreach (Guid id in command.Band.CountryIds)
             band.AddCountry(CountryId.Of(id));
 
-        foreach (var (id, index) in command.Band.GenreIds.Select((id, i) => (id, i)))
+        foreach ((Guid id, int index) in command.Band.GenreIds.Select((id, i) => (id, i)))
             band.AddGenre(GenreId.Of(id), isPrimary: index == 0);
 
         return band;

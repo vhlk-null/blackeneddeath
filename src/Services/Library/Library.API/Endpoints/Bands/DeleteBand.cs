@@ -9,9 +9,9 @@ public class DeleteBand : ICarterModule
         app.MapDelete("/bands/{id:guid}",
                 async (Guid id, ISender sender) =>
                 {
-                    var command = new DeleteBandCommand(id);
+                    DeleteBandCommand command = new DeleteBandCommand(id);
 
-                    var result = await sender.Send(command);
+                    DeleteBandResult result = await sender.Send(command);
 
                     return Results.Ok(result.Adapt<DeleteBandResponse>());
                 })

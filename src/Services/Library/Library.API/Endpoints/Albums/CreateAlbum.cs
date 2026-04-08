@@ -14,7 +14,7 @@ public class CreateAlbum : ICarterModule
         app.MapPost("/albums",
                 async ([FromForm] CreateAlbumRequest request, ISender sender) =>
                 {
-                    var albumDto = JsonSerializer.Deserialize<CreateAlbumDto>(request.Album,
+                    CreateAlbumDto? albumDto = JsonSerializer.Deserialize<CreateAlbumDto>(request.Album,
                         new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true,
@@ -32,12 +32,12 @@ public class CreateAlbum : ICarterModule
                         coverImageStream.Position = 0;
                     }
 
-                    var command = new CreateAlbumCommand(
+                    CreateAlbumCommand command = new CreateAlbumCommand(
                         albumDto,
                         coverImageStream,
                         request.CoverImage?.ContentType,
                         request.CoverImage?.FileName);
-                    var result = await sender.Send(command);
+                    CreateAlbumResult result = await sender.Send(command);
                     return Results.Created($"/albums/{result.Id}", result.Adapt<CreateAlbumResponse>());
                 })
             .WithName("CreatedAlbum")
@@ -47,6 +47,9 @@ public class CreateAlbum : ICarterModule
             .WithSummary("Create Album")
             .WithDescription("Create Album")
             .WithTags("Albums")
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization();
     }
 }

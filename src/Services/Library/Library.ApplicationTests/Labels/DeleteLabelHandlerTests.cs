@@ -31,13 +31,13 @@ public class DeleteLabelHandlerTests
     [Fact]
     public async Task Handle_ExistingLabel_RemovesLabelAndReturnsSuccess()
     {
-        var labelId = Guid.NewGuid();
-        var label = Label.Create(LabelId.Of(labelId), "Nuclear Blast");
+        Guid labelId = Guid.NewGuid();
+        Label label = Label.Create(LabelId.Of(labelId), "Nuclear Blast");
         _labelsDbSetMock
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<Label?>(label));
 
-        var result = await _handler.Handle(new DeleteLabelCommand(labelId), CancellationToken.None);
+        DeleteLabelResult result = await _handler.Handle(new DeleteLabelCommand(labelId), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         _labelsDbSetMock.Verify(x => x.Remove(label), Times.Once);
@@ -51,7 +51,7 @@ public class DeleteLabelHandlerTests
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<Label?>(null));
 
-        var act = async () => await _handler.Handle(
+        Func<Task<DeleteLabelResult>> act = async () => await _handler.Handle(
             new DeleteLabelCommand(Guid.NewGuid()), CancellationToken.None);
 
         await act.Should().ThrowAsync<LabelNotFoundException>();

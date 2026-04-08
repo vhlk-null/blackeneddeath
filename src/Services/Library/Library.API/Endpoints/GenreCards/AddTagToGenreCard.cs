@@ -9,7 +9,7 @@ public class AddTagToGenreCard : ICarterModule
         app.MapPost("/genre-cards/{id:guid}/tags/{tagId:guid}",
                 async (Guid id, Guid tagId, ISender sender) =>
                 {
-                    var result = await sender.Send(new AddTagToGenreCardCommand(id, tagId));
+                    AddTagToGenreCardResult result = await sender.Send(new AddTagToGenreCardCommand(id, tagId));
 
                     return Results.Ok(result.Adapt<AddTagToGenreCardResponse>());
                 })

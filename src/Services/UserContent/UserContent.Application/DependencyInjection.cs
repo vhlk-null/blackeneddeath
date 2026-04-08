@@ -7,8 +7,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var grpcUrl = configuration["GrpcSettings:LibraryUrl"]
-            ?? throw new InvalidOperationException("GrpcSettings:LibraryUrl is missing");
+        string grpcUrl = configuration["GrpcSettings:LibraryUrl"]
+                         ?? throw new InvalidOperationException("GrpcSettings:LibraryUrl is missing");
 
         services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());
 

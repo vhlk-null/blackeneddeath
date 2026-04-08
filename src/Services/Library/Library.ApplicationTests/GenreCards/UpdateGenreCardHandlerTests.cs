@@ -30,11 +30,11 @@ public class UpdateGenreCardHandlerTests
     [Fact]
     public async Task Handle_WithoutNewCoverImage_KeepsExistingCoverUrl()
     {
-        var cardId = Guid.NewGuid();
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Old Name", "Old description", "genres/old/existing-key");
+        Guid cardId = Guid.NewGuid();
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Old Name", "Old description", "genres/old/existing-key");
         _contextMock.Setup(x => x.GenreCards).Returns(MockDbSetFactory.Create(card).Object);
 
-        var result = await _handler.Handle(
+        UpdateGenreCardResult result = await _handler.Handle(
             new UpdateGenreCardCommand(cardId, "New Name", "New description", 1, [], []),
             CancellationToken.None);
 
@@ -48,10 +48,10 @@ public class UpdateGenreCardHandlerTests
     [Fact]
     public async Task Handle_WithNewCoverImage_DeletesOldAndUploadsNew()
     {
-        var cardId = Guid.NewGuid();
+        Guid cardId = Guid.NewGuid();
         const string oldKey = "genres/doom/old-key";
         const string newKey = "genres/doom/new-key";
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Doom", "Heavy", oldKey);
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Doom", "Heavy", oldKey);
         _contextMock.Setup(x => x.GenreCards).Returns(MockDbSetFactory.Create(card).Object);
         _storageMock
             .Setup(x => x.UploadFileAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -69,8 +69,8 @@ public class UpdateGenreCardHandlerTests
     [Fact]
     public async Task Handle_WithNewCoverImageAndNoPreviousCover_UploadsWithoutDeleting()
     {
-        var cardId = Guid.NewGuid();
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Thrash", "Fast", null);
+        Guid cardId = Guid.NewGuid();
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Thrash", "Fast", null);
         _contextMock.Setup(x => x.GenreCards).Returns(MockDbSetFactory.Create(card).Object);
         _storageMock
             .Setup(x => x.UploadFileAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -87,7 +87,7 @@ public class UpdateGenreCardHandlerTests
     [Fact]
     public async Task Handle_NonExistingCard_ThrowsGenreCardNotFoundException()
     {
-        var act = async () => await _handler.Handle(
+        Func<Task<UpdateGenreCardResult>> act = async () => await _handler.Handle(
             new UpdateGenreCardCommand(Guid.NewGuid(), "Name", "Desc", 1, [], []),
             CancellationToken.None);
 

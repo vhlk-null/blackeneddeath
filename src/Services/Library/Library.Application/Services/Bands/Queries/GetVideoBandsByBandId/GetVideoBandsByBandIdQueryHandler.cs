@@ -5,24 +5,24 @@ public class GetVideoBandsByBandIdQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetVideoBandsByBandIdResult> Handle(GetVideoBandsByBandIdQuery query, CancellationToken cancellationToken)
     {
-        var bandId = BandId.Of(query.BandId);
+        BandId bandId = BandId.Of(query.BandId);
 
-        var bandName = await context.Bands
-            .Where(b => b.Id == bandId)
-            .Select(b => b.Name)
-            .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new BandNotFoundException(query.BandId);
+        string bandName = await context.Bands
+                              .Where(b => b.Id == bandId)
+                              .Select(b => b.Name)
+                              .FirstOrDefaultAsync(cancellationToken)
+                          ?? throw new BandNotFoundException(query.BandId);
 
-        var pageIndex = query.PaginationRequest.PageIndex;
-        var pageSize = query.PaginationRequest.PageSize;
+        int pageIndex = query.PaginationRequest.PageIndex;
+        int pageSize = query.PaginationRequest.PageSize;
 
-        var baseQuery = context.VideoBands
+        IQueryable<VideoBand> baseQuery = context.VideoBands
             .AsNoTracking()
             .Where(vb => vb.BandId == bandId);
 
-        var totalCount = await baseQuery.LongCountAsync(cancellationToken);
+        long totalCount = await baseQuery.LongCountAsync(cancellationToken);
 
-        var videoBands = await baseQuery
+        List<VideoBandDto> videoBands = await baseQuery
             .OrderByDescending(vb => vb.Year)
             .Skip(pageSize * pageIndex)
             .Take(pageSize)

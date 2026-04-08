@@ -5,7 +5,7 @@ public class CreateCountryCommandHandler(ILibraryDbContext context)
 {
     public async ValueTask<CreateCountryResult> Handle(CreateCountryCommand command, CancellationToken cancellationToken)
     {
-        var country = Country.Create(CountryId.Of(Guid.NewGuid()), command.Name, command.Code);
+        Country country = Country.Create(CountryId.Of(Guid.NewGuid()), command.Name, command.Code);
 
         context.Countries.Add(country);
         await context.SaveChangesAsync(cancellationToken);

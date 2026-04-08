@@ -19,42 +19,42 @@ public class GenreEndpointsTests(LibraryWebAppFactory factory) : IClassFixture<L
     [Fact]
     public async Task CreateGenre_ValidRequest_Returns201WithId()
     {
-        var genreId = Guid.NewGuid();
+        Guid genreId = Guid.NewGuid();
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<CreateGenreCommand>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<CreateGenreResult>(new CreateGenreResult(genreId)));
 
-        var response = await _client.PostAsJsonAsync("/genres", new { Name = "Death Metal", ParentGenreId = (Guid?)null });
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/genres", new { Name = "Death Metal", ParentGenreId = (Guid?)null });
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var body = await response.Content.ReadFromJsonAsync<CreateGenreResponse>();
+        CreateGenreResponse? body = await response.Content.ReadFromJsonAsync<CreateGenreResponse>();
         body!.Id.Should().Be(genreId);
     }
 
     [Fact]
     public async Task DeleteGenre_ValidId_Returns200WithSuccess()
     {
-        var genreId = Guid.NewGuid();
+        Guid genreId = Guid.NewGuid();
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<DeleteGenreCommand>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<DeleteGenreResult>(new DeleteGenreResult(true)));
 
-        var response = await _client.DeleteAsync($"/genres/{genreId}");
+        HttpResponseMessage response = await _client.DeleteAsync($"/genres/{genreId}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<DeleteGenreResponse>();
+        DeleteGenreResponse? body = await response.Content.ReadFromJsonAsync<DeleteGenreResponse>();
         body!.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
     public async Task GetGenres_Returns200WithList()
     {
-        var appResult = new GetGenresResult([]);
+        GetGenresResult appResult = new GetGenresResult([]);
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<GetGenresQuery>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<GetGenresResult>(appResult));
 
-        var response = await _client.GetAsync("/genres");
+        HttpResponseMessage response = await _client.GetAsync("/genres");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }

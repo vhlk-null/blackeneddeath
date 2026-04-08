@@ -15,21 +15,21 @@ public class UpdateBandLogo : ICarterModule
         app.MapPut("/bands/{id:guid}/logo",
                 async (Guid id, [FromForm] UpdateBandLogoRequest request, ISender sender) =>
                 {
-                    var logo = request.Logo ?? request.LogoUrl;
+                    IFormFile? logo = request.Logo ?? request.LogoUrl;
                     if (logo is null)
                         return Results.Problem("Logo file is required.", instance: $"/bands/{id}/logo", statusCode: StatusCodes.Status400BadRequest);
 
-                    var logoStream = new MemoryStream();
+                    MemoryStream logoStream = new MemoryStream();
                     await logo.CopyToAsync(logoStream);
                     logoStream.Position = 0;
 
-                    var command = new UpdateBandLogoCommand(
+                    UpdateBandLogoCommand command = new UpdateBandLogoCommand(
                         id,
                         logoStream,
                         logo.ContentType,
                         logo.FileName);
 
-                    var result = await sender.Send(command);
+                    UpdateBandLogoResult result = await sender.Send(command);
 
                     return Results.Ok(result.Adapt<UpdateBandLogoResponse>());
                 })

@@ -10,14 +10,14 @@ public sealed class UnitOfWorkBehavior<TRequest, TResponse>(DbContext context)
 {
     public async ValueTask<TResponse> Handle(TRequest message, MessageHandlerDelegate<TRequest, TResponse> next, CancellationToken cancellationToken)
     {        
-        var messageTypeName = typeof(TRequest).Name;
+        string messageTypeName = typeof(TRequest).Name;
 
         if (messageTypeName.Contains("Query", StringComparison.OrdinalIgnoreCase))
         {
             return await next(message, cancellationToken);
         }
 
-        var response = await next(message, cancellationToken);
+        TResponse response = await next(message, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
         return response;

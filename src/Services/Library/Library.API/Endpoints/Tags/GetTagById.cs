@@ -8,8 +8,8 @@ public class GetTagById : ICarterModule
     {
         app.MapGet("/tags/{id:guid}", async (Guid id, ISender sender) =>
             {
-                var result = await sender.Send(new GetTagByIdQuery(id));
-                var response = result.Adapt<GetTagByIdResponse>();
+                GetTagByIdResult result = await sender.Send(new GetTagByIdQuery(id));
+                GetTagByIdResponse response = result.Adapt<GetTagByIdResponse>();
                 return Results.Ok(response);
             })
             .WithName("GetTagById")

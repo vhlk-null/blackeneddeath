@@ -5,7 +5,7 @@ public class GetBandSummariesQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetBandSummariesResult> Handle(GetBandSummariesQuery query, CancellationToken cancellationToken)
     {
-        var bands = (await context.Bands
+        List<BandSummaryDto> bands = (await context.Bands
             .AsNoTracking()
             .Select(b => new { b.Id, b.Name, b.Slug, b.Status })
             .ToListAsync(cancellationToken))

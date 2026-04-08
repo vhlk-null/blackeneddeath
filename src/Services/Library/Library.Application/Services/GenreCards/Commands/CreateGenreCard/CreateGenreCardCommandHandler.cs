@@ -10,12 +10,12 @@ public class CreateGenreCardCommandHandler(ILibraryDbContext context, IStorageSe
         string? coverKey = null;
         if (command.CoverImage is not null && command.CoverImageContentType is not null && command.CoverImageFileName is not null)
         {
-            var folder = $"genres/{Slugify(command.Name)}";
-            var extension = Path.GetExtension(command.CoverImageFileName);
+            string folder = $"genres/{Slugify(command.Name)}";
+            string extension = Path.GetExtension(command.CoverImageFileName);
             coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
         }
 
-        var card = GenreCard.Create(GenreCardId.Of(Guid.NewGuid()), command.Name, command.Description, coverKey, command.OrderNumber);
+        GenreCard card = GenreCard.Create(GenreCardId.Of(Guid.NewGuid()), command.Name, command.Description, coverKey, command.OrderNumber);
 
         context.GenreCards.Add(card);
         await context.SaveChangesAsync(cancellationToken);

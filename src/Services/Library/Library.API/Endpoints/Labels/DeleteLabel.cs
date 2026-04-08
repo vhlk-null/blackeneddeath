@@ -9,9 +9,9 @@ public class DeleteLabel : ICarterModule
         app.MapDelete("/labels/{id:guid}",
                 async (Guid id, ISender sender) =>
                 {
-                    var command = new DeleteLabelCommand(id);
+                    DeleteLabelCommand command = new DeleteLabelCommand(id);
 
-                    var result = await sender.Send(command);
+                    DeleteLabelResult result = await sender.Send(command);
 
                     return Results.Ok(result.Adapt<DeleteLabelResponse>());
                 })

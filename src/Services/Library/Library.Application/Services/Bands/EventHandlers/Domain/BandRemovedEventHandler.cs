@@ -7,7 +7,7 @@ public sealed class BandRemovedEventHandler(ILogger<BandRemovedEventHandler> log
     {
         logger.LogInformation("Domain Event handled: {DomainEvent}", domainEvent.GetType().Name);
 
-        var integrationEvent = new BandRemovedIntegrationEvent
+        BandRemovedIntegrationEvent integrationEvent = new BandRemovedIntegrationEvent
         {
             BandId = domainEvent.Band.Id.Value,
             Name = domainEvent.Band.Name

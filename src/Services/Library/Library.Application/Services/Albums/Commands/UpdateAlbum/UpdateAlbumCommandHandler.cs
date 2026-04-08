@@ -4,45 +4,45 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
 {
     public async ValueTask<UpdateAlbumResult> Handle(UpdateAlbumCommand command, CancellationToken cancellationToken)
     {
-        var albumId = AlbumId.Of(command.Album.Id);
+        AlbumId albumId = AlbumId.Of(command.Album.Id);
 
-        var album = await context.Albums
-            .Include(a => a.AlbumBands)
-            .Include(a => a.AlbumGenres)
-            .Include(a => a.AlbumCountries)
-            .Include(a => a.StreamingLinks)
-            .Include(a => a.AlbumTracks)
-            .Include(a => a.AlbumTags)
-            .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
-            ?? throw new AlbumNotFoundException(command.Album.Id);
+        Album album = await context.Albums
+                          .Include(a => a.AlbumBands)
+                          .Include(a => a.AlbumGenres)
+                          .Include(a => a.AlbumCountries)
+                          .Include(a => a.StreamingLinks)
+                          .Include(a => a.AlbumTracks)
+                          .Include(a => a.AlbumTags)
+                          .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
+                      ?? throw new AlbumNotFoundException(command.Album.Id);
 
-        var albumTrackIds = album.AlbumTracks.Select(x => x.TrackId).ToList();
-        var albumTracks = await context.Tracks
+        List<TrackId> albumTrackIds = album.AlbumTracks.Select(x => x.TrackId).ToList();
+        List<Track> albumTracks = await context.Tracks
             .Where(t => albumTrackIds.Contains(t.Id))
             .ToListAsync(cancellationToken);
 
         if (command.Album.LabelIds is { Count: > 0 })
         {
-            var labelGuid = command.Album.LabelIds[0];
+            Guid labelGuid = command.Album.LabelIds[0];
             if (!await context.Labels.AnyAsync(l => l.Id == LabelId.Of(labelGuid), cancellationToken))
                 throw new LabelNotFoundException(labelGuid);
         }
 
-        var coverKey = album.CoverUrl;
+        string? coverKey = album.CoverUrl;
         if (command.CoverImage is not null && command.CoverImageContentType is not null && command.CoverImageFileName is not null)
         {
             if (album.CoverUrl is not null)
                 await storage.DeleteFileAsync(album.CoverUrl, cancellationToken);
 
-            var folder = $"albums/{Slugify(command.Album.Title)}";
-            var extension = Path.GetExtension(command.CoverImageFileName);
+            string folder = $"albums/{Slugify(command.Album.Title)}";
+            string extension = Path.GetExtension(command.CoverImageFileName);
             coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
         }
 
-        var albumRelease = AlbumRelease.Of(command.Album.ReleaseDate, command.Album.Format);
-        var labelId = command.Album.LabelIds is { Count: > 0 } ? LabelId.Of(command.Album.LabelIds[0]) : null;
+        AlbumRelease albumRelease = AlbumRelease.Of(command.Album.ReleaseDate, command.Album.Format);
+        LabelId? labelId = command.Album.LabelIds is { Count: > 0 } ? LabelId.Of(command.Album.LabelIds[0]) : null;
 
-        var newSlug = album.Title != command.Album.Title
+        string newSlug = album.Title != command.Album.Title
             ? await GenerateUniqueSlugAsync(command.Album.Title, command.Album.ReleaseDate, album.Id, cancellationToken)
             : album.Slug;
 
@@ -62,9 +62,9 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
 
     private async Task<string> GenerateUniqueSlugAsync(string title, int releaseYear, AlbumId excludeId, CancellationToken ct)
     {
-        var baseSlug = $"{SlugHelper.Generate(title)}-{releaseYear}";
-        var slug = baseSlug;
-        var counter = 1;
+        string baseSlug = $"{SlugHelper.Generate(title)}-{releaseYear}";
+        string slug = baseSlug;
+        int counter = 1;
         while (await context.Albums.AnyAsync(a => a.Slug == slug && a.Id != excludeId, ct))
             slug = $"{baseSlug}-{++counter}";
         return slug;
@@ -72,38 +72,38 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
 
     private static void ReconcileBands(Album album, UpdateAlbumDto dto)
     {
-        var currentIds = album.AlbumBands.Select(x => x.BandId).ToHashSet();
-        var incomingIds = dto.BandIds.Select(BandId.Of).ToHashSet();
+        HashSet<BandId> currentIds = album.AlbumBands.Select(x => x.BandId).ToHashSet();
+        HashSet<BandId> incomingIds = dto.BandIds.Select(BandId.Of).ToHashSet();
 
-        foreach (var id in currentIds.Except(incomingIds))
+        foreach (BandId id in currentIds.Except(incomingIds))
             album.RemoveBand(id);
 
-        foreach (var id in incomingIds.Except(currentIds))
+        foreach (BandId id in incomingIds.Except(currentIds))
             album.AddBand(id);
     }
 
     private static void ReconcileCountries(Album album, UpdateAlbumDto dto)
     {
-        var currentIds = album.AlbumCountries.Select(x => x.CountryId).ToHashSet();
-        var incomingIds = dto.CountryIds.Select(CountryId.Of).ToHashSet();
+        HashSet<CountryId> currentIds = album.AlbumCountries.Select(x => x.CountryId).ToHashSet();
+        HashSet<CountryId> incomingIds = dto.CountryIds.Select(CountryId.Of).ToHashSet();
 
-        foreach (var id in currentIds.Except(incomingIds))
+        foreach (CountryId id in currentIds.Except(incomingIds))
             album.RemoveCountry(id);
 
-        foreach (var id in incomingIds.Except(currentIds))
+        foreach (CountryId id in incomingIds.Except(currentIds))
             album.AddCountry(id);
     }
 
     private static void ReconcileGenres(Album album, UpdateAlbumDto dto)
     {
-        var currentIds = album.AlbumGenres.Select(x => x.GenreId).ToHashSet();
-        var incomingOrdered = dto.GenreIds.Select(GenreId.Of).ToList();
-        var incomingIds = incomingOrdered.ToHashSet();
+        HashSet<GenreId> currentIds = album.AlbumGenres.Select(x => x.GenreId).ToHashSet();
+        List<GenreId> incomingOrdered = dto.GenreIds.Select(GenreId.Of).ToList();
+        HashSet<GenreId> incomingIds = incomingOrdered.ToHashSet();
 
-        foreach (var id in currentIds.Except(incomingIds))
+        foreach (GenreId id in currentIds.Except(incomingIds))
             album.RemoveGenre(id);
 
-        foreach (var (genreId, index) in incomingOrdered.Select((id, i) => (id, i)))
+        foreach ((GenreId genreId, int index) in incomingOrdered.Select((id, i) => (id, i)))
         {
             if (currentIds.Contains(genreId))
                 album.UpdateGenrePrimary(genreId, isPrimary: index == 0);
@@ -114,31 +114,31 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
 
     private static void ReconcileTags(Album album, UpdateAlbumDto dto)
     {
-        var currentIds = album.AlbumTags.Select(x => x.TagId).ToHashSet();
-        var incomingIds = dto.TagIds.Select(TagId.Of).ToHashSet();
+        HashSet<TagId> currentIds = album.AlbumTags.Select(x => x.TagId).ToHashSet();
+        HashSet<TagId> incomingIds = dto.TagIds.Select(TagId.Of).ToHashSet();
 
-        foreach (var id in currentIds.Except(incomingIds))
+        foreach (TagId id in currentIds.Except(incomingIds))
             album.RemoveTag(id);
 
-        foreach (var id in incomingIds.Except(currentIds))
+        foreach (TagId id in incomingIds.Except(currentIds))
             album.AddTag(id);
     }
 
     private static void ReconcileStreamingLinks(Album album, UpdateAlbumDto dto)
     {
-        var incomingByPlatform = dto.StreamingLinks.ToDictionary(x => x.Platform);
+        Dictionary<StreamingPlatform, StreamingLinkDto> incomingByPlatform = dto.StreamingLinks.ToDictionary(x => x.Platform);
 
-        foreach (var link in album.StreamingLinks.ToList())
+        foreach (StreamingLink link in album.StreamingLinks.ToList())
         {
             if (!incomingByPlatform.ContainsKey(link.Platform))
                 album.RemoveStreamingLink(link.Id);
         }
 
-        var currentByPlatform = album.StreamingLinks.ToDictionary(x => x.Platform);
+        Dictionary<StreamingPlatform, StreamingLink> currentByPlatform = album.StreamingLinks.ToDictionary(x => x.Platform);
 
-        foreach (var incoming in dto.StreamingLinks)
+        foreach (StreamingLinkDto incoming in dto.StreamingLinks)
         {
-            if (currentByPlatform.TryGetValue(incoming.Platform, out var existing))
+            if (currentByPlatform.TryGetValue(incoming.Platform, out StreamingLink? existing))
             {
                 if (existing.EmbedCode != incoming.EmbedCode)
                     album.UpdateStreamingLink(existing.Id, incoming.EmbedCode);
@@ -155,14 +155,14 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
         if (dto.Tracks is null or { Count: 0 })
             return;
 
-        var incomingByNumber = dto.Tracks.ToDictionary(t => t.TrackNumber);
-        var tracksById       = currentTracks.ToDictionary(t => t.Id);
-        var currentByNumber  = album.AlbumTracks
+        Dictionary<int, TrackInputDto> incomingByNumber = dto.Tracks.ToDictionary(t => t.TrackNumber);
+        Dictionary<TrackId, Track> tracksById       = currentTracks.ToDictionary(t => t.Id);
+        Dictionary<int, Track> currentByNumber  = album.AlbumTracks
             .Where(at => tracksById.ContainsKey(at.TrackId))
             .ToDictionary(at => at.TrackNumber, at => tracksById[at.TrackId]);
 
         // Remove tracks no longer in the list
-        foreach (var (number, track) in currentByNumber)
+        foreach ((int number, Track track) in currentByNumber)
         {
             if (!incomingByNumber.ContainsKey(number))
             {
@@ -172,9 +172,9 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
         }
 
         // Update existing or add new
-        foreach (var incoming in dto.Tracks)
+        foreach (TrackInputDto incoming in dto.Tracks)
         {
-            if (currentByNumber.TryGetValue(incoming.TrackNumber, out var existing))
+            if (currentByNumber.TryGetValue(incoming.TrackNumber, out Track? existing))
             {
                 if (existing.Title != incoming.Title)
                     existing.UpdateTitle(incoming.Title);
@@ -184,7 +184,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
             }
             else
             {
-                var newTrack = Track.Create(TrackId.Of(Guid.NewGuid()), incoming.Title, incoming.Duration);
+                Track newTrack = Track.Create(TrackId.Of(Guid.NewGuid()), incoming.Title, incoming.Duration);
                 await context.Tracks.AddAsync(newTrack, cancellationToken);
                 album.AddTrack(newTrack.Id, incoming.TrackNumber);
             }

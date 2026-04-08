@@ -5,12 +5,12 @@ public class GetGenreCardByIdQueryHandler(ILibraryDbContext context, IStorageUrl
 {
     public async ValueTask<GetGenreCardByIdResult> Handle(GetGenreCardByIdQuery query, CancellationToken cancellationToken)
     {
-        var cardId = GenreCardId.Of(query.Id);
+        GenreCardId cardId = GenreCardId.Of(query.Id);
 
-        var card = await context.GenreCards
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken)
-            ?? throw new GenreCardNotFoundException(query.Id);
+        GenreCard card = await context.GenreCards
+                             .AsNoTracking()
+                             .FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken)
+                         ?? throw new GenreCardNotFoundException(query.Id);
 
         return new GetGenreCardByIdResult(card.ToGenreCardDto(urlResolver));
     }

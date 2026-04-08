@@ -8,7 +8,7 @@ public class GetAlbumNames : ICarterModule
     {
         app.MapGet("/albums/names", async (ISender sender) =>
             {
-                var result = await sender.Send(new GetAlbumNamesQuery());
+                GetAlbumNamesResult result = await sender.Send(new GetAlbumNamesQuery());
                 return Results.Ok(result.Adapt<GetAlbumNamesResponse>());
             })
             .WithName("GetAlbumNames")

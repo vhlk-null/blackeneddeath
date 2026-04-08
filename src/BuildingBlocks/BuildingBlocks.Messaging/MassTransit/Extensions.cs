@@ -22,10 +22,10 @@ public static class Extensions
 
             config.UsingRabbitMq((context, cfg) =>
             {
-                var logger = context.GetRequiredService<ILogger<IBus>>();
+                ILogger<IBus> logger = context.GetRequiredService<ILogger<IBus>>();
 
-                var host = configuration["MessageBroker:Host"];
-                var username = configuration["MessageBroker:Username"];
+                string? host = configuration["MessageBroker:Host"];
+                string? username = configuration["MessageBroker:Username"];
 
                 if (string.IsNullOrWhiteSpace(host))
                 {

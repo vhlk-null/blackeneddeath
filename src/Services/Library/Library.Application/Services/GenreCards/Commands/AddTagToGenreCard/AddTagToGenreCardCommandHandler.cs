@@ -5,14 +5,14 @@ public class AddTagToGenreCardCommandHandler(ILibraryDbContext context)
 {
     public async ValueTask<AddTagToGenreCardResult> Handle(AddTagToGenreCardCommand command, CancellationToken cancellationToken)
     {
-        var cardId = GenreCardId.Of(command.GenreCardId);
+        GenreCardId cardId = GenreCardId.Of(command.GenreCardId);
 
-        var card = await context.GenreCards
-            .Include(c => c.GenreCardTags)
-            .FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken)
-            ?? throw new GenreCardNotFoundException(command.GenreCardId);
+        GenreCard card = await context.GenreCards
+                             .Include(c => c.GenreCardTags)
+                             .FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken)
+                         ?? throw new GenreCardNotFoundException(command.GenreCardId);
 
-        var tagId = TagId.Of(command.TagId);
+        TagId tagId = TagId.Of(command.TagId);
 
         if (!await context.Tags.AnyAsync(t => t.Id == tagId, cancellationToken))
             throw new TagNotFoundException(command.TagId);

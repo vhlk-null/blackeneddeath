@@ -20,7 +20,7 @@ public class GenreCard : Aggregate<GenreCardId>
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentException.ThrowIfNullOrWhiteSpace(description);
 
-        var card = new GenreCard
+        GenreCard card = new GenreCard
         {
             Id = id,
             Name = name,
@@ -59,8 +59,8 @@ public class GenreCard : Aggregate<GenreCardId>
 
     public void RemoveGenre(GenreId genreId)
     {
-        var item = _genreCardGenres.FirstOrDefault(g => g.GenreId == genreId)
-            ?? throw new DomainException($"Genre {genreId.Value} is not on this card.");
+        GenreCardGenre item = _genreCardGenres.FirstOrDefault(g => g.GenreId == genreId)
+                              ?? throw new DomainException($"Genre {genreId.Value} is not on this card.");
 
         _genreCardGenres.Remove(item);
     }
@@ -75,8 +75,8 @@ public class GenreCard : Aggregate<GenreCardId>
 
     public void RemoveTag(TagId tagId)
     {
-        var item = _genreCardTags.FirstOrDefault(t => t.TagId == tagId)
-            ?? throw new DomainException($"Tag {tagId.Value} is not on this card.");
+        GenreCardTag item = _genreCardTags.FirstOrDefault(t => t.TagId == tagId)
+                            ?? throw new DomainException($"Tag {tagId.Value} is not on this card.");
 
         _genreCardTags.Remove(item);
     }

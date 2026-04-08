@@ -29,13 +29,13 @@ public class DeleteGenreCardHandlerTests
     [Fact]
     public async Task Handle_ExistingCard_RemovesAndReturnsSuccess()
     {
-        var cardId = Guid.NewGuid();
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Thrash", "Fast and aggressive");
+        Guid cardId = Guid.NewGuid();
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Thrash", "Fast and aggressive");
         _genreCardsDbSetMock
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<GenreCard?>(card));
 
-        var result = await _handler.Handle(new DeleteGenreCardCommand(cardId), CancellationToken.None);
+        DeleteGenreCardResult result = await _handler.Handle(new DeleteGenreCardCommand(cardId), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         _genreCardsDbSetMock.Verify(x => x.Remove(card), Times.Once);
@@ -49,7 +49,7 @@ public class DeleteGenreCardHandlerTests
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<GenreCard?>(null));
 
-        var act = async () => await _handler.Handle(
+        Func<Task<DeleteGenreCardResult>> act = async () => await _handler.Handle(
             new DeleteGenreCardCommand(Guid.NewGuid()), CancellationToken.None);
 
         await act.Should().ThrowAsync<GenreCardNotFoundException>();

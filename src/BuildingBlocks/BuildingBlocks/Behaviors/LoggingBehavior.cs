@@ -14,14 +14,14 @@ public class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior<TReque
         logger.LogInformation("[START] Handler request={Request} - Response={Response} - RequestData={RequestDate}",
             typeof(TRequest).Name, typeof(TResponse).Name, request);
 
-        var timer = new Stopwatch();
+        Stopwatch timer = new Stopwatch();
         timer.Start();
 
-        var response = await next(request, cancellationToken);
+        TResponse response = await next(request, cancellationToken);
 
         timer.Stop();
 
-        var timeTaken = timer.Elapsed;
+        TimeSpan timeTaken = timer.Elapsed;
         if (timeTaken.Seconds > 3) 
             logger.LogWarning("[PERFORMANCE] The request {Request} took {TimeTaken}", typeof(TRequest).Name, timeTaken.Seconds);
 

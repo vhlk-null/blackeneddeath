@@ -6,10 +6,10 @@ public static class DatabaseInitializerExtensions
 {
     public static async Task InitializeDatabaseAsync(this WebApplication app)
     {
-        using var scope = app.Services.CreateScope();
-        var services = scope.ServiceProvider;
-        var context = services.GetRequiredService<UserContentContext>();
-        var logger = services.GetRequiredService<ILogger<UserContentContext>>();
+        using IServiceScope scope = app.Services.CreateScope();
+        IServiceProvider services = scope.ServiceProvider;
+        UserContentContext context = services.GetRequiredService<UserContentContext>();
+        ILogger<UserContentContext> logger = services.GetRequiredService<ILogger<UserContentContext>>();
 
         try
         {

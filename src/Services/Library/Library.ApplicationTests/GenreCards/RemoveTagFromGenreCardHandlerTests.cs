@@ -27,15 +27,15 @@ public class RemoveTagFromGenreCardHandlerTests
     [Fact]
     public async Task Handle_ExistingTag_RemovesAndReturnsSuccess()
     {
-        var cardId = Guid.NewGuid();
-        var tagId = Guid.NewGuid();
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Grind", "Fast and brutal");
+        Guid cardId = Guid.NewGuid();
+        Guid tagId = Guid.NewGuid();
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Grind", "Fast and brutal");
         card.AddTag(TagId.Of(tagId));
 
-        var cardsDbSet = MockDbSetFactory.Create(card);
+        Mock<DbSet<GenreCard>> cardsDbSet = MockDbSetFactory.Create(card);
         _contextMock.Setup(x => x.GenreCards).Returns(cardsDbSet.Object);
 
-        var result = await _handler.Handle(
+        RemoveTagFromGenreCardResult result = await _handler.Handle(
             new RemoveTagFromGenreCardCommand(cardId, tagId), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -46,10 +46,10 @@ public class RemoveTagFromGenreCardHandlerTests
     [Fact]
     public async Task Handle_CardNotFound_ThrowsGenreCardNotFoundException()
     {
-        var cardsDbSet = MockDbSetFactory.Create<GenreCard>();
+        Mock<DbSet<GenreCard>> cardsDbSet = MockDbSetFactory.Create<GenreCard>();
         _contextMock.Setup(x => x.GenreCards).Returns(cardsDbSet.Object);
 
-        var act = async () => await _handler.Handle(
+        Func<Task<RemoveTagFromGenreCardResult>> act = async () => await _handler.Handle(
             new RemoveTagFromGenreCardCommand(Guid.NewGuid(), Guid.NewGuid()), CancellationToken.None);
 
         await act.Should().ThrowAsync<GenreCardNotFoundException>();
@@ -58,13 +58,13 @@ public class RemoveTagFromGenreCardHandlerTests
     [Fact]
     public async Task Handle_TagNotOnCard_ThrowsDomainException()
     {
-        var cardId = Guid.NewGuid();
-        var card = GenreCard.Create(GenreCardId.Of(cardId), "Avant-Garde", "Experimental and weird");
+        Guid cardId = Guid.NewGuid();
+        GenreCard card = GenreCard.Create(GenreCardId.Of(cardId), "Avant-Garde", "Experimental and weird");
 
-        var cardsDbSet = MockDbSetFactory.Create(card);
+        Mock<DbSet<GenreCard>> cardsDbSet = MockDbSetFactory.Create(card);
         _contextMock.Setup(x => x.GenreCards).Returns(cardsDbSet.Object);
 
-        var act = async () => await _handler.Handle(
+        Func<Task<RemoveTagFromGenreCardResult>> act = async () => await _handler.Handle(
             new RemoveTagFromGenreCardCommand(cardId, Guid.NewGuid()), CancellationToken.None);
 
         await act.Should().ThrowAsync<DomainException>();

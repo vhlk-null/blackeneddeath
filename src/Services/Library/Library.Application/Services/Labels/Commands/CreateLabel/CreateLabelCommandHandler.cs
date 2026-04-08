@@ -5,7 +5,7 @@ public class CreateLabelCommandHandler(ILibraryDbContext context)
 {
     public async ValueTask<CreateLabelResult> Handle(CreateLabelCommand command, CancellationToken cancellationToken)
     {
-        var label = Label.Create(LabelId.Of(Guid.NewGuid()), command.Name);
+        Label label = Label.Create(LabelId.Of(Guid.NewGuid()), command.Name);
 
         context.Labels.Add(label);
         await context.SaveChangesAsync(cancellationToken);

@@ -5,11 +5,11 @@ public class GetGenresQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetGenresResult> Handle(GetGenresQuery query, CancellationToken cancellationToken)
     {
-        var genres = await context.Genres
+        List<Genre> genres = await context.Genres
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        var genreDtos = genres.Select(g => g.ToGenreDetailDto()).ToList();
+        List<GenreDetailDto> genreDtos = genres.Select(g => g.ToGenreDetailDto()).ToList();
 
         return new GetGenresResult(genreDtos);
     }

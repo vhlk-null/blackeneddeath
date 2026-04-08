@@ -8,7 +8,7 @@ public class GetBandSummaries : ICarterModule
     {
         app.MapGet("/bands/summaries", async (ISender sender) =>
             {
-                var result = await sender.Send(new GetBandSummariesQuery());
+                GetBandSummariesResult result = await sender.Send(new GetBandSummariesQuery());
                 return Results.Ok(result.Adapt<GetBandSummariesResponse>());
             })
             .WithName("GetBandSummaries")

@@ -5,8 +5,8 @@ public class UpdateLabelCommandHandler(ILibraryDbContext context)
 {
     public async ValueTask<UpdateLabelResult> Handle(UpdateLabelCommand command, CancellationToken cancellationToken)
     {
-        var label = await context.Labels.FindAsync([LabelId.Of(command.Id)], cancellationToken)
-            ?? throw new LabelNotFoundException(command.Id);
+        Label label = await context.Labels.FindAsync([LabelId.Of(command.Id)], cancellationToken)
+                      ?? throw new LabelNotFoundException(command.Id);
 
         label.Update(command.Name);
         await context.SaveChangesAsync(cancellationToken);

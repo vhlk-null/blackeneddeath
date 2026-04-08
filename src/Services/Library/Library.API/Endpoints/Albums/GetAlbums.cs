@@ -1,3 +1,5 @@
+using BuildingBlocks.Specifications;
+
 namespace Library.API.Endpoints.Albums;
 
 public record GetAlbumsResult(PaginatedResult<AlbumCardDto> Albums);
@@ -15,8 +17,8 @@ public class GetAlbums : ICarterModule
                 AlbumType? type = null,
                 int? year = null) =>
             {
-                var filter = AlbumFilterBuilder.Build(genreId, labelId, countryId, type, year);
-                var result = await sender.Send(new GetAlbumsQuery(paginationRequest, sortBy, filter));
+                ISpecification<Album>? filter = AlbumFilterBuilder.Build(genreId, labelId, countryId, type, year);
+                Application.Services.Albums.Queries.GetAlbums.GetAlbumsResult result = await sender.Send(new GetAlbumsQuery(paginationRequest, sortBy, filter));
                 return Results.Ok(result.Adapt<GetAlbumsResult>());
             })
             .WithName("GetAlbums")

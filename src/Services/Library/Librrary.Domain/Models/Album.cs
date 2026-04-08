@@ -30,7 +30,7 @@ public class Album : Aggregate<AlbumId>
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentNullException.ThrowIfNull(albumRelease);
 
-        var album =  new Album
+        Album album =  new Album
         {
             Id = id ?? AlbumId.Of(Guid.NewGuid()),
             Title = title,
@@ -80,8 +80,8 @@ public class Album : Aggregate<AlbumId>
 
     public void RemoveBand(BandId bandId)
     {
-        var entry = _albumBands.FirstOrDefault(x => x.BandId == bandId)
-            ?? throw new DomainException("Band is not associated with this album.");
+        AlbumBand entry = _albumBands.FirstOrDefault(x => x.BandId == bandId)
+                          ?? throw new DomainException("Band is not associated with this album.");
 
         _albumBands.Remove(entry);
     }
@@ -97,16 +97,16 @@ public class Album : Aggregate<AlbumId>
 
     public void UpdateGenrePrimary(GenreId genreId, bool isPrimary)
     {
-        var entry = _albumGenres.FirstOrDefault(x => x.GenreId == genreId)
-            ?? throw new DomainException("Genre is not associated with this album.");
+        AlbumGenre entry = _albumGenres.FirstOrDefault(x => x.GenreId == genreId)
+                           ?? throw new DomainException("Genre is not associated with this album.");
 
         entry.IsPrimary = isPrimary;
     }
 
     public void RemoveGenre(GenreId genreId)
     {
-        var entry = _albumGenres.FirstOrDefault(x => x.GenreId == genreId)
-            ?? throw new DomainException("Genre is not associated with this album.");
+        AlbumGenre entry = _albumGenres.FirstOrDefault(x => x.GenreId == genreId)
+                           ?? throw new DomainException("Genre is not associated with this album.");
 
         _albumGenres.Remove(entry);
     }
@@ -122,8 +122,8 @@ public class Album : Aggregate<AlbumId>
 
     public void RemoveCountry(CountryId countryId)
     {
-        var entry = _albumCountries.FirstOrDefault(x => x.CountryId == countryId)
-            ?? throw new DomainException("Country is not associated with this album.");
+        AlbumCountry entry = _albumCountries.FirstOrDefault(x => x.CountryId == countryId)
+                             ?? throw new DomainException("Country is not associated with this album.");
 
         _albumCountries.Remove(entry);
     }
@@ -139,8 +139,8 @@ public class Album : Aggregate<AlbumId>
 
     public void RemoveTrack(TrackId trackId)
     {
-        var entry = _albumTracks.FirstOrDefault(x => x.TrackId == trackId)
-            ?? throw new DomainException("Track is not associated with this album.");
+        AlbumTrack entry = _albumTracks.FirstOrDefault(x => x.TrackId == trackId)
+                           ?? throw new DomainException("Track is not associated with this album.");
 
         _albumTracks.Remove(entry);
     }
@@ -156,8 +156,8 @@ public class Album : Aggregate<AlbumId>
 
     public void RemoveTag(TagId tagId)
     {
-        var entry = _albumTags.FirstOrDefault(x => x.TagId == tagId)
-            ?? throw new DomainException("Tag is not associated with this album.");
+        AlbumTag entry = _albumTags.FirstOrDefault(x => x.TagId == tagId)
+                         ?? throw new DomainException("Tag is not associated with this album.");
 
         _albumTags.Remove(entry);
     }
@@ -174,16 +174,16 @@ public class Album : Aggregate<AlbumId>
     public void UpdateStreamingLink(StreamingLinkId streamingLinkId, string embedCode)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(embedCode);
-        var entry = _streamingLinks.FirstOrDefault(x => x.Id == streamingLinkId)
-            ?? throw new DomainException("Streaming link not found.");
+        StreamingLink entry = _streamingLinks.FirstOrDefault(x => x.Id == streamingLinkId)
+                              ?? throw new DomainException("Streaming link not found.");
 
         entry.UpdateEmbedCode(embedCode);
     }
 
     public void RemoveStreamingLink(StreamingLinkId streamingLinkId)
     {
-        var entry = _streamingLinks.FirstOrDefault(x => x.Id == streamingLinkId)
-            ?? throw new DomainException("Streaming link not found.");
+        StreamingLink entry = _streamingLinks.FirstOrDefault(x => x.Id == streamingLinkId)
+                              ?? throw new DomainException("Streaming link not found.");
 
         _streamingLinks.Remove(entry);
     }

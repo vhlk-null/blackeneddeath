@@ -7,15 +7,15 @@ public class UpdateGenreCardCoverCommandHandler(ILibraryDbContext context, IStor
 {
     public async ValueTask<UpdateGenreCardCoverResult> Handle(UpdateGenreCardCoverCommand command, CancellationToken cancellationToken)
     {
-        var card = await context.GenreCards.FindAsync([GenreCardId.Of(command.GenreCardId)], cancellationToken)
-            ?? throw new GenreCardNotFoundException(command.GenreCardId);
+        GenreCard card = await context.GenreCards.FindAsync([GenreCardId.Of(command.GenreCardId)], cancellationToken)
+                         ?? throw new GenreCardNotFoundException(command.GenreCardId);
 
         if (card.CoverUrl is not null)
             await storage.DeleteFileAsync(card.CoverUrl, cancellationToken);
 
-        var folder = $"genres/{Slugify(card.Name)}";
-        var extension = Path.GetExtension(command.CoverImageFileName);
-        var coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
+        string folder = $"genres/{Slugify(card.Name)}";
+        string extension = Path.GetExtension(command.CoverImageFileName);
+        string coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
 
         card.Update(card.Name, card.Description, coverKey, card.OrderNumber);
         await context.SaveChangesAsync(cancellationToken);

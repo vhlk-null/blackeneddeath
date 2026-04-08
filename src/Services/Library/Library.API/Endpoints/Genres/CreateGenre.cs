@@ -11,11 +11,11 @@ public class CreateGenre : ICarterModule
         app.MapPost("/genres",
                 async (CreateGenreRequest request, ISender sender) =>
                 {
-                    var command = request.Adapt<CreateGenreCommand>();
+                    CreateGenreCommand command = request.Adapt<CreateGenreCommand>();
 
-                    var result = await sender.Send(command);
+                    CreateGenreResult result = await sender.Send(command);
 
-                    var response = result.Adapt<CreateGenreResponse>();
+                    CreateGenreResponse response = result.Adapt<CreateGenreResponse>();
 
                     return Results.Created($"/genres/{response.Id}", response);
                 })

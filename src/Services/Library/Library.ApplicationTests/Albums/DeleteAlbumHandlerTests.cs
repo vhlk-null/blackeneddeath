@@ -31,8 +31,8 @@ public class DeleteAlbumHandlerTests
     [Fact]
     public async Task Handle_ExistingAlbum_RemovesAlbumAndReturnsSuccess()
     {
-        var albumId = Guid.NewGuid();
-        var album = Album.Create(
+        Guid albumId = Guid.NewGuid();
+        Album album = Album.Create(
             "Symbolic", AlbumType.FullLength,
             AlbumRelease.Of(1995, AlbumFormat.CD),
             null, null, AlbumId.Of(albumId));
@@ -40,7 +40,7 @@ public class DeleteAlbumHandlerTests
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<Album?>(album));
 
-        var result = await _handler.Handle(new DeleteAlbumCommand(albumId), CancellationToken.None);
+        DeleteAlbumResult result = await _handler.Handle(new DeleteAlbumCommand(albumId), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         _albumsDbSetMock.Verify(x => x.Remove(album), Times.Once);
@@ -54,7 +54,7 @@ public class DeleteAlbumHandlerTests
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<Album?>(null));
 
-        var act = async () => await _handler.Handle(
+        Func<Task<DeleteAlbumResult>> act = async () => await _handler.Handle(
             new DeleteAlbumCommand(Guid.NewGuid()), CancellationToken.None);
 
         await act.Should().ThrowAsync<AlbumNotFoundException>();

@@ -46,7 +46,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> _logger) : I
             )
         };
 
-        var problemDetails = new ProblemDetails
+        ProblemDetails problemDetails = new ProblemDetails
         {
             Title = details.Title,
             Detail = details.Detail,

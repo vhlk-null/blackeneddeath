@@ -5,22 +5,22 @@ public class GetAlbumsByGenreCardQueryHandler(ILibraryDbContext context, IStorag
 {
     public async ValueTask<GetAlbumsByGenreCardResult> Handle(GetAlbumsByGenreCardQuery query, CancellationToken cancellationToken)
     {
-        var cardId = GenreCardId.Of(query.GenreCardId);
+        GenreCardId cardId = GenreCardId.Of(query.GenreCardId);
 
-        var card = await context.GenreCards
-            .AsNoTracking()
-            .Include(c => c.GenreCardGenres)
-            .Include(c => c.GenreCardTags)
-            .FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken)
-            ?? throw new GenreCardNotFoundException(query.GenreCardId);
+        GenreCard card = await context.GenreCards
+                             .AsNoTracking()
+                             .Include(c => c.GenreCardGenres)
+                             .Include(c => c.GenreCardTags)
+                             .FirstOrDefaultAsync(c => c.Id == cardId, cancellationToken)
+                         ?? throw new GenreCardNotFoundException(query.GenreCardId);
 
-        var genreIds = card.GenreCardGenres.Select(g => g.GenreId).ToList();
-        var tagIds   = card.GenreCardTags.Select(t => t.TagId).ToList();
+        List<GenreId> genreIds = card.GenreCardGenres.Select(g => g.GenreId).ToList();
+        List<TagId> tagIds   = card.GenreCardTags.Select(t => t.TagId).ToList();
 
-        var pageIndex = query.PaginationRequest.PageIndex;
-        var pageSize  = query.PaginationRequest.PageSize;
+        int pageIndex = query.PaginationRequest.PageIndex;
+        int pageSize  = query.PaginationRequest.PageSize;
 
-        var albumsQuery = context.Albums
+        IQueryable<Album> albumsQuery = context.Albums
             .AsNoTracking()
             .Include(a => a.AlbumBands)
             .Include(a => a.AlbumGenres)
@@ -29,33 +29,33 @@ public class GetAlbumsByGenreCardQueryHandler(ILibraryDbContext context, IStorag
                 a.AlbumGenres.Any(ag => genreIds.Contains(ag.GenreId)) ||
                 a.AlbumTags.Any(at => tagIds.Contains(at.TagId)));
 
-        var totalCount = await albumsQuery.LongCountAsync(cancellationToken);
+        long totalCount = await albumsQuery.LongCountAsync(cancellationToken);
 
-        var albums = await albumsQuery
+        List<Album> albums = await albumsQuery
             .OrderByDescending(a => a.AlbumRelease.ReleaseYear)
             .Skip(pageSize * pageIndex)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        var bandIds  = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
-        var albumGenreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)).Distinct().ToList();
+        List<BandId> bandIds  = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
+        List<GenreId> albumGenreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)).Distinct().ToList();
 
-        var bands = await context.Bands.AsNoTracking()
+        Dictionary<BandId, Band> bands = await context.Bands.AsNoTracking()
             .Include(b => b.BandCountries)
             .Where(b => bandIds.Contains(b.Id))
             .ToDictionaryAsync(b => b.Id, cancellationToken);
 
-        var genres = await context.Genres.AsNoTracking()
+        Dictionary<GenreId, Genre> genres = await context.Genres.AsNoTracking()
             .Where(g => albumGenreIds.Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, cancellationToken);
 
-        var countryIds = bands.Values.SelectMany(b => b.BandCountries.Select(bc => bc.CountryId)).Distinct().ToList();
+        List<CountryId> countryIds = bands.Values.SelectMany(b => b.BandCountries.Select(bc => bc.CountryId)).Distinct().ToList();
 
-        var countries = await context.Countries.AsNoTracking()
+        Dictionary<CountryId, Country> countries = await context.Countries.AsNoTracking()
             .Where(c => countryIds.Contains(c.Id))
             .ToDictionaryAsync(c => c.Id, cancellationToken);
 
-        var albumDtos = albums.Select(a => new AlbumCardDto(
+        List<AlbumCardDto> albumDtos = albums.Select(a => new AlbumCardDto(
             a.Id.Value,
             a.Title,
             a.Slug,

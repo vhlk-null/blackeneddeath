@@ -4,14 +4,14 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
-        var connectionString = configuration.GetConnectionString("LibraryDb");
+        string? connectionString = configuration.GetConnectionString("LibraryDb");
 
-        var cloudinaryAccount = new Account(
+        Account cloudinaryAccount = new Account(
             configuration["Storage:CloudName"],
             configuration["Storage:ApiKey"],
             configuration["Storage:ApiSecret"]);
 
-        var environmentPrefix = environment.IsProduction() ? "production" : "local";
+        string environmentPrefix = environment.IsProduction() ? "production" : "local";
 
         services.AddSingleton(new Cloudinary(cloudinaryAccount) { Api = { Secure = true } });
         services.AddScoped<IStorageService>(sp => new CloudinaryStorageService(

@@ -22,17 +22,17 @@ public class UserProfileControllerTests : IClassFixture<UserContentWebAppFactory
     [Fact]
     public async Task GetUserProfile_ExistingUser_Returns200WithDto()
     {
-        var userId = Guid.NewGuid();
-        var dto = new UserProfileDto(userId, "metal_head", "user@example.com",
+        Guid userId = Guid.NewGuid();
+        UserProfileDto dto = new UserProfileDto(userId, "metal_head", "user@example.com",
             null, DateTime.UtcNow, null, null, 0, 0, 0, [], []);
         _factory.ServiceMock
             .Setup(s => s.GetUserProfileAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(dto);
 
-        var response = await _client.GetAsync($"/profile/{userId}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await _client.GetAsync($"/profile/{userId}", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<UserProfileDto>(TestContext.Current.CancellationToken);
+        UserProfileDto? body = await response.Content.ReadFromJsonAsync<UserProfileDto>(TestContext.Current.CancellationToken);
         body!.UserId.Should().Be(userId);
         body.Username.Should().Be("metal_head");
     }
@@ -40,12 +40,12 @@ public class UserProfileControllerTests : IClassFixture<UserContentWebAppFactory
     [Fact]
     public async Task GetUserProfile_UserNotFound_Returns404()
     {
-        var userId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
         _factory.ServiceMock
             .Setup(s => s.GetUserProfileAsync(userId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new UserProfileNotFoundException(userId));
 
-        var response = await _client.GetAsync($"/profile/{userId}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await _client.GetAsync($"/profile/{userId}", TestContext.Current.CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }

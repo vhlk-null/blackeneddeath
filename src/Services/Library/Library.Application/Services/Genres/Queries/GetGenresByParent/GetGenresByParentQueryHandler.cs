@@ -5,9 +5,9 @@ public class GetGenresByParentQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetGenresByParentResult> Handle(GetGenresByParentQuery query, CancellationToken cancellationToken)
     {
-        var parentId = GenreId.Of(query.ParentId);
+        GenreId parentId = GenreId.Of(query.ParentId);
 
-        var genres = await context.Genres
+        List<Genre> genres = await context.Genres
             .AsNoTracking()
             .Where(g => g.ParentGenreId == parentId)
             .ToListAsync(cancellationToken);

@@ -14,7 +14,7 @@ public class AuditableEntityInterceptorTests
 {
     private static LibraryContext CreateContext()
     {
-        var options = new DbContextOptionsBuilder<LibraryContext>()
+        DbContextOptions<LibraryContext> options = new DbContextOptionsBuilder<LibraryContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         return new LibraryContext(options);
@@ -23,9 +23,9 @@ public class AuditableEntityInterceptorTests
     [Fact]
     public void UpdateEntities_NullContext_DoesNotThrow()
     {
-        var interceptor = new AuditableEntityInterceptor();
+        AuditableEntityInterceptor interceptor = new AuditableEntityInterceptor();
 
-        var act = () => interceptor.UpdateEntities(null);
+        Action act = () => interceptor.UpdateEntities(null);
 
         act.Should().NotThrow();
     }
@@ -33,10 +33,10 @@ public class AuditableEntityInterceptorTests
     [Fact]
     public void UpdateEntities_AddedEntity_SetsCreatedAndModifiedFields()
     {
-        var interceptor = new AuditableEntityInterceptor();
-        using var context = CreateContext();
+        AuditableEntityInterceptor interceptor = new AuditableEntityInterceptor();
+        using LibraryContext context = CreateContext();
 
-        var genre = Genre.Create(GenreId.Of(Guid.NewGuid()), "Death Metal", null);
+        Genre genre = Genre.Create(GenreId.Of(Guid.NewGuid()), "Death Metal", null);
         context.Genres.Add(genre);
 
         interceptor.UpdateEntities(context);
@@ -50,10 +50,10 @@ public class AuditableEntityInterceptorTests
     [Fact]
     public void UpdateEntities_ModifiedEntity_SetsOnlyModifiedFields()
     {
-        var interceptor = new AuditableEntityInterceptor();
-        using var context = CreateContext();
+        AuditableEntityInterceptor interceptor = new AuditableEntityInterceptor();
+        using LibraryContext context = CreateContext();
 
-        var genre = Genre.Create(GenreId.Of(Guid.NewGuid()), "Death Metal", null);
+        Genre genre = Genre.Create(GenreId.Of(Guid.NewGuid()), "Death Metal", null);
         context.Genres.Add(genre);
         context.SaveChanges();
 

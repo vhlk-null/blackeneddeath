@@ -1,38 +1,84 @@
 ﻿namespace IdentityServer
 {
-    public static class Config
+    public class Config(IConfiguration configuration)
     {
-        public static IEnumerable<Client> Clients =>
-        [
-            new()
+        public IEnumerable<Client> Clients
+        {
+            get
             {
-                ClientId = "libraryClient",
-                AllowedGrantTypes = GrantTypes.ClientCredentials,
-                ClientSecrets = { new Secret("secret".Sha256()) },
-                AllowedScopes = { "libraryAPI" }
+                List<Client> clients = new List<Client>();
+                configuration.GetSection("IdentityServer:Clients").Bind(clients);
+
+                foreach (Client client in clients)
+                {
+                    client.AllowedGrantTypes = GrantTypes.Code;
+                    client.RequirePkce = true;
+                    client.RequireClientSecret = false;
+                    client.AllowOfflineAccess = true;
+                    client.AllowedScopes =
+                    [
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.Email,
+                        Scopes.Roles,
+                        Scopes.LibraryApi
+                    ];
+                }
+
+                return clients;
+            }
+        }
+
+        public List<ApiScope> ApiScopes =>
+        [
+            new(Scopes.LibraryApi, "Library API")
+        ];
+
+        public IEnumerable<ApiResource> ApiResources =>
+        [
+            new(Scopes.LibraryApi, "Library API")
+            {
+                Scopes = { Scopes.LibraryApi },
+                UserClaims = { JwtClaimTypes.Role }
             }
         ];
 
-        public static List<ApiScope> ApiScopes =>
+        public IEnumerable<IdentityResource> IdentityResources =>
         [
-            new("libraryAPI","Library API")
-        ];
-        
-        public static IEnumerable<ApiResource> ApiResources =>
-        [
-
-        ];
-        
-        public static IEnumerable<IdentityResource> IdentityResources =>
-        [
-
+            new IdentityResources.OpenId(),
+            new IdentityResources.Profile(),
+            new IdentityResources.Email(),
+            new IdentityResource(
+                "roles","Your role(s)", new List<string>() {"role"})
         ];
 
-        public static List<TestUser> TestUsers =>
+        public List<TestUser> TestUsers =>
         [
-            new() { SubjectId = "1", Username = "Alice", Password = "password" },
-            new() { SubjectId = "2", Username = "Bob", Password = "password" }
-        ];
+            new()
+            {
+                SubjectId = "1",
+                Username = "alice",
+                Password = "Alice@7392!",
+                Claims =
+                [
+                    new(JwtClaimTypes.Name, "Alice Smith"),
+                    new(JwtClaimTypes.Email, "alice@example.com"),
+                    new Claim(JwtClaimTypes.Role, "user")
 
+                ]
+            },
+            new()
+            {
+                SubjectId = "2",
+                Username = "bob",
+                Password = "Bob#5814@",
+                Claims =
+                [
+                    new(JwtClaimTypes.Name, "Bob Jones"),
+                    new(JwtClaimTypes.Email, "bob@example.com"),
+                    new Claim(JwtClaimTypes.Role, "admin")
+                ]
+            }
+        ];
     }
 }

@@ -15,7 +15,7 @@ public class Genre : Aggregate<GenreId>
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
-        var genre = new Genre
+        Genre genre = new Genre
         {
             Id = id,
             Name = name,

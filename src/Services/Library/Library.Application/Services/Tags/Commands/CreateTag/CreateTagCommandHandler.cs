@@ -5,7 +5,7 @@ public class CreateTagCommandHandler(ILibraryDbContext context)
 {
     public async ValueTask<CreateTagResult> Handle(CreateTagCommand command, CancellationToken cancellationToken)
     {
-        var tag = Tag.Create(TagId.Of(Guid.NewGuid()), command.Name);
+        Tag tag = Tag.Create(TagId.Of(Guid.NewGuid()), command.Name);
 
         context.Tags.Add(tag);
         await context.SaveChangesAsync(cancellationToken);

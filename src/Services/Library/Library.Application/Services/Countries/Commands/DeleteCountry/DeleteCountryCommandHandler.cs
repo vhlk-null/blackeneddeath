@@ -5,8 +5,8 @@ public class DeleteCountryCommandHandler(ILibraryDbContext context)
 {
     public async ValueTask<DeleteCountryResult> Handle(DeleteCountryCommand command, CancellationToken cancellationToken)
     {
-        var country = await context.Countries.FindAsync([CountryId.Of(command.Id)], cancellationToken)
-            ?? throw new CountryNotFoundException(command.Id);
+        Country country = await context.Countries.FindAsync([CountryId.Of(command.Id)], cancellationToken)
+                          ?? throw new CountryNotFoundException(command.Id);
 
         context.Countries.Remove(country);
         await context.SaveChangesAsync(cancellationToken);

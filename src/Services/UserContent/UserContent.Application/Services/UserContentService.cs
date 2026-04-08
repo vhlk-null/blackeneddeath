@@ -5,7 +5,7 @@ public class UserContentService(IRepository<UserContentContext> repo, ILibrarySe
 {
     public async Task<UserProfileDto> GetUserProfileAsync(Guid userId, CancellationToken ct = default)
     {
-        var profile = await repo.GetWithIncludesAsync<UserProfileInfo>(
+        UserProfileInfo profile = await repo.GetWithIncludesAsync<UserProfileInfo>(
             u => u.UserId == userId,
             q => q.Include(u => u.FavoriteAlbums).ThenInclude(fa => fa.Album)
                   .Include(u => u.FavoriteBands).ThenInclude(fb => fb.Band),
@@ -16,7 +16,7 @@ public class UserContentService(IRepository<UserContentContext> repo, ILibrarySe
 
     public async Task<Guid> AddFavoriteAlbumAsync(Guid userId, Guid albumId, CancellationToken ct = default)
     {
-        var album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct);
+        Album? album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct);
         if (album is null)
         {
             album = await libraryService.GetAlbumByIdAsync(albumId, ct)
@@ -31,9 +31,9 @@ public class UserContentService(IRepository<UserContentContext> repo, ILibrarySe
 
     public async Task DeleteFavoriteAlbumAsync(Guid userId, Guid albumId, CancellationToken ct = default)
     {
-        var fa = await repo.GetByAsync<FavoriteAlbum>(
-            fa => fa.UserId == userId && fa.AlbumId == albumId, cancellationToken: ct)
-            ?? throw new FavoriteAlbumNotFoundException(albumId);
+        FavoriteAlbum fa = await repo.GetByAsync<FavoriteAlbum>(
+                               fa => fa.UserId == userId && fa.AlbumId == albumId, cancellationToken: ct)
+                           ?? throw new FavoriteAlbumNotFoundException(albumId);
 
         repo.Delete(fa);
         await repo.SaveChangesAsync(ct);
@@ -48,9 +48,9 @@ public class UserContentService(IRepository<UserContentContext> repo, ILibrarySe
 
     public async Task DeleteFavoriteBandAsync(Guid userId, Guid bandId, CancellationToken ct = default)
     {
-        var fb = await repo.GetByAsync<FavoriteBand>(
-            fb => fb.UserId == userId && fb.BandId == bandId, cancellationToken: ct)
-            ?? throw new FavoriteBandNotFoundException(bandId);
+        FavoriteBand fb = await repo.GetByAsync<FavoriteBand>(
+                              fb => fb.UserId == userId && fb.BandId == bandId, cancellationToken: ct)
+                          ?? throw new FavoriteBandNotFoundException(bandId);
 
         repo.Delete(fb);
         await repo.SaveChangesAsync(ct);

@@ -9,9 +9,9 @@ public class DeleteCountry : ICarterModule
         app.MapDelete("/countries/{id:guid}",
                 async (Guid id, ISender sender) =>
                 {
-                    var command = new DeleteCountryCommand(id);
+                    DeleteCountryCommand command = new DeleteCountryCommand(id);
 
-                    var result = await sender.Send(command);
+                    DeleteCountryResult result = await sender.Send(command);
 
                     return Results.Ok(result.Adapt<DeleteCountryResponse>());
                 })

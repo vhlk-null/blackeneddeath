@@ -27,9 +27,9 @@ public class CreateGenreHandlerTests
     [Fact]
     public async Task Handle_ValidCommand_AddsGenreAndReturnsId()
     {
-        var command = new CreateGenreCommand("Death Metal", null);
+        CreateGenreCommand command = new CreateGenreCommand("Death Metal", null);
 
-        var result = await _handler.Handle(command, CancellationToken.None);
+        CreateGenreResult result = await _handler.Handle(command, CancellationToken.None);
 
         result.Id.Should().NotBeEmpty();
         _genresDbSetMock.Verify(x => x.Add(It.IsAny<Genre>()), Times.Once);
@@ -39,10 +39,10 @@ public class CreateGenreHandlerTests
     [Fact]
     public async Task Handle_CommandWithParentGenre_AddsGenreAndReturnsId()
     {
-        var parentId = Guid.NewGuid();
-        var command = new CreateGenreCommand("Old School Death Metal", parentId);
+        Guid parentId = Guid.NewGuid();
+        CreateGenreCommand command = new CreateGenreCommand("Old School Death Metal", parentId);
 
-        var result = await _handler.Handle(command, CancellationToken.None);
+        CreateGenreResult result = await _handler.Handle(command, CancellationToken.None);
 
         result.Id.Should().NotBeEmpty();
         _genresDbSetMock.Verify(x => x.Add(It.IsAny<Genre>()), Times.Once);

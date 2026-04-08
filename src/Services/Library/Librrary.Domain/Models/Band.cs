@@ -30,7 +30,7 @@ public class Band : Aggregate<BandId>
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(activity);
 
-        var band = new Band
+        Band band = new Band
         {
             Id = id ?? BandId.Of(Guid.NewGuid()),
             Name = name,
@@ -90,16 +90,16 @@ public class Band : Aggregate<BandId>
 
     public void UpdateGenrePrimary(GenreId genreId, bool isPrimary)
     {
-        var entry = _bandGenres.FirstOrDefault(x => x.GenreId == genreId)
-            ?? throw new DomainException("Genre is not associated with this band.");
+        BandGenre entry = _bandGenres.FirstOrDefault(x => x.GenreId == genreId)
+                          ?? throw new DomainException("Genre is not associated with this band.");
 
         entry.IsPrimary = isPrimary;
     }
 
     public void RemoveGenre(GenreId genreId)
     {
-        var entry = _bandGenres.FirstOrDefault(x => x.GenreId == genreId)
-            ?? throw new DomainException("Genre is not associated with this band.");
+        BandGenre entry = _bandGenres.FirstOrDefault(x => x.GenreId == genreId)
+                          ?? throw new DomainException("Genre is not associated with this band.");
 
         _bandGenres.Remove(entry);
     }
@@ -115,8 +115,8 @@ public class Band : Aggregate<BandId>
 
     public void RemoveCountry(CountryId countryId)
     {
-        var entry = _bandCountries.FirstOrDefault(x => x.CountryId == countryId)
-            ?? throw new DomainException("Country is not associated with this band.");
+        BandCountry entry = _bandCountries.FirstOrDefault(x => x.CountryId == countryId)
+                            ?? throw new DomainException("Country is not associated with this band.");
 
         _bandCountries.Remove(entry);
     }

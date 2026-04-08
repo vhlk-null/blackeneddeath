@@ -11,9 +11,9 @@ public class UpdateLabel : ICarterModule
         app.MapPut("/labels/{id:guid}",
                 async (Guid id, UpdateLabelRequest request, ISender sender) =>
                 {
-                    var command = request.Adapt<UpdateLabelCommand>() with { Id = id };
+                    UpdateLabelCommand command = request.Adapt<UpdateLabelCommand>() with { Id = id };
 
-                    var result = await sender.Send(command);
+                    UpdateLabelResult result = await sender.Send(command);
 
                     return Results.Ok(result.Adapt<UpdateLabelResponse>());
                 })

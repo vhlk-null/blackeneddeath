@@ -5,8 +5,8 @@ public class DeleteTagCommandHandler(ILibraryDbContext context)
 {
     public async ValueTask<DeleteTagResult> Handle(DeleteTagCommand command, CancellationToken cancellationToken)
     {
-        var tag = await context.Tags.FindAsync([TagId.Of(command.Id)], cancellationToken)
-            ?? throw new TagNotFoundException(command.Id);
+        Tag tag = await context.Tags.FindAsync([TagId.Of(command.Id)], cancellationToken)
+                  ?? throw new TagNotFoundException(command.Id);
 
         context.Tags.Remove(tag);
         await context.SaveChangesAsync(cancellationToken);

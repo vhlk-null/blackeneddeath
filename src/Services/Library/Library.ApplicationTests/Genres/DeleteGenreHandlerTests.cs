@@ -29,13 +29,13 @@ public class DeleteGenreHandlerTests
     [Fact]
     public async Task Handle_ExistingGenre_RemovesGenreAndReturnsSuccess()
     {
-        var genreId = Guid.NewGuid();
-        var genre = Genre.Create(GenreId.Of(genreId), "Death Metal", null);
+        Guid genreId = Guid.NewGuid();
+        Genre genre = Genre.Create(GenreId.Of(genreId), "Death Metal", null);
         _genresDbSetMock
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<Genre?>(genre));
 
-        var result = await _handler.Handle(new DeleteGenreCommand(genreId), CancellationToken.None);
+        DeleteGenreResult result = await _handler.Handle(new DeleteGenreCommand(genreId), CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
         _genresDbSetMock.Verify(x => x.Remove(genre), Times.Once);
@@ -49,7 +49,7 @@ public class DeleteGenreHandlerTests
             .Setup(x => x.FindAsync(It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.FromResult<Genre?>(null));
 
-        var act = async () => await _handler.Handle(
+        Func<Task<DeleteGenreResult>> act = async () => await _handler.Handle(
             new DeleteGenreCommand(Guid.NewGuid()), CancellationToken.None);
 
         await act.Should().ThrowAsync<GenreNotFoundException>();

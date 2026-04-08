@@ -5,8 +5,8 @@ public class DeleteGenreCommandHandler(ILibraryDbContext context)
 {
     public async ValueTask<DeleteGenreResult> Handle(DeleteGenreCommand command, CancellationToken cancellationToken)
     {
-        var genre = await context.Genres.FindAsync([GenreId.Of(command.Id)], cancellationToken)
-            ?? throw new GenreNotFoundException(command.Id);
+        Genre genre = await context.Genres.FindAsync([GenreId.Of(command.Id)], cancellationToken)
+                      ?? throw new GenreNotFoundException(command.Id);
 
         genre.Remove();
         context.Genres.Remove(genre);

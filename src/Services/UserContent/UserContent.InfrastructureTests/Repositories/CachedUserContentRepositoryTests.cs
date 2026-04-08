@@ -66,7 +66,7 @@ public class CachedUserContentRepositoryTests
 
     private void SetupCacheHit<T>(T value) where T : class
     {
-        var bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value, JsonOptions));
+        byte[] bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value, JsonOptions));
         _cacheMock
             .Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(bytes);
@@ -83,8 +83,8 @@ public class CachedUserContentRepositoryTests
     [Fact]
     public async Task GetWithIncludesAsync_UserProfileInfo_CacheMiss_FetchesFromInnerAndCaches()
     {
-        var userId = Guid.NewGuid();
-        var profile = new UserProfileInfo { UserId = userId, Username = "metal_head" };
+        Guid userId = Guid.NewGuid();
+        UserProfileInfo profile = new UserProfileInfo { UserId = userId, Username = "metal_head" };
         SetupCacheMiss();
         SetupCacheSet();
         _innerMock
@@ -94,7 +94,7 @@ public class CachedUserContentRepositoryTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(profile);
 
-        var result = await _sut.GetWithIncludesAsync<UserProfileInfo>(
+        UserProfileInfo? result = await _sut.GetWithIncludesAsync<UserProfileInfo>(
             u => u.UserId == userId,
             q => q,
             CancellationToken.None);
@@ -115,7 +115,7 @@ public class CachedUserContentRepositoryTests
     [Fact]
     public async Task GetWithIncludesAsync_UserProfileInfo_CacheMiss_NullResult_DoesNotWriteToCache()
     {
-        var userId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
         SetupCacheMiss();
         _innerMock
             .Setup(r => r.GetWithIncludesAsync(
@@ -124,7 +124,7 @@ public class CachedUserContentRepositoryTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync((UserProfileInfo?)null);
 
-        var result = await _sut.GetWithIncludesAsync<UserProfileInfo>(
+        UserProfileInfo? result = await _sut.GetWithIncludesAsync<UserProfileInfo>(
             u => u.UserId == userId,
             q => q,
             CancellationToken.None);
@@ -140,11 +140,11 @@ public class CachedUserContentRepositoryTests
     [Fact]
     public async Task GetWithIncludesAsync_UserProfileInfo_CacheHit_ReturnsFromCacheWithoutCallingInner()
     {
-        var userId = Guid.NewGuid();
-        var profile = new UserProfileInfo { UserId = userId, Username = "cached_user" };
+        Guid userId = Guid.NewGuid();
+        UserProfileInfo profile = new UserProfileInfo { UserId = userId, Username = "cached_user" };
         SetupCacheHit(profile);
 
-        var result = await _sut.GetWithIncludesAsync<UserProfileInfo>(
+        UserProfileInfo? result = await _sut.GetWithIncludesAsync<UserProfileInfo>(
             u => u.UserId == userId,
             q => q,
             CancellationToken.None);
@@ -163,7 +163,7 @@ public class CachedUserContentRepositoryTests
     [Fact]
     public async Task GetWithIncludesAsync_NonUserProfileInfoType_DelegatesToInnerWithoutTouchingCache()
     {
-        var album = new Album { Id = Guid.NewGuid(), Title = "Symbolic" };
+        Album album = new Album { Id = Guid.NewGuid(), Title = "Symbolic" };
         _innerMock
             .Setup(r => r.GetWithIncludesAsync(
                 It.IsAny<Expression<Func<Album, bool>>>(),
@@ -171,7 +171,7 @@ public class CachedUserContentRepositoryTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(album);
 
-        var result = await _sut.GetWithIncludesAsync<Album>(
+        Album? result = await _sut.GetWithIncludesAsync<Album>(
             a => a.Id == album.Id,
             q => q,
             CancellationToken.None);
@@ -187,8 +187,8 @@ public class CachedUserContentRepositoryTests
     [Fact]
     public async Task GetWithIncludesAsync_CacheReadThrows_FallsThroughToInner()
     {
-        var userId = Guid.NewGuid();
-        var profile = new UserProfileInfo { UserId = userId, Username = "metal_head" };
+        Guid userId = Guid.NewGuid();
+        UserProfileInfo profile = new UserProfileInfo { UserId = userId, Username = "metal_head" };
         _cacheMock
             .Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("Redis unavailable"));
@@ -200,7 +200,7 @@ public class CachedUserContentRepositoryTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(profile);
 
-        var act = () => _sut.GetWithIncludesAsync<UserProfileInfo>(u => u.UserId == userId, q => q);
+        Func<Task<UserProfileInfo?>> act = () => _sut.GetWithIncludesAsync<UserProfileInfo>(u => u.UserId == userId, q => q);
 
         await act.Should().NotThrowAsync();
         _innerMock.Verify(r => r.GetWithIncludesAsync(
@@ -212,8 +212,8 @@ public class CachedUserContentRepositoryTests
     [Fact]
     public async Task GetWithIncludesAsync_CacheWriteThrows_ReturnsResultWithoutThrowing()
     {
-        var userId = Guid.NewGuid();
-        var profile = new UserProfileInfo { UserId = userId };
+        Guid userId = Guid.NewGuid();
+        UserProfileInfo profile = new UserProfileInfo { UserId = userId };
         SetupCacheMiss();
         _cacheMock
             .Setup(c => c.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(),
@@ -226,7 +226,7 @@ public class CachedUserContentRepositoryTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(profile);
 
-        var result = await _sut.GetWithIncludesAsync<UserProfileInfo>(u => u.UserId == userId, q => q, TestContext.Current.CancellationToken);
+        UserProfileInfo? result = await _sut.GetWithIncludesAsync<UserProfileInfo>(u => u.UserId == userId, q => q, TestContext.Current.CancellationToken);
 
         result.Should().NotBeNull();
         result!.UserId.Should().Be(userId);
@@ -237,9 +237,9 @@ public class CachedUserContentRepositoryTests
     [Fact]
     public async Task AddAsync_EntityWithUserId_CallsInnerAndInvalidatesCache()
     {
-        var userId = Guid.NewGuid();
-        var fa = new FavoriteAlbum { UserId = userId, AlbumId = Guid.NewGuid() };
-        var keys = new RedisKey[] { $"UserContent:{userId}:UserProfileInfo" };
+        Guid userId = Guid.NewGuid();
+        FavoriteAlbum fa = new FavoriteAlbum { UserId = userId, AlbumId = Guid.NewGuid() };
+        RedisKey[] keys = new RedisKey[] { $"UserContent:{userId}:UserProfileInfo" };
         _serverMock
             .Setup(s => s.Keys(It.IsAny<int>(), It.IsAny<RedisValue>(), It.IsAny<int>(),
                 It.IsAny<long>(), It.IsAny<int>(), It.IsAny<CommandFlags>()))
@@ -254,9 +254,9 @@ public class CachedUserContentRepositoryTests
     [Fact]
     public void Delete_EntityWithUserId_CallsInnerAndInvalidatesCache()
     {
-        var userId = Guid.NewGuid();
-        var fb = new FavoriteBand { UserId = userId, BandId = Guid.NewGuid() };
-        var keys = new RedisKey[] { $"UserContent:{userId}:UserProfileInfo" };
+        Guid userId = Guid.NewGuid();
+        FavoriteBand fb = new FavoriteBand { UserId = userId, BandId = Guid.NewGuid() };
+        RedisKey[] keys = new RedisKey[] { $"UserContent:{userId}:UserProfileInfo" };
         _serverMock
             .Setup(s => s.Keys(It.IsAny<int>(), It.IsAny<RedisValue>(), It.IsAny<int>(),
                 It.IsAny<long>(), It.IsAny<int>(), It.IsAny<CommandFlags>()))
@@ -271,10 +271,10 @@ public class CachedUserContentRepositoryTests
     [Fact]
     public async Task AddAsync_CacheInvalidationThrows_DoesNotThrow()
     {
-        var fa = new FavoriteAlbum { UserId = Guid.NewGuid(), AlbumId = Guid.NewGuid() };
+        FavoriteAlbum fa = new FavoriteAlbum { UserId = Guid.NewGuid(), AlbumId = Guid.NewGuid() };
         _redisMock.Setup(r => r.GetServers()).Throws(new Exception("Redis unavailable"));
 
-        var act = () => _sut.AddAsync(fa);
+        Func<Task> act = () => _sut.AddAsync(fa);
 
         await act.Should().NotThrowAsync();
         _innerMock.Verify(r => r.AddAsync(fa, It.IsAny<CancellationToken>()), Times.Once);
@@ -287,7 +287,7 @@ public class CachedUserContentRepositoryTests
     {
         _innerMock.Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(3);
 
-        var result = await _sut.SaveChangesAsync(TestContext.Current.CancellationToken);
+        int result = await _sut.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         result.Should().Be(3);
         _redisMock.Verify(r => r.GetServers(), Times.Never);
@@ -296,14 +296,14 @@ public class CachedUserContentRepositoryTests
     [Fact]
     public async Task SaveChangesAsync_WithModifiedAlbum_InvalidatesAllUserProfileCaches()
     {
-        var album = new Album { Id = Guid.NewGuid(), Title = "Symbolic" };
+        Album album = new Album { Id = Guid.NewGuid(), Title = "Symbolic" };
         await _context.Albums.AddAsync(album, TestContext.Current.CancellationToken);
         await _context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         album.Title = "Symbolic (Updated)";
         _context.ChangeTracker.DetectChanges();
 
-        var keys = new RedisKey[] { "UserContent:user1:UserProfileInfo" };
+        RedisKey[] keys = new RedisKey[] { "UserContent:user1:UserProfileInfo" };
         _serverMock
             .Setup(s => s.Keys(It.IsAny<int>(), It.IsAny<RedisValue>(), It.IsAny<int>(),
                 It.IsAny<long>(), It.IsAny<int>(), It.IsAny<CommandFlags>()))

@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore.Query;
+
 namespace Library.Application.Services.Albums.Queries.GetAlbums;
 
 public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver)
@@ -5,21 +7,21 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
 {
     public async ValueTask<GetAlbumsResult> Handle(GetAlbumsQuery query, CancellationToken cancellationToken)
     {
-        var pageIndex = query.PaginationRequest.PageIndex;
-        var pageSize = query.PaginationRequest.PageSize;
+        int pageIndex = query.PaginationRequest.PageIndex;
+        int pageSize = query.PaginationRequest.PageSize;
 
-        var filteredQuery = context.Albums.AsNoTracking();
+        IQueryable<Album> filteredQuery = context.Albums.AsNoTracking();
 
         if (query.Filter is not null)
             filteredQuery = filteredQuery.Where(query.Filter.Criteria);
 
-        var totalCount = await filteredQuery.LongCountAsync(cancellationToken);
+        long totalCount = await filteredQuery.LongCountAsync(cancellationToken);
 
-        var albumsQuery = filteredQuery
+        IIncludableQueryable<Album, IReadOnlyList<AlbumGenre>> albumsQuery = filteredQuery
             .Include(a => a.AlbumBands)
             .Include(a => a.AlbumGenres);
 
-        var sorted = query.SortBy switch
+        IOrderedQueryable<Album> sorted = query.SortBy switch
         {
             AlbumSortBy.Oldest      => albumsQuery.OrderBy(a => a.CreatedAt),
             AlbumSortBy.ReleaseDate => albumsQuery.OrderByDescending(a => a.AlbumRelease.ReleaseYear),
@@ -27,30 +29,30 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
             _                       => albumsQuery.OrderByDescending(a => a.CreatedAt)
         };
 
-        var albums = await sorted
+        List<Album> albums = await sorted
             .Skip(pageSize * pageIndex)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        var bandIds  = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
-        var genreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)).Distinct().ToList();
+        List<BandId> bandIds  = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
+        List<GenreId> genreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)).Distinct().ToList();
 
-        var bands = await context.Bands.AsNoTracking()
+        Dictionary<BandId, Band> bands = await context.Bands.AsNoTracking()
             .Include(b => b.BandCountries)
             .Where(b => bandIds.Contains(b.Id))
             .ToDictionaryAsync(b => b.Id, cancellationToken);
 
-        var genres = await context.Genres.AsNoTracking()
+        Dictionary<GenreId, Genre> genres = await context.Genres.AsNoTracking()
             .Where(g => genreIds.Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, cancellationToken);
 
-        var countryIds = bands.Values.SelectMany(b => b.BandCountries.Select(bc => bc.CountryId)).Distinct().ToList();
+        List<CountryId> countryIds = bands.Values.SelectMany(b => b.BandCountries.Select(bc => bc.CountryId)).Distinct().ToList();
 
-        var countries = await context.Countries.AsNoTracking()
+        Dictionary<CountryId, Country> countries = await context.Countries.AsNoTracking()
             .Where(c => countryIds.Contains(c.Id))
             .ToDictionaryAsync(c => c.Id, cancellationToken);
 
-        var albumDtos = albums.Select(a => new AlbumCardDto(
+        List<AlbumCardDto> albumDtos = albums.Select(a => new AlbumCardDto(
             a.Id.Value,
             a.Title,
             a.Slug,

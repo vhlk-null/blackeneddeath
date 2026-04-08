@@ -19,42 +19,42 @@ public class CountryEndpointsTests(LibraryWebAppFactory factory) : IClassFixture
     [Fact]
     public async Task CreateCountry_ValidRequest_Returns201WithId()
     {
-        var countryId = Guid.NewGuid();
+        Guid countryId = Guid.NewGuid();
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<CreateCountryCommand>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<CreateCountryResult>(new CreateCountryResult(countryId)));
 
-        var response = await _client.PostAsJsonAsync("/countries", new { Name = "Norway", Code = "NO" });
+        HttpResponseMessage response = await _client.PostAsJsonAsync("/countries", new { Name = "Norway", Code = "NO" });
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var body = await response.Content.ReadFromJsonAsync<CreateCountryResponse>();
+        CreateCountryResponse? body = await response.Content.ReadFromJsonAsync<CreateCountryResponse>();
         body!.Id.Should().Be(countryId);
     }
 
     [Fact]
     public async Task DeleteCountry_ValidId_Returns200WithSuccess()
     {
-        var countryId = Guid.NewGuid();
+        Guid countryId = Guid.NewGuid();
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<DeleteCountryCommand>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<DeleteCountryResult>(new DeleteCountryResult(true)));
 
-        var response = await _client.DeleteAsync($"/countries/{countryId}");
+        HttpResponseMessage response = await _client.DeleteAsync($"/countries/{countryId}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var body = await response.Content.ReadFromJsonAsync<DeleteCountryResponse>();
+        DeleteCountryResponse? body = await response.Content.ReadFromJsonAsync<DeleteCountryResponse>();
         body!.IsSuccess.Should().BeTrue();
     }
 
     [Fact]
     public async Task GetCountries_Returns200WithList()
     {
-        var appResult = new GetCountriesResult([]);
+        GetCountriesResult appResult = new GetCountriesResult([]);
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<GetCountriesQuery>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<GetCountriesResult>(appResult));
 
-        var response = await _client.GetAsync("/countries");
+        HttpResponseMessage response = await _client.GetAsync("/countries");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }

@@ -30,22 +30,22 @@ public class UserContentWebAppFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
-            var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IUserContentService));
+            ServiceDescriptor? descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IUserContentService));
             if (descriptor != null)
                 services.Remove(descriptor);
             services.AddSingleton(ServiceMock.Object);
 
             // Remove MassTransit hosted services to prevent RabbitMQ connection attempts
-            var hostedServiceDescriptors = services
+            List<ServiceDescriptor> hostedServiceDescriptors = services
                 .Where(d => d.ServiceType == typeof(IHostedService) &&
                             d.ImplementationType?.FullName?.Contains("MassTransit") == true)
                 .ToList();
-            foreach (var d in hostedServiceDescriptors)
+            foreach (ServiceDescriptor d in hostedServiceDescriptors)
                 services.Remove(d);
 
             // Replace IPublishEndpoint with a mock so MassTransit DI is satisfied
-            var publishDescriptors = services.Where(d => d.ServiceType == typeof(IPublishEndpoint)).ToList();
-            foreach (var d in publishDescriptors)
+            List<ServiceDescriptor> publishDescriptors = services.Where(d => d.ServiceType == typeof(IPublishEndpoint)).ToList();
+            foreach (ServiceDescriptor d in publishDescriptors)
                 services.Remove(d);
             services.AddSingleton(new Mock<IPublishEndpoint>().Object);
         });

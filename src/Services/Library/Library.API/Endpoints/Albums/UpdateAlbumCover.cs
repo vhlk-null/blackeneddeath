@@ -14,17 +14,17 @@ public class UpdateAlbumCover : ICarterModule
         app.MapPut("/albums/{id:guid}/cover",
                 async (Guid id, [FromForm] UpdateAlbumCoverRequest request, ISender sender) =>
                 {
-                    var coverImageStream = new MemoryStream();
+                    MemoryStream coverImageStream = new MemoryStream();
                     await request.CoverImage.CopyToAsync(coverImageStream);
                     coverImageStream.Position = 0;
 
-                    var command = new UpdateAlbumCoverCommand(
+                    UpdateAlbumCoverCommand command = new UpdateAlbumCoverCommand(
                         id,
                         coverImageStream,
                         request.CoverImage.ContentType,
                         request.CoverImage.FileName);
 
-                    var result = await sender.Send(command);
+                    UpdateAlbumCoverResult result = await sender.Send(command);
 
                     return Results.Ok(result.Adapt<UpdateAlbumCoverResponse>());
                 })
@@ -35,6 +35,9 @@ public class UpdateAlbumCover : ICarterModule
             .WithSummary("Update Album Cover")
             .WithDescription("Upload or replace the cover image for an album")
             .WithTags("Albums")
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

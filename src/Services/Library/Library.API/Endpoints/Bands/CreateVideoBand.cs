@@ -10,9 +10,9 @@ public class CreateVideoBand : ICarterModule
         app.MapPost("/bands/{bandId:guid}/videos",
                 async ([FromRoute] Guid bandId, [FromBody] CreateVideoBandDto body, ISender sender) =>
                 {
-                    var dto = body with { BandId = bandId };
-                    var command = new CreateVideoBandCommand(dto);
-                    var result = await sender.Send(command);
+                    CreateVideoBandDto dto = body with { BandId = bandId };
+                    CreateVideoBandCommand command = new CreateVideoBandCommand(dto);
+                    CreateVideoBandResult result = await sender.Send(command);
                     return Results.Created($"/bands/{bandId}/videos/{result.Id}", result.Adapt<CreateVideoBandResponse>());
                 })
             .WithName("CreateVideoBand")

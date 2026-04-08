@@ -5,12 +5,12 @@ public class GetCountriesQueryHandler(ILibraryDbContext context)
 {
     public async ValueTask<GetCountriesResult> Handle(GetCountriesQuery query, CancellationToken cancellationToken)
     {
-        var countries = await context.Countries
+        List<Country> countries = await context.Countries
             .AsNoTracking()
             .OrderBy(c => c.Name)
             .ToListAsync(cancellationToken);
 
-        var countryDtos = countries.Select(c => c.ToCountryDto()).ToList();
+        List<CountryDto> countryDtos = countries.Select(c => c.ToCountryDto()).ToList();
 
         return new GetCountriesResult(countryDtos);
     }

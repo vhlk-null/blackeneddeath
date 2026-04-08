@@ -8,8 +8,8 @@ public class DeleteBandCommandHandler(ILibraryDbContext context, IStorageService
         DeleteBandCommand command,
         CancellationToken cancellationToken)
     {
-        var band = await context.Bands.FindAsync([BandId.Of(command.Id)], cancellationToken)
-            ?? throw new BandNotFoundException(command.Id);
+        Band band = await context.Bands.FindAsync([BandId.Of(command.Id)], cancellationToken)
+                    ?? throw new BandNotFoundException(command.Id);
 
         if (band.LogoUrl is not null)
             await storage.DeleteFileAsync(band.LogoUrl, cancellationToken);

@@ -14,17 +14,17 @@ public class UpdateGenreCardCover : ICarterModule
         app.MapPut("/genre-cards/{id:guid}/cover",
                 async (Guid id, [FromForm] UpdateGenreCardCoverRequest request, ISender sender) =>
                 {
-                    var coverImageStream = new MemoryStream();
+                    MemoryStream coverImageStream = new MemoryStream();
                     await request.CoverImage.CopyToAsync(coverImageStream);
                     coverImageStream.Position = 0;
 
-                    var command = new UpdateGenreCardCoverCommand(
+                    UpdateGenreCardCoverCommand command = new UpdateGenreCardCoverCommand(
                         id,
                         coverImageStream,
                         request.CoverImage.ContentType,
                         request.CoverImage.FileName);
 
-                    var result = await sender.Send(command);
+                    UpdateGenreCardCoverResult result = await sender.Send(command);
 
                     return Results.Ok(result.Adapt<UpdateGenreCardCoverResponse>());
                 })

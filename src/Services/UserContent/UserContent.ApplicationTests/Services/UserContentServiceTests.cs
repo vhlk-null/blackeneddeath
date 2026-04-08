@@ -4,6 +4,7 @@ using BuildingBlocks.Repositories;
 using FluentAssertions;
 using Moq;
 using UserContent.Application.Abstractions;
+using UserContent.Application.Dtos;
 using UserContent.Application.Exceptions;
 using UserContent.Application.Mappings;
 using UserContent.Application.Services;
@@ -32,15 +33,15 @@ public class UserContentServiceTests
     [Fact]
     public async Task GetUserProfileAsync_ProfileExists_ReturnsMappedDto()
     {
-        var userId = Guid.NewGuid();
-        var profile = new UserProfileInfo { UserId = userId, Username = "metal_head", Email = "user@example.com", RegisteredDate = DateTime.UtcNow };
+        Guid userId = Guid.NewGuid();
+        UserProfileInfo profile = new UserProfileInfo { UserId = userId, Username = "metal_head", Email = "user@example.com", RegisteredDate = DateTime.UtcNow };
         _repoMock.Setup(x => x.GetWithIncludesAsync<UserProfileInfo>(
                 It.IsAny<Expression<Func<UserProfileInfo, bool>>>(),
                 It.IsAny<Func<IQueryable<UserProfileInfo>, IQueryable<UserProfileInfo>>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(profile);
 
-        var result = await _sut.GetUserProfileAsync(userId, TestContext.Current.CancellationToken);
+        UserProfileDto result = await _sut.GetUserProfileAsync(userId, TestContext.Current.CancellationToken);
 
         result.UserId.Should().Be(userId);
         result.Username.Should().Be("metal_head");
@@ -65,13 +66,13 @@ public class UserContentServiceTests
     [Fact]
     public async Task AddFavoriteAlbumAsync_AlbumExistsLocally_DoesNotCallLibraryAndReturnsUserId()
     {
-        var userId = Guid.NewGuid();
-        var albumId = Guid.NewGuid();
-        var album = new Album { Id = albumId, Title = "Symbolic" };
+        Guid userId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        Album album = new Album { Id = albumId, Title = "Symbolic" };
         _repoMock.Setup(x => x.GetByAsync<Album>(It.IsAny<Expression<Func<Album, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(album);
 
-        var result = await _sut.AddFavoriteAlbumAsync(userId, albumId, TestContext.Current.CancellationToken);
+        Guid result = await _sut.AddFavoriteAlbumAsync(userId, albumId, TestContext.Current.CancellationToken);
 
         result.Should().Be(userId);
         _libraryMock.Verify(x => x.GetAlbumByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -81,15 +82,15 @@ public class UserContentServiceTests
     [Fact]
     public async Task AddFavoriteAlbumAsync_AlbumNotLocalButFoundInLibrary_FetchesThenAddsAndReturnsUserId()
     {
-        var userId = Guid.NewGuid();
-        var albumId = Guid.NewGuid();
-        var album = new Album { Id = albumId, Title = "Symbolic" };
+        Guid userId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        Album album = new Album { Id = albumId, Title = "Symbolic" };
         _repoMock.Setup(x => x.GetByAsync<Album>(It.IsAny<Expression<Func<Album, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Album?)null);
         _libraryMock.Setup(x => x.GetAlbumByIdAsync(albumId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(album);
 
-        var result = await _sut.AddFavoriteAlbumAsync(userId, albumId, TestContext.Current.CancellationToken);
+        Guid result = await _sut.AddFavoriteAlbumAsync(userId, albumId, TestContext.Current.CancellationToken);
 
         result.Should().Be(userId);
         _repoMock.Verify(x => x.AddAsync(album, It.IsAny<CancellationToken>()), Times.Once);
@@ -99,7 +100,7 @@ public class UserContentServiceTests
     [Fact]
     public async Task AddFavoriteAlbumAsync_AlbumNotFoundAnywhere_ThrowsNotFoundException()
     {
-        var albumId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
         _repoMock.Setup(x => x.GetByAsync<Album>(It.IsAny<Expression<Func<Album, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Album?)null);
         _libraryMock.Setup(x => x.GetAlbumByIdAsync(albumId, It.IsAny<CancellationToken>()))
@@ -114,9 +115,9 @@ public class UserContentServiceTests
     [Fact]
     public async Task DeleteFavoriteAlbumAsync_FavoriteExists_RemovesAndSaves()
     {
-        var userId = Guid.NewGuid();
-        var albumId = Guid.NewGuid();
-        var fa = new FavoriteAlbum { UserId = userId, AlbumId = albumId };
+        Guid userId = Guid.NewGuid();
+        Guid albumId = Guid.NewGuid();
+        FavoriteAlbum fa = new FavoriteAlbum { UserId = userId, AlbumId = albumId };
         _repoMock.Setup(x => x.GetByAsync<FavoriteAlbum>(It.IsAny<Expression<Func<FavoriteAlbum, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(fa);
 
@@ -141,10 +142,10 @@ public class UserContentServiceTests
     [Fact]
     public async Task AddFavoriteBandAsync_AddsAndReturnsUserId()
     {
-        var userId = Guid.NewGuid();
-        var bandId = Guid.NewGuid();
+        Guid userId = Guid.NewGuid();
+        Guid bandId = Guid.NewGuid();
 
-        var result = await _sut.AddFavoriteBandAsync(userId, bandId, TestContext.Current.CancellationToken);
+        Guid result = await _sut.AddFavoriteBandAsync(userId, bandId, TestContext.Current.CancellationToken);
 
         result.Should().Be(userId);
         _repoMock.Verify(x => x.AddAsync(
@@ -158,9 +159,9 @@ public class UserContentServiceTests
     [Fact]
     public async Task DeleteFavoriteBandAsync_FavoriteExists_RemovesAndSaves()
     {
-        var userId = Guid.NewGuid();
-        var bandId = Guid.NewGuid();
-        var fb = new FavoriteBand { UserId = userId, BandId = bandId };
+        Guid userId = Guid.NewGuid();
+        Guid bandId = Guid.NewGuid();
+        FavoriteBand fb = new FavoriteBand { UserId = userId, BandId = bandId };
         _repoMock.Setup(x => x.GetByAsync<FavoriteBand>(It.IsAny<Expression<Func<FavoriteBand, bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(fb);
 

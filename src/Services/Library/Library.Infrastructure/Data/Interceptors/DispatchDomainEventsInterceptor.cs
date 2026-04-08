@@ -19,15 +19,15 @@ internal class DispatchDomainEventsInterceptor(IMediator mediator) : SaveChanges
     {
         if (context == null) return;
 
-        var aggregates = context.ChangeTracker.Entries<IAggregate>()
+        IEnumerable<IAggregate> aggregates = context.ChangeTracker.Entries<IAggregate>()
             .Where(a => a.Entity.DomainEvents.Any())
             .Select(a => a.Entity);
 
-        var domainEvents = aggregates.SelectMany(a => a.DomainEvents).ToList();
+        List<IDomainEvent> domainEvents = aggregates.SelectMany(a => a.DomainEvents).ToList();
 
         aggregates.ToList().ForEach(a => a.ClearDomainEvents());
 
-        foreach (var domainEvent in domainEvents)
+        foreach (IDomainEvent domainEvent in domainEvents)
             await mediator.Publish(domainEvent);
     }
 }

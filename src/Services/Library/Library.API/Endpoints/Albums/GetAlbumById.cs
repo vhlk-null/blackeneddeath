@@ -8,9 +8,9 @@ public class GetAlbumById : ICarterModule
     {
         app.MapGet("/albums/{id:guid}", async (Guid id, ISender sender) =>
             {
-                var query = new GetAlbumByIdQuery(id);
-                var result = await sender.Send(query);
-                var response = result.Adapt<GetAlbumByIdResponse>();
+                GetAlbumByIdQuery query = new GetAlbumByIdQuery(id);
+                GetAlbumByIdResult result = await sender.Send(query);
+                GetAlbumByIdResponse response = result.Adapt<GetAlbumByIdResponse>();
                 return Results.Ok(response);
             })
             .WithName("GetAlbumById")

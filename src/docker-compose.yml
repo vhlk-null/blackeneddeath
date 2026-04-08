@@ -49,3 +49,4 @@ volumes:
   postgres_usercontent:
   postgres_identity:
   rabbitmq_data:
+  identity_dataprotection:

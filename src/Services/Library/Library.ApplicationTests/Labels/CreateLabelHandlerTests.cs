@@ -29,9 +29,9 @@ public class CreateLabelHandlerTests
     [Fact]
     public async Task Handle_ValidCommand_AddsLabelAndReturnsId()
     {
-        var command = new CreateLabelCommand("Nuclear Blast");
+        CreateLabelCommand command = new CreateLabelCommand("Nuclear Blast");
 
-        var result = await _handler.Handle(command, CancellationToken.None);
+        CreateLabelResult result = await _handler.Handle(command, CancellationToken.None);
 
         result.Id.Should().NotBeEmpty();
         _labelsDbSetMock.Verify(x => x.Add(It.IsAny<Label>()), Times.Once);
@@ -41,7 +41,7 @@ public class CreateLabelHandlerTests
     [Fact]
     public async Task Handle_ValidCommand_CreatesLabelWithCorrectName()
     {
-        var command = new CreateLabelCommand("Peaceville Records");
+        CreateLabelCommand command = new CreateLabelCommand("Peaceville Records");
 
         await _handler.Handle(command, CancellationToken.None);
 

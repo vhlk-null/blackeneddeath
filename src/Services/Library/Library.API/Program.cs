@@ -1,4 +1,4 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddApplicationServices()
@@ -7,10 +7,9 @@ builder.Services
 
 MappingConfig.RegisterMappings();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseApiServices();
-app.UseRouting();
 
 await app.InitializeDatabaseAsync();
 

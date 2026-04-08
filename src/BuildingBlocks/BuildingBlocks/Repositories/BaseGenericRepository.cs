@@ -25,7 +25,7 @@ public abstract class BaseGenericRepository<TContext> : IRepository<TContext> wh
     {
         IQueryable<T> query = Context.Set<T>().AsNoTracking();
 
-        foreach (var include in includes)
+        foreach (Expression<Func<T, object>> include in includes)
             query = query.Include(include);
 
         return await query.FirstOrDefaultAsync(filter, cancellationToken);
@@ -33,7 +33,7 @@ public abstract class BaseGenericRepository<TContext> : IRepository<TContext> wh
 
     public async Task<T?> GetWithIncludesAsync<T>(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IQueryable<T>> includeBuilder, CancellationToken cancellationToken = default) where T : class
     {
-        var query = includeBuilder(Context.Set<T>().AsNoTracking());
+        IQueryable<T> query = includeBuilder(Context.Set<T>().AsNoTracking());
         return await query.FirstOrDefaultAsync(filter, cancellationToken);
     }
 
@@ -65,7 +65,7 @@ public abstract class BaseGenericRepository<TContext> : IRepository<TContext> wh
     {
         IQueryable<T> set = Context.Set<T>();
 
-        foreach (var include in includeExpressions)
+        foreach (Expression<Func<T, object>> include in includeExpressions)
         {
             set = set.Include(include);
         }
@@ -105,9 +105,9 @@ public abstract class BaseGenericRepository<TContext> : IRepository<TContext> wh
 
     public void DeleteRange<T>(IEnumerable<T> entities) where T : class
     {
-        var enumerableEntities = entities as IList<T> ?? entities.ToList();
+        IList<T> enumerableEntities = entities as IList<T> ?? entities.ToList();
 
-        foreach (var entity in enumerableEntities)
+        foreach (T entity in enumerableEntities)
         {
             if (Context.Entry(entity).State == EntityState.Detached)
             {
@@ -120,7 +120,7 @@ public abstract class BaseGenericRepository<TContext> : IRepository<TContext> wh
 
     public async Task DeleteAsync<T>(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default) where T : class
     {
-        var entities = await Context.Set<T>().Where(expression).ToListAsync(cancellationToken);
+        List<T> entities = await Context.Set<T>().Where(expression).ToListAsync(cancellationToken);
         DeleteRange(entities);
     }
 
