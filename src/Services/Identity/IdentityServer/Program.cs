@@ -64,7 +64,6 @@ app.UseIdentityServer();
 app.UseAuthorization();
 app.MapRazorPages();
 
-if (app.Environment.IsDevelopment())
-    await app.InitializeDatabaseAsync();
+await app.InitializeDatabaseAsync();
 
 app.Run();
