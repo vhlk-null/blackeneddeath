@@ -58,7 +58,7 @@
             {
                 SubjectId = "1",
                 Username = "alice",
-                Password = "alice",
+                Password = "Alice@7392!",
                 Claims =
                 [
                     new(JwtClaimTypes.Name, "Alice Smith"),
@@ -71,7 +71,7 @@
             {
                 SubjectId = "2",
                 Username = "bob",
-                Password = "bob",
+                Password = "Bob#5814@",
                 Claims =
                 [
                     new(JwtClaimTypes.Name, "Bob Jones"),

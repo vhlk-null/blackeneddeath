@@ -71,11 +71,11 @@ public class AlbumEndpointsTests(LibraryWebAppFactory factory) : IClassFixture<L
     [Fact]
     public async Task GetAlbums_Returns200WithPaginatedResult()
     {
-        GetAlbumsResult appResult = new Library.Application.Services.Albums.Queries.GetAlbums.GetAlbumsResult(
+        GetAlbumsResult appResult = new GetAlbumsResult(
             new PaginatedResult<AlbumDto>(0, 10, 0, []));
         factory.SenderMock
             .Setup(s => s.Send(It.IsAny<GetAlbumsQuery>(), It.IsAny<CancellationToken>()))
-            .Returns(new ValueTask<Library.Application.Services.Albums.Queries.GetAlbums.GetAlbumsResult>(appResult));
+            .Returns(new ValueTask<GetAlbumsResult>(appResult));
 
         HttpResponseMessage response = await _client.GetAsync("/albums?pageIndex=0&pageSize=10");
 

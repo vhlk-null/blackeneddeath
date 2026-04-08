@@ -1,8 +1,11 @@
+using IdentityServer.Data;
+using Microsoft.AspNetCore.Identity;
+
 namespace IdentityServer.Pages.Account;
 
 public class LoginModel(
     IIdentityServerInteractionService interaction,
-    TestUserStore users) : PageModel
+    SignInManager<ApplicationUser> signInManager) : PageModel
 {
     [BindProperty(SupportsGet = true)]
     public string? ReturnUrl { get; set; }
@@ -30,36 +33,14 @@ public class LoginModel(
         if (!ModelState.IsValid)
             return Page();
 
-        if (!users.ValidateCredentials(Username, Password))
+        Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(
+            Username, Password, RememberMe, lockoutOnFailure: false);
+
+        if (!result.Succeeded)
         {
             ErrorMessage = "Invalid username or password.";
             return Page();
         }
-
-        TestUser user = users.FindByUsername(Username)!;
-
-        List<Claim> claims = new List<Claim>
-        {
-            new(JwtClaimTypes.Subject, user.SubjectId),
-            new(JwtClaimTypes.Name, user.Username)
-        };
-        claims.AddRange(user.Claims.Select(c => new Claim(c.Type, c.Value)));
-
-        ClaimsPrincipal principal = new ClaimsPrincipal(new ClaimsIdentity(
-            claims,
-            IdentityServerConstants.DefaultCookieAuthenticationScheme));
-
-        AuthenticationProperties props = new AuthenticationProperties();
-        if (RememberMe)
-        {
-            props.IsPersistent = true;
-            props.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30);
-        }
-
-        await HttpContext.SignInAsync(
-            Duende.IdentityServer.IdentityServerConstants.DefaultCookieAuthenticationScheme,
-            principal,
-            props);
 
         if (context != null || Url.IsLocalUrl(ReturnUrl))
             return Redirect(ReturnUrl ?? "/");

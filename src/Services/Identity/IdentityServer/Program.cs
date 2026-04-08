@@ -1,16 +1,29 @@
+using IdentityServer.Data;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 Config config = new Config(builder.Configuration);
 string? issuerUri = builder.Configuration["IdentityServer:IssuerUri"];
+string? connectionString = builder.Configuration.GetConnectionString("IdentityDb");
+string? migrationsAssembly = typeof(Program).Assembly.GetName().Name;
 
 builder.Services.AddRazorPages();
 
-string? migrationsAssembly = typeof(Program).Assembly.GetName().Name;
-string? connectionString = builder.Configuration.GetConnectionString("IdentityDb");
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
+    .SetApplicationName("IdentityServer");
 
-builder.Services.AddIdentityServer(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(opt =>
+    opt.UseNpgsql(connectionString));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+IIdentityServerBuilder identityServerBuilder = builder.Services.AddIdentityServer(options =>
     {
         if (!string.IsNullOrEmpty(issuerUri))
             options.IssuerUri = issuerUri;
@@ -18,19 +31,20 @@ builder.Services.AddIdentityServer(options =>
         options.UserInteraction.LoginUrl = "/Account/Login";
         options.UserInteraction.LogoutUrl = "/Account/Logout";
     })
-    //.AddInMemoryClients(config.Clients)
-    //.AddInMemoryApiScopes(config.ApiScopes)
-    //.AddInMemoryApiResources(config.ApiResources)
-    //.AddInMemoryIdentityResources(config.IdentityResources)
     .AddConfigurationStore(opt =>
     {
         opt.ConfigureDbContext = b => b.UseNpgsql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
-    }).AddOperationalStore(opt =>
+    })
+    .AddOperationalStore(opt =>
     {
         opt.ConfigureDbContext = b => b.UseNpgsql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
     })
-    .AddTestUsers(config.TestUsers)
-    .AddDeveloperSigningCredential(persistKey: false);
+    .AddAspNetIdentity<ApplicationUser>();
+
+if (builder.Environment.IsDevelopment())
+    identityServerBuilder.AddDeveloperSigningCredential(persistKey: false);
+else
+    throw new InvalidOperationException("Production signing credential is not configured. Add a signing certificate before deploying.");
 
 if (!builder.Environment.IsDevelopment())
 {

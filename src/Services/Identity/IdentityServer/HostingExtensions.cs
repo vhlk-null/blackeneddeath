@@ -1,5 +1,7 @@
 using Duende.IdentityServer.EntityFramework.DbContexts;
 using Duende.IdentityServer.EntityFramework.Mappers;
+using IdentityServer.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentityServer;
@@ -9,6 +11,10 @@ public static class HostingExtensions
     public static async Task InitializeDatabaseAsync(this WebApplication app)
     {
         using IServiceScope scope = app.Services.CreateScope();
+
+        await scope.ServiceProvider
+            .GetRequiredService<ApplicationDbContext>()
+            .Database.MigrateAsync();
 
         await scope.ServiceProvider
             .GetRequiredService<PersistedGrantDbContext>()
@@ -29,8 +35,8 @@ public static class HostingExtensions
 
         if (!configContext.ApiScopes.Any())
         {
-            foreach (Duende.IdentityServer.Models.ApiScope scope2 in config.ApiScopes)
-                configContext.ApiScopes.Add(scope2.ToEntity());
+            foreach (Duende.IdentityServer.Models.ApiScope apiScope in config.ApiScopes)
+                configContext.ApiScopes.Add(apiScope.ToEntity());
         }
 
         if (!configContext.ApiResources.Any())
@@ -46,5 +52,27 @@ public static class HostingExtensions
         }
 
         await configContext.SaveChangesAsync();
+
+        await SeedUsersAsync(scope.ServiceProvider, config);
+    }
+
+    private static async Task SeedUsersAsync(IServiceProvider services, Config config)
+    {
+        UserManager<ApplicationUser> userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+        foreach (Duende.IdentityServer.Test.TestUser testUser in config.TestUsers)
+        {
+            if (await userManager.FindByNameAsync(testUser.Username) is not null)
+                continue;
+
+            ApplicationUser user = new()
+            {
+                UserName = testUser.Username,
+                Email = testUser.Claims.FirstOrDefault(c => c.Type == "email")?.Value
+            };
+
+            await userManager.CreateAsync(user, testUser.Password);
+            await userManager.AddClaimsAsync(user, testUser.Claims);
+        }
     }
 }
