@@ -1,5 +1,6 @@
 using IdentityServer.Data;
 using Microsoft.AspNetCore.DataProtection;
+using Npgsql;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,22 +11,14 @@ string? issuerUri = builder.Configuration["IdentityServer:IssuerUri"];
 string? migrationsAssembly = typeof(Program).Assembly.GetName().Name;
 
 string rawConnectionString = builder.Configuration.GetConnectionString("IdentityDb")
-    ?? Environment.GetEnvironmentVariable("DATABASE_URL")
     ?? throw new InvalidOperationException("IdentityDb connection string is not configured.");
 
-Console.WriteLine($"[DEBUG] Raw ConnectionString: {rawConnectionString}");
-
-string connectionString = ConvertConnectionString(rawConnectionString);
-
-static string ConvertConnectionString(string value)
+var csBuilder = new NpgsqlConnectionStringBuilder(rawConnectionString)
 {
-    if (!value.StartsWith("postgresql://") && !value.StartsWith("postgres://"))
-        return value;
+    GssEncryptionMode = GssEncryptionMode.Disable
+};
 
-    var uri = new Uri(value);
-    var userInfo = uri.UserInfo.Split(':', 2);
-    return $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};Trust Server Certificate=true";
-}
+string connectionString = csBuilder.ConnectionString;
 
 builder.Services.AddRazorPages();
 
