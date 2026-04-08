@@ -1,4 +1,5 @@
 using IdentityServer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,15 @@ builder.Services.AddIdentityServer(options =>
     .AddInMemoryIdentityResources(config.IdentityResources)
     .AddTestUsers(config.TestUsers)
     .AddDeveloperSigningCredential(persistKey: false);
+
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.Configure<CookieAuthenticationOptions>(IdentityServerConstants.DefaultCookieAuthenticationScheme, options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
+}
 
 var app = builder.Build();
 

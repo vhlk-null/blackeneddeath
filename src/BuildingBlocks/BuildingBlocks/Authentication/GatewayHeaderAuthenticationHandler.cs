@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
@@ -14,10 +15,19 @@ public class GatewayHeaderAuthenticationHandler(
     UrlEncoder encoder)
     : AuthenticationHandler<GatewayHeaderAuthenticationOptions>(options, logger, encoder)
 {
+    protected override Task HandleChallengeAsync(AuthenticationProperties properties)
+    {
+        Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    }
+
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (!Request.Headers.TryGetValue("X-User-Id", out var userId))
-            return Task.FromResult(AuthenticateResult.Fail("Missing X-User-Id header"));
+        {
+            Logger.LogDebug("GatewayHeader: Missing X-User-Id header — treating as anonymous");
+            return Task.FromResult(AuthenticateResult.NoResult());
+        }
 
         var claims = new List<Claim>
         {

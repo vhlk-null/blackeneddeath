@@ -1,5 +1,9 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,13 +13,45 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = builder.Configuration["IdentityServer:Authority"];
+        var authority = builder.Configuration["IdentityServer:Authority"]!;
+        var jwksUri = builder.Configuration["IdentityServer:JwksUri"];
         options.RequireHttpsMetadata = false;
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new()
         {
             ValidateAudience = false,
-            ValidateIssuer = false
+            ValidateIssuer = false,
+            ValidateIssuerSigningKey = true
         };
+
+        var metadataAddress = $"{authority}/.well-known/openid-configuration";
+        var httpHandler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        };
+        var retriever = new HttpDocumentRetriever(new HttpClient(httpHandler)) { RequireHttps = false };
+
+        if (jwksUri is not null)
+        {
+            // Завантажуємо metadata але підміняємо jwks_uri на внутрішній Docker URI
+            options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                metadataAddress,
+                new OpenIdConnectConfigurationRetriever(),
+                retriever);
+
+            options.TokenValidationParameters.IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
+            {
+                var jwks = new HttpClient(httpHandler).GetStringAsync(jwksUri).GetAwaiter().GetResult();
+                var keySet = new Microsoft.IdentityModel.Tokens.JsonWebKeySet(jwks);
+                return keySet.GetSigningKeys();
+            };
+        }
+        else
+        {
+            options.Authority = authority;
+            options.MetadataAddress = metadataAddress;
+            options.BackchannelHttpHandler = httpHandler;
+        }
     });
 
 builder.Services.AddAuthorization(options =>
@@ -27,11 +63,15 @@ builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
     .AddTransforms(context =>
     {
-        context.AddRequestTransform(transformContext =>
+        context.AddRequestTransform(async transformContext =>
         {
-            var user = transformContext.HttpContext.User;
-            if (user.Identity?.IsAuthenticated != true)
-                return ValueTask.CompletedTask;
+            var httpContext = transformContext.HttpContext;
+            var authResult = await httpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
+
+            if (!authResult.Succeeded)
+                return;
+
+            var user = authResult.Principal;
 
             var userId = user.FindFirst("sub")?.Value;
             if (userId is not null)
@@ -40,8 +80,6 @@ builder.Services.AddReverseProxy()
             var roles = user.FindAll("role").Select(c => c.Value).ToList();
             if (roles.Count > 0)
                 transformContext.ProxyRequest.Headers.TryAddWithoutValidation("X-User-Role", string.Join(",", roles));
-
-            return ValueTask.CompletedTask;
         });
     });
 
