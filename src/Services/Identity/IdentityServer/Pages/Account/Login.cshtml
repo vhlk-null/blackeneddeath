@@ -266,6 +266,20 @@
               opacity: 0.85;
             }
 
+            .login-footer {
+              margin-top: 1.5rem;
+              text-align: center;
+              font-size: 0.875rem;
+              color: var(--color-text-muted);
+            }
+
+            .login-footer a {
+              color: var(--color-text-heading);
+              text-decoration: none;
+            }
+
+            .login-footer a:hover { text-decoration: underline; }
+
             @@keyframes scale-in {
               from { opacity: 0; transform: scale(0.97) translateY(-6px); }
               to   { opacity: 1; transform: scale(1)    translateY(0); }
@@ -312,6 +326,11 @@
                 <button class="login-submit" type="submit">Sign In</button>
             </form>
 
+            <p class="login-footer">
+                Don't have an account? <a href="/Account/Register?returnUrl=@Uri.EscapeDataString(Model.ReturnUrl ?? string.Empty)">Register</a>
+            </p>
+
+            @*
             <div class="login-divider">
                 <span>or</span>
             </div>
@@ -325,6 +344,7 @@
                 </svg>
                 Continue with Google
             </a>
+            *@
 
         </div>
     </main>

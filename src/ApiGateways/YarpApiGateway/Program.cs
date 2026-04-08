@@ -15,7 +15,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         string authority = builder.Configuration["IdentityServer:Authority"]!;
-        string? jwksUri = builder.Configuration["IdentityServer:JwksUri"];
         options.RequireHttpsMetadata = false;
         options.MapInboundClaims = false;
         options.TokenValidationParameters = new()
@@ -32,27 +31,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
         HttpDocumentRetriever retriever = new HttpDocumentRetriever(new HttpClient(httpHandler)) { RequireHttps = false };
 
-        if (jwksUri is not null)
-        {
-            // Завантажуємо metadata але підміняємо jwks_uri на внутрішній Docker URI
-            options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-                metadataAddress,
-                new OpenIdConnectConfigurationRetriever(),
-                retriever);
-
-            options.TokenValidationParameters.IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
-            {
-                string jwks = new HttpClient(httpHandler).GetStringAsync(jwksUri).GetAwaiter().GetResult();
-                JsonWebKeySet keySet = new Microsoft.IdentityModel.Tokens.JsonWebKeySet(jwks);
-                return keySet.GetSigningKeys();
-            };
-        }
-        else
-        {
-            options.Authority = authority;
-            options.MetadataAddress = metadataAddress;
-            options.BackchannelHttpHandler = httpHandler;
-        }
+        options.ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+            metadataAddress,
+            new OpenIdConnectConfigurationRetriever(),
+            retriever);
     });
 
 builder.Services.AddAuthorization(options =>

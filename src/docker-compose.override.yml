@@ -183,7 +183,6 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=DevPassword123!
       - IdentityServer__Authority=http://identity.server:8080
-      - IdentityServer__JwksUri=http://identity.server:8080/.well-known/openid-configuration/jwks
     depends_on:
       library.api:
         condition: service_started

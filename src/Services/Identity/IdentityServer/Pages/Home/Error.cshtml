@@ -1,0 +1,97 @@
+@page
+@model IdentityServer.Pages.Home.ErrorModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Error — Blackened Death Metal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+
+        :root {
+          --color-bg:           #060708;
+          --color-border:       rgba(255,255,255,0.08);
+          --color-error-bg:     rgba(220,50,50,0.12);
+          --color-error-border: rgba(220,50,50,0.35);
+          --color-error-text:   #F08080;
+          --color-text-heading: #E3EAFF;
+          --color-text-muted:   #B2B2B2;
+          --font-heading:       'Cinzel', serif;
+          --font-body:          'Inter', sans-serif;
+          --radius-md:          6px;
+        }
+
+        body {
+          margin: 0;
+          min-height: 100vh;
+          background-color: var(--color-bg);
+          font-family: var(--font-body);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem 1rem;
+        }
+
+        .error-card {
+          background: #161616;
+          border: 1px solid var(--color-border);
+          border-radius: 12px;
+          padding: 2.5rem 2rem;
+          width: min(26rem, calc(100vw - 2rem));
+          text-align: center;
+        }
+
+        .error-card__title {
+          margin: 0 0 1rem;
+          font-family: var(--font-heading);
+          font-weight: 400;
+          font-size: 1.5rem;
+          color: var(--color-text-heading);
+          letter-spacing: 0.06em;
+        }
+
+        .error-message {
+          background: var(--color-error-bg);
+          border: 1px solid var(--color-error-border);
+          border-radius: var(--radius-md);
+          padding: 0.75rem 1rem;
+          font-size: 0.875rem;
+          color: var(--color-error-text);
+        }
+
+        .error-back {
+          display: inline-block;
+          margin-top: 1.5rem;
+          font-size: 0.875rem;
+          color: var(--color-text-muted);
+          text-decoration: none;
+        }
+
+        .error-back:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="error-card">
+        <h1 class="error-card__title">Something went wrong</h1>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorDescription))
+        {
+            <div class="error-message">@Model.ErrorDescription</div>
+        }
+        else
+        {
+            <div class="error-message">An unexpected error occurred.</div>
+        }
+
+        <a class="error-back" href="/">Back to home</a>
+    </div>
+</body>
+</html>

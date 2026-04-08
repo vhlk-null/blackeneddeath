@@ -1,0 +1,227 @@
+@page
+@model IdentityServer.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register — Blackened Death Metal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+
+        :root {
+          --color-bg:                #060708;
+          --color-header-bg:         #161616;
+          --color-border:            rgba(255,255,255,0.08);
+          --color-border-input:      #2A2A2A;
+          --color-border-input-focus:#444444;
+          --color-input-bg:          #060708;
+          --color-text:              rgba(255,255,255,0.7);
+          --color-text-heading:      #E3EAFF;
+          --color-text-muted:        #B2B2B2;
+          --color-text-placeholder:  #555555;
+          --color-error-bg:          rgba(220,50,50,0.12);
+          --color-error-border:      rgba(220,50,50,0.35);
+          --color-error-text:        #F08080;
+          --font-heading:            'Cinzel', serif;
+          --font-body:               'Inter', sans-serif;
+          --radius-md:               6px;
+        }
+
+        body {
+          margin: 0;
+          min-height: 100vh;
+          background-color: var(--color-bg);
+          font-family: var(--font-body);
+          font-size: 1rem;
+          line-height: 1.5;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .page {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem 1rem;
+        }
+
+        .login-card {
+          background: #161616;
+          border: 1px solid var(--color-border);
+          border-radius: 12px;
+          padding: 2.5rem 2rem 2rem;
+          width: min(26rem, calc(100vw - 2rem));
+          animation: scale-in 0.25s ease;
+        }
+
+        .login-card__title {
+          margin: 0 0 0.375rem;
+          font-family: var(--font-heading);
+          font-weight: 400;
+          font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+          color: var(--color-text-heading);
+          letter-spacing: 0.06em;
+        }
+
+        .login-card__subtitle {
+          margin: 0 0 2rem;
+          font-family: var(--font-body);
+          font-size: 0.875rem;
+          color: var(--color-text-muted);
+        }
+
+        .login-error {
+          background: var(--color-error-bg);
+          border: 1px solid var(--color-error-border);
+          border-radius: var(--radius-md);
+          padding: 0.75rem 1rem;
+          margin-bottom: 1.5rem;
+          font-family: var(--font-body);
+          font-size: 0.875rem;
+          color: var(--color-error-text);
+        }
+
+        .login-form {
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+        }
+
+        .form-field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .form-field__label {
+          font-family: var(--font-body);
+          font-size: 0.8125rem;
+          font-weight: 500;
+          color: var(--color-text-muted);
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+
+        .form-field__input {
+          appearance: none;
+          -webkit-appearance: none;
+          background: var(--color-input-bg);
+          border: 1px solid var(--color-border-input);
+          border-radius: var(--radius-md);
+          height: 2.75rem;
+          padding: 0 1rem;
+          color: var(--color-text);
+          font-family: var(--font-body);
+          font-size: 0.9375rem;
+          outline: none;
+          transition: border-color 0.15s ease;
+          width: 100%;
+        }
+
+        .form-field__input::placeholder { color: var(--color-text-placeholder); }
+        .form-field__input:focus { border-color: var(--color-border-input-focus); }
+
+        .login-submit {
+          margin-top: 0.5rem;
+          height: 2.75rem;
+          background: var(--color-text-heading);
+          color: var(--color-bg);
+          border: none;
+          border-radius: var(--radius-md);
+          font-family: var(--font-heading);
+          font-size: 0.9375rem;
+          letter-spacing: 0.08em;
+          cursor: pointer;
+          transition: opacity 0.15s ease;
+          width: 100%;
+        }
+
+        .login-submit:hover { opacity: 0.85; }
+
+        .login-footer {
+          margin-top: 1.5rem;
+          text-align: center;
+          font-size: 0.875rem;
+          color: var(--color-text-muted);
+        }
+
+        .login-footer a {
+          color: var(--color-text-heading);
+          text-decoration: none;
+        }
+
+        .login-footer a:hover { text-decoration: underline; }
+
+        @@keyframes scale-in {
+          from { opacity: 0; transform: scale(0.97) translateY(-6px); }
+          to   { opacity: 1; transform: scale(1)    translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <div class="login-card">
+
+            <h1 class="login-card__title">Create Account</h1>
+            <p class="login-card__subtitle">Join Blackened Death Metal</p>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="login-error">@Model.ErrorMessage</div>
+            }
+
+            <form class="login-form" method="post">
+                <input type="hidden" asp-for="ReturnUrl" />
+
+                <div class="form-field">
+                    <label class="form-field__label" asp-for="Username">Username</label>
+                    <input class="form-field__input" asp-for="Username"
+                           type="text"
+                           placeholder="your_username"
+                           autocomplete="username" />
+                </div>
+
+                <div class="form-field">
+                    <label class="form-field__label" asp-for="Email">Email</label>
+                    <input class="form-field__input" asp-for="Email"
+                           type="email"
+                           placeholder="you@example.com"
+                           autocomplete="email" />
+                </div>
+
+                <div class="form-field">
+                    <label class="form-field__label" asp-for="Password">Password</label>
+                    <input class="form-field__input" asp-for="Password"
+                           type="password"
+                           placeholder="••••••••"
+                           autocomplete="new-password" />
+                </div>
+
+                <div class="form-field">
+                    <label class="form-field__label" asp-for="ConfirmPassword">Confirm Password</label>
+                    <input class="form-field__input" asp-for="ConfirmPassword"
+                           type="password"
+                           placeholder="••••••••"
+                           autocomplete="new-password" />
+                </div>
+
+                <button class="login-submit" type="submit">Create Account</button>
+            </form>
+
+            <p class="login-footer">
+                Already have an account? <a href="/Account/Login?returnUrl=@Uri.EscapeDataString(Model.ReturnUrl ?? string.Empty)">Sign in</a>
+            </p>
+
+        </div>
+    </main>
+</body>
+</html>
