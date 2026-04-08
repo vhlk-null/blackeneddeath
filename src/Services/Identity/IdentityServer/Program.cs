@@ -7,8 +7,23 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 Config config = new Config(builder.Configuration);
 string? issuerUri = builder.Configuration["IdentityServer:IssuerUri"];
-string? connectionString = builder.Configuration.GetConnectionString("IdentityDb");
 string? migrationsAssembly = typeof(Program).Assembly.GetName().Name;
+
+string rawConnectionString = builder.Configuration.GetConnectionString("IdentityDb")
+    ?? Environment.GetEnvironmentVariable("DATABASE_URL")
+    ?? throw new InvalidOperationException("IdentityDb connection string is not configured.");
+
+string connectionString = ConvertConnectionString(rawConnectionString);
+
+static string ConvertConnectionString(string value)
+{
+    if (!value.StartsWith("postgresql://") && !value.StartsWith("postgres://"))
+        return value;
+
+    var uri = new Uri(value);
+    var userInfo = uri.UserInfo.Split(':', 2);
+    return $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};Trust Server Certificate=true";
+}
 
 builder.Services.AddRazorPages();
 
