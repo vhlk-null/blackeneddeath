@@ -23,6 +23,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+
 IIdentityServerBuilder identityServerBuilder = builder.Services.AddIdentityServer(options =>
     {
         if (!string.IsNullOrEmpty(issuerUri))
@@ -44,7 +45,7 @@ IIdentityServerBuilder identityServerBuilder = builder.Services.AddIdentityServe
 if (builder.Environment.IsDevelopment())
     identityServerBuilder.AddDeveloperSigningCredential(persistKey: false);
 else
-    identityServerBuilder.AddDeveloperSigningCredential(persistKey: true, filename: "/app/keys/signing-credential.jwk");
+    throw new InvalidOperationException("Production signing credential is not configured. Add a signing certificate before deploying.");
 
 if (!builder.Environment.IsDevelopment())
 {
