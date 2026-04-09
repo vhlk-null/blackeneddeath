@@ -21,6 +21,9 @@ public class CreateVideoBand : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Create Video Band")
             .WithDescription("Create Video Band")
-            .WithTags("Bands");
+            .WithTags("Bands")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization();
     }
 }

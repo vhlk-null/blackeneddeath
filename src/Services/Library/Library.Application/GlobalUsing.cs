@@ -23,6 +23,7 @@ global using Library.Domain.Models.JoinTables;
 global using Library.Domain.ValueObjects;
 global using Library.Domain.ValueObjects.Ids;
 global using MassTransit;
+global using Microsoft.AspNetCore.Http;
 global using Mediator;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;

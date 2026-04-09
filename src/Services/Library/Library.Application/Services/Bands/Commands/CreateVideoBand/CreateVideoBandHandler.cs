@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Bands.Commands.CreateVideoBand;
 
-public class CreateVideoBandHandler(ILibraryDbContext context)
+public class CreateVideoBandHandler(ILibraryDbContext context, IHttpContextAccessor httpContextAccessor)
     : BuildingBlocks.CQRS.ICommandHandler<CreateVideoBandCommand, CreateVideoBandResult>
 {
     public async ValueTask<CreateVideoBandResult> Handle(CreateVideoBandCommand command, CancellationToken cancellationToken)
@@ -26,6 +26,9 @@ public class CreateVideoBandHandler(ILibraryDbContext context)
             dto.VideoType,
             dto.YoutubeLink,
             dto.Info);
+
+        if (httpContextAccessor.HttpContext?.User.IsInRole("admin") == true)
+            videoBand.Approve();
 
         context.VideoBands.Add(videoBand);
         await context.SaveChangesAsync(cancellationToken);

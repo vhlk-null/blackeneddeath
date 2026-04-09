@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Albums.Commands.CreateAlbum;
 
-public class CreateAlbumHandler(ILibraryDbContext context, IStorageService storage) : BuildingBlocks.CQRS.ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
+public class CreateAlbumHandler(ILibraryDbContext context, IStorageService storage, IHttpContextAccessor httpContextAccessor) : BuildingBlocks.CQRS.ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
 {
     public async ValueTask<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
     {
@@ -28,6 +28,9 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
             foreach ((Track track, TrackInputDto dto) in tracks.Zip(command.Album.Tracks))
                 album.AddTrack(track.Id, dto.TrackNumber);
         }
+
+        if (httpContextAccessor.HttpContext?.User.IsInRole("admin") == true)
+            album.Approve();
 
         context.Albums.Add(album);
         await context.SaveChangesAsync(cancellationToken);

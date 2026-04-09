@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Library.Application.Services.Bands.Commands.CreateBand;
 
-public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService storage)
+public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService storage, IHttpContextAccessor httpContextAccessor)
     : BuildingBlocks.CQRS.ICommandHandler<CreateBandCommand, CreateBandResult>
 {
     public async ValueTask<CreateBandResult> Handle(CreateBandCommand command, CancellationToken cancellationToken)
@@ -18,6 +18,9 @@ public class CreateBandCommandHandler(ILibraryDbContext context, IStorageService
         }
 
         Band band = CreateNewBand(command, logoKey);
+
+        if (httpContextAccessor.HttpContext?.User.IsInRole("admin") == true)
+            band.Approve();
 
         context.Bands.Add(band);
         await context.SaveChangesAsync(cancellationToken);
