@@ -19,6 +19,7 @@ var csBuilder = new NpgsqlConnectionStringBuilder(rawConnectionString)
 };
 
 string connectionString = csBuilder.ConnectionString;
+Console.WriteLine($"[DEBUG] Final ConnectionString: {connectionString}");
 
 builder.Services.AddRazorPages();
 
