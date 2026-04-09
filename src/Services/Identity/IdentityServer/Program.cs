@@ -13,10 +13,7 @@ string? migrationsAssembly = typeof(Program).Assembly.GetName().Name;
 string rawConnectionString = builder.Configuration.GetConnectionString("IdentityDb")
     ?? throw new InvalidOperationException("IdentityDb connection string is not configured.");
 
-var csBuilder = new NpgsqlConnectionStringBuilder(rawConnectionString)
-{
-    GssEncryptionMode = GssEncryptionMode.Disable
-};
+var csBuilder = new NpgsqlConnectionStringBuilder(rawConnectionString);
 
 string connectionString = csBuilder.ConnectionString;
 Console.WriteLine($"[DEBUG] Final ConnectionString: {connectionString}");
