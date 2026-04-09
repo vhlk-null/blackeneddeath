@@ -24,6 +24,9 @@ public class CreateLabel : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Create Label")
             .WithDescription("Create Label")
-            .WithTags("Labels");
+            .WithTags("Labels")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

@@ -21,6 +21,9 @@ public class DeleteLabel : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Delete Label")
             .WithDescription("Delete Label")
-            .WithTags("Labels");
+            .WithTags("Labels")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

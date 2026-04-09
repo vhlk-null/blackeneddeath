@@ -50,6 +50,9 @@ public class UpdateGenreCard : ICarterModule
             .WithSummary("Update GenreCard")
             .WithDescription("Update GenreCard")
             .WithTags("GenreCards")
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

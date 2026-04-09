@@ -23,6 +23,9 @@ public class UpdateGenre : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Update Genre")
             .WithDescription("Update Genre")
-            .WithTags("Genres");
+            .WithTags("Genres")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

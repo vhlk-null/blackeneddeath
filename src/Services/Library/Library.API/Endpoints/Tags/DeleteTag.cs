@@ -18,6 +18,9 @@ public class DeleteTag : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Delete Tag")
             .WithDescription("Delete Tag")
-            .WithTags("Tags");
+            .WithTags("Tags")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

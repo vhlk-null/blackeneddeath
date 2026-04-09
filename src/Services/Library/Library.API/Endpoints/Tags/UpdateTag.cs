@@ -21,6 +21,9 @@ public class UpdateTag : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Update Tag")
             .WithDescription("Update Tag")
-            .WithTags("Tags");
+            .WithTags("Tags")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

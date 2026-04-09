@@ -35,6 +35,9 @@ public class UpdateGenreCardCover : ICarterModule
             .WithSummary("Update GenreCard Cover")
             .WithDescription("Upload or replace the cover image for a genre card")
             .WithTags("GenreCards")
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

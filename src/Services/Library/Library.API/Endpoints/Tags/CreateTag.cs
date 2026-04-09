@@ -20,6 +20,9 @@ public class CreateTag : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Create Tag")
             .WithDescription("Create Tag")
-            .WithTags("Tags");
+            .WithTags("Tags")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

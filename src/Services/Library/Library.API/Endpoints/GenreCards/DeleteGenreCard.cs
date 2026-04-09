@@ -20,6 +20,9 @@ public class DeleteGenreCard : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Delete GenreCard")
             .WithDescription("Delete GenreCard")
-            .WithTags("GenreCards");
+            .WithTags("GenreCards")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

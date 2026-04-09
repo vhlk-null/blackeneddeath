@@ -24,6 +24,9 @@ public class CreateCountry : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Create Country")
             .WithDescription("Create Country")
-            .WithTags("Countries");
+            .WithTags("Countries")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly"); ;
     }
 }

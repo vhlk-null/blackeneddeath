@@ -23,6 +23,9 @@ public class UpdateLabel : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Update Label")
             .WithDescription("Update Label")
-            .WithTags("Labels");
+            .WithTags("Labels")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

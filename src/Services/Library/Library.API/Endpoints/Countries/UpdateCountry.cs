@@ -23,6 +23,9 @@ public class UpdateCountry : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Update Country")
             .WithDescription("Update Country")
-            .WithTags("Countries");
+            .WithTags("Countries")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly"); ;
     }
 }

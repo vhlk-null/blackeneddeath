@@ -21,6 +21,9 @@ public class DeleteCountry : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Delete Country")
             .WithDescription("Delete Country")
-            .WithTags("Countries");
+            .WithTags("Countries")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly"); ;
     }
 }

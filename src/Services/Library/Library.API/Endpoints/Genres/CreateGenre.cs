@@ -24,6 +24,9 @@ public class CreateGenre : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Create Genre")
             .WithDescription("Create Genre")
-            .WithTags("Genres");
+            .WithTags("Genres")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

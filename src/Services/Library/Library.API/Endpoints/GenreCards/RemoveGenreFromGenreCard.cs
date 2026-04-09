@@ -18,6 +18,9 @@ public class RemoveGenreFromGenreCard : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Remove Genre from GenreCard")
             .WithDescription("Remove Genre from GenreCard")
-            .WithTags("GenreCards");
+            .WithTags("GenreCards")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

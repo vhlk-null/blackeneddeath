@@ -21,6 +21,9 @@ public class DeleteGenre : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Delete Genre")
             .WithDescription("Delete Genre")
-            .WithTags("Genres");
+            .WithTags("Genres")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }
