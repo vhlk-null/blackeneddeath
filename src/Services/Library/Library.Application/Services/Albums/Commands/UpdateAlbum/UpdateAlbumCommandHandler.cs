@@ -47,6 +47,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
             : album.Slug;
 
         album.Update(command.Album.Title, newSlug, command.Album.Type, albumRelease, coverKey, labelId);
+        album.Approve();
 
         ReconcileBands(album, command.Album);
         ReconcileCountries(album, command.Album);

@@ -10,6 +10,9 @@ public class GetVideoBandsQueryHandler(ILibraryDbContext context)
 
         IQueryable<VideoBand> baseQuery = context.VideoBands.AsNoTracking();
 
+        if (query.ApprovedOnly)
+            baseQuery = baseQuery.Where(vb => vb.IsApproved);
+
         long totalCount = await baseQuery.LongCountAsync(cancellationToken);
 
         List<VideoBandDto> videoBands = await baseQuery

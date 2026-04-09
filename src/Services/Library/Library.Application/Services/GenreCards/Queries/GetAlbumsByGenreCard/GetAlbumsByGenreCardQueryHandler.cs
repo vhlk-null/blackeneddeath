@@ -26,8 +26,9 @@ public class GetAlbumsByGenreCardQueryHandler(ILibraryDbContext context, IStorag
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumTags)
             .Where(a =>
-                a.AlbumGenres.Any(ag => genreIds.Contains(ag.GenreId)) ||
-                a.AlbumTags.Any(at => tagIds.Contains(at.TagId)));
+                a.IsApproved &&
+                (a.AlbumGenres.Any(ag => genreIds.Contains(ag.GenreId)) ||
+                 a.AlbumTags.Any(at => tagIds.Contains(at.TagId))));
 
         long totalCount = await albumsQuery.LongCountAsync(cancellationToken);
 

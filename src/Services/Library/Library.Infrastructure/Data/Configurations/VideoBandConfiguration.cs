@@ -46,6 +46,10 @@ public class VideoBandConfiguration : IEntityTypeConfiguration<VideoBand>
             .HasColumnType("text")
             .HasColumnName("info");
 
+        entity.Property(e => e.IsApproved)
+            .HasDefaultValue(false)
+            .HasColumnName("is_approved");
+
         entity.HasOne<Band>()
             .WithMany(b => b.VideoBands)
             .HasForeignKey(e => e.BandId)

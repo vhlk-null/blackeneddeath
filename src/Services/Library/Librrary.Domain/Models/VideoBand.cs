@@ -9,6 +9,7 @@ public class VideoBand : Entity<VideoBandId>
     public VideoType VideoType { get; private set; }
     public string YoutubeLink { get; private set; } = null!;
     public string? Info { get; private set; }
+    public bool IsApproved { get; private set; }
 
     private VideoBand() { }
 
@@ -30,6 +31,11 @@ public class VideoBand : Entity<VideoBandId>
             YoutubeLink = youtubeLink,
             Info = info
         };
+    }
+
+    public void Approve()
+    {
+        IsApproved = true;
     }
 
     public void Update(string name, int? year, CountryId? countryId,

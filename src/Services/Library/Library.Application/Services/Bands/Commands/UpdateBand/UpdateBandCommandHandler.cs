@@ -26,6 +26,7 @@ public class UpdateBandCommandHandler(ILibraryDbContext context, IStorageService
         BandActivity activity = BandActivity.Of(command.Band.FormedYear, command.Band.DisbandedYear);
         band.Update(command.Band.Name, command.Band.Bio, logoKey, activity, command.Band.Status,
             command.Band.Facebook, command.Band.Youtube, command.Band.Instagram, command.Band.Twitter, command.Band.Website);
+        band.Approve();
 
         ReconcileCountries(band, command.Band.CountryIds);
         ReconcileGenres(band, command.Band.GenreIds);

@@ -12,6 +12,9 @@ public class GetBandsQueryHandler(ILibraryDbContext context, IStorageUrlResolver
 
         IQueryable<Band> filteredQuery = context.Bands.AsNoTracking();
 
+        if (query.ApprovedOnly)
+            filteredQuery = filteredQuery.Where(b => b.IsApproved);
+
         if (query.Filter is not null)
             filteredQuery = filteredQuery.Where(query.Filter.Criteria);
 

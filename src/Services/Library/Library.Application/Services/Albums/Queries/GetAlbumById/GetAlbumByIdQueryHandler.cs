@@ -14,7 +14,7 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
                           .Include(a => a.AlbumTracks)
                           .Include(a => a.AlbumTags)
                           .Include(a => a.StreamingLinks)
-                          .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
+                          .FirstOrDefaultAsync(a => a.Id == albumId && (!query.ApprovedOnly || a.IsApproved), cancellationToken)
                       ?? throw new AlbumNotFoundException(query.Id);
 
         List<BandId> bandIds = album.AlbumBands.Select(ab => ab.BandId).ToList();
@@ -27,7 +27,7 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
             .Include(a => a.AlbumBands)
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
-            .Where(a => a.AlbumBands.Any(ab => bandIds.Contains(ab.BandId)))
+            .Where(a => (!query.ApprovedOnly || a.IsApproved) && a.AlbumBands.Any(ab => bandIds.Contains(ab.BandId)))
             .ToListAsync(cancellationToken);
 
         ILookup<BandId, Album> discographyByBand = discographyAlbums
@@ -42,7 +42,7 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
         List<Album> similarAlbums = await context.Albums.AsNoTracking()
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
-            .Where(a => !excludeAlbumIds.Contains(a.Id))
+            .Where(a => (!query.ApprovedOnly || a.IsApproved) && !excludeAlbumIds.Contains(a.Id))
             .Where(a => a.AlbumGenres.Any(ag => genreIds.Contains(ag.GenreId)))
             .OrderBy(_ => EF.Functions.Random())
             .Take(4)

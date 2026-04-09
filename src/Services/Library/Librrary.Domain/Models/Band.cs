@@ -13,6 +13,7 @@ public class Band : Aggregate<BandId>
     public string? Instagram { get; private set; }
     public string? Twitter { get; private set; }
     public string? Website { get; private set; }
+    public bool IsApproved { get; private set; }
 
     private readonly List<BandCountry> _bandCountries = [];
     private readonly List<BandGenre> _bandGenres = [];
@@ -72,6 +73,11 @@ public class Band : Aggregate<BandId>
         AddDomainEvent(new BandUpdatedEvent(this));
 
         return this;
+    }
+
+    public void Approve()
+    {
+        IsApproved = true;
     }
 
     public void Remove()

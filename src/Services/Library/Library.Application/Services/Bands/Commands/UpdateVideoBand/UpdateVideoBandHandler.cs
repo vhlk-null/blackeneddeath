@@ -24,6 +24,7 @@ public class UpdateVideoBandHandler(ILibraryDbContext context)
             dto.VideoType,
             dto.YoutubeLink,
             dto.Info);
+        videoBand.Approve();
 
         await context.SaveChangesAsync(cancellationToken);
 

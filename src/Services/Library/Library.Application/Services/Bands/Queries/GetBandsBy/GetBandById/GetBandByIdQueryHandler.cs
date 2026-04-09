@@ -12,7 +12,7 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
                         .Include(b => b.BandCountries)
                         .Include(b => b.BandGenres)
                         .Include(b => b.VideoBands)
-                        .FirstOrDefaultAsync(b => b.Id == bandId, cancellationToken)
+                        .FirstOrDefaultAsync(b => b.Id == bandId && (!query.ApprovedOnly || b.IsApproved), cancellationToken)
                     ?? throw new BandNotFoundException(query.Id);
 
         List<AlbumId> albumIds = await context.AlbumBands.AsNoTracking()
@@ -26,14 +26,14 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
         List<Album> albums = await context.Albums.AsNoTracking()
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
-            .Where(a => albumIds.Contains(a.Id))
+            .Where(a => albumIds.Contains(a.Id) && (!query.ApprovedOnly || a.IsApproved))
             .ToListAsync(cancellationToken);
 
         // Similar bands: same genre, not this band, random 3
         List<Band> similarBands = await context.Bands.AsNoTracking()
             .Include(b => b.BandGenres)
             .Include(b => b.BandCountries)
-            .Where(b => b.Id != bandId)
+            .Where(b => b.Id != bandId && (!query.ApprovedOnly || b.IsApproved))
             .Where(b => b.BandGenres.Any(bg => genreIds.Contains(bg.GenreId)))
             .OrderBy(_ => EF.Functions.Random())
             .Take(3)

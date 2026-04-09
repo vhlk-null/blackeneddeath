@@ -47,6 +47,10 @@ public class BandConfiguration : IEntityTypeConfiguration<Band>
         entity.Property(e => e.Twitter).HasMaxLength(500).HasColumnName("twitter");
         entity.Property(e => e.Website).HasMaxLength(500).HasColumnName("website");
 
+        entity.Property(e => e.IsApproved)
+            .HasDefaultValue(false)
+            .HasColumnName("is_approved");
+
         entity.ComplexProperty(e => e.Activity, ba =>
         {
             ba.Property(a => a.FormedYear).HasColumnName("formed_year");

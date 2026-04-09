@@ -1,10 +1,12 @@
-﻿using Library.Domain.Abstractions;
+﻿using System.Security.Claims;
+using Library.Domain.Abstractions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Library.Infrastructure.Data.Interceptors;
 
-public class AuditableEntityInterceptor : SaveChangesInterceptor
+public class AuditableEntityInterceptor(IHttpContextAccessor httpContextAccessor) : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
@@ -22,17 +24,19 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
     {
         if (context == null) return;
 
+        string currentUser = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "system";
+
         foreach (EntityEntry<IEntity> entity in context.ChangeTracker.Entries<IEntity>())
         {
             if (entity.State == EntityState.Added)
             {
-                entity.Entity.CreatedBy = "alex";
+                entity.Entity.CreatedBy = currentUser;
                 entity.Entity.CreatedAt = DateTime.UtcNow;
             }
 
             if (entity.State == EntityState.Added || entity.State == EntityState.Modified || entity.HasChangedOwnedEntities())
             {
-                entity.Entity.LastModifiedBy = "alex";
+                entity.Entity.LastModifiedBy = currentUser;
                 entity.Entity.LastModifiedAt = DateTime.UtcNow;
             }
         }

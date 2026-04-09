@@ -12,6 +12,9 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
 
         IQueryable<Album> filteredQuery = context.Albums.AsNoTracking();
 
+        if (query.ApprovedOnly)
+            filteredQuery = filteredQuery.Where(a => a.IsApproved);
+
         if (query.Filter is not null)
             filteredQuery = filteredQuery.Where(query.Filter.Criteria);
 

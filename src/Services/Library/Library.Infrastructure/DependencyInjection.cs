@@ -18,6 +18,7 @@ public static class DependencyInjection
             sp.GetRequiredService<Cloudinary>(), environmentPrefix));
         services.AddSingleton<IStorageUrlResolver, StorageUrlResolver>();
 
+        services.AddHttpContextAccessor();
         services.AddScoped<AuditableEntityInterceptor>();
         services.AddScoped<DispatchDomainEventsInterceptor>();
         services.AddSingleton<SlowQueryInterceptor>();

@@ -50,6 +50,10 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
             .HasColumnName("label_id")
             .IsRequired(false);
 
+        entity.Property(e => e.IsApproved)
+            .HasDefaultValue(false)
+            .HasColumnName("is_approved");
+
         entity.Navigation(e => e.AlbumBands).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumGenres).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumCountries).UsePropertyAccessMode(PropertyAccessMode.Field);

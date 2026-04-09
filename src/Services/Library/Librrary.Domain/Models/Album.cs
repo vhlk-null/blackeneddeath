@@ -8,6 +8,7 @@ public class Album : Aggregate<AlbumId>
     public AlbumRelease AlbumRelease { get; private set; } = null!;
     public string? CoverUrl { get; private set; }
     public LabelId? LabelId { get; private set; }
+    public bool IsApproved { get; private set; }
     
     private readonly List<AlbumBand> _albumBands = [];
     private readonly List<AlbumGenre> _albumGenres = [];
@@ -44,6 +45,11 @@ public class Album : Aggregate<AlbumId>
         album.AddDomainEvent(new AlbumCreatedEvent(album));
 
         return album;
+    }
+
+    public void Approve()
+    {
+        IsApproved = true;
     }
 
     public void Delete()
