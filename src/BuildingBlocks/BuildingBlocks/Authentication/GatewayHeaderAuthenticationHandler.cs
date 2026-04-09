@@ -35,6 +35,9 @@ public class GatewayHeaderAuthenticationHandler(
             new(ClaimTypes.NameIdentifier, userId.ToString())
         };
 
+        if (Request.Headers.TryGetValue("X-User-Name", out StringValues userName))
+            claims.Add(new Claim(ClaimTypes.Name, userName.ToString()));
+
         if (Request.Headers.TryGetValue("X-User-Role", out StringValues roles))
         {
             foreach (string role in roles.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))

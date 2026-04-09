@@ -24,7 +24,9 @@ public class AuditableEntityInterceptor(IHttpContextAccessor httpContextAccessor
     {
         if (context == null) return;
 
-        string currentUser = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "system";
+        string currentUser = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name)
+            ?? httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? "system";
 
         foreach (EntityEntry<IEntity> entity in context.ChangeTracker.Entries<IEntity>())
         {
