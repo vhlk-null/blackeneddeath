@@ -52,6 +52,9 @@ public class UpdateBand : ICarterModule
             .WithSummary("Update Band")
             .WithDescription("Update Band")
             .WithTags("Bands")
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

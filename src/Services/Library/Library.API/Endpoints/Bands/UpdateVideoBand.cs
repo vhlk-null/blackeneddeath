@@ -20,6 +20,9 @@ public class UpdateVideoBand : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Update Video Band")
             .WithDescription("Update Video Band")
-            .WithTags("Bands");
+            .WithTags("Bands")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

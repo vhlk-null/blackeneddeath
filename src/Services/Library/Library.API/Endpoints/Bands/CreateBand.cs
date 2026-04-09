@@ -46,6 +46,9 @@ public class CreateBand : ICarterModule
             .WithSummary("Create Band")
             .WithDescription("Create Band")
             .WithTags("Bands")
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization();
     }
 }

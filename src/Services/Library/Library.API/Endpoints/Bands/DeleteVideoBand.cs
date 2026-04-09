@@ -19,6 +19,9 @@ public class DeleteVideoBand : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Delete Video Band")
             .WithDescription("Delete Video Band")
-            .WithTags("Bands");
+            .WithTags("Bands")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }

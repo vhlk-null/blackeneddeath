@@ -21,6 +21,9 @@ public class DeleteBand : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Delete Band")
             .WithDescription("Delete Band")
-            .WithTags("Bands");
+            .WithTags("Bands")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly");
     }
 }
