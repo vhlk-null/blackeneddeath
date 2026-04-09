@@ -10,7 +10,7 @@ public class GetPendingApprovalAlbumsQueryHandler(ILibraryDbContext context)
         List<PendingApprovalDto> albums = await context.Albums
             .AsNoTracking()
             .Where(a => !a.IsApproved)
-            .Select(a => new PendingApprovalDto(a.Id.Value, a.Title, a.Slug))
+            .Select(a => new PendingApprovalDto(a.Id.Value, a.Title, a.Slug, a.CreatedBy))
             .ToListAsync(cancellationToken);
 
         return new GetPendingApprovalAlbumsResult(albums);

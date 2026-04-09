@@ -10,7 +10,7 @@ public class GetPendingApprovalVideoBandsQueryHandler(ILibraryDbContext context)
         List<PendingApprovalDto> videoBands = await context.VideoBands
             .AsNoTracking()
             .Where(vb => !vb.IsApproved)
-            .Select(vb => new PendingApprovalDto(vb.Id.Value, vb.Name, null))
+            .Select(vb => new PendingApprovalDto(vb.Id.Value, vb.Name, null, vb.CreatedBy))
             .ToListAsync(cancellationToken);
 
         return new GetPendingApprovalVideoBandsResult(videoBands);
