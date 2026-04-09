@@ -20,6 +20,21 @@ Console.WriteLine($"[DEBUG] Final ConnectionString: {connectionString}");
 
 builder.Services.AddRazorPages();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularClient", policy =>
+    {
+        string[] allowedOrigins = builder.Configuration
+            .GetSection("Cors:AllowedOrigins")
+            .Get<string[]>() ?? [];
+
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
     .SetApplicationName("IdentityServer");
@@ -68,6 +83,7 @@ WebApplication app = builder.Build();
 
 app.UseStaticFiles();
 app.UseRouting();
+app.UseCors("AllowAngularClient");
 app.UseIdentityServer();
 app.UseAuthorization();
 app.MapRazorPages();
