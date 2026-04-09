@@ -28,6 +28,7 @@ RUN dotnet publish "./IdentityServer.csproj" -c $BUILD_CONFIGURATION -o /app/pub
 FROM base AS final
 USER root
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 && rm -rf /var/lib/apt/lists/*
 COPY --from=publish /app/publish .
 RUN mkdir -p /app/keys && chown -R $APP_UID /app/keys
 USER $APP_UID
