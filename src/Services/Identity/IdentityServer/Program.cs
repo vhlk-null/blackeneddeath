@@ -82,10 +82,13 @@ if (!builder.Environment.IsDevelopment())
 
 WebApplication app = builder.Build();
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions
+ForwardedHeadersOptions forwardedOptions = new()
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
+};
+forwardedOptions.KnownNetworks.Clear();
+forwardedOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedOptions);
 
 app.UseStaticFiles();
 app.UseRouting();
