@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Duende.IdentityServer.Services;
 using IdentityServer.Data;
 using Microsoft.AspNetCore.Identity;
@@ -52,6 +53,8 @@ public class RegisterModel(
             ErrorMessage = string.Join(" ", result.Errors.Select(e => e.Description));
             return Page();
         }
+
+        await userManager.AddClaimAsync(user, new Claim("role", "user"));
 
         await signInManager.SignInAsync(user, isPersistent: false);
 

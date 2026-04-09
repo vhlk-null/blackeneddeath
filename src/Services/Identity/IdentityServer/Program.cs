@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-Config config = new Config(builder.Configuration);
 string? issuerUri = builder.Configuration["IdentityServer:IssuerUri"];
 string? migrationsAssembly = typeof(Program).Assembly.GetName().Name;
 
