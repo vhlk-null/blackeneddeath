@@ -15,9 +15,11 @@ public class GetAllBands : ICarterModule
                 Guid? genreId = null,
                 Guid? countryId = null,
                 BandStatus? status = null,
-                int? formedYear = null) =>
+                int? yearFrom = null,
+                int? yearTo = null,
+                string? name = null) =>
             {
-                ISpecification<Band>? filter = BandFilterBuilder.Build(genreId, countryId, status, formedYear);
+                ISpecification<Band>? filter = BandFilterBuilder.Build(genreId, countryId, status, yearFrom, yearTo, name);
                 Application.Services.Bands.Queries.GetBands.GetBandsResult result = await sender.Send(new GetBandsQuery(paginationRequest, sortBy, filter, ApprovedOnly: false));
                 return Results.Ok(result.Adapt<GetAllBandsResult>());
             })

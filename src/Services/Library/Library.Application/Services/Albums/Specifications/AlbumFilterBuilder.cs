@@ -7,15 +7,18 @@ public static class AlbumFilterBuilder
         Guid? labelId,
         Guid? countryId,
         AlbumType? type,
-        int? year)
+        int? yearFrom,
+        int? yearTo,
+        string? name = null)
     {
         ISpecification<Album>? filter = null;
 
-        if (genreId.HasValue)   filter = Combine(filter, new AlbumByGenreSpec(genreId.Value));
-        if (labelId.HasValue)   filter = Combine(filter, new AlbumByLabelSpec(labelId.Value));
-        if (countryId.HasValue) filter = Combine(filter, new AlbumByCountrySpec(countryId.Value));
-        if (type.HasValue)      filter = Combine(filter, new AlbumByTypeSpec(type.Value));
-        if (year.HasValue)      filter = Combine(filter, new AlbumByYearSpec(year.Value));
+        if (genreId.HasValue)                    filter = Combine(filter, new AlbumByGenreSpec(genreId.Value));
+        if (labelId.HasValue)                    filter = Combine(filter, new AlbumByLabelSpec(labelId.Value));
+        if (countryId.HasValue)                  filter = Combine(filter, new AlbumByCountrySpec(countryId.Value));
+        if (type.HasValue)                       filter = Combine(filter, new AlbumByTypeSpec(type.Value));
+        if (yearFrom.HasValue || yearTo.HasValue) filter = Combine(filter, new AlbumByYearRangeSpec(yearFrom, yearTo));
+        if (!string.IsNullOrWhiteSpace(name))    filter = Combine(filter, new AlbumByNameSpec(name));
 
         return filter;
     }

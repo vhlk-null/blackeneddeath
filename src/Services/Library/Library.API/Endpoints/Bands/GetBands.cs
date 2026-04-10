@@ -15,9 +15,11 @@ public class GetBands : ICarterModule
                 Guid? genreId = null,
                 Guid? countryId = null,
                 BandStatus? status = null,
-                int? formedYear = null) =>
+                int? yearFrom = null,
+                int? yearTo = null,
+                string? name = null) =>
             {
-                ISpecification<Band>? filter = BandFilterBuilder.Build(genreId, countryId, status, formedYear);
+                ISpecification<Band>? filter = BandFilterBuilder.Build(genreId, countryId, status, yearFrom, yearTo, name);
                 Application.Services.Bands.Queries.GetBands.GetBandsResult result = await sender.Send(new GetBandsQuery(paginationRequest, sortBy, filter));
                 return Results.Ok(result.Adapt<GetBandsResult>());
             })
@@ -25,7 +27,7 @@ public class GetBands : ICarterModule
             .Produces<GetBandsResult>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Bands")
-            .WithDescription("Get Bands with optional filters: genreId, countryId, status")
+            .WithDescription("Get Bands with optional filters: genreId, countryId, status, yearFrom, yearTo")
             .WithTags("Bands");
     }
 }

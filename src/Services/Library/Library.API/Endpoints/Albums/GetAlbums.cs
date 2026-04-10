@@ -15,9 +15,11 @@ public class GetAlbums : ICarterModule
                 Guid? labelId = null,
                 Guid? countryId = null,
                 AlbumType? type = null,
-                int? year = null) =>
+                int? yearFrom = null,
+                int? yearTo = null,
+                string? name = null) =>
             {
-                ISpecification<Album>? filter = AlbumFilterBuilder.Build(genreId, labelId, countryId, type, year);
+                ISpecification<Album>? filter = AlbumFilterBuilder.Build(genreId, labelId, countryId, type, yearFrom, yearTo, name);
                 Application.Services.Albums.Queries.GetAlbums.GetAlbumsResult result = await sender.Send(new GetAlbumsQuery(paginationRequest, sortBy, filter));
                 return Results.Ok(result.Adapt<GetAlbumsResult>());
             })
@@ -25,7 +27,7 @@ public class GetAlbums : ICarterModule
             .Produces<GetAlbumsResult>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Albums")
-            .WithDescription("Get Albums with optional filters: genreId, labelId, countryId, type, year")
+            .WithDescription("Get Albums with optional filters: genreId, labelId, countryId, type, yearFrom, yearTo")
             .WithTags("Albums");
     }
 }

@@ -16,9 +16,11 @@ public class GetAllAlbums : ICarterModule
                 Guid? labelId = null,
                 Guid? countryId = null,
                 AlbumType? type = null,
-                int? year = null) =>
+                int? yearFrom = null,
+                int? yearTo = null,
+                string? name = null) =>
             {
-                ISpecification<Album>? filter = AlbumFilterBuilder.Build(genreId, labelId, countryId, type, year);
+                ISpecification<Album>? filter = AlbumFilterBuilder.Build(genreId, labelId, countryId, type, yearFrom, yearTo, name);
                 Application.Services.Albums.Queries.GetAlbums.GetAlbumsResult result = await sender.Send(new GetAlbumsQuery(paginationRequest, sortBy, filter, ApprovedOnly: false));
                 return Results.Ok(result.Adapt<GetAllAlbumsResult>());
             })
