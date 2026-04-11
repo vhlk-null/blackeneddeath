@@ -27,6 +27,7 @@ public class GetBandsByCountryQueryHandler(ILibraryDbContext context, IStorageUr
         List<Album> albums = await context.Albums.AsNoTracking()
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
+            .Include(a => a.AlbumBands)
             .Where(a => albumIds.Contains(a.Id))
             .ToListAsync(cancellationToken);
 
@@ -45,8 +46,20 @@ public class GetBandsByCountryQueryHandler(ILibraryDbContext context, IStorageUr
         Dictionary<AlbumId, Album> albumsById = albums.ToDictionary(a => a.Id);
         ILookup<BandId, Album> albumsByBand = albumBands.ToLookup(ab => ab.BandId, ab => albumsById[ab.AlbumId]);
 
+        List<BandId> coArtistBandIds = albums
+            .SelectMany(a => a.AlbumBands.Select(ab => ab.BandId))
+            .Except(bandIds)
+            .Distinct()
+            .ToList();
+
+        Dictionary<BandId, Band> coArtistBands = coArtistBandIds.Count > 0
+            ? await context.Bands.AsNoTracking()
+                .Where(b => coArtistBandIds.Contains(b.Id))
+                .ToDictionaryAsync(b => b.Id, cancellationToken)
+            : new Dictionary<BandId, Band>();
+
         List<BandDto> bandDtos = bands
-            .Select(b => b.ToBandDto(countries, genres, albumsByBand, urlResolver))
+            .Select(b => b.ToBandDto(countries, genres, albumsByBand, urlResolver, coArtistBands))
             .ToList();
 
         return new GetBandsByCountryResult(bandDtos);

@@ -26,8 +26,21 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
         List<Album> albums = await context.Albums.AsNoTracking()
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
+            .Include(a => a.AlbumBands)
             .Where(a => albumIds.Contains(a.Id) && (!query.ApprovedOnly || a.IsApproved))
             .ToListAsync(cancellationToken);
+
+        List<BandId> coArtistBandIds = albums
+            .SelectMany(a => a.AlbumBands.Select(ab => ab.BandId))
+            .Where(id => id != band.Id)
+            .Distinct()
+            .ToList();
+
+        Dictionary<BandId, Band> coArtistBands = coArtistBandIds.Count > 0
+            ? await context.Bands.AsNoTracking()
+                .Where(b => coArtistBandIds.Contains(b.Id))
+                .ToDictionaryAsync(b => b.Id, cancellationToken)
+            : new Dictionary<BandId, Band>();
 
         // Similar bands: same genre, not this band, random 3
         List<Band> similarBands = await context.Bands.AsNoTracking()
@@ -61,7 +74,7 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
 
         ILookup<BandId, Album> albumsByBand = albums.ToLookup(_ => band.Id);
 
-        BandDto bandDto = band.ToBandDto(countries, genres, albumsByBand, urlResolver);
+        BandDto bandDto = band.ToBandDto(countries, genres, albumsByBand, urlResolver, coArtistBands);
 
         List<CountryId> similarBandCountryIds = similarBands
             .SelectMany(b => b.BandCountries.Select(bc => bc.CountryId))

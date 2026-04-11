@@ -34,6 +34,21 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
             .SelectMany(a => a.AlbumBands.Select(ab => (ab.BandId, a)))
             .ToLookup(x => x.BandId, x => x.a);
 
+        List<BandId> discographyCoArtistIds = discographyAlbums
+            .SelectMany(a => a.AlbumBands.Select(ab => ab.BandId))
+            .Except(bands.Keys)
+            .Distinct()
+            .ToList();
+
+        if (discographyCoArtistIds.Count > 0)
+        {
+            Dictionary<BandId, Band> discographyCoArtists = await context.Bands.AsNoTracking()
+                .Where(b => discographyCoArtistIds.Contains(b.Id))
+                .ToDictionaryAsync(b => b.Id, cancellationToken);
+            foreach (KeyValuePair<BandId, Band> kv in discographyCoArtists)
+                bands[kv.Key] = kv.Value;
+        }
+
         List<GenreId> genreIds = album.AlbumGenres.Select(ag => ag.GenreId).ToList();
 
         // Similar albums: same genre, exclude current + discography, random 4
@@ -42,11 +57,27 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
         List<Album> similarAlbums = await context.Albums.AsNoTracking()
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
+            .Include(a => a.AlbumBands)
             .Where(a => (!query.ApprovedOnly || a.IsApproved) && !excludeAlbumIds.Contains(a.Id))
             .Where(a => a.AlbumGenres.Any(ag => genreIds.Contains(ag.GenreId)))
             .OrderBy(_ => EF.Functions.Random())
             .Take(4)
             .ToListAsync(cancellationToken);
+
+        List<BandId> similarBandIds = similarAlbums
+            .SelectMany(a => a.AlbumBands.Select(ab => ab.BandId))
+            .Except(bands.Keys)
+            .Distinct()
+            .ToList();
+
+        if (similarBandIds.Count > 0)
+        {
+            Dictionary<BandId, Band> similarBands = await context.Bands.AsNoTracking()
+                .Where(b => similarBandIds.Contains(b.Id))
+                .ToDictionaryAsync(b => b.Id, cancellationToken);
+            foreach (KeyValuePair<BandId, Band> kv in similarBands)
+                bands[kv.Key] = kv.Value;
+        }
 
         List<GenreId> allGenreIds = genreIds
             .Concat(discographyAlbums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)))
@@ -85,17 +116,25 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
 
         AlbumDto albumDto = album.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels, tags, discographyByBand);
 
-        List<AlbumSummaryDto> similarAlbumDtos = similarAlbums.Select(a => new AlbumSummaryDto(
-            a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear,
-            urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
-            a.AlbumGenres
-                .Where(ag => genres.ContainsKey(ag.GenreId))
-                .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
-                .ToList(),
-            a.AlbumCountries
-                .Where(ac => countries.ContainsKey(ac.CountryId))
-                .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
-                .ToList())).ToList();
+        List<AlbumSummaryDto> similarAlbumDtos = similarAlbums.Select(a =>
+        {
+            Band? primaryBand = a.AlbumBands
+                .Select(ab => bands.GetValueOrDefault(ab.BandId))
+                .FirstOrDefault(b => b is not null);
+            return new AlbumSummaryDto(
+                a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear,
+                urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
+                a.AlbumGenres
+                    .Where(ag => genres.ContainsKey(ag.GenreId))
+                    .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
+                    .ToList(),
+                a.AlbumCountries
+                    .Where(ac => countries.ContainsKey(ac.CountryId))
+                    .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
+                    .ToList(),
+                primaryBand?.Id.Value ?? Guid.Empty,
+                primaryBand?.Name ?? string.Empty);
+        }).ToList();
 
         List<VideoBandDto> videos = await context.VideoBands.AsNoTracking()
             .Where(vb => bandIds.Contains(vb.BandId))

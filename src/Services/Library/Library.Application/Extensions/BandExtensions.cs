@@ -7,7 +7,8 @@ public static class BandExtensions
         IReadOnlyDictionary<CountryId, Country> countries,
         IReadOnlyDictionary<GenreId, Genre> genres,
         ILookup<BandId, Album> albumsByBand,
-        IStorageUrlResolver urlResolver) => new(
+        IStorageUrlResolver urlResolver,
+        IReadOnlyDictionary<BandId, Band> coArtistBands) => new(
             band.Id.Value,
             band.Name,
             band.Slug,
@@ -24,13 +25,18 @@ public static class BandExtensions
             albumsByBand[band.Id]
                 .DistinctBy(a => a.Id)
                 .OrderByDescending(a => a.AlbumRelease.ReleaseYear)
-                .Select(a => new AlbumSummaryDto(a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear, urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
-                    a.AlbumGenres.Where(ag => genres.ContainsKey(ag.GenreId))
-                        .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
-                        .ToList(),
-                    a.AlbumCountries.Where(ac => countries.ContainsKey(ac.CountryId))
-                        .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
-                        .ToList()))
+                .SelectMany(a => a.AlbumBands
+                    .Select(ab => ab.BandId == band.Id ? band : coArtistBands.GetValueOrDefault(ab.BandId))
+                    .Where(b => b is not null)
+                    .Select(b => new AlbumSummaryDto(a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear, urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
+                        a.AlbumGenres.Where(ag => genres.ContainsKey(ag.GenreId))
+                            .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
+                            .ToList(),
+                        a.AlbumCountries.Where(ac => countries.ContainsKey(ac.CountryId))
+                            .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
+                            .ToList(),
+                        b!.Id.Value,
+                        b.Name)))
                 .ToList(),
             band.BandGenres
                 .Where(bg => genres.ContainsKey(bg.GenreId))

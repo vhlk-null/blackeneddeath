@@ -63,17 +63,22 @@ public static class AlbumExtensions
                         .DistinctBy(a => a.Id)
                         .Where(a => a.Id != album.Id)
                         .OrderByDescending(a => a.AlbumRelease.ReleaseYear)
-                        .Select(a => new AlbumSummaryDto(
-                            a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear,
-                            urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
-                            a.AlbumGenres
-                                .Where(ag => genres.ContainsKey(ag.GenreId))
-                                .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
-                                .ToList(),
-                            a.AlbumCountries
-                                .Where(ac => countries.ContainsKey(ac.CountryId))
-                                .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
-                                .ToList()))
+                        .SelectMany(a => a.AlbumBands
+                            .Select(ab => bands.GetValueOrDefault(ab.BandId))
+                            .Where(ab => ab is not null)
+                            .Select(ab => new AlbumSummaryDto(
+                                a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear,
+                                urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
+                                a.AlbumGenres
+                                    .Where(ag => genres.ContainsKey(ag.GenreId))
+                                    .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
+                                    .ToList(),
+                                a.AlbumCountries
+                                    .Where(ac => countries.ContainsKey(ac.CountryId))
+                                    .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
+                                    .ToList(),
+                                ab!.Id.Value,
+                                ab.Name)))
                         .ToList()))
                 .ToList(),
             album.AlbumCountries

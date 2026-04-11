@@ -9,4 +9,6 @@ public record AlbumSummaryDto(
     AlbumType Type,
     AlbumFormat Format,
     IReadOnlyList<GenreDto> Genres,
-    IReadOnlyList<CountryDto> Countries);
+    IReadOnlyList<CountryDto> Countries,
+    Guid BandId,
+    string BandName);
