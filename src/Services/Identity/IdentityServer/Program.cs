@@ -66,7 +66,7 @@ IIdentityServerBuilder identityServerBuilder = builder.Services.AddIdentityServe
     .AddAspNetIdentity<ApplicationUser>();
 
 if (builder.Environment.IsDevelopment())
-    identityServerBuilder.AddDeveloperSigningCredential(persistKey: false);
+    identityServerBuilder.AddDeveloperSigningCredential(persistKey: true);
 else
     identityServerBuilder.AddDeveloperSigningCredential(persistKey: true, filename: "/app/keys/signing-credential.jwk");
 
