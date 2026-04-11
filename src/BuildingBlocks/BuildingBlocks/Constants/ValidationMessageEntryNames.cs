@@ -12,4 +12,6 @@ public static class ValidationMessageEntryNames
     public const string ReleaseYearTooOld = nameof(ReleaseYearTooOld);
     public const string ReleaseYearInFuture = nameof(ReleaseYearInFuture);
     public const string ReleaseYearRequired = nameof(ReleaseYearRequired);
+    public const string BandYearOutOfRange = nameof(BandYearOutOfRange);
+    public const string DisbandedYearBeforeFormed = nameof(DisbandedYearBeforeFormed);
 }

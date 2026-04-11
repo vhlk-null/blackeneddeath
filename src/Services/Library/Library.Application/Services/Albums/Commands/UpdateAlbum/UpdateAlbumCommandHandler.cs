@@ -21,7 +21,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
             .Where(t => albumTrackIds.Contains(t.Id))
             .ToListAsync(cancellationToken);
 
-        if (command.Album.LabelIds is { Count: > 0 })
+        if (command.Album.LabelIds is { Count: > 0 } && command.Album.LabelNames is not { Count: > 0 })
         {
             Guid labelGuid = command.Album.LabelIds[0];
             if (!await context.Labels.AnyAsync(l => l.Id == LabelId.Of(labelGuid), cancellationToken))
@@ -40,7 +40,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
         }
 
         AlbumRelease albumRelease = AlbumRelease.Of(command.Album.ReleaseDate, command.Album.Format);
-        LabelId? labelId = command.Album.LabelIds is { Count: > 0 } ? LabelId.Of(command.Album.LabelIds[0]) : null;
+        LabelId? labelId = await ResolveLabelAsync(command.Album, cancellationToken);
 
         string newSlug = album.Title != command.Album.Title
             ? await GenerateUniqueSlugAsync(command.Album.Title, command.Album.ReleaseDate, album.Id, cancellationToken)
@@ -49,7 +49,8 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
         album.Update(command.Album.Title, newSlug, command.Album.Type, albumRelease, coverKey, labelId);
         album.Approve();
 
-        ReconcileBands(album, command.Album);
+        List<BandId> bandIds = await ResolveBandIdsAsync(command.Album, cancellationToken);
+        ReconcileBands(album, bandIds);
         ReconcileCountries(album, command.Album);
         ReconcileGenres(album, command.Album);
         ReconcileTags(album, command.Album);
@@ -71,15 +72,40 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
         return slug;
     }
 
-    private static void ReconcileBands(Album album, UpdateAlbumDto dto)
+    private async Task<List<BandId>> ResolveBandIdsAsync(UpdateAlbumDto album, CancellationToken cancellationToken)
+    {
+        List<BandId> result = album.BandIds.Select(BandId.Of).ToList();
+
+        if (album.BandNames is not { Count: > 0 })
+            return result;
+
+        foreach (string name in album.BandNames)
+        {
+            string trimmed = name.Trim();
+            Band? existing = await context.Bands.FirstOrDefaultAsync(b => b.Name.ToLower() == trimmed.ToLower(), cancellationToken);
+            if (existing is not null)
+            {
+                result.Add(existing.Id);
+                continue;
+            }
+
+            Band newBand = Band.Create(trimmed, null, null, BandActivity.Of(null, null), BandStatus.Unknown);
+            await context.Bands.AddAsync(newBand, cancellationToken);
+            result.Add(newBand.Id);
+        }
+
+        return result;
+    }
+
+    private static void ReconcileBands(Album album, List<BandId> incomingIds)
     {
         HashSet<BandId> currentIds = album.AlbumBands.Select(x => x.BandId).ToHashSet();
-        HashSet<BandId> incomingIds = dto.BandIds.Select(BandId.Of).ToHashSet();
+        HashSet<BandId> incoming = incomingIds.ToHashSet();
 
-        foreach (BandId id in currentIds.Except(incomingIds))
+        foreach (BandId id in currentIds.Except(incoming))
             album.RemoveBand(id);
 
-        foreach (BandId id in incomingIds.Except(currentIds))
+        foreach (BandId id in incoming.Except(currentIds))
             album.AddBand(id);
     }
 
@@ -190,6 +216,23 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
                 album.AddTrack(newTrack.Id, incoming.TrackNumber);
             }
         }
+    }
+
+    private async Task<LabelId?> ResolveLabelAsync(UpdateAlbumDto album, CancellationToken cancellationToken)
+    {
+        if (album.LabelNames is { Count: > 0 })
+        {
+            string name = album.LabelNames[0].Trim();
+            Label? existing = await context.Labels.FirstOrDefaultAsync(l => l.Name.ToLower() == name.ToLower(), cancellationToken);
+            if (existing is not null)
+                return existing.Id;
+
+            Label newLabel = Label.Create(LabelId.Of(Guid.NewGuid()), name);
+            await context.Labels.AddAsync(newLabel, cancellationToken);
+            return newLabel.Id;
+        }
+
+        return album.LabelIds is { Count: > 0 } ? LabelId.Of(album.LabelIds[0]) : null;
     }
 
     private static string Slugify(string value) =>

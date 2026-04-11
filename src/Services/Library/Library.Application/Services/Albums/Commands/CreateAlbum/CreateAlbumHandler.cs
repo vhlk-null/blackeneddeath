@@ -15,7 +15,9 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
         }
 
         string slug = await GenerateUniqueSlugAsync(command.Album.Title, command.Album.ReleaseDate, cancellationToken);
-        Album album = CreateNewAlbum(command.Album, coverKey, slug);
+        LabelId? labelId = await ResolveLabelAsync(command.Album, cancellationToken);
+        List<BandId> bandIds = await ResolveBandIdsAsync(command.Album, cancellationToken);
+        Album album = CreateNewAlbum(command.Album, coverKey, slug, labelId, bandIds);
 
         if (command.Album.Tracks is { Count: > 0 })
         {
@@ -45,6 +47,7 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
             if (!await context.Bands.AnyAsync(b => b.Id == BandId.Of(id), cancellationToken))
                 throw new BandNotFoundException(id);
         }
+
 
         foreach (Guid id in album.CountryIds)
         {
@@ -84,15 +87,56 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
         return slug;
     }
 
-    private Album CreateNewAlbum(CreateAlbumDto album, string? coverKey, string slug)
+    private async Task<LabelId?> ResolveLabelAsync(CreateAlbumDto album, CancellationToken cancellationToken)
+    {
+        if (album.LabelNames is { Count: > 0 })
+        {
+            string name = album.LabelNames[0].Trim();
+            Label? existing = await context.Labels.FirstOrDefaultAsync(l => l.Name.ToLower() == name.ToLower(), cancellationToken);
+            if (existing is not null)
+                return existing.Id;
+
+            Label newLabel = Label.Create(LabelId.Of(Guid.NewGuid()), name);
+            await context.Labels.AddAsync(newLabel, cancellationToken);
+            return newLabel.Id;
+        }
+
+        return album.LabelIds is { Count: > 0 } ? LabelId.Of(album.LabelIds[0]) : null;
+    }
+
+    private async Task<List<BandId>> ResolveBandIdsAsync(CreateAlbumDto album, CancellationToken cancellationToken)
+    {
+        List<BandId> result = album.BandIds.Select(BandId.Of).ToList();
+
+        if (album.BandNames is not { Count: > 0 })
+            return result;
+
+        foreach (string name in album.BandNames)
+        {
+            string trimmed = name.Trim();
+            Band? existing = await context.Bands.FirstOrDefaultAsync(b => b.Name.ToLower() == trimmed.ToLower(), cancellationToken);
+            if (existing is not null)
+            {
+                result.Add(existing.Id);
+                continue;
+            }
+
+            Band newBand = Band.Create(trimmed, null, null, BandActivity.Of(null, null), BandStatus.Unknown);
+            await context.Bands.AddAsync(newBand, cancellationToken);
+            result.Add(newBand.Id);
+        }
+
+        return result;
+    }
+
+    private Album CreateNewAlbum(CreateAlbumDto album, string? coverKey, string slug, LabelId? labelId, List<BandId> bandIds)
     {
         AlbumRelease albumRelease = AlbumRelease.Of(album.ReleaseDate, album.Format);
-        LabelId? labelId = album.LabelIds is { Count: > 0 } ? LabelId.Of(album.LabelIds[0]) : null;
 
         Album newAlbum = Album.Create(album.Title, album.Type, albumRelease, coverKey, labelId, slug: slug);
 
-        foreach (Guid id in album.BandIds)
-            newAlbum.AddBand(BandId.Of(id));
+        foreach (BandId bandId in bandIds)
+            newAlbum.AddBand(bandId);
 
         foreach (Guid id in album.CountryIds)
             newAlbum.AddCountry(CountryId.Of(id));

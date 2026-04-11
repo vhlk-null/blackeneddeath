@@ -11,7 +11,8 @@ WebApplication app = builder.Build();
 
 app.UseApiServices();
 
-await app.InitializeDatabaseAsync();
+if (app.Environment.IsDevelopment())
+    await app.InitializeDatabaseAsync();
 
 app.Run();
 

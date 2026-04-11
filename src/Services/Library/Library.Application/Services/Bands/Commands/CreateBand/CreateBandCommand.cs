@@ -16,13 +16,15 @@ public class CreateBandCommandValidator : AbstractValidator<CreateBandCommand>
             .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField);
 
         RuleFor(x => x.Band.FormedYear)
-            .GreaterThan(1900).When(x => x.Band.FormedYear.HasValue)
-            .LessThanOrEqualTo(DateTime.UtcNow.Year).When(x => x.Band.FormedYear.HasValue);
+            .InclusiveBetween(1900, 2099).WithMessage(ValidationMessages.BandYearOutOfRange)
+            .When(x => x.Band.FormedYear.HasValue);
 
         RuleFor(x => x.Band.DisbandedYear)
-            .GreaterThan(1900).When(x => x.Band.DisbandedYear.HasValue)
-            .LessThanOrEqualTo(DateTime.UtcNow.Year).When(x => x.Band.DisbandedYear.HasValue)
-            .GreaterThanOrEqualTo(x => x.Band.FormedYear).When(x => x.Band.FormedYear.HasValue && x.Band.DisbandedYear.HasValue)
-            .WithMessage("Disbanded year must be after formed year");
+            .InclusiveBetween(1900, 2099).WithMessage(ValidationMessages.BandYearOutOfRange)
+            .When(x => x.Band.DisbandedYear.HasValue);
+
+        RuleFor(x => x.Band.DisbandedYear)
+            .GreaterThanOrEqualTo(x => x.Band.FormedYear).WithMessage(ValidationMessages.DisbandedYearBeforeFormed)
+            .When(x => x.Band.FormedYear.HasValue && x.Band.DisbandedYear.HasValue);
     }
 }

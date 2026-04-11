@@ -130,12 +130,18 @@
     <value>Maximum length is exceeded</value>
   </data>
   <data name="ReleaseYearInFuture" xml:space="preserve">
-    <value>Release year cannot be in the future</value>
+    <value>Enter a valid year (1960–current year + 1)</value>
   </data>
   <data name="ReleaseYearRequired" xml:space="preserve">
     <value>Release year is required</value>
   </data>
   <data name="ReleaseYearTooOld" xml:space="preserve">
-    <value>Release year must be after 1900</value>
+    <value>Enter a valid year (1960–current year + 1)</value>
+  </data>
+  <data name="BandYearOutOfRange" xml:space="preserve">
+    <value>Enter a valid year (1900–2099)</value>
+  </data>
+  <data name="DisbandedYearBeforeFormed" xml:space="preserve">
+    <value>Disbanded year must be after formed year</value>
   </data>
 </root>

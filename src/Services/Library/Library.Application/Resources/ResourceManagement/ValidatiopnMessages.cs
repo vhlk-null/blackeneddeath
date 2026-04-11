@@ -39,4 +39,10 @@ public static class ValidationMessages
 
     public static string ReleaseYearRequired =>
         resourceManager.GetString(ValidationMessageEntryNames.ReleaseYearRequired, CultureInfo.CurrentCulture)!;
+
+    public static string BandYearOutOfRange =>
+        resourceManager.GetString(ValidationMessageEntryNames.BandYearOutOfRange, CultureInfo.CurrentCulture)!;
+
+    public static string DisbandedYearBeforeFormed =>
+        resourceManager.GetString(ValidationMessageEntryNames.DisbandedYearBeforeFormed, CultureInfo.CurrentCulture)!;
 }

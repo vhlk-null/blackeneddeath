@@ -25,9 +25,8 @@ public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
                 .NotEmpty().WithMessage(ValidationMessages.EmptyRequiredField);
 
             RuleFor(x => x.Album.ReleaseDate)
-                .GreaterThan(0).WithMessage(ValidationMessages.ReleaseYearRequired)
-                .GreaterThan(1900).WithMessage(ValidationMessages.ReleaseYearTooOld)
-                .LessThanOrEqualTo(DateTime.UtcNow.Year).WithMessage(ValidationMessages.ReleaseYearInFuture);
+                .GreaterThanOrEqualTo(1960).WithMessage(ValidationMessages.ReleaseYearTooOld)
+                .LessThanOrEqualTo(DateTime.UtcNow.Year + 1).WithMessage(ValidationMessages.ReleaseYearInFuture);
         });
     }
 }
