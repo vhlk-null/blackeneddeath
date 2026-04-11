@@ -31,12 +31,12 @@
 
         public List<ApiScope> ApiScopes =>
         [
-            new(Scopes.LibraryApi, "Library API")
+            new(Scopes.LibraryApi, "Blackeneddeath API")
         ];
 
         public IEnumerable<ApiResource> ApiResources =>
         [
-            new(Scopes.LibraryApi, "Library API")
+            new(Scopes.LibraryApi, "Blackeneddeath API")
             {
                 Scopes = { Scopes.LibraryApi },
                 UserClaims = { JwtClaimTypes.Role }
