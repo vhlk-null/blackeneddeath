@@ -52,6 +52,7 @@ public static class AlbumExtensions
             album.AlbumRelease.Format,
             album.LabelId != null && labels.TryGetValue(album.LabelId, out Label? label) ? label.ToLabelDto() : null,
             album.AlbumBands
+                .OrderBy(ab => ab.Order)
                 .Where(ab => bands.ContainsKey(ab.BandId))
                 .Select(ab => bands[ab.BandId])
                 .Select(b => new BandSummaryDto(

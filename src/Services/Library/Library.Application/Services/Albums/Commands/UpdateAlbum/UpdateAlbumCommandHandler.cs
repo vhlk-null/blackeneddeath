@@ -107,6 +107,8 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
 
         foreach (BandId id in incoming.Except(currentIds))
             album.AddBand(id);
+
+        album.ReorderBands(incomingIds.Where(id => album.AlbumBands.Any(ab => ab.BandId == id)).ToList());
     }
 
     private static void ReconcileCountries(Album album, UpdateAlbumDto dto)

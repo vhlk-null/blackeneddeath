@@ -81,7 +81,18 @@ public class Album : Aggregate<AlbumId>
         if (_albumBands.Any(x => x.BandId == bandId))
             throw new DomainException("Band is already associated with this album.");
 
-        _albumBands.Add(new AlbumBand(Id, bandId));
+        int order = _albumBands.Count > 0 ? _albumBands.Max(x => x.Order) + 1 : 0;
+        _albumBands.Add(new AlbumBand(Id, bandId, order));
+    }
+
+    public void ReorderBands(List<BandId> orderedBandIds)
+    {
+        for (int i = 0; i < orderedBandIds.Count; i++)
+        {
+            AlbumBand entry = _albumBands.FirstOrDefault(x => x.BandId == orderedBandIds[i])
+                              ?? throw new DomainException("Band is not associated with this album.");
+            entry.SetOrder(i);
+        }
     }
 
     public void RemoveBand(BandId bandId)
