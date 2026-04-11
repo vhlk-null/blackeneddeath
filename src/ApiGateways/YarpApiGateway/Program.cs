@@ -84,11 +84,7 @@ builder.Services.AddCors(options =>
 {
     string[] origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
     options.AddDefaultPolicy(policy =>
-        policy.SetIsOriginAllowed(origin =>
-              {
-                  Uri uri = new Uri(origin);
-                  return uri.Host == "localhost" || origins.Contains(origin);
-              })
+        policy.WithOrigins(origins)
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
