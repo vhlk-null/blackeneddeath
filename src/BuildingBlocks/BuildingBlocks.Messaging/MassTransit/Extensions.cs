@@ -39,7 +39,11 @@ public static class Extensions
                 {
                     h.Username(username!);
                     h.Password(configuration["MessageBroker:Password"]!);
+
+                    h.RequestedConnectionTimeout(TimeSpan.FromSeconds(30));
                 });
+
+                cfg.UseMessageRetry(r => r.Exponential(5, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(5)));
 
                 cfg.ConfigureEndpoints(context);
 
