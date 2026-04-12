@@ -151,6 +151,6 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context, IStorageUrlReso
             albumDto.CoverUrl, albumDto.Type, albumDto.Format, albumDto.Label,
             albumDto.Bands, albumDto.Countries, albumDto.StreamingLinks,
             albumDto.Tracks, albumDto.Genres, albumDto.Tags, albumDto.TotalDuration,
-            videos, similarAlbumDtos));
+            albumDto.DiscographyGroups, videos, similarAlbumDtos));
     }
 }
