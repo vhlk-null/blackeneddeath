@@ -11,6 +11,7 @@ public static class DependencyInjection
                          ?? throw new InvalidOperationException("GrpcSettings:LibraryUrl is missing");
 
         services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());
+        services.AddHttpContextAccessor();
 
         services.AddScoped<IUserContentService, UserContentService>();
 

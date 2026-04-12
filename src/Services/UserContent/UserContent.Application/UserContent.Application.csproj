@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\EventHandlers\**" />
+    <EmbeddedResource Remove="Services\EventHandlers\**" />
+    <None Remove="Services\EventHandlers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Google.Protobuf" />
     <PackageReference Include="Grpc.Net.Client" />
     <PackageReference Include="Grpc.Net.ClientFactory" />
@@ -23,10 +29,6 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks\BuildingBlocks.csproj" />
     <ProjectReference Include="..\UserContent.Domain\UserContent.Domain.csproj" />
     <ProjectReference Include="..\UserContent.Infrastructure\UserContent.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\EventHandlers\Domain\" />
   </ItemGroup>
 
   <ItemGroup>

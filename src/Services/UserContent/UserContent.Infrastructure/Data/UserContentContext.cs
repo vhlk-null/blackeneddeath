@@ -15,6 +15,8 @@ public class UserContentContext : DbContext
     public virtual DbSet<Band> Bands { get; set; }
     public virtual DbSet<FavoriteAlbum> FavoriteAlbums { get; set; }
     public virtual DbSet<FavoriteBand> FavoriteBands { get; set; }
+    public virtual DbSet<AlbumRating> AlbumRatings { get; set; }
+    public virtual DbSet<BandRating> BandRatings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,5 +27,7 @@ public class UserContentContext : DbContext
         modelBuilder.SetupBand();
         modelBuilder.SetupFavoriteAlbum();
         modelBuilder.SetupFavoriteBand();
+        modelBuilder.SetupAlbumRating();
+        modelBuilder.SetupBandRating();
     }
 }

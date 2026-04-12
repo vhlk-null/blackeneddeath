@@ -64,6 +64,10 @@ builder.Services.AddReverseProxy()
             if (userName is not null)
                 transformContext.ProxyRequest.Headers.TryAddWithoutValidation("X-User-Name", userName);
 
+            string? email = user.FindFirst("email")?.Value;
+            if (email is not null)
+                transformContext.ProxyRequest.Headers.TryAddWithoutValidation("X-User-Email", email);
+
             List<string> roles = user.FindAll("role").Select(c => c.Value).ToList();
             if (roles.Count > 0)
                 transformContext.ProxyRequest.Headers.TryAddWithoutValidation("X-User-Role", string.Join(",", roles));

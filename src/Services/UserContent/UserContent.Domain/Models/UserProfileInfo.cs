@@ -4,7 +4,7 @@ public class UserProfileInfo
 {
     public Guid UserId { get; set; }
     public string Username { get; set; } = null!;
-    public string Email { get; set; } = null!;
+    public string? Email { get; set; }
     public string? AvatarUrl { get; set; }
     public DateTime RegisteredDate { get; set; }
     public DateTime? LastLoginDate { get; set; }
@@ -14,4 +14,6 @@ public class UserProfileInfo
     public int ReviewsCount { get; set; }
     public List<FavoriteAlbum> FavoriteAlbums { get; set; } = new();
     public List<FavoriteBand> FavoriteBands { get; set; } = new();
+    public List<AlbumRating> AlbumRatings { get; set; } = new();
+    public List<BandRating> BandRatings { get; set; } = new();
 }

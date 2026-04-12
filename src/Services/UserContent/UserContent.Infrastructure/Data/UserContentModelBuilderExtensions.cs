@@ -20,7 +20,6 @@ public static class UserContentModelBuilderExtensions
                 .HasColumnName("username");
 
             entity.Property(e => e.Email)
-                .IsRequired()
                 .HasMaxLength(255)
                 .HasColumnName("email");
 
@@ -70,6 +69,13 @@ public static class UserContentModelBuilderExtensions
 
             entity.Property(e => e.ReleaseDate)
                 .HasColumnName("release_date");
+
+            entity.Property(e => e.AverageRating)
+                .HasColumnName("average_rating");
+
+            entity.Property(e => e.RatingsCount)
+                .HasColumnName("ratings_count")
+                .HasDefaultValue(0);
         });
     }
 
@@ -96,6 +102,13 @@ public static class UserContentModelBuilderExtensions
 
             entity.Property(e => e.ReleaseDate)
                 .HasColumnName("release_date");
+
+            entity.Property(e => e.AverageRating)
+                .HasColumnName("average_rating");
+
+            entity.Property(e => e.RatingsCount)
+                .HasColumnName("ratings_count")
+                .HasDefaultValue(0);
         });
     }
 
@@ -162,6 +175,70 @@ public static class UserContentModelBuilderExtensions
 
             entity.HasOne(e => e.Band)
                 .WithMany(b => b.FavoriteBands)
+                .HasForeignKey(e => e.BandId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    public static void SetupAlbumRating(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<AlbumRating>(entity =>
+        {
+            entity.ToTable("album_ratings");
+
+            entity.HasKey(e => new { e.UserId, e.AlbumId });
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.AlbumId)
+                .HasColumnName("album_id");
+
+            entity.Property(e => e.Rating)
+                .HasColumnName("rating");
+
+            entity.Property(e => e.RatedAt)
+                .HasColumnName("rated_at");
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.AlbumRatings)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Album)
+                .WithMany(a => a.Ratings)
+                .HasForeignKey(e => e.AlbumId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    public static void SetupBandRating(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BandRating>(entity =>
+        {
+            entity.ToTable("band_ratings");
+
+            entity.HasKey(e => new { e.UserId, e.BandId });
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.BandId)
+                .HasColumnName("band_id");
+
+            entity.Property(e => e.Rating)
+                .HasColumnName("rating");
+
+            entity.Property(e => e.RatedAt)
+                .HasColumnName("rated_at");
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.BandRatings)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Band)
+                .WithMany(b => b.Ratings)
                 .HasForeignKey(e => e.BandId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
