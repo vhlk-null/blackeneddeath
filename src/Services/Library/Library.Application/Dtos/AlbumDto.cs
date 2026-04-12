@@ -1,4 +1,4 @@
-﻿namespace Library.Application.Dtos;
+namespace Library.Application.Dtos;
 
 public record AlbumDto(
     Guid Id,
@@ -15,7 +15,8 @@ public record AlbumDto(
     List<TrackDto> Tracks,
     List<GenreDto> Genres,
     List<TagDto> Tags,
-    string? TotalDuration);
+    string? TotalDuration,
+    List<DiscographyGroupDto> DiscographyGroups);
 
 public record AlbumDetailDto(
     Guid Id,
@@ -33,5 +34,6 @@ public record AlbumDetailDto(
     List<GenreDto> Genres,
     List<TagDto> Tags,
     string? TotalDuration,
+    List<DiscographyGroupDto> DiscographyGroups,
     List<VideoBandDto> Videos,
     List<AlbumSummaryDto> SimilarAlbums);
