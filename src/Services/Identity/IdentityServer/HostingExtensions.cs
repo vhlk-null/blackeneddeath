@@ -25,7 +25,15 @@ public static class HostingExtensions
 
         await configContext.Database.MigrateAsync();
 
-        Config config = new(app.Configuration);
+        await SyncConfigurationAsync(configContext, app.Configuration);
+
+        if (app.Environment.IsDevelopment())
+            await SeedUsersAsync(scope.ServiceProvider, app.Configuration);
+    }
+
+    private static async Task SyncConfigurationAsync(ConfigurationDbContext configContext, IConfiguration configuration)
+    {
+        Config config = new(configuration);
 
         if (!configContext.Clients.Any())
         {
@@ -65,13 +73,12 @@ public static class HostingExtensions
         }
 
         await configContext.SaveChangesAsync();
-
-        await SeedUsersAsync(scope.ServiceProvider, config);
     }
 
-    private static async Task SeedUsersAsync(IServiceProvider services, Config config)
+    private static async Task SeedUsersAsync(IServiceProvider services, IConfiguration configuration)
     {
         UserManager<ApplicationUser> userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        Config config = new(configuration);
 
         foreach (Duende.IdentityServer.Test.TestUser testUser in config.TestUsers)
         {
