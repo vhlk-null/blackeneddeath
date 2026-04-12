@@ -25,18 +25,17 @@ public static class BandExtensions
             albumsByBand[band.Id]
                 .DistinctBy(a => a.Id)
                 .OrderByDescending(a => a.AlbumRelease.ReleaseYear)
-                .SelectMany(a => a.AlbumBands
-                    .Select(ab => ab.BandId == band.Id ? band : coArtistBands.GetValueOrDefault(ab.BandId))
-                    .Where(b => b is not null)
-                    .Select(b => new AlbumSummaryDto(a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear, urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
-                        a.AlbumGenres.Where(ag => genres.ContainsKey(ag.GenreId))
-                            .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
-                            .ToList(),
-                        a.AlbumCountries.Where(ac => countries.ContainsKey(ac.CountryId))
-                            .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
-                            .ToList(),
-                        b!.Id.Value,
-                        b.Name)))
+                .Select(a => new AlbumSummaryDto(
+                    a.Id.Value, a.Title, a.Slug ?? string.Empty, a.AlbumRelease.ReleaseYear,
+                    urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
+                    a.AlbumGenres.Where(ag => genres.ContainsKey(ag.GenreId))
+                        .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))
+                        .ToList(),
+                    a.AlbumCountries.Where(ac => countries.ContainsKey(ac.CountryId))
+                        .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
+                        .ToList(),
+                    band.Id.Value,
+                    band.Name))
                 .ToList(),
             band.BandGenres
                 .Where(bg => genres.ContainsKey(bg.GenreId))
