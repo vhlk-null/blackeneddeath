@@ -1,3 +1,4 @@
+using BuildingBlocks.Authentication;
 using BuildingBlocks.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +12,16 @@ public static class DependencyInjection
         services.AddControllers();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
+
+        services.AddAuthentication("GatewayHeader")
+            .AddScheme<GatewayHeaderAuthenticationOptions, GatewayHeaderAuthenticationHandler>(
+                "GatewayHeader", _ => { });
+
+        services.AddAuthorization(opt =>
+        {
+            opt.AddPolicy("AdminOnly", policy =>
+                policy.RequireRole("admin"));
+        });
 
         return services;
     }

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
+
 namespace UserContent.API.Endpoints.FavoriteAlbums;
 
 public record AddAlbumToFavoriteRequest(Guid AlbumId, Guid UserId);
@@ -7,6 +9,7 @@ public record DeleteFavoriteAlbumResponse(bool IsSuccess);
 [ApiController]
 [Route("favoriteAlbums")]
 [Tags("Favorite Albums")]
+[Authorize]
 public class FavoriteAlbumsController(IUserContentService service) : ControllerBase
 {
     [HttpPost]

@@ -32,6 +32,9 @@
         public List<ApiScope> ApiScopes =>
         [
             new(Scopes.LibraryApi, "Blackeneddeath API")
+            {
+                UserClaims = { JwtClaimTypes.Role }
+            }
         ];
 
         public IEnumerable<ApiResource> ApiResources =>

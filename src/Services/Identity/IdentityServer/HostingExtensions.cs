@@ -33,10 +33,23 @@ public static class HostingExtensions
                 configContext.Clients.Add(client.ToEntity());
         }
 
-        if (!configContext.ApiScopes.Any())
+        foreach (Duende.IdentityServer.Models.ApiScope apiScope in config.ApiScopes)
         {
-            foreach (Duende.IdentityServer.Models.ApiScope apiScope in config.ApiScopes)
+            Duende.IdentityServer.EntityFramework.Entities.ApiScope? existing =
+                configContext.ApiScopes
+                    .Include(s => s.UserClaims)
+                    .FirstOrDefault(s => s.Name == apiScope.Name);
+
+            if (existing is null)
+            {
                 configContext.ApiScopes.Add(apiScope.ToEntity());
+            }
+            else
+            {
+                existing.UserClaims.Clear();
+                foreach (string claim in apiScope.UserClaims)
+                    existing.UserClaims.Add(new() { Type = claim });
+            }
         }
 
         if (!configContext.ApiResources.Any())
