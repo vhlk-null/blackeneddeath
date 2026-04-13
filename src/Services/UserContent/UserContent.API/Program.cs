@@ -16,9 +16,10 @@ MappingConfig.RegisterMappings();
 // ===== APP =====
 WebApplication app = builder.Build();
 
+await app.InitializeDatabaseAsync();
+
 if (app.Environment.IsDevelopment())
 {
-    await app.InitializeDatabaseAsync();
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
