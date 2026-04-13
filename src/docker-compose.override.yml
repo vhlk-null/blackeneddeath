@@ -106,6 +106,8 @@ services:
   library.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=
+      - ASPNETCORE_HTTPS_PORTS=
       - DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2UNENCRYPTEDSUPPORT=true
       - ConnectionStrings__LibraryDb=Host=librarydb;Port=5432;Database=LibraryDb;Username=postgres;Password=postgres
       - MessageBroker__Host=amqp://messagebroker:5672
@@ -126,7 +128,6 @@ services:
     ports:
       - "6000:8080"
       - "6001:8081"
-      - "6002:8082"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -140,7 +141,7 @@ services:
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__UserContentDB=Host=usercontentdb;Port=5432;Database=UserContentDB;Username=postgres;Password=postgres
       - ConnectionStrings__Redis=distributedcache:6379,abortConnect=false
-      - GrpcSettings__LibraryUrl=http://library.api:8082
+      - GrpcSettings__LibraryUrl=http://library.api:8080
       - MessageBroker__Host=amqp://messagebroker:5672
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest

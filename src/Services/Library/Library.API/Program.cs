@@ -1,12 +1,4 @@
-﻿using Microsoft.AspNetCore.Server.Kestrel.Core;
-
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(8080, o => o.Protocols = HttpProtocols.Http1);
-    options.ListenAnyIP(8082, o => o.Protocols = HttpProtocols.Http2);
-});
+﻿WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddApplicationServices()
