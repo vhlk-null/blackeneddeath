@@ -106,12 +106,7 @@ services:
   library.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_Kestrel__Endpoints__Http__Url=http://+:8080
-      - ASPNETCORE_Kestrel__Endpoints__Http__Protocols=Http1AndHttp2
-      - ASPNETCORE_Kestrel__Endpoints__Https__Url=https://+:8081
-      - ASPNETCORE_Kestrel__Endpoints__Https__Protocols=Http1AndHttp2
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=DevPassword123!
+      - DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2UNENCRYPTEDSUPPORT=true
       - ConnectionStrings__LibraryDb=Host=librarydb;Port=5432;Database=LibraryDb;Username=postgres;Password=postgres
       - MessageBroker__Host=amqp://messagebroker:5672
       - MessageBroker__UserName=guest
@@ -121,6 +116,8 @@ services:
       - Storage__ApiKey=695255835435442
       - Storage__ApiSecret=IfARU4chBqqo_usv7spAL76YOL4
       - IdentityServer__Authority=http://identity.server:8080
+      - Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
+      - Kestrel__Certificates__Default__Password=DevPassword123!
     depends_on:
       librarydb:
         condition: service_healthy
@@ -131,6 +128,7 @@ services:
     ports:
       - "6000:8080"
       - "6001:8081"
+      - "6002:8082"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -144,10 +142,11 @@ services:
       - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__UserContentDB=Host=usercontentdb;Port=5432;Database=UserContentDB;Username=postgres;Password=postgres
       - ConnectionStrings__Redis=distributedcache:6379,abortConnect=false
-      - GrpcSettings__LibraryUrl=http://library.api:8080
+      - GrpcSettings__LibraryUrl=http://library.api:8082
       - MessageBroker__Host=amqp://messagebroker:5672
       - MessageBroker__UserName=guest
       - MessageBroker__Password=guest
+      - DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2UNENCRYPTEDSUPPORT=true
     depends_on:
       usercontentdb:
         condition: service_healthy

@@ -15,20 +15,29 @@ public static class DependencyInjection
 
         services.AddScoped<IUserContentService, UserContentService>();
 
-        // gRPC — force HTTP/2 cleartext (h2c) for Railway private network
+        // gRPC — force HTTP/2
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
+        bool isHttps = grpcUrl.StartsWith("https://");
 
         services.AddGrpcClient<LibraryProtoService.LibraryProtoServiceClient>(options =>
         {
             options.Address = new Uri(grpcUrl);
-        }).ConfigureChannel(o =>
+        }).ConfigurePrimaryHttpMessageHandler(() =>
         {
-            o.HttpHandler = new SocketsHttpHandler
+            SocketsHttpHandler handler = new()
             {
                 EnableMultipleHttp2Connections = true,
                 PooledConnectionIdleTimeout = TimeSpan.FromMinutes(5),
             };
-            o.UnsafeUseInsecureChannelCallCredentials = false;
+
+            if (isHttps)
+                handler.SslOptions = new System.Net.Security.SslClientAuthenticationOptions
+                {
+                    RemoteCertificateValidationCallback = (_, _, _, _) => true
+                };
+
+            return handler;
         });
         services.AddScoped<ILibraryService, LibraryGrpcService>();
 

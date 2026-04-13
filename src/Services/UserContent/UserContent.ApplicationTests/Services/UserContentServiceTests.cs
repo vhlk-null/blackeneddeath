@@ -1,7 +1,9 @@
 using System.Linq.Expressions;
+using System.Security.Claims;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Repositories;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using UserContent.Application.Abstractions;
 using UserContent.Application.Dtos;
@@ -18,6 +20,7 @@ public class UserContentServiceTests
 {
     private readonly Mock<IRepository<UserContentContext>> _repoMock = new();
     private readonly Mock<ILibraryService> _libraryMock = new();
+    private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new();
     private readonly UserContentService _sut;
 
     static UserContentServiceTests() => MappingConfig.RegisterMappings();
@@ -25,7 +28,23 @@ public class UserContentServiceTests
     public UserContentServiceTests()
     {
         _repoMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
-        _sut = new UserContentService(_repoMock.Object, _libraryMock.Object);
+
+        // default: profile exists — prevents EnsureUserProfileAsync from creating a new one
+        _repoMock.Setup(x => x.GetByAsync<UserProfileInfo>(
+                It.IsAny<Expression<Func<UserProfileInfo, bool>>>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new UserProfileInfo { UserId = Guid.NewGuid(), Username = "test_user", RegisteredDate = DateTime.UtcNow });
+
+        DefaultHttpContext httpContext = new();
+        httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(
+        [
+            new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Name, "test_user")
+        ]));
+        _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(httpContext);
+
+        _sut = new UserContentService(_repoMock.Object, _libraryMock.Object, _httpContextAccessorMock.Object);
     }
 
     // ── GetUserProfile ────────────────────────────────────────────────────────
