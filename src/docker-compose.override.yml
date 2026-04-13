@@ -116,8 +116,6 @@ services:
       - Storage__ApiKey=695255835435442
       - Storage__ApiSecret=IfARU4chBqqo_usv7spAL76YOL4
       - IdentityServer__Authority=http://identity.server:8080
-      - Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
-      - Kestrel__Certificates__Default__Password=DevPassword123!
     depends_on:
       librarydb:
         condition: service_healthy
