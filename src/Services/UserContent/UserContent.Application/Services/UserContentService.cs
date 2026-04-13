@@ -88,28 +88,35 @@ public class UserContentService(
         await repo.SaveChangesAsync(ct);
     }
 
-    public async Task<(int? UserRating, double? AverageRating)> GetAlbumRatingAsync(Guid userId, Guid albumId, CancellationToken ct = default)
+    public async Task<(int? UserRating, double? AverageRating, int RatingsCount)> GetAlbumRatingAsync(Guid userId, Guid albumId, CancellationToken ct = default)
     {
         AlbumRating? rating = await repo.GetByAsync<AlbumRating>(
             r => r.UserId == userId && r.AlbumId == albumId, cancellationToken: ct);
         Album? album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct);
-        return (rating?.Rating, album?.AverageRating);
+        return (rating?.Rating, album?.AverageRating, album?.RatingsCount ?? 0);
     }
 
-    public async Task<double?> GetAlbumAverageRatingAsync(Guid albumId, CancellationToken ct = default)
+    public async Task<(double? AverageRating, int RatingsCount)> GetAlbumAverageRatingAsync(Guid albumId, CancellationToken ct = default)
     {
         Album? album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct);
-        return album?.AverageRating;
+        return (album?.AverageRating, album?.RatingsCount ?? 0);
     }
 
-    public async Task<int?> GetBandRatingAsync(Guid userId, Guid bandId, CancellationToken ct = default)
+    public async Task<(int? UserRating, double? AverageRating, int RatingsCount)> GetBandRatingAsync(Guid userId, Guid bandId, CancellationToken ct = default)
     {
         BandRating? rating = await repo.GetByAsync<BandRating>(
             r => r.UserId == userId && r.BandId == bandId, cancellationToken: ct);
-        return rating?.Rating;
+        Band? band = await repo.GetByAsync<Band>(b => b.BandId == bandId, cancellationToken: ct);
+        return (rating?.Rating, band?.AverageRating, band?.RatingsCount ?? 0);
     }
 
-    public async Task<double?> RateAlbumAsync(Guid userId, Guid albumId, int rating, CancellationToken ct = default)
+    public async Task<(double? AverageRating, int RatingsCount)> GetBandAverageRatingAsync(Guid bandId, CancellationToken ct = default)
+    {
+        Band? band = await repo.GetByAsync<Band>(b => b.BandId == bandId, cancellationToken: ct);
+        return (band?.AverageRating, band?.RatingsCount ?? 0);
+    }
+
+    public async Task<(double? AverageRating, int RatingsCount)> RateAlbumAsync(Guid userId, Guid albumId, int rating, CancellationToken ct = default)
     {
         await EnsureUserProfileAsync(userId, ct);
 
@@ -139,10 +146,10 @@ public class UserContentService(
         }
 
         await repo.SaveChangesAsync(ct);
-        return album.AverageRating;
+        return (album.AverageRating, album.RatingsCount);
     }
 
-    public async Task RateBandAsync(Guid userId, Guid bandId, int rating, CancellationToken ct = default)
+    public async Task<(double? AverageRating, int RatingsCount)> RateBandAsync(Guid userId, Guid bandId, int rating, CancellationToken ct = default)
     {
         await EnsureUserProfileAsync(userId, ct);
 
@@ -172,5 +179,6 @@ public class UserContentService(
         }
 
         await repo.SaveChangesAsync(ct);
+        return (band.AverageRating, band.RatingsCount);
     }
 }
