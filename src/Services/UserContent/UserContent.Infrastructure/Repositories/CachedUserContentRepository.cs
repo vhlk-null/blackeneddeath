@@ -70,29 +70,33 @@ public class CachedUserContentRepository(
     public async Task AddAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
     {
         await inner.AddAsync(entity, cancellationToken);
-        await InvalidateCacheForUserAsync(ExtractUserIdFromEntity(entity));
+        if (AffectsUserProfileCache<T>())
+            await InvalidateCacheForUserAsync(ExtractUserIdFromEntity(entity));
     }
 
     public async Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default) where T : class
     {
         IList<T> list = entities as IList<T> ?? entities.ToList();
         await inner.AddRangeAsync(list, cancellationToken);
-        foreach (T entity in list)
-            await InvalidateCacheForUserAsync(ExtractUserIdFromEntity(entity));
+        if (AffectsUserProfileCache<T>())
+            foreach (T entity in list)
+                await InvalidateCacheForUserAsync(ExtractUserIdFromEntity(entity));
     }
 
     public void Delete<T>(T entity) where T : class
     {
         inner.Delete(entity);
-        InvalidateCacheForUser(ExtractUserIdFromEntity(entity));
+        if (AffectsUserProfileCache<T>())
+            InvalidateCacheForUser(ExtractUserIdFromEntity(entity));
     }
 
     public void DeleteRange<T>(IEnumerable<T> entities) where T : class
     {
         IList<T> list = entities as IList<T> ?? entities.ToList();
         inner.DeleteRange(list);
-        foreach (T entity in list)
-            InvalidateCacheForUser(ExtractUserIdFromEntity(entity));
+        if (AffectsUserProfileCache<T>())
+            foreach (T entity in list)
+                InvalidateCacheForUser(ExtractUserIdFromEntity(entity));
     }
 
     public async Task DeleteAsync<T>(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default) where T : class
@@ -161,6 +165,12 @@ public class CachedUserContentRepository(
     }
 
     // Helpers
+
+    // Only these types affect the cached UserProfileInfo
+    private static bool AffectsUserProfileCache<T>() where T : class =>
+        typeof(T) == typeof(UserProfileInfo) ||
+        typeof(T) == typeof(FavoriteAlbum) ||
+        typeof(T) == typeof(FavoriteBand);
 
     private static Guid? TryExtractUserIdFromFilter(Expression<Func<UserProfileInfo, bool>>? filter)
     {
