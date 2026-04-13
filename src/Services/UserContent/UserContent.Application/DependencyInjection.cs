@@ -15,10 +15,17 @@ public static class DependencyInjection
 
         services.AddScoped<IUserContentService, UserContentService>();
 
-        // gRPC
+        // gRPC — enable HTTP/2 cleartext for non-TLS internal communication (e.g. Railway private network)
+        if (grpcUrl.StartsWith("http://"))
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
         services.AddGrpcClient<LibraryProtoService.LibraryProtoServiceClient>(options =>
         {
             options.Address = new Uri(grpcUrl);
+        }).ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+        {
+            EnableMultipleHttp2Connections = true,
+            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(5),
         });
         services.AddScoped<ILibraryService, LibraryGrpcService>();
 
