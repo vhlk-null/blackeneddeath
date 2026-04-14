@@ -26,7 +26,13 @@ internal static class MockDbSetFactory
 internal class TestAsyncQueryProvider<T>(IQueryProvider inner) : IAsyncQueryProvider
 {
     public IQueryable CreateQuery(Expression expression) => inner.CreateQuery(expression);
-    public IQueryable<TElement> CreateQuery<TElement>(Expression expression) => new List<TElement>().AsQueryable();
+
+    public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
+    {
+        IQueryable<TElement> queryable = inner.CreateQuery<TElement>(expression);
+        return new AsyncQueryable<TElement>(queryable, this);
+    }
+
     public object? Execute(Expression expression) => inner.Execute(expression);
     public TResult Execute<TResult>(Expression expression) => inner.Execute<TResult>(expression);
 
@@ -37,6 +43,17 @@ internal class TestAsyncQueryProvider<T>(IQueryProvider inner) : IAsyncQueryProv
             .MakeGenericMethod(typeof(TResult).GetGenericArguments()[0])
             .Invoke(null, [result])!;
     }
+}
+
+internal class AsyncQueryable<T>(IQueryable<T> inner, IAsyncQueryProvider provider) : IQueryable<T>, IAsyncEnumerable<T>
+{
+    public Type ElementType => inner.ElementType;
+    public Expression Expression => inner.Expression;
+    public IQueryProvider Provider => provider;
+    public IEnumerator<T> GetEnumerator() => inner.GetEnumerator();
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => inner.GetEnumerator();
+    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+        => new TestAsyncEnumerator<T>(inner.GetEnumerator());
 }
 
 internal class TestAsyncEnumerator<T>(IEnumerator<T> inner) : IAsyncEnumerator<T>

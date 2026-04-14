@@ -7,6 +7,7 @@ using Library.Domain.Enums;
 using Library.Domain.Models;
 using Library.Domain.ValueObjects;
 using Library.Domain.ValueObjects.Ids;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -33,17 +34,25 @@ public class CreateAlbumHandlerTests
         _contextMock.Setup(x => x.Albums).Returns(_albumsDbSetMock.Object);
         _contextMock.Setup(x => x.Tracks).Returns(_tracksDbSetMock.Object);
         _contextMock.Setup(x => x.Bands).Returns(MockDbSetFactory.Create<Band>().Object);
+        _contextMock.Setup(x => x.Labels).Returns(MockDbSetFactory.Create<Label>().Object);
+        _contextMock.Setup(x => x.Genres).Returns(MockDbSetFactory.Create<Genre>().Object);
+        _contextMock.Setup(x => x.Countries).Returns(MockDbSetFactory.Create<Country>().Object);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
-        _handler = new CreateAlbumHandler(_contextMock.Object, Mock.Of<IStorageService>());
+        Mock<IHttpContextAccessor> httpContextAccessorMock = new();
+        httpContextAccessorMock.Setup(x => x.HttpContext).Returns(new DefaultHttpContext());
+
+        _handler = new CreateAlbumHandler(_contextMock.Object, Mock.Of<IStorageService>(), httpContextAccessorMock.Object);
     }
+
+    private static CreateAlbumDto SimpleDto(string title = "Symbolic") =>
+        new(title, 1995, AlbumType.FullLength, AlbumFormat.CD,
+            null, null, [], null, [], [], [], [], null);
 
     [Fact]
     public async Task Handle_ValidCommand_AddsAlbumAndReturnsId()
     {
-        CreateAlbumCommand command = new CreateAlbumCommand(new CreateAlbumDto(
-            "Symbolic", 1995, AlbumType.FullLength, AlbumFormat.CD,
-            null, [], [], [], [], [], null));
+        CreateAlbumCommand command = new(SimpleDto());
 
         CreateAlbumResult result = await _handler.Handle(command, CancellationToken.None);
 
@@ -59,9 +68,9 @@ public class CreateAlbumHandlerTests
         Band band = Band.Create("Death", null, null, BandActivity.Of(1983, null), BandStatus.Active, BandId.Of(bandId));
         _contextMock.Setup(x => x.Bands).Returns(MockDbSetFactory.Create(band).Object);
 
-        CreateAlbumCommand command = new CreateAlbumCommand(new CreateAlbumDto(
+        CreateAlbumCommand command = new(new CreateAlbumDto(
             "Symbolic", 1995, AlbumType.FullLength, AlbumFormat.CD,
-            null, [bandId], [], [], [], [], null));
+            null, null, [bandId], null, [], [], [], [], null));
 
         CreateAlbumResult result = await _handler.Handle(command, CancellationToken.None);
 
@@ -76,9 +85,9 @@ public class CreateAlbumHandlerTests
         Genre genre = Genre.Create(GenreId.Of(genreId), "Death Metal");
         _contextMock.Setup(x => x.Genres).Returns(MockDbSetFactory.Create(genre).Object);
 
-        CreateAlbumCommand command = new CreateAlbumCommand(new CreateAlbumDto(
+        CreateAlbumCommand command = new(new CreateAlbumDto(
             "Symbolic", 1995, AlbumType.FullLength, AlbumFormat.CD,
-            null, [], [], [genreId], [], [], null));
+            null, null, [], null, [], [genreId], [], [], null));
 
         CreateAlbumResult result = await _handler.Handle(command, CancellationToken.None);
 
