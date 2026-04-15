@@ -1,6 +1,7 @@
 global using System.Reflection;
 global using BuildingBlocks.Exceptions;
 global using BuildingBlocks.Messaging.Events.Albums;
+global using BuildingBlocks.Messaging.Events.Bands;
 global using BuildingBlocks.Messaging.MassTransit;
 global using BuildingBlocks.Repositories;
 global using Library.Grpc;

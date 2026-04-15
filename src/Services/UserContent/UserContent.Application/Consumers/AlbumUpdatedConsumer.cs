@@ -8,7 +8,19 @@ public class AlbumUpdatedConsumer(IRepository<UserContentContext> repo) : IConsu
             a => a.Id == consumeContext.Message.AlbumId,
             cancellationToken: consumeContext.CancellationToken);
 
-        if (album is null) return;
+        if (album is null)
+        {
+            album = new Album
+            {
+                Id = consumeContext.Message.AlbumId,
+                Title = consumeContext.Message.Title,
+                CoverUrl = consumeContext.Message.CoverUrl,
+                ReleaseDate = consumeContext.Message.ReleaseDate
+            };
+            await repo.AddAsync(album, consumeContext.CancellationToken);
+            await repo.SaveChangesAsync(consumeContext.CancellationToken);
+            return;
+        }
 
         album.Title = consumeContext.Message.Title;
         album.CoverUrl = consumeContext.Message.CoverUrl;

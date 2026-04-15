@@ -17,7 +17,7 @@ public static class DatabaseInitializerExtensions
             await context.Database.MigrateAsync();
             logger.LogInformation("UserContent database migrations applied successfully!");
 
-            await DatabaseSeeder.SeedDatabaseAsync(services, logger);
+            // await DatabaseSeeder.SeedDatabaseAsync(services, logger);
         }
         catch (Exception ex)
         {

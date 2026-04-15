@@ -12,7 +12,6 @@ public static class DependencyInjection
 
         services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());
         services.AddHttpContextAccessor();
-
         services.AddScoped<IUserContentService, UserContentService>();
 
         // gRPC — force HTTP/2

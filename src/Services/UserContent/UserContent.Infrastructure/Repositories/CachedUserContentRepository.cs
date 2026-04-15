@@ -33,7 +33,7 @@ public class CachedUserContentRepository(
         if (!userId.HasValue)
             return await inner.GetWithIncludesAsync(filter, includeBuilder, cancellationToken);
 
-        string cacheKey = $"{userId.Value}:UserProfileInfo";
+        string cacheKey = $"UserContent:{userId.Value}:UserProfileInfo";
 
         try
         {

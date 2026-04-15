@@ -5,7 +5,6 @@ namespace UserContent.Application.Services;
 
 public class UserContentService(
     IRepository<UserContentContext> repo,
-    ILibraryService libraryService,
     IHttpContextAccessor httpContextAccessor)
     : IUserContentService
 {
@@ -46,13 +45,8 @@ public class UserContentService(
     {
         await EnsureUserProfileAsync(userId, ct);
 
-        Album? album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct);
-        if (album is null)
-        {
-            album = await libraryService.GetAlbumByIdAsync(albumId, ct)
-                ?? throw new NotFoundException("Album", albumId);
-            await repo.AddAsync(album, ct);
-        }
+        Album album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct)
+            ?? throw new NotFoundException("Album", albumId);
 
         await repo.AddAsync(new FavoriteAlbum { AlbumId = album.Id, UserId = userId, AddedDate = DateTime.UtcNow }, ct);
         await repo.SaveChangesAsync(ct);
@@ -73,7 +67,10 @@ public class UserContentService(
     {
         await EnsureUserProfileAsync(userId, ct);
 
-        await repo.AddAsync(new FavoriteBand { UserId = userId, BandId = bandId, AddedDate = DateTime.UtcNow }, ct);
+        Band band = await repo.GetByAsync<Band>(b => b.BandId == bandId, cancellationToken: ct)
+            ?? throw new NotFoundException("Band", bandId);
+
+        await repo.AddAsync(new FavoriteBand { UserId = userId, BandId = band.BandId, AddedDate = DateTime.UtcNow }, ct);
         await repo.SaveChangesAsync(ct);
         return userId;
     }
@@ -120,13 +117,8 @@ public class UserContentService(
     {
         await EnsureUserProfileAsync(userId, ct);
 
-        Album? album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct);
-        if (album is null)
-        {
-            album = await libraryService.GetAlbumByIdAsync(albumId, ct)
-                ?? throw new NotFoundException("Album", albumId);
-            await repo.AddAsync(album, ct);
-        }
+        Album album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct)
+            ?? throw new NotFoundException("Album", albumId);
 
         AlbumRating? existing = await repo.GetByAsync<AlbumRating>(
             r => r.UserId == userId && r.AlbumId == albumId, cancellationToken: ct);
@@ -153,13 +145,8 @@ public class UserContentService(
     {
         await EnsureUserProfileAsync(userId, ct);
 
-        Band? band = await repo.GetByAsync<Band>(b => b.BandId == bandId, cancellationToken: ct);
-        if (band is null)
-        {
-            band = await libraryService.GetBandByIdAsync(bandId, ct)
-                ?? throw new NotFoundException("Band", bandId);
-            await repo.AddAsync(band, ct);
-        }
+        Band band = await repo.GetByAsync<Band>(b => b.BandId == bandId, cancellationToken: ct)
+            ?? throw new NotFoundException("Band", bandId);
 
         BandRating? existing = await repo.GetByAsync<BandRating>(
             r => r.UserId == userId && r.BandId == bandId, cancellationToken: ct);
