@@ -20,8 +20,7 @@ public static class MappingConfig
         TypeAdapterConfig<GetBandResponse, Band>.NewConfig()
             .Map(dest => dest.BandId, src => Guid.Parse(src.Id))
             .Map(dest => dest.BandName, src => src.Title)
-            .Map(dest => dest.LogoUrl, src => src.LogoUrl)
-            .Map(dest => dest.ReleaseDate, src => src.ReleaseDate);
+            .Map(dest => dest.LogoUrl, src => src.LogoUrl);
     }
 
     private static void ConfigureFavoriteAlbumMappings()
@@ -37,6 +36,6 @@ public static class MappingConfig
         TypeAdapterConfig<FavoriteBand, FavoriteBandDto>.NewConfig()
             .Map(dest => dest.BandName, src => src.Band.BandName)
             .Map(dest => dest.LogoUrl, src => src.Band.LogoUrl)
-            .Map(dest => dest.ReleaseDate, src => src.Band.ReleaseDate);
+            .Map(dest => dest.FormedYear, src => src.Band.FormedYear);
     }
 }

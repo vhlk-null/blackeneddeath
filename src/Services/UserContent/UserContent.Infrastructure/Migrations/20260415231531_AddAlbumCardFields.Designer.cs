@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UserContent.Infrastructure.Data;
@@ -11,9 +12,11 @@ using UserContent.Infrastructure.Data;
 namespace UserContent.Infrastructure.Migrations
 {
     [DbContext(typeof(UserContentContext))]
-    partial class UserContentContextModelSnapshot : ModelSnapshot
+    [Migration("20260415231531_AddAlbumCardFields")]
+    partial class AddAlbumCardFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,36 +141,10 @@ namespace UserContent.Infrastructure.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("band_name");
 
-                    b.Property<string>("CountryCodes")
-                        .HasColumnType("text")
-                        .HasColumnName("country_codes");
-
-                    b.Property<string>("CountryNames")
-                        .HasColumnType("text")
-                        .HasColumnName("country_names");
-
-                    b.Property<int?>("DisbandedYear")
-                        .HasColumnType("integer")
-                        .HasColumnName("disbanded_year");
-
-                    b.Property<int?>("FormedYear")
-                        .HasColumnType("integer")
-                        .HasColumnName("formed_year");
-
                     b.Property<string>("LogoUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
                         .HasColumnName("logo_url");
-
-                    b.Property<string>("PrimaryGenreName")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("primary_genre_name");
-
-                    b.Property<string>("PrimaryGenreSlug")
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)")
-                        .HasColumnName("primary_genre_slug");
 
                     b.Property<int>("RatingsCount")
                         .ValueGeneratedOnAdd()
@@ -175,14 +152,9 @@ namespace UserContent.Infrastructure.Migrations
                         .HasDefaultValue(0)
                         .HasColumnName("ratings_count");
 
-                    b.Property<string>("Slug")
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)")
-                        .HasColumnName("slug");
-
-                    b.Property<int>("Status")
+                    b.Property<int>("ReleaseDate")
                         .HasColumnType("integer")
-                        .HasColumnName("status");
+                        .HasColumnName("release_date");
 
                     b.HasKey("BandId");
 

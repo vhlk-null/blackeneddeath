@@ -2,6 +2,7 @@
 global using BuildingBlocks.Behaviors;
 global using BuildingBlocks.Exceptions;
 global using BuildingBlocks.Helpers;
+global using BuildingBlocks.Messaging.Events;
 global using BuildingBlocks.Messaging.Events.Albums;
 global using BuildingBlocks.Messaging.Events.Bands;
 global using BuildingBlocks.Pagination;

@@ -63,12 +63,46 @@ public static class UserContentModelBuilderExtensions
                 .HasMaxLength(200)
                 .HasColumnName("title");
 
+            entity.Property(e => e.Slug)
+                .HasMaxLength(300)
+                .HasColumnName("slug");
+
             entity.Property(e => e.CoverUrl)
                 .HasMaxLength(500)
                 .HasColumnName("cover_url");
 
             entity.Property(e => e.ReleaseDate)
                 .HasColumnName("release_date");
+
+            entity.Property(e => e.Format)
+                .HasColumnName("format");
+
+            entity.Property(e => e.Type)
+                .HasColumnName("type");
+
+            entity.Property(e => e.PrimaryGenreName)
+                .HasMaxLength(100)
+                .HasColumnName("primary_genre_name");
+
+            entity.Property(e => e.PrimaryGenreSlug)
+                .HasMaxLength(150)
+                .HasColumnName("primary_genre_slug");
+
+            entity.Property(e => e.BandNames)
+                .HasColumnType("text")
+                .HasColumnName("band_names");
+
+            entity.Property(e => e.BandSlugs)
+                .HasColumnType("text")
+                .HasColumnName("band_slugs");
+
+            entity.Property(e => e.CountryNames)
+                .HasColumnType("text")
+                .HasColumnName("country_names");
+
+            entity.Property(e => e.CountryCodes)
+                .HasColumnType("text")
+                .HasColumnName("country_codes");
 
             entity.Property(e => e.AverageRating)
                 .HasColumnName("average_rating");
@@ -96,12 +130,38 @@ public static class UserContentModelBuilderExtensions
                 .HasMaxLength(200)
                 .HasColumnName("band_name");
 
+            entity.Property(e => e.Slug)
+                .HasMaxLength(300)
+                .HasColumnName("slug");
+
             entity.Property(e => e.LogoUrl)
                 .HasMaxLength(500)
                 .HasColumnName("logo_url");
 
-            entity.Property(e => e.ReleaseDate)
-                .HasColumnName("release_date");
+            entity.Property(e => e.FormedYear)
+                .HasColumnName("formed_year");
+
+            entity.Property(e => e.DisbandedYear)
+                .HasColumnName("disbanded_year");
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status");
+
+            entity.Property(e => e.PrimaryGenreName)
+                .HasMaxLength(100)
+                .HasColumnName("primary_genre_name");
+
+            entity.Property(e => e.PrimaryGenreSlug)
+                .HasMaxLength(150)
+                .HasColumnName("primary_genre_slug");
+
+            entity.Property(e => e.CountryNames)
+                .HasColumnType("text")
+                .HasColumnName("country_names");
+
+            entity.Property(e => e.CountryCodes)
+                .HasColumnType("text")
+                .HasColumnName("country_codes");
 
             entity.Property(e => e.AverageRating)
                 .HasColumnName("average_rating");

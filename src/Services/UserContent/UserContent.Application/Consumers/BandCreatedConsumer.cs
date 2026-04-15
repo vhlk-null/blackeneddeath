@@ -14,7 +14,19 @@ public class BandCreatedConsumer(IRepository<UserContentContext> repo) : IConsum
         {
             BandId = consumeContext.Message.BandId,
             BandName = consumeContext.Message.Name,
-            LogoUrl = consumeContext.Message.LogoUrl
+            Slug = consumeContext.Message.Slug,
+            LogoUrl = consumeContext.Message.LogoUrl,
+            FormedYear = consumeContext.Message.FormedYear,
+            DisbandedYear = consumeContext.Message.DisbandedYear,
+            Status = consumeContext.Message.Status,
+            PrimaryGenreName = consumeContext.Message.PrimaryGenre?.Name,
+            PrimaryGenreSlug = consumeContext.Message.PrimaryGenre?.Slug,
+            CountryNames = consumeContext.Message.Countries.Count > 0
+                ? string.Join(",", consumeContext.Message.Countries.Select(c => c.Name))
+                : null,
+            CountryCodes = consumeContext.Message.Countries.Count > 0
+                ? string.Join(",", consumeContext.Message.Countries.Select(c => c.Code ?? ""))
+                : null
         };
 
         await repo.AddAsync(band, consumeContext.CancellationToken);
