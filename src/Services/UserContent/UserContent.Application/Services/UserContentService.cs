@@ -169,64 +169,115 @@ public class UserContentService(
         return (band.AverageRating, band.RatingsCount);
     }
 
-    public async Task<PaginatedResult<AlbumCardDto>> GetTopRatedAlbumsAsync(PaginationRequest pagination, CancellationToken ct = default)
+    public async Task<PaginatedResult<AlbumCardDto>> GetTopRatedAlbumsAsync(PaginationRequest pagination, RatingPeriod period, CancellationToken ct = default)
     {
-        IQueryable<Album> query = repo.Filter<Album>(a => a.RatingsCount > 0)
-            .OrderByDescending(a => a.AverageRating)
-            .ThenByDescending(a => a.RatingsCount);
+        if (period == RatingPeriod.All)
+        {
+            IQueryable<Album> query = repo.Filter<Album>(a => a.RatingsCount > 0)
+                .OrderByDescending(a => a.AverageRating)
+                .ThenByDescending(a => a.RatingsCount);
 
-        long count = await query.LongCountAsync(ct);
+            long count = await query.LongCountAsync(ct);
 
-        List<AlbumCardDto> data = await query
+            List<AlbumCardDto> data = await query
+                .Skip(pagination.PageIndex * pagination.PageSize)
+                .Take(pagination.PageSize)
+                .Select(a => new AlbumCardDto(
+                    a.Id, a.Title, a.Slug, a.CoverUrl, a.ReleaseDate,
+                    ((AlbumFormat)a.Format).ToString(), ((AlbumType)a.Type).ToString(),
+                    a.PrimaryGenreName, a.PrimaryGenreSlug, a.BandNames, a.BandSlugs,
+                    a.CountryNames, a.AverageRating, a.RatingsCount))
+                .ToListAsync(ct);
+
+            return new PaginatedResult<AlbumCardDto>(pagination.PageIndex, pagination.PageSize, count, data);
+        }
+
+        DateTime cutoff = period == RatingPeriod.Month
+            ? DateTime.UtcNow.AddMonths(-1)
+            : DateTime.UtcNow.AddYears(-1);
+
+        IQueryable<AlbumRating> ratingsQuery = repo.Filter<AlbumRating>(r => r.RatedAt >= cutoff);
+
+        var grouped = ratingsQuery
+            .GroupBy(r => r.AlbumId)
+            .Select(g => new { AlbumId = g.Key, Avg = g.Average(r => r.Rating), Count = g.Count() });
+
+        long periodCount = await grouped.LongCountAsync(ct);
+
+        var topIds = await grouped
+            .OrderByDescending(g => g.Avg)
+            .ThenByDescending(g => g.Count)
             .Skip(pagination.PageIndex * pagination.PageSize)
             .Take(pagination.PageSize)
-            .Select(a => new AlbumCardDto(
-                a.Id,
-                a.Title,
-                a.Slug,
-                a.CoverUrl,
-                a.ReleaseDate,
-                ((AlbumFormat)a.Format).ToString(),
-                ((AlbumType)a.Type).ToString(),
-                a.PrimaryGenreName,
-                a.PrimaryGenreSlug,
-                a.BandNames,
-                a.BandSlugs,
-                a.CountryNames,
-                a.AverageRating,
-                a.RatingsCount))
             .ToListAsync(ct);
 
-        return new PaginatedResult<AlbumCardDto>(pagination.PageIndex, pagination.PageSize, count, data);
+        List<Guid> ids = topIds.Select(x => x.AlbumId).ToList();
+
+        List<Album> albums = await repo.Filter<Album>(a => ids.Contains(a.Id)).ToListAsync(ct);
+
+        List<AlbumCardDto> periodData = topIds
+            .Join(albums, t => t.AlbumId, a => a.Id, (t, a) => new AlbumCardDto(
+                a.Id, a.Title, a.Slug, a.CoverUrl, a.ReleaseDate,
+                ((AlbumFormat)a.Format).ToString(), ((AlbumType)a.Type).ToString(),
+                a.PrimaryGenreName, a.PrimaryGenreSlug, a.BandNames, a.BandSlugs,
+                a.CountryNames, t.Avg, t.Count))
+            .ToList();
+
+        return new PaginatedResult<AlbumCardDto>(pagination.PageIndex, pagination.PageSize, periodCount, periodData);
     }
 
-    public async Task<PaginatedResult<BandCardDto>> GetTopRatedBandsAsync(PaginationRequest pagination, CancellationToken ct = default)
+    public async Task<PaginatedResult<BandCardDto>> GetTopRatedBandsAsync(PaginationRequest pagination, RatingPeriod period, CancellationToken ct = default)
     {
-        IQueryable<Band> query = repo.Filter<Band>(b => b.RatingsCount > 0)
-            .OrderByDescending(b => b.AverageRating)
-            .ThenByDescending(b => b.RatingsCount);
+        if (period == RatingPeriod.All)
+        {
+            IQueryable<Band> query = repo.Filter<Band>(b => b.RatingsCount > 0)
+                .OrderByDescending(b => b.AverageRating)
+                .ThenByDescending(b => b.RatingsCount);
 
-        long count = await query.LongCountAsync(ct);
+            long count = await query.LongCountAsync(ct);
 
-        List<BandCardDto> data = await query
+            List<BandCardDto> data = await query
+                .Skip(pagination.PageIndex * pagination.PageSize)
+                .Take(pagination.PageSize)
+                .Select(b => new BandCardDto(
+                    b.BandId, b.BandName, b.Slug, b.LogoUrl, b.FormedYear, b.DisbandedYear,
+                    ((BandStatus)b.Status).ToString(), b.PrimaryGenreName, b.PrimaryGenreSlug,
+                    b.CountryNames, b.CountryCodes, b.AverageRating, b.RatingsCount))
+                .ToListAsync(ct);
+
+            return new PaginatedResult<BandCardDto>(pagination.PageIndex, pagination.PageSize, count, data);
+        }
+
+        DateTime cutoff = period == RatingPeriod.Month
+            ? DateTime.UtcNow.AddMonths(-1)
+            : DateTime.UtcNow.AddYears(-1);
+
+        IQueryable<BandRating> ratingsQuery = repo.Filter<BandRating>(r => r.RatedAt >= cutoff);
+
+        var grouped = ratingsQuery
+            .GroupBy(r => r.BandId)
+            .Select(g => new { BandId = g.Key, Avg = g.Average(r => r.Rating), Count = g.Count() });
+
+        long periodCount = await grouped.LongCountAsync(ct);
+
+        var topIds = await grouped
+            .OrderByDescending(g => g.Avg)
+            .ThenByDescending(g => g.Count)
             .Skip(pagination.PageIndex * pagination.PageSize)
             .Take(pagination.PageSize)
-            .Select(b => new BandCardDto(
-                b.BandId,
-                b.BandName,
-                b.Slug,
-                b.LogoUrl,
-                b.FormedYear,
-                b.DisbandedYear,
-                ((BandStatus)b.Status).ToString(),
-                b.PrimaryGenreName,
-                b.PrimaryGenreSlug,
-                b.CountryNames,
-                b.CountryCodes,
-                b.AverageRating,
-                b.RatingsCount))
             .ToListAsync(ct);
 
-        return new PaginatedResult<BandCardDto>(pagination.PageIndex, pagination.PageSize, count, data);
+        List<Guid> ids = topIds.Select(x => x.BandId).ToList();
+
+        List<Band> bands = await repo.Filter<Band>(b => ids.Contains(b.BandId)).ToListAsync(ct);
+
+        List<BandCardDto> periodData = topIds
+            .Join(bands, t => t.BandId, b => b.BandId, (t, b) => new BandCardDto(
+                b.BandId, b.BandName, b.Slug, b.LogoUrl, b.FormedYear, b.DisbandedYear,
+                ((BandStatus)b.Status).ToString(), b.PrimaryGenreName, b.PrimaryGenreSlug,
+                b.CountryNames, b.CountryCodes, t.Avg, t.Count))
+            .ToList();
+
+        return new PaginatedResult<BandCardDto>(pagination.PageIndex, pagination.PageSize, periodCount, periodData);
     }
 }

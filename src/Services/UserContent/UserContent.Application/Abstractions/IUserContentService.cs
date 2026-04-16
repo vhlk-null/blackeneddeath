@@ -13,6 +13,6 @@ public interface IUserContentService
     Task<(double? AverageRating, int RatingsCount)> GetAlbumAverageRatingAsync(Guid albumId, CancellationToken ct = default);
     Task<(int? UserRating, double? AverageRating, int RatingsCount)> GetBandRatingAsync(Guid userId, Guid bandId, CancellationToken ct = default);
     Task<(double? AverageRating, int RatingsCount)> GetBandAverageRatingAsync(Guid bandId, CancellationToken ct = default);
-    Task<PaginatedResult<AlbumCardDto>> GetTopRatedAlbumsAsync(PaginationRequest pagination, CancellationToken ct = default);
-    Task<PaginatedResult<BandCardDto>> GetTopRatedBandsAsync(PaginationRequest pagination, CancellationToken ct = default);
+    Task<PaginatedResult<AlbumCardDto>> GetTopRatedAlbumsAsync(PaginationRequest pagination, RatingPeriod period, CancellationToken ct = default);
+    Task<PaginatedResult<BandCardDto>> GetTopRatedBandsAsync(PaginationRequest pagination, RatingPeriod period, CancellationToken ct = default);
 }

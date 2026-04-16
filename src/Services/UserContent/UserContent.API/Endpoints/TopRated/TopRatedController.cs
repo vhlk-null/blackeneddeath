@@ -10,10 +10,11 @@ public class TopRatedController(IUserContentService service) : ControllerBase
     public async Task<IActionResult> GetTopRatedAlbums(
         [FromQuery] int pageIndex = 0,
         [FromQuery] int pageSize = 20,
+        [FromQuery] RatingPeriod period = RatingPeriod.All,
         CancellationToken ct = default)
     {
         PaginatedResult<AlbumCardDto> result = await service.GetTopRatedAlbumsAsync(
-            new PaginationRequest(pageIndex, pageSize), ct);
+            new PaginationRequest(pageIndex, pageSize), period, ct);
         return Ok(result);
     }
 
@@ -22,10 +23,11 @@ public class TopRatedController(IUserContentService service) : ControllerBase
     public async Task<IActionResult> GetTopRatedBands(
         [FromQuery] int pageIndex = 0,
         [FromQuery] int pageSize = 20,
+        [FromQuery] RatingPeriod period = RatingPeriod.All,
         CancellationToken ct = default)
     {
         PaginatedResult<BandCardDto> result = await service.GetTopRatedBandsAsync(
-            new PaginationRequest(pageIndex, pageSize), ct);
+            new PaginationRequest(pageIndex, pageSize), period, ct);
         return Ok(result);
     }
 }
