@@ -342,4 +342,92 @@ public class UserContentService(
 
         return new PaginatedResult<BandCardDto>(pagination.PageIndex, pagination.PageSize, periodCount, periodData);
     }
+
+    public async Task<PaginatedResult<ReviewDto>> GetAlbumReviewsAsync(Guid albumId, int pageIndex, int pageSize, CancellationToken ct = default)
+    {
+        IQueryable<AlbumReview> query = repo.Filter<AlbumReview>(r => r.AlbumId == albumId, asTracked: false)
+            .OrderByDescending(r => r.CreatedAt);
+
+        int totalCount = await query.CountAsync(ct);
+        List<ReviewDto> items = await query
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .Select(r => new ReviewDto(r.Id, r.UserId, r.Username, r.Title, r.Body, r.Grade, r.CreatedAt))
+            .ToListAsync(ct);
+
+        return new PaginatedResult<ReviewDto>(pageIndex, pageSize, totalCount, items);
+    }
+
+    public async Task<ReviewDto> CreateAlbumReviewAsync(CreateAlbumReviewRequest request, CancellationToken ct = default)
+    {
+        AlbumReview review = new()
+        {
+            Id = Guid.NewGuid(),
+            AlbumId = request.AlbumId,
+            UserId = request.UserId,
+            Username = request.Username,
+            Title = request.Title,
+            Body = request.Body,
+            Grade = request.Grade,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await repo.AddAsync(review, ct);
+        await repo.SaveChangesAsync(ct);
+
+        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.Grade, review.CreatedAt);
+    }
+
+    public async Task DeleteAlbumReviewAsync(Guid reviewId, CancellationToken ct = default)
+    {
+        AlbumReview review = await repo.GetByAsync<AlbumReview>(r => r.Id == reviewId, cancellationToken: ct)
+            ?? throw new AlbumReviewNotFoundException(reviewId);
+
+        repo.Delete(review);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    public async Task<PaginatedResult<ReviewDto>> GetBandReviewsAsync(Guid bandId, int pageIndex, int pageSize, CancellationToken ct = default)
+    {
+        IQueryable<BandReview> query = repo.Filter<BandReview>(r => r.BandId == bandId, asTracked: false)
+            .OrderByDescending(r => r.CreatedAt);
+
+        int totalCount = await query.CountAsync(ct);
+        List<ReviewDto> items = await query
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .Select(r => new ReviewDto(r.Id, r.UserId, r.Username, r.Title, r.Body, r.Grade, r.CreatedAt))
+            .ToListAsync(ct);
+
+        return new PaginatedResult<ReviewDto>(pageIndex, pageSize, totalCount, items);
+    }
+
+    public async Task<ReviewDto> CreateBandReviewAsync(CreateBandReviewRequest request, CancellationToken ct = default)
+    {
+        BandReview review = new()
+        {
+            Id = Guid.NewGuid(),
+            BandId = request.BandId,
+            UserId = request.UserId,
+            Username = request.Username,
+            Title = request.Title,
+            Body = request.Body,
+            Grade = request.Grade,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await repo.AddAsync(review, ct);
+        await repo.SaveChangesAsync(ct);
+
+        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.Grade, review.CreatedAt);
+    }
+
+    public async Task DeleteBandReviewAsync(Guid reviewId, CancellationToken ct = default)
+    {
+        BandReview review = await repo.GetByAsync<BandReview>(r => r.Id == reviewId, cancellationToken: ct)
+            ?? throw new BandReviewNotFoundException(reviewId);
+
+        repo.Delete(review);
+        await repo.SaveChangesAsync(ct);
+    }
 }

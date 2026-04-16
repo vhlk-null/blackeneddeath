@@ -300,4 +300,96 @@ public static class UserContentModelBuilderExtensions
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }
+
+    public static void SetupAlbumReview(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<AlbumReview>(entity =>
+        {
+            entity.ToTable("album_reviews");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.AlbumId)
+                .HasColumnName("album_id");
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.Username)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("username");
+
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(120)
+                .HasColumnName("title");
+
+            entity.Property(e => e.Body)
+                .IsRequired()
+                .HasColumnType("text")
+                .HasColumnName("body");
+
+            entity.Property(e => e.Grade)
+                .HasColumnName("grade");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at");
+
+            entity.HasOne(e => e.Album)
+                .WithMany(a => a.Reviews)
+                .HasForeignKey(e => e.AlbumId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
+    public static void SetupBandReview(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BandReview>(entity =>
+        {
+            entity.ToTable("band_reviews");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.BandId)
+                .HasColumnName("band_id");
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.Username)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("username");
+
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(120)
+                .HasColumnName("title");
+
+            entity.Property(e => e.Body)
+                .IsRequired()
+                .HasColumnType("text")
+                .HasColumnName("body");
+
+            entity.Property(e => e.Grade)
+                .HasColumnName("grade");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at");
+
+            entity.HasOne(e => e.Band)
+                .WithMany(b => b.Reviews)
+                .HasForeignKey(e => e.BandId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
 }
