@@ -36,4 +36,4 @@ public record AlbumDetailDto(
     string? TotalDuration,
     List<DiscographyGroupDto> DiscographyGroups,
     List<VideoBandDto> Videos,
-    List<AlbumSummaryDto> SimilarAlbums);
+    PaginatedResult<AlbumSummaryDto> SimilarAlbums);

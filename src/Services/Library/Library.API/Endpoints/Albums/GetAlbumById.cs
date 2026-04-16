@@ -6,9 +6,9 @@ public class GetAlbumById : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/albums/{id:guid}", async (Guid id, ISender sender) =>
+        app.MapGet("/albums/{id:guid}", async (Guid id, ISender sender, int similarPageNumber = 1, int similarPageSize = 4) =>
             {
-                GetAlbumByIdQuery query = new GetAlbumByIdQuery(id);
+                GetAlbumByIdQuery query = new GetAlbumByIdQuery(id, SimilarPageNumber: similarPageNumber, SimilarPageSize: similarPageSize);
                 GetAlbumByIdResult result = await sender.Send(query);
                 GetAlbumByIdResponse response = result.Adapt<GetAlbumByIdResponse>();
                 return Results.Ok(response);

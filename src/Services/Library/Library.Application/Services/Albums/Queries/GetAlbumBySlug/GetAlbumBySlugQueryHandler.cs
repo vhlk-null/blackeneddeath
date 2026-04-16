@@ -51,17 +51,23 @@ public class GetAlbumBySlugQueryHandler(ILibraryDbContext context, IStorageUrlRe
         }
 
         List<GenreId> genreIds = album.AlbumGenres.Select(ag => ag.GenreId).ToList();
+        List<TagId> tagIds = album.AlbumTags.Select(at => at.TagId).ToList();
 
         HashSet<AlbumId> excludeAlbumIds = discographyAlbums.Select(a => a.Id).Append(albumId).Distinct().ToHashSet();
 
-        List<Album> similarAlbums = await context.Albums.AsNoTracking()
+        IQueryable<Album> similarQuery = context.Albums.AsNoTracking()
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
             .Include(a => a.AlbumBands)
             .Where(a => (!query.ApprovedOnly || a.IsApproved) && !excludeAlbumIds.Contains(a.Id))
-            .Where(a => a.AlbumGenres.Any(ag => genreIds.Contains(ag.GenreId)))
-            .OrderBy(_ => EF.Functions.Random())
-            .Take(4)
+            .Where(a => a.AlbumGenres.Any(ag => genreIds.Contains(ag.GenreId))
+                     || (tagIds.Count > 0 && a.AlbumTags.Any(at => tagIds.Contains(at.TagId))))
+            .OrderBy(_ => EF.Functions.Random());
+
+        int similarTotalCount = await similarQuery.CountAsync(cancellationToken);
+        List<Album> similarAlbums = await similarQuery
+            .Skip((query.SimilarPageNumber - 1) * query.SimilarPageSize)
+            .Take(query.SimilarPageSize)
             .ToListAsync(cancellationToken);
 
         List<BandId> similarBandIds = similarAlbums
@@ -107,7 +113,6 @@ public class GetAlbumBySlugQueryHandler(ILibraryDbContext context, IStorageUrlRe
                 .ToDictionaryAsync(l => l.Id, cancellationToken)
             : new Dictionary<LabelId, Label>();
 
-        List<TagId> tagIds = album.AlbumTags.Select(at => at.TagId).ToList();
         Dictionary<TagId, Tag> tags = tagIds.Count > 0
             ? await context.Tags.AsNoTracking()
                 .Where(t => tagIds.Contains(t.Id))
@@ -116,7 +121,7 @@ public class GetAlbumBySlugQueryHandler(ILibraryDbContext context, IStorageUrlRe
 
         AlbumDto albumDto = album.ToAlbumDto(bands, genres, countries, tracks, urlResolver, labels, tags, discographyByBand);
 
-        List<AlbumSummaryDto> similarAlbumDtos = similarAlbums.Select(a =>
+        List<AlbumSummaryDto> similarAlbumItems = similarAlbums.Select(a =>
         {
             Band? primaryBand = a.AlbumBands
                 .Select(ab => bands.GetValueOrDefault(ab.BandId))
@@ -135,6 +140,8 @@ public class GetAlbumBySlugQueryHandler(ILibraryDbContext context, IStorageUrlRe
                 primaryBand?.Id.Value ?? Guid.Empty,
                 primaryBand?.Name ?? string.Empty);
         }).ToList();
+
+        PaginatedResult<AlbumSummaryDto> similarAlbumDtos = new(query.SimilarPageNumber, query.SimilarPageSize, similarTotalCount, similarAlbumItems);
 
         List<VideoBandDto> videos = await context.VideoBands.AsNoTracking()
             .Where(vb => bandIds.Contains(vb.BandId))

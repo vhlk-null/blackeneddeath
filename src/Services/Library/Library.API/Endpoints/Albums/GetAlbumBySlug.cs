@@ -6,9 +6,9 @@ public class GetAlbumBySlug : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/albums/slug/{slug}", async (string slug, ISender sender) =>
+        app.MapGet("/albums/slug/{slug}", async (string slug, ISender sender, int similarPageNumber = 1, int similarPageSize = 4) =>
             {
-                GetAlbumBySlugQuery query = new GetAlbumBySlugQuery(slug);
+                GetAlbumBySlugQuery query = new GetAlbumBySlugQuery(slug, SimilarPageNumber: similarPageNumber, SimilarPageSize: similarPageSize);
                 GetAlbumBySlugResult result = await sender.Send(query);
                 GetAlbumBySlugResponse response = result.Adapt<GetAlbumBySlugResponse>();
                 return Results.Ok(response);
