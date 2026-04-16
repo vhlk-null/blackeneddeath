@@ -41,6 +41,38 @@ public class UserContentService(
         return profile.Adapt<UserProfileDto>();
     }
 
+    public async Task<PaginatedResult<AlbumCardDto>> GetFavoriteAlbumsAsync(Guid userId, int pageIndex, int pageSize, CancellationToken ct = default)
+    {
+        IQueryable<FavoriteAlbum> favQuery = repo.Filter<FavoriteAlbum>(fa => fa.UserId == userId, asTracked: false);
+        IQueryable<Album> albumQuery = repo.Filter<Album>(_ => true, asTracked: false);
+
+        var query = favQuery
+            .Join(albumQuery, fa => fa.AlbumId, a => a.Id, (fa, a) => new { fa.AddedDate, Album = a })
+            .OrderByDescending(x => x.AddedDate);
+
+        int totalCount = await query.CountAsync(ct);
+        var albums = await query
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        List<AlbumCardDto> items = albums.Select(x => { var a = x.Album; return new AlbumCardDto(
+            a.Id, a.Title, a.Slug, a.CoverUrl, a.ReleaseDate,
+            ((AlbumFormat)a.Format).ToString(), ((AlbumType)a.Type).ToString(),
+            a.PrimaryGenreName, a.PrimaryGenreSlug,
+            a.BandNames, a.BandSlugs, a.CountryNames,
+            a.AverageRating, a.RatingsCount); }).ToList();
+
+        return new PaginatedResult<AlbumCardDto>(pageIndex, pageSize, totalCount, items);
+    }
+
+    public async Task<bool> IsAlbumFavoriteAsync(Guid userId, Guid albumId, CancellationToken ct = default)
+    {
+        FavoriteAlbum? fa = await repo.GetByAsync<FavoriteAlbum>(
+            fa => fa.UserId == userId && fa.AlbumId == albumId, asTracked: false, cancellationToken: ct);
+        return fa is not null;
+    }
+
     public async Task<Guid> AddFavoriteAlbumAsync(Guid userId, Guid albumId, CancellationToken ct = default)
     {
         await EnsureUserProfileAsync(userId, ct);
@@ -61,6 +93,36 @@ public class UserContentService(
 
         repo.Delete(fa);
         await repo.SaveChangesAsync(ct);
+    }
+
+    public async Task<PaginatedResult<BandCardDto>> GetFavoriteBandsAsync(Guid userId, int pageIndex, int pageSize, CancellationToken ct = default)
+    {
+        IQueryable<FavoriteBand> favQuery = repo.Filter<FavoriteBand>(fb => fb.UserId == userId, asTracked: false);
+        IQueryable<Band> bandQuery = repo.Filter<Band>(_ => true, asTracked: false);
+
+        var query = favQuery
+            .Join(bandQuery, fb => fb.BandId, b => b.BandId, (fb, b) => new { fb.AddedDate, Band = b })
+            .OrderByDescending(x => x.AddedDate);
+
+        int totalCount = await query.CountAsync(ct);
+        var bands = await query
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        List<BandCardDto> items = bands.Select(x => { var b = x.Band; return new BandCardDto(
+            b.BandId, b.BandName, b.Slug, b.LogoUrl, b.FormedYear, b.DisbandedYear,
+            ((BandStatus)b.Status).ToString(), b.PrimaryGenreName, b.PrimaryGenreSlug,
+            b.CountryNames, b.CountryCodes, b.AverageRating, b.RatingsCount); }).ToList();
+
+        return new PaginatedResult<BandCardDto>(pageIndex, pageSize, totalCount, items);
+    }
+
+    public async Task<bool> IsBandFavoriteAsync(Guid userId, Guid bandId, CancellationToken ct = default)
+    {
+        FavoriteBand? fb = await repo.GetByAsync<FavoriteBand>(
+            fb => fb.UserId == userId && fb.BandId == bandId, asTracked: false, cancellationToken: ct);
+        return fb is not null;
     }
 
     public async Task<Guid> AddFavoriteBandAsync(Guid userId, Guid bandId, CancellationToken ct = default)

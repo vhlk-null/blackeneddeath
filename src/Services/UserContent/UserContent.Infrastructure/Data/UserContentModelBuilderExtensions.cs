@@ -189,9 +189,6 @@ public static class UserContentModelBuilderExtensions
             entity.Property(e => e.AddedDate)
                 .HasColumnName("added_date");
 
-            entity.Property(e => e.UserRating)
-                .HasColumnName("user_rating");
-
             entity.Property(e => e.UserReview)
                 .HasColumnType("text")
                 .HasColumnName("user_review");

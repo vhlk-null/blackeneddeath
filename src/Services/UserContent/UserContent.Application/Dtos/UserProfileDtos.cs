@@ -32,7 +32,7 @@ public record BandCardDto(
     int RatingsCount);
 
 public record FavoriteAlbumDto(Guid AlbumId, string AlbumTitle, string? CoverUrl,
-    int ReleaseDate, DateTime AddedDate, int? UserRating, string? UserReview);
+    int ReleaseDate, DateTime AddedDate, string? UserReview);
 
 public record FavoriteBandDto(Guid BandId, string BandName, string? LogoUrl,
     int? FormedYear, DateTime AddedDate, bool IsFollowing);

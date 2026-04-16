@@ -10,6 +10,23 @@ public record DeleteFavoriteBandResponse(bool IsSuccess);
 [Authorize]
 public class FavoriteBandsController(IUserContentService service) : ControllerBase
 {
+    [HttpGet("{userId:guid}")]
+    [ProducesResponseType(typeof(PaginatedResult<BandCardDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetFavoriteBands(Guid userId, CancellationToken ct, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+    {
+        PaginatedResult<BandCardDto> result = await service.GetFavoriteBandsAsync(userId, pageIndex, pageSize, ct);
+        return Ok(result);
+    }
+
+    [HttpGet("check")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    public async Task<IActionResult> IsBandFavorite([FromQuery] Guid userId, [FromQuery] Guid bandId, CancellationToken ct)
+    {
+        bool isFavorite = await service.IsBandFavoriteAsync(userId, bandId, ct);
+        return Ok(isFavorite);
+    }
+
     [HttpPost]
     [ProducesResponseType(typeof(AddBandToFavoriteResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
