@@ -1,5 +1,36 @@
 namespace UserContent.Application.Dtos;
 
+public record AlbumCardDto(
+    Guid Id,
+    string Title,
+    string? Slug,
+    string? CoverUrl,
+    int ReleaseDate,
+    string Format,
+    string Type,
+    string? PrimaryGenreName,
+    string? PrimaryGenreSlug,
+    string? BandNames,
+    string? BandSlugs,
+    string? CountryNames,
+    double? AverageRating,
+    int RatingsCount);
+
+public record BandCardDto(
+    Guid Id,
+    string Name,
+    string? Slug,
+    string? LogoUrl,
+    int? FormedYear,
+    int? DisbandedYear,
+    string Status,
+    string? PrimaryGenreName,
+    string? PrimaryGenreSlug,
+    string? CountryNames,
+    string? CountryCodes,
+    double? AverageRating,
+    int RatingsCount);
+
 public record FavoriteAlbumDto(Guid AlbumId, string AlbumTitle, string? CoverUrl,
     int ReleaseDate, DateTime AddedDate, int? UserRating, string? UserReview);
 

@@ -168,4 +168,65 @@ public class UserContentService(
         await repo.SaveChangesAsync(ct);
         return (band.AverageRating, band.RatingsCount);
     }
+
+    public async Task<PaginatedResult<AlbumCardDto>> GetTopRatedAlbumsAsync(PaginationRequest pagination, CancellationToken ct = default)
+    {
+        IQueryable<Album> query = repo.Filter<Album>(a => a.RatingsCount > 0)
+            .OrderByDescending(a => a.AverageRating)
+            .ThenByDescending(a => a.RatingsCount);
+
+        long count = await query.LongCountAsync(ct);
+
+        List<AlbumCardDto> data = await query
+            .Skip(pagination.PageIndex * pagination.PageSize)
+            .Take(pagination.PageSize)
+            .Select(a => new AlbumCardDto(
+                a.Id,
+                a.Title,
+                a.Slug,
+                a.CoverUrl,
+                a.ReleaseDate,
+                ((AlbumFormat)a.Format).ToString(),
+                ((AlbumType)a.Type).ToString(),
+                a.PrimaryGenreName,
+                a.PrimaryGenreSlug,
+                a.BandNames,
+                a.BandSlugs,
+                a.CountryNames,
+                a.AverageRating,
+                a.RatingsCount))
+            .ToListAsync(ct);
+
+        return new PaginatedResult<AlbumCardDto>(pagination.PageIndex, pagination.PageSize, count, data);
+    }
+
+    public async Task<PaginatedResult<BandCardDto>> GetTopRatedBandsAsync(PaginationRequest pagination, CancellationToken ct = default)
+    {
+        IQueryable<Band> query = repo.Filter<Band>(b => b.RatingsCount > 0)
+            .OrderByDescending(b => b.AverageRating)
+            .ThenByDescending(b => b.RatingsCount);
+
+        long count = await query.LongCountAsync(ct);
+
+        List<BandCardDto> data = await query
+            .Skip(pagination.PageIndex * pagination.PageSize)
+            .Take(pagination.PageSize)
+            .Select(b => new BandCardDto(
+                b.BandId,
+                b.BandName,
+                b.Slug,
+                b.LogoUrl,
+                b.FormedYear,
+                b.DisbandedYear,
+                ((BandStatus)b.Status).ToString(),
+                b.PrimaryGenreName,
+                b.PrimaryGenreSlug,
+                b.CountryNames,
+                b.CountryCodes,
+                b.AverageRating,
+                b.RatingsCount))
+            .ToListAsync(ct);
+
+        return new PaginatedResult<BandCardDto>(pagination.PageIndex, pagination.PageSize, count, data);
+    }
 }

@@ -3,7 +3,8 @@ namespace Library.Application.Services.Albums.EventHandlers.Domain;
 public sealed class AlbumUpdatedEventHandler(
     ILogger<AlbumUpdatedEventHandler> logger,
     IPublishEndpoint publishEndpoint,
-    ILibraryDbContext context)
+    ILibraryDbContext context,
+    IStorageUrlResolver urlResolver)
     : INotificationHandler<AlbumUpdatedEvent>
 {
     public async ValueTask Handle(AlbumUpdatedEvent domainEvent, CancellationToken cancellationToken)
@@ -43,7 +44,7 @@ public sealed class AlbumUpdatedEventHandler(
             AlbumId = album.Id.Value,
             Title = album.Title,
             Slug = album.Slug,
-            CoverUrl = album.CoverUrl,
+            CoverUrl = urlResolver.Resolve(album.CoverUrl),
             ReleaseDate = album.AlbumRelease.ReleaseYear,
             Format = (int)album.AlbumRelease.Format,
             Type = (int)album.Type,

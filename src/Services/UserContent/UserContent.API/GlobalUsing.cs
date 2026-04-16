@@ -1,6 +1,7 @@
 global using System.Text.Json.Serialization;
 global using BuildingBlocks.Authentication;
 global using BuildingBlocks.Exceptions;
+global using BuildingBlocks.Pagination;
 global using Microsoft.AspNetCore.Authorization;
 global using HealthChecks.UI.Client;
 global using Microsoft.AspNetCore.Diagnostics.HealthChecks;

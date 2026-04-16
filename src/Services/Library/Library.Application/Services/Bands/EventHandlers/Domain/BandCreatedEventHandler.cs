@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Bands.EventHandlers.Domain;
 
-public sealed class BandCreatedEventHandler(ILogger<BandCreatedEventHandler> logger, IPublishEndpoint publishEndpoint, ILibraryDbContext context)
+public sealed class BandCreatedEventHandler(ILogger<BandCreatedEventHandler> logger, IPublishEndpoint publishEndpoint, ILibraryDbContext context, IStorageUrlResolver urlResolver)
     : INotificationHandler<BandCreatedEvent>
 {
     public async ValueTask Handle(BandCreatedEvent domainEvent, CancellationToken cancellationToken)
@@ -35,7 +35,7 @@ public sealed class BandCreatedEventHandler(ILogger<BandCreatedEventHandler> log
             Name = band.Name,
             Slug = band.Slug,
             Bio = band.Bio,
-            LogoUrl = band.LogoUrl,
+            LogoUrl = urlResolver.Resolve(band.LogoUrl),
             FormedYear = band.Activity.FormedYear,
             DisbandedYear = band.Activity.DisbandedYear,
             Status = (int)band.Status,
