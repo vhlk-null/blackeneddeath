@@ -23,6 +23,38 @@ public static class AlbumFilterBuilder
         return filter;
     }
 
+    public static async Task<ISpecification<Album>?> BuildBySlugAsync(
+        ILibraryDbContext context,
+        string? genreSlug,
+        string? labelId,
+        string? countryId,
+        AlbumType? type,
+        int? yearFrom,
+        int? yearTo,
+        string? name = null,
+        CancellationToken cancellationToken = default)
+    {
+        Guid? resolvedGenreId = null;
+        Guid? resolvedLabelId = null;
+        Guid? resolvedCountryId = null;
+
+        if (!string.IsNullOrWhiteSpace(genreSlug))
+        {
+            Genre? genre = await context.Genres.AsNoTracking()
+                .FirstOrDefaultAsync(g => g.Slug == genreSlug, cancellationToken);
+            if (genre is not null)
+                resolvedGenreId = genre.Id.Value;
+        }
+
+        if (!string.IsNullOrWhiteSpace(labelId) && Guid.TryParse(labelId, out Guid parsedLabelId))
+            resolvedLabelId = parsedLabelId;
+
+        if (!string.IsNullOrWhiteSpace(countryId) && Guid.TryParse(countryId, out Guid parsedCountryId))
+            resolvedCountryId = parsedCountryId;
+
+        return Build(resolvedGenreId, resolvedLabelId, resolvedCountryId, type, yearFrom, yearTo, name);
+    }
+
     private static ISpecification<Album> Combine(ISpecification<Album>? current, ISpecification<Album> next) =>
         current is null ? next : current.And(next);
 }

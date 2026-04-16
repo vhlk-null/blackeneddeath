@@ -21,6 +21,33 @@ public static class BandFilterBuilder
         return filter;
     }
 
+    public static async Task<ISpecification<Band>?> BuildBySlugAsync(
+        ILibraryDbContext context,
+        string? genreSlug,
+        string? countryId,
+        BandStatus? status,
+        int? yearFrom,
+        int? yearTo,
+        string? name = null,
+        CancellationToken cancellationToken = default)
+    {
+        Guid? resolvedGenreId = null;
+        Guid? resolvedCountryId = null;
+
+        if (!string.IsNullOrWhiteSpace(genreSlug))
+        {
+            Genre? genre = await context.Genres.AsNoTracking()
+                .FirstOrDefaultAsync(g => g.Slug == genreSlug, cancellationToken);
+            if (genre is not null)
+                resolvedGenreId = genre.Id.Value;
+        }
+
+        if (!string.IsNullOrWhiteSpace(countryId) && Guid.TryParse(countryId, out Guid parsedCountryId))
+            resolvedCountryId = parsedCountryId;
+
+        return Build(resolvedGenreId, resolvedCountryId, status, yearFrom, yearTo, name);
+    }
+
     private static ISpecification<Band> Combine(ISpecification<Band>? current, ISpecification<Band> next) =>
         current is null ? next : current.And(next);
 }

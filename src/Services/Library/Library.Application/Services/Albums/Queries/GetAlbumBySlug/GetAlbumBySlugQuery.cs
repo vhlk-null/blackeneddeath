@@ -1,0 +1,4 @@
+namespace Library.Application.Services.Albums.Queries.GetAlbumBySlug;
+
+public record GetAlbumBySlugQuery(string Slug, bool ApprovedOnly = true) : BuildingBlocks.CQRS.IQuery<GetAlbumBySlugResult>;
+public record GetAlbumBySlugResult(AlbumDetailDto Album);
