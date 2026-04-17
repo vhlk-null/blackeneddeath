@@ -9,6 +9,7 @@ namespace UserContent.API.Endpoints.AlbumReviews;
 public class AlbumReviewsController(IUserContentService service) : ControllerBase
 {
     [HttpGet("{albumId:guid}")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(PaginatedResult<ReviewDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAlbumReviews(Guid albumId, CancellationToken ct, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 20)
     {

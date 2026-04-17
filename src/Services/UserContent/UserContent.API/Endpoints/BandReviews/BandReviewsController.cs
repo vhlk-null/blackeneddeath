@@ -9,6 +9,7 @@ namespace UserContent.API.Endpoints.BandReviews;
 public class BandReviewsController(IUserContentService service) : ControllerBase
 {
     [HttpGet("{bandId:guid}")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(PaginatedResult<ReviewDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetBandReviews(Guid bandId, CancellationToken ct, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 20)
     {
