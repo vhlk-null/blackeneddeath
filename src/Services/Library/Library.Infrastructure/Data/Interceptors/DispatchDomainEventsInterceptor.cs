@@ -2,20 +2,35 @@
 
 internal class DispatchDomainEventsInterceptor(IMediator mediator) : SaveChangesInterceptor
 {
+    private List<IDomainEvent> _domainEvents = [];
+
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
-        DispatchDomainEvents(eventData.Context).GetAwaiter().GetResult();
+        CollectDomainEvents(eventData.Context);
         return base.SavingChanges(eventData, result);
     }
 
     public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result,
         CancellationToken cancellationToken = new CancellationToken())
     {
-        await DispatchDomainEvents(eventData.Context);
+        CollectDomainEvents(eventData.Context);
         return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private async Task DispatchDomainEvents(DbContext? context)
+    public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
+    {
+        DispatchDomainEvents().GetAwaiter().GetResult();
+        return base.SavedChanges(eventData, result);
+    }
+
+    public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result,
+        CancellationToken cancellationToken = new CancellationToken())
+    {
+        await DispatchDomainEvents();
+        return await base.SavedChangesAsync(eventData, result, cancellationToken);
+    }
+
+    private void CollectDomainEvents(DbContext? context)
     {
         if (context == null) return;
 
@@ -23,11 +38,15 @@ internal class DispatchDomainEventsInterceptor(IMediator mediator) : SaveChanges
             .Where(a => a.Entity.DomainEvents.Any())
             .Select(a => a.Entity);
 
-        List<IDomainEvent> domainEvents = aggregates.SelectMany(a => a.DomainEvents).ToList();
-
+        _domainEvents = aggregates.SelectMany(a => a.DomainEvents).ToList();
         aggregates.ToList().ForEach(a => a.ClearDomainEvents());
+    }
 
-        foreach (IDomainEvent domainEvent in domainEvents)
+    private async Task DispatchDomainEvents()
+    {
+        foreach (IDomainEvent domainEvent in _domainEvents)
             await mediator.Publish(domainEvent);
+
+        _domainEvents = [];
     }
 }

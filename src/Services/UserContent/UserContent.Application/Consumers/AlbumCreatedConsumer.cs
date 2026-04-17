@@ -1,14 +1,10 @@
 namespace UserContent.Application.Consumers;
 
-public class AlbumCreatedConsumer(IRepository<UserContentContext> repo) : IConsumer<AlbumCreatedIntegrationEvent>
+public class AlbumCreatedConsumer(IRepository<UserContentContext> repo, ILogger<AlbumCreatedConsumer> logger) : IConsumer<AlbumCreatedIntegrationEvent>
 {
     public async Task Consume(ConsumeContext<AlbumCreatedIntegrationEvent> consumeContext)
     {
-        bool exists = await repo.GetByAsync<Album>(
-            a => a.Id == consumeContext.Message.AlbumId,
-            cancellationToken: consumeContext.CancellationToken) is not null;
-
-        if (exists) return;
+        logger.LogInformation("AlbumCreatedConsumer received message for AlbumId: {AlbumId}", consumeContext.Message.AlbumId);
 
         Album album = new()
         {

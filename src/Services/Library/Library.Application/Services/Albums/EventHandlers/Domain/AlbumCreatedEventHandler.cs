@@ -17,7 +17,11 @@ public sealed class AlbumCreatedEventHandler(
             .Include(a => a.AlbumCountries)
             .FirstOrDefaultAsync(a => a.Id == domainEvent.Album.Id, cancellationToken);
 
-        if (album is null) return;
+        if (album is null)
+        {
+            logger.LogWarning("AlbumCreatedEventHandler: Album {AlbumId} not found in DB — integration event will NOT be published", domainEvent.Album.Id.Value);
+            return;
+        }
 
         List<BandId> bandIds = album.AlbumBands.Select(ab => ab.BandId).ToList();
         List<Band> bands = bandIds.Count > 0
@@ -56,6 +60,7 @@ public sealed class AlbumCreatedEventHandler(
             Countries = countries.Select(c => new AlbumCountryInfo(c.Id.Value, c.Name, c.Code)).ToList()
         };
 
+        logger.LogInformation("AlbumCreatedEventHandler: Publishing integration event for AlbumId: {AlbumId}", album.Id.Value);
         await publishEndpoint.Publish(integrationEvent, cancellationToken);
     }
 }
