@@ -380,6 +380,37 @@ public class UserContentService(
     {
         await EnsureUserProfileAsync(request.UserId, ct);
 
+        AlbumReview? existing = await repo.GetByAsync<AlbumReview>(
+            r => r.UserId == request.UserId && r.AlbumId == request.AlbumId, cancellationToken: ct);
+
+        if (existing is not null)
+        {
+            existing.Title = request.Title;
+            existing.Body = request.Body;
+
+            if (request.UserRating.HasValue)
+            {
+                Album album = await repo.GetByAsync<Album>(a => a.Id == request.AlbumId, cancellationToken: ct)
+                    ?? throw new NotFoundException("Album", request.AlbumId);
+
+                if (existing.Rating is null)
+                {
+                    album.AverageRating = ((album.AverageRating ?? 0) * album.RatingsCount + request.UserRating.Value) / (album.RatingsCount + 1);
+                    album.RatingsCount++;
+                }
+                else
+                {
+                    album.AverageRating = (album.AverageRating!.Value * album.RatingsCount - existing.Rating.Value + request.UserRating.Value) / album.RatingsCount;
+                }
+
+                existing.Rating = request.UserRating;
+                existing.RatedAt = DateTime.UtcNow;
+            }
+
+            await repo.SaveChangesAsync(ct);
+            return new ReviewDto(existing.Id, existing.UserId, existing.Username, existing.Title, existing.Body, existing.CreatedAt, existing.Rating);
+        }
+
         AlbumReview review = new()
         {
             Id = Guid.NewGuid(),
@@ -404,7 +435,6 @@ public class UserContentService(
         }
 
         await repo.SaveChangesAsync(ct);
-
         return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, review.Rating);
     }
 
@@ -478,6 +508,37 @@ public class UserContentService(
     {
         await EnsureUserProfileAsync(request.UserId, ct);
 
+        BandReview? existing = await repo.GetByAsync<BandReview>(
+            r => r.UserId == request.UserId && r.BandId == request.BandId, cancellationToken: ct);
+
+        if (existing is not null)
+        {
+            existing.Title = request.Title;
+            existing.Body = request.Body;
+
+            if (request.UserRating.HasValue)
+            {
+                Band band = await repo.GetByAsync<Band>(b => b.BandId == request.BandId, cancellationToken: ct)
+                    ?? throw new NotFoundException("Band", request.BandId);
+
+                if (existing.Rating is null)
+                {
+                    band.AverageRating = ((band.AverageRating ?? 0) * band.RatingsCount + request.UserRating.Value) / (band.RatingsCount + 1);
+                    band.RatingsCount++;
+                }
+                else
+                {
+                    band.AverageRating = (band.AverageRating!.Value * band.RatingsCount - existing.Rating.Value + request.UserRating.Value) / band.RatingsCount;
+                }
+
+                existing.Rating = request.UserRating;
+                existing.RatedAt = DateTime.UtcNow;
+            }
+
+            await repo.SaveChangesAsync(ct);
+            return new ReviewDto(existing.Id, existing.UserId, existing.Username, existing.Title, existing.Body, existing.CreatedAt, existing.Rating);
+        }
+
         BandReview review = new()
         {
             Id = Guid.NewGuid(),
@@ -502,7 +563,6 @@ public class UserContentService(
         }
 
         await repo.SaveChangesAsync(ct);
-
         return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, review.Rating);
     }
 
