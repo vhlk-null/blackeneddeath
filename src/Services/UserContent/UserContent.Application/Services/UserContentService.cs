@@ -361,6 +361,9 @@ public class UserContentService(
         return new PaginatedResult<ReviewDto>(pageIndex, pageSize, totalCount, items);
     }
 
+    public async Task<int> GetAlbumReviewCountAsync(Guid albumId, CancellationToken ct = default)
+        => await repo.Filter<AlbumReview>(r => r.AlbumId == albumId, asTracked: false).CountAsync(ct);
+
     public async Task<ReviewDto> CreateAlbumReviewAsync(CreateAlbumReviewRequest request, CancellationToken ct = default)
     {
         AlbumReview review = new()
@@ -406,6 +409,9 @@ public class UserContentService(
 
         return new PaginatedResult<ReviewDto>(pageIndex, pageSize, totalCount, items);
     }
+
+    public async Task<int> GetBandReviewCountAsync(Guid bandId, CancellationToken ct = default)
+        => await repo.Filter<BandReview>(r => r.BandId == bandId, asTracked: false).CountAsync(ct);
 
     public async Task<ReviewDto> CreateBandReviewAsync(CreateBandReviewRequest request, CancellationToken ct = default)
     {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace UserContent.API.Endpoints.AlbumReviews;
 
 [ApiController]
-[Route("albumReviews")]
+[Route("album-reviews")]
 [Tags("Album Reviews")]
 [Authorize]
 public class AlbumReviewsController(IUserContentService service) : ControllerBase
@@ -14,6 +14,14 @@ public class AlbumReviewsController(IUserContentService service) : ControllerBas
     {
         PaginatedResult<ReviewDto> result = await service.GetAlbumReviewsAsync(albumId, pageIndex, pageSize, ct);
         return Ok(result);
+    }
+
+    [HttpGet("{albumId:guid}/count")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAlbumReviewCount(Guid albumId, CancellationToken ct)
+    {
+        int count = await service.GetAlbumReviewCountAsync(albumId, ct);
+        return Ok(count);
     }
 
     [HttpPost]
