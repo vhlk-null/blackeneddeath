@@ -201,7 +201,7 @@ public static class UserContentModelBuilderExtensions
             entity.HasOne(e => e.Album)
                 .WithMany(a => a.FavoriteAlbums)
                 .HasForeignKey(e => e.AlbumId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 
@@ -233,7 +233,7 @@ public static class UserContentModelBuilderExtensions
             entity.HasOne(e => e.Band)
                 .WithMany(b => b.FavoriteBands)
                 .HasForeignKey(e => e.BandId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 
