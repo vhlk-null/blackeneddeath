@@ -200,7 +200,7 @@ public class UserContentService(
             double oldRating = review.Rating.Value;
             review.Rating = rating;
             review.RatedAt = DateTime.UtcNow;
-            album.AverageRating = album.RatingsCount > 0
+            album.AverageRating = album.RatingsCount > 0 && double.IsFinite(album.AverageRating ?? 0)
                 ? (album.AverageRating!.Value * album.RatingsCount - oldRating + rating) / album.RatingsCount
                 : rating;
         }
@@ -234,7 +234,7 @@ public class UserContentService(
             double oldRating = review.Rating.Value;
             review.Rating = rating;
             review.RatedAt = DateTime.UtcNow;
-            band.AverageRating = band.RatingsCount > 0
+            band.AverageRating = band.RatingsCount > 0 && double.IsFinite(band.AverageRating ?? 0)
                 ? (band.AverageRating!.Value * band.RatingsCount - oldRating + rating) / band.RatingsCount
                 : rating;
         }
@@ -404,7 +404,7 @@ public class UserContentService(
                 }
                 else
                 {
-                    album.AverageRating = album.RatingsCount > 0
+                    album.AverageRating = album.RatingsCount > 0 && double.IsFinite(album.AverageRating ?? 0)
                         ? (album.AverageRating!.Value * album.RatingsCount - existing.Rating.Value + request.UserRating.Value) / album.RatingsCount
                         : request.UserRating.Value;
                 }
@@ -534,7 +534,7 @@ public class UserContentService(
                 }
                 else
                 {
-                    band.AverageRating = band.RatingsCount > 0
+                    band.AverageRating = band.RatingsCount > 0 && double.IsFinite(band.AverageRating ?? 0)
                         ? (band.AverageRating!.Value * band.RatingsCount - existing.Rating.Value + request.UserRating.Value) / band.RatingsCount
                         : request.UserRating.Value;
                 }
