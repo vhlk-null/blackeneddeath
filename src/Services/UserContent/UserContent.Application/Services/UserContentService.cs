@@ -186,13 +186,27 @@ public class UserContentService(
             r => r.UserId == userId && r.AlbumId == albumId, cancellationToken: ct);
 
         if (review is null)
-            throw new NotFoundException("AlbumReview", userId);
+        {
+            UserProfileInfo profile = await repo.GetByAsync<UserProfileInfo>(p => p.UserId == userId, cancellationToken: ct)
+                ?? throw new NotFoundException("UserProfile", userId);
+            review = new AlbumReview
+            {
+                Id = Guid.NewGuid(),
+                AlbumId = albumId,
+                UserId = userId,
+                Username = profile.Username,
+                CreatedAt = DateTime.UtcNow
+            };
+            await repo.AddAsync(review, ct);
+        }
 
         if (review.Rating is null)
         {
             review.Rating = rating;
             review.RatedAt = DateTime.UtcNow;
-            album.AverageRating = ((album.AverageRating ?? 0) * album.RatingsCount + rating) / (album.RatingsCount + 1);
+            album.AverageRating = double.IsFinite(album.AverageRating ?? 0)
+                ? ((album.AverageRating ?? 0) * album.RatingsCount + rating) / (album.RatingsCount + 1)
+                : rating;
             album.RatingsCount++;
         }
         else
@@ -220,13 +234,27 @@ public class UserContentService(
             r => r.UserId == userId && r.BandId == bandId, cancellationToken: ct);
 
         if (review is null)
-            throw new NotFoundException("BandReview", userId);
+        {
+            UserProfileInfo profile = await repo.GetByAsync<UserProfileInfo>(p => p.UserId == userId, cancellationToken: ct)
+                ?? throw new NotFoundException("UserProfile", userId);
+            review = new BandReview
+            {
+                Id = Guid.NewGuid(),
+                BandId = bandId,
+                UserId = userId,
+                Username = profile.Username,
+                CreatedAt = DateTime.UtcNow
+            };
+            await repo.AddAsync(review, ct);
+        }
 
         if (review.Rating is null)
         {
             review.Rating = rating;
             review.RatedAt = DateTime.UtcNow;
-            band.AverageRating = ((band.AverageRating ?? 0) * band.RatingsCount + rating) / (band.RatingsCount + 1);
+            band.AverageRating = double.IsFinite(band.AverageRating ?? 0)
+                ? ((band.AverageRating ?? 0) * band.RatingsCount + rating) / (band.RatingsCount + 1)
+                : rating;
             band.RatingsCount++;
         }
         else
