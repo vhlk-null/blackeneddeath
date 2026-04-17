@@ -11,9 +11,9 @@ public class BandReviewsController(IUserContentService service) : ControllerBase
     [HttpGet("{bandId:guid}")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(PaginatedResult<ReviewDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetBandReviews(Guid bandId, CancellationToken ct, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 20)
+    public async Task<IActionResult> GetBandReviews(Guid bandId, CancellationToken ct, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 20, [FromQuery] ReviewOrderBy orderBy = ReviewOrderBy.Newest)
     {
-        PaginatedResult<ReviewDto> result = await service.GetBandReviewsAsync(bandId, pageIndex, pageSize, ct);
+        PaginatedResult<ReviewDto> result = await service.GetBandReviewsAsync(bandId, pageIndex, pageSize, orderBy, ct);
         return Ok(result);
     }
 
@@ -33,6 +33,15 @@ public class BandReviewsController(IUserContentService service) : ControllerBase
     {
         ReviewDto review = await service.CreateBandReviewAsync(request, ct);
         return CreatedAtAction(nameof(GetBandReviews), new { bandId = request.BandId }, review);
+    }
+
+    [HttpPut("{reviewId:guid}")]
+    [ProducesResponseType(typeof(ReviewDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateBandReview(Guid reviewId, UpdateReviewRequest request, CancellationToken ct)
+    {
+        ReviewDto review = await service.UpdateBandReviewAsync(reviewId, request, ct);
+        return Ok(review);
     }
 
     [HttpDelete("{reviewId:guid}")]

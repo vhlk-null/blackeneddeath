@@ -14,6 +14,4 @@ public class UserProfileInfo
     public int ReviewsCount { get; set; }
     public List<FavoriteAlbum> FavoriteAlbums { get; set; } = new();
     public List<FavoriteBand> FavoriteBands { get; set; } = new();
-    public List<AlbumRating> AlbumRatings { get; set; } = new();
-    public List<BandRating> BandRatings { get; set; } = new();
 }

@@ -16,6 +16,5 @@ public class Band
     public double? AverageRating { get; set; }
     public int RatingsCount { get; set; }
     public List<FavoriteBand> FavoriteBands { get; set; } = new();
-    public List<BandRating> Ratings { get; set; } = new();
     public List<BandReview> Reviews { get; set; } = new();
 }

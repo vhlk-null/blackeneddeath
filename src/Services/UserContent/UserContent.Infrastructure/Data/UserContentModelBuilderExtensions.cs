@@ -237,70 +237,6 @@ public static class UserContentModelBuilderExtensions
         });
     }
 
-    public static void SetupAlbumRating(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<AlbumRating>(entity =>
-        {
-            entity.ToTable("album_ratings");
-
-            entity.HasKey(e => new { e.UserId, e.AlbumId });
-
-            entity.Property(e => e.UserId)
-                .HasColumnName("user_id");
-
-            entity.Property(e => e.AlbumId)
-                .HasColumnName("album_id");
-
-            entity.Property(e => e.Rating)
-                .HasColumnName("rating");
-
-            entity.Property(e => e.RatedAt)
-                .HasColumnName("rated_at");
-
-            entity.HasOne(e => e.User)
-                .WithMany(u => u.AlbumRatings)
-                .HasForeignKey(e => e.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasOne(e => e.Album)
-                .WithMany(a => a.Ratings)
-                .HasForeignKey(e => e.AlbumId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-    }
-
-    public static void SetupBandRating(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<BandRating>(entity =>
-        {
-            entity.ToTable("band_ratings");
-
-            entity.HasKey(e => new { e.UserId, e.BandId });
-
-            entity.Property(e => e.UserId)
-                .HasColumnName("user_id");
-
-            entity.Property(e => e.BandId)
-                .HasColumnName("band_id");
-
-            entity.Property(e => e.Rating)
-                .HasColumnName("rating");
-
-            entity.Property(e => e.RatedAt)
-                .HasColumnName("rated_at");
-
-            entity.HasOne(e => e.User)
-                .WithMany(u => u.BandRatings)
-                .HasForeignKey(e => e.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasOne(e => e.Band)
-                .WithMany(b => b.Ratings)
-                .HasForeignKey(e => e.BandId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-    }
-
     public static void SetupAlbumReview(this ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AlbumReview>(entity =>
@@ -333,6 +269,12 @@ public static class UserContentModelBuilderExtensions
                 .IsRequired()
                 .HasColumnType("text")
                 .HasColumnName("body");
+
+            entity.Property(e => e.Rating)
+                .HasColumnName("rating");
+
+            entity.Property(e => e.RatedAt)
+                .HasColumnName("rated_at");
 
             entity.Property(e => e.CreatedAt)
                 .HasColumnName("created_at");
@@ -376,6 +318,12 @@ public static class UserContentModelBuilderExtensions
                 .IsRequired()
                 .HasColumnType("text")
                 .HasColumnName("body");
+
+            entity.Property(e => e.Rating)
+                .HasColumnName("rating");
+
+            entity.Property(e => e.RatedAt)
+                .HasColumnName("rated_at");
 
             entity.Property(e => e.CreatedAt)
                 .HasColumnName("created_at");

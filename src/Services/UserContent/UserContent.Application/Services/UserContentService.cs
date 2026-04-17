@@ -149,10 +149,10 @@ public class UserContentService(
 
     public async Task<(int? UserRating, double? AverageRating, int RatingsCount)> GetAlbumRatingAsync(Guid userId, Guid albumId, CancellationToken ct = default)
     {
-        AlbumRating? rating = await repo.GetByAsync<AlbumRating>(
+        AlbumReview? review = await repo.GetByAsync<AlbumReview>(
             r => r.UserId == userId && r.AlbumId == albumId, cancellationToken: ct);
         Album? album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct);
-        return (rating?.Rating, album?.AverageRating, album?.RatingsCount ?? 0);
+        return (review?.Rating, album?.AverageRating, album?.RatingsCount ?? 0);
     }
 
     public async Task<(double? AverageRating, int RatingsCount)> GetAlbumAverageRatingAsync(Guid albumId, CancellationToken ct = default)
@@ -163,10 +163,10 @@ public class UserContentService(
 
     public async Task<(int? UserRating, double? AverageRating, int RatingsCount)> GetBandRatingAsync(Guid userId, Guid bandId, CancellationToken ct = default)
     {
-        BandRating? rating = await repo.GetByAsync<BandRating>(
+        BandReview? review = await repo.GetByAsync<BandReview>(
             r => r.UserId == userId && r.BandId == bandId, cancellationToken: ct);
         Band? band = await repo.GetByAsync<Band>(b => b.BandId == bandId, cancellationToken: ct);
-        return (rating?.Rating, band?.AverageRating, band?.RatingsCount ?? 0);
+        return (review?.Rating, band?.AverageRating, band?.RatingsCount ?? 0);
     }
 
     public async Task<(double? AverageRating, int RatingsCount)> GetBandAverageRatingAsync(Guid bandId, CancellationToken ct = default)
@@ -182,20 +182,24 @@ public class UserContentService(
         Album album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct)
             ?? throw new NotFoundException("Album", albumId);
 
-        AlbumRating? existing = await repo.GetByAsync<AlbumRating>(
+        AlbumReview? review = await repo.GetByAsync<AlbumReview>(
             r => r.UserId == userId && r.AlbumId == albumId, cancellationToken: ct);
 
-        if (existing is null)
+        if (review is null)
+            throw new NotFoundException("AlbumReview", userId);
+
+        if (review.Rating is null)
         {
-            await repo.AddAsync(new AlbumRating { UserId = userId, AlbumId = albumId, Rating = rating, RatedAt = DateTime.UtcNow }, ct);
+            review.Rating = rating;
+            review.RatedAt = DateTime.UtcNow;
             album.AverageRating = ((album.AverageRating ?? 0) * album.RatingsCount + rating) / (album.RatingsCount + 1);
             album.RatingsCount++;
         }
         else
         {
-            double oldRating = existing.Rating;
-            existing.Rating = rating;
-            existing.RatedAt = DateTime.UtcNow;
+            double oldRating = review.Rating.Value;
+            review.Rating = rating;
+            review.RatedAt = DateTime.UtcNow;
             album.AverageRating = (album.AverageRating!.Value * album.RatingsCount - oldRating + rating) / album.RatingsCount;
         }
 
@@ -210,20 +214,24 @@ public class UserContentService(
         Band band = await repo.GetByAsync<Band>(b => b.BandId == bandId, cancellationToken: ct)
             ?? throw new NotFoundException("Band", bandId);
 
-        BandRating? existing = await repo.GetByAsync<BandRating>(
+        BandReview? review = await repo.GetByAsync<BandReview>(
             r => r.UserId == userId && r.BandId == bandId, cancellationToken: ct);
 
-        if (existing is null)
+        if (review is null)
+            throw new NotFoundException("BandReview", userId);
+
+        if (review.Rating is null)
         {
-            await repo.AddAsync(new BandRating { UserId = userId, BandId = bandId, Rating = rating, RatedAt = DateTime.UtcNow }, ct);
+            review.Rating = rating;
+            review.RatedAt = DateTime.UtcNow;
             band.AverageRating = ((band.AverageRating ?? 0) * band.RatingsCount + rating) / (band.RatingsCount + 1);
             band.RatingsCount++;
         }
         else
         {
-            double oldRating = existing.Rating;
-            existing.Rating = rating;
-            existing.RatedAt = DateTime.UtcNow;
+            double oldRating = review.Rating.Value;
+            review.Rating = rating;
+            review.RatedAt = DateTime.UtcNow;
             band.AverageRating = (band.AverageRating!.Value * band.RatingsCount - oldRating + rating) / band.RatingsCount;
         }
 
@@ -258,11 +266,11 @@ public class UserContentService(
             ? DateTime.UtcNow.AddMonths(-1)
             : DateTime.UtcNow.AddYears(-1);
 
-        IQueryable<AlbumRating> ratingsQuery = repo.Filter<AlbumRating>(r => r.RatedAt >= cutoff);
+        IQueryable<AlbumReview> ratingsQuery = repo.Filter<AlbumReview>(r => r.Rating != null && r.RatedAt >= cutoff);
 
         var grouped = ratingsQuery
             .GroupBy(r => r.AlbumId)
-            .Select(g => new { AlbumId = g.Key, Avg = g.Average(r => r.Rating), Count = g.Count() });
+            .Select(g => new { AlbumId = g.Key, Avg = g.Average(r => (double)r.Rating!.Value), Count = g.Count() });
 
         long periodCount = await grouped.LongCountAsync(ct);
 
@@ -314,11 +322,11 @@ public class UserContentService(
             ? DateTime.UtcNow.AddMonths(-1)
             : DateTime.UtcNow.AddYears(-1);
 
-        IQueryable<BandRating> ratingsQuery = repo.Filter<BandRating>(r => r.RatedAt >= cutoff);
+        IQueryable<BandReview> ratingsQuery = repo.Filter<BandReview>(r => r.Rating != null && r.RatedAt >= cutoff);
 
         var grouped = ratingsQuery
             .GroupBy(r => r.BandId)
-            .Select(g => new { BandId = g.Key, Avg = g.Average(r => r.Rating), Count = g.Count() });
+            .Select(g => new { BandId = g.Key, Avg = g.Average(r => (double)r.Rating!.Value), Count = g.Count() });
 
         long periodCount = await grouped.LongCountAsync(ct);
 
@@ -343,19 +351,23 @@ public class UserContentService(
         return new PaginatedResult<BandCardDto>(pagination.PageIndex, pagination.PageSize, periodCount, periodData);
     }
 
-    public async Task<PaginatedResult<ReviewDto>> GetAlbumReviewsAsync(Guid albumId, int pageIndex, int pageSize, CancellationToken ct = default)
+    public async Task<PaginatedResult<ReviewDto>> GetAlbumReviewsAsync(Guid albumId, int pageIndex, int pageSize, ReviewOrderBy orderBy, CancellationToken ct = default)
     {
-        IQueryable<AlbumReview> query = repo.Filter<AlbumReview>(r => r.AlbumId == albumId, asTracked: false)
-            .OrderByDescending(r => r.CreatedAt);
+        IQueryable<AlbumReview> baseQuery = repo.Filter<AlbumReview>(r => r.AlbumId == albumId, asTracked: false);
 
-        IQueryable<AlbumRating> ratings = repo.Filter<AlbumRating>(r => r.AlbumId == albumId, asTracked: false);
+        var ordered = orderBy switch
+        {
+            ReviewOrderBy.Oldest => baseQuery.OrderBy(r => r.CreatedAt),
+            ReviewOrderBy.HighestRated => baseQuery.OrderByDescending(r => r.Rating),
+            ReviewOrderBy.LowestRated => baseQuery.OrderBy(r => r.Rating),
+            _ => baseQuery.OrderByDescending(r => r.CreatedAt)
+        };
 
-        int totalCount = await query.CountAsync(ct);
-        List<ReviewDto> items = await query
+        int totalCount = await baseQuery.CountAsync(ct);
+        List<ReviewDto> items = await ordered
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
-            .Select(r => new ReviewDto(r.Id, r.UserId, r.Username, r.Title, r.Body, r.CreatedAt,
-                ratings.Where(rt => rt.UserId == r.UserId).Select(rt => (int?)rt.Rating).FirstOrDefault()))
+            .Select(r => new ReviewDto(r.Id, r.UserId, r.Username, r.Title, r.Body, r.CreatedAt, r.Rating))
             .ToListAsync(ct);
 
         return new PaginatedResult<ReviewDto>(pageIndex, pageSize, totalCount, items);
@@ -366,6 +378,8 @@ public class UserContentService(
 
     public async Task<ReviewDto> CreateAlbumReviewAsync(CreateAlbumReviewRequest request, CancellationToken ct = default)
     {
+        await EnsureUserProfileAsync(request.UserId, ct);
+
         AlbumReview review = new()
         {
             Id = Guid.NewGuid(),
@@ -374,10 +388,34 @@ public class UserContentService(
             Username = request.Username,
             Title = request.Title,
             Body = request.Body,
+            Rating = request.UserRating,
+            RatedAt = request.UserRating.HasValue ? DateTime.UtcNow : null,
             CreatedAt = DateTime.UtcNow
         };
 
         await repo.AddAsync(review, ct);
+
+        if (request.UserRating.HasValue)
+        {
+            Album album = await repo.GetByAsync<Album>(a => a.Id == request.AlbumId, cancellationToken: ct)
+                ?? throw new NotFoundException("Album", request.AlbumId);
+            album.AverageRating = ((album.AverageRating ?? 0) * album.RatingsCount + request.UserRating.Value) / (album.RatingsCount + 1);
+            album.RatingsCount++;
+        }
+
+        await repo.SaveChangesAsync(ct);
+
+        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, review.Rating);
+    }
+
+    public async Task<ReviewDto> UpdateAlbumReviewAsync(Guid reviewId, UpdateReviewRequest request, CancellationToken ct = default)
+    {
+        AlbumReview review = await repo.GetByAsync<AlbumReview>(r => r.Id == reviewId, cancellationToken: ct)
+            ?? throw new AlbumReviewNotFoundException(reviewId);
+
+        review.Title = request.Title;
+        review.Body = request.Body;
+
         await repo.SaveChangesAsync(ct);
 
         return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, null);
@@ -392,19 +430,23 @@ public class UserContentService(
         await repo.SaveChangesAsync(ct);
     }
 
-    public async Task<PaginatedResult<ReviewDto>> GetBandReviewsAsync(Guid bandId, int pageIndex, int pageSize, CancellationToken ct = default)
+    public async Task<PaginatedResult<ReviewDto>> GetBandReviewsAsync(Guid bandId, int pageIndex, int pageSize, ReviewOrderBy orderBy, CancellationToken ct = default)
     {
-        IQueryable<BandReview> query = repo.Filter<BandReview>(r => r.BandId == bandId, asTracked: false)
-            .OrderByDescending(r => r.CreatedAt);
+        IQueryable<BandReview> baseQuery = repo.Filter<BandReview>(r => r.BandId == bandId, asTracked: false);
 
-        IQueryable<BandRating> ratings = repo.Filter<BandRating>(r => r.BandId == bandId, asTracked: false);
+        var ordered = orderBy switch
+        {
+            ReviewOrderBy.Oldest => baseQuery.OrderBy(r => r.CreatedAt),
+            ReviewOrderBy.HighestRated => baseQuery.OrderByDescending(r => r.Rating),
+            ReviewOrderBy.LowestRated => baseQuery.OrderBy(r => r.Rating),
+            _ => baseQuery.OrderByDescending(r => r.CreatedAt)
+        };
 
-        int totalCount = await query.CountAsync(ct);
-        List<ReviewDto> items = await query
+        int totalCount = await baseQuery.CountAsync(ct);
+        List<ReviewDto> items = await ordered
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
-            .Select(r => new ReviewDto(r.Id, r.UserId, r.Username, r.Title, r.Body, r.CreatedAt,
-                ratings.Where(rt => rt.UserId == r.UserId).Select(rt => (int?)rt.Rating).FirstOrDefault()))
+            .Select(r => new ReviewDto(r.Id, r.UserId, r.Username, r.Title, r.Body, r.CreatedAt, r.Rating))
             .ToListAsync(ct);
 
         return new PaginatedResult<ReviewDto>(pageIndex, pageSize, totalCount, items);
@@ -415,6 +457,8 @@ public class UserContentService(
 
     public async Task<ReviewDto> CreateBandReviewAsync(CreateBandReviewRequest request, CancellationToken ct = default)
     {
+        await EnsureUserProfileAsync(request.UserId, ct);
+
         BandReview review = new()
         {
             Id = Guid.NewGuid(),
@@ -423,10 +467,34 @@ public class UserContentService(
             Username = request.Username,
             Title = request.Title,
             Body = request.Body,
+            Rating = request.UserRating,
+            RatedAt = request.UserRating.HasValue ? DateTime.UtcNow : null,
             CreatedAt = DateTime.UtcNow
         };
 
         await repo.AddAsync(review, ct);
+
+        if (request.UserRating.HasValue)
+        {
+            Band band = await repo.GetByAsync<Band>(b => b.BandId == request.BandId, cancellationToken: ct)
+                ?? throw new NotFoundException("Band", request.BandId);
+            band.AverageRating = ((band.AverageRating ?? 0) * band.RatingsCount + request.UserRating.Value) / (band.RatingsCount + 1);
+            band.RatingsCount++;
+        }
+
+        await repo.SaveChangesAsync(ct);
+
+        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, review.Rating);
+    }
+
+    public async Task<ReviewDto> UpdateBandReviewAsync(Guid reviewId, UpdateReviewRequest request, CancellationToken ct = default)
+    {
+        BandReview review = await repo.GetByAsync<BandReview>(r => r.Id == reviewId, cancellationToken: ct)
+            ?? throw new BandReviewNotFoundException(reviewId);
+
+        review.Title = request.Title;
+        review.Body = request.Body;
+
         await repo.SaveChangesAsync(ct);
 
         return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, null);

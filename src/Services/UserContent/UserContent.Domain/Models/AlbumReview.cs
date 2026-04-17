@@ -8,6 +8,8 @@ public class AlbumReview
     public string Username { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
+    public int? Rating { get; set; }
+    public DateTime? RatedAt { get; set; }
     public DateTime CreatedAt { get; set; }
     public Album Album { get; set; } = null!;
 }
