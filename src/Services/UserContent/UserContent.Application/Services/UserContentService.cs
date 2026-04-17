@@ -353,7 +353,7 @@ public class UserContentService(
 
     public async Task<PaginatedResult<ReviewDto>> GetAlbumReviewsAsync(Guid albumId, int pageIndex, int pageSize, ReviewOrderBy orderBy, CancellationToken ct = default)
     {
-        IQueryable<AlbumReview> baseQuery = repo.Filter<AlbumReview>(r => r.AlbumId == albumId && (r.Title != null || r.Body != null), asTracked: false);
+        IQueryable<AlbumReview> baseQuery = repo.Filter<AlbumReview>(r => r.AlbumId == albumId && ((!string.IsNullOrEmpty(r.Title)) || (!string.IsNullOrEmpty(r.Body))), asTracked: false);
 
         var ordered = orderBy switch
         {
@@ -374,7 +374,7 @@ public class UserContentService(
     }
 
     public async Task<int> GetAlbumReviewCountAsync(Guid albumId, CancellationToken ct = default)
-        => await repo.Filter<AlbumReview>(r => r.AlbumId == albumId && (r.Title != null || r.Body != null), asTracked: false).CountAsync(ct);
+        => await repo.Filter<AlbumReview>(r => r.AlbumId == albumId && ((!string.IsNullOrEmpty(r.Title)) || (!string.IsNullOrEmpty(r.Body))), asTracked: false).CountAsync(ct);
 
     public async Task<ReviewDto> CreateAlbumReviewAsync(CreateAlbumReviewRequest request, CancellationToken ct = default)
     {
@@ -451,7 +451,7 @@ public class UserContentService(
 
     public async Task<PaginatedResult<ReviewDto>> GetBandReviewsAsync(Guid bandId, int pageIndex, int pageSize, ReviewOrderBy orderBy, CancellationToken ct = default)
     {
-        IQueryable<BandReview> baseQuery = repo.Filter<BandReview>(r => r.BandId == bandId && (r.Title != null || r.Body != null), asTracked: false);
+        IQueryable<BandReview> baseQuery = repo.Filter<BandReview>(r => r.BandId == bandId && ((!string.IsNullOrEmpty(r.Title)) || (!string.IsNullOrEmpty(r.Body))), asTracked: false);
 
         var ordered = orderBy switch
         {
@@ -472,7 +472,7 @@ public class UserContentService(
     }
 
     public async Task<int> GetBandReviewCountAsync(Guid bandId, CancellationToken ct = default)
-        => await repo.Filter<BandReview>(r => r.BandId == bandId && (r.Title != null || r.Body != null), asTracked: false).CountAsync(ct);
+        => await repo.Filter<BandReview>(r => r.BandId == bandId && ((!string.IsNullOrEmpty(r.Title)) || (!string.IsNullOrEmpty(r.Body))), asTracked: false).CountAsync(ct);
 
     public async Task<ReviewDto> CreateBandReviewAsync(CreateBandReviewRequest request, CancellationToken ct = default)
     {
