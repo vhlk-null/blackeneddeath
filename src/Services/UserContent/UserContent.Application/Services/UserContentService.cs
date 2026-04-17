@@ -200,7 +200,9 @@ public class UserContentService(
             double oldRating = review.Rating.Value;
             review.Rating = rating;
             review.RatedAt = DateTime.UtcNow;
-            album.AverageRating = (album.AverageRating!.Value * album.RatingsCount - oldRating + rating) / album.RatingsCount;
+            album.AverageRating = album.RatingsCount > 0
+                ? (album.AverageRating!.Value * album.RatingsCount - oldRating + rating) / album.RatingsCount
+                : rating;
         }
 
         await repo.SaveChangesAsync(ct);
@@ -232,7 +234,9 @@ public class UserContentService(
             double oldRating = review.Rating.Value;
             review.Rating = rating;
             review.RatedAt = DateTime.UtcNow;
-            band.AverageRating = (band.AverageRating!.Value * band.RatingsCount - oldRating + rating) / band.RatingsCount;
+            band.AverageRating = band.RatingsCount > 0
+                ? (band.AverageRating!.Value * band.RatingsCount - oldRating + rating) / band.RatingsCount
+                : rating;
         }
 
         await repo.SaveChangesAsync(ct);
@@ -400,7 +404,9 @@ public class UserContentService(
                 }
                 else
                 {
-                    album.AverageRating = (album.AverageRating!.Value * album.RatingsCount - existing.Rating.Value + request.UserRating.Value) / album.RatingsCount;
+                    album.AverageRating = album.RatingsCount > 0
+                        ? (album.AverageRating!.Value * album.RatingsCount - existing.Rating.Value + request.UserRating.Value) / album.RatingsCount
+                        : request.UserRating.Value;
                 }
 
                 existing.Rating = request.UserRating;
@@ -528,7 +534,9 @@ public class UserContentService(
                 }
                 else
                 {
-                    band.AverageRating = (band.AverageRating!.Value * band.RatingsCount - existing.Rating.Value + request.UserRating.Value) / band.RatingsCount;
+                    band.AverageRating = band.RatingsCount > 0
+                        ? (band.AverageRating!.Value * band.RatingsCount - existing.Rating.Value + request.UserRating.Value) / band.RatingsCount
+                        : request.UserRating.Value;
                 }
 
                 existing.Rating = request.UserRating;
