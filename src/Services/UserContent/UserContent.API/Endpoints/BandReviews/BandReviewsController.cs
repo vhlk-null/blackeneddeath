@@ -17,6 +17,7 @@ public class BandReviewsController(IUserContentService service) : ControllerBase
     }
 
     [HttpGet("{bandId:guid}/count")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetBandReviewCount(Guid bandId, CancellationToken ct)
     {

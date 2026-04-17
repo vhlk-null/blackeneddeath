@@ -17,6 +17,7 @@ public class AlbumReviewsController(IUserContentService service) : ControllerBas
     }
 
     [HttpGet("{albumId:guid}/count")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAlbumReviewCount(Guid albumId, CancellationToken ct)
     {
