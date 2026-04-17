@@ -348,11 +348,14 @@ public class UserContentService(
         IQueryable<AlbumReview> query = repo.Filter<AlbumReview>(r => r.AlbumId == albumId, asTracked: false)
             .OrderByDescending(r => r.CreatedAt);
 
+        IQueryable<AlbumRating> ratings = repo.Filter<AlbumRating>(r => r.AlbumId == albumId, asTracked: false);
+
         int totalCount = await query.CountAsync(ct);
         List<ReviewDto> items = await query
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
-            .Select(r => new ReviewDto(r.Id, r.UserId, r.Username, r.Title, r.Body, r.Grade, r.CreatedAt))
+            .Select(r => new ReviewDto(r.Id, r.UserId, r.Username, r.Title, r.Body, r.CreatedAt,
+                ratings.Where(rt => rt.UserId == r.UserId).Select(rt => (int?)rt.Rating).FirstOrDefault()))
             .ToListAsync(ct);
 
         return new PaginatedResult<ReviewDto>(pageIndex, pageSize, totalCount, items);
@@ -368,14 +371,13 @@ public class UserContentService(
             Username = request.Username,
             Title = request.Title,
             Body = request.Body,
-            Grade = request.Grade,
             CreatedAt = DateTime.UtcNow
         };
 
         await repo.AddAsync(review, ct);
         await repo.SaveChangesAsync(ct);
 
-        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.Grade, review.CreatedAt);
+        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, null);
     }
 
     public async Task DeleteAlbumReviewAsync(Guid reviewId, CancellationToken ct = default)
@@ -392,11 +394,14 @@ public class UserContentService(
         IQueryable<BandReview> query = repo.Filter<BandReview>(r => r.BandId == bandId, asTracked: false)
             .OrderByDescending(r => r.CreatedAt);
 
+        IQueryable<BandRating> ratings = repo.Filter<BandRating>(r => r.BandId == bandId, asTracked: false);
+
         int totalCount = await query.CountAsync(ct);
         List<ReviewDto> items = await query
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
-            .Select(r => new ReviewDto(r.Id, r.UserId, r.Username, r.Title, r.Body, r.Grade, r.CreatedAt))
+            .Select(r => new ReviewDto(r.Id, r.UserId, r.Username, r.Title, r.Body, r.CreatedAt,
+                ratings.Where(rt => rt.UserId == r.UserId).Select(rt => (int?)rt.Rating).FirstOrDefault()))
             .ToListAsync(ct);
 
         return new PaginatedResult<ReviewDto>(pageIndex, pageSize, totalCount, items);
@@ -412,14 +417,13 @@ public class UserContentService(
             Username = request.Username,
             Title = request.Title,
             Body = request.Body,
-            Grade = request.Grade,
             CreatedAt = DateTime.UtcNow
         };
 
         await repo.AddAsync(review, ct);
         await repo.SaveChangesAsync(ct);
 
-        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.Grade, review.CreatedAt);
+        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, null);
     }
 
     public async Task DeleteBandReviewAsync(Guid reviewId, CancellationToken ct = default)

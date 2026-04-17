@@ -334,9 +334,6 @@ public static class UserContentModelBuilderExtensions
                 .HasColumnType("text")
                 .HasColumnName("body");
 
-            entity.Property(e => e.Grade)
-                .HasColumnName("grade");
-
             entity.Property(e => e.CreatedAt)
                 .HasColumnName("created_at");
 
@@ -379,9 +376,6 @@ public static class UserContentModelBuilderExtensions
                 .IsRequired()
                 .HasColumnType("text")
                 .HasColumnName("body");
-
-            entity.Property(e => e.Grade)
-                .HasColumnName("grade");
 
             entity.Property(e => e.CreatedAt)
                 .HasColumnName("created_at");
