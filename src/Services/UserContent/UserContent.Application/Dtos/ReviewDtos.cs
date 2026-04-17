@@ -6,4 +6,4 @@ public record ReviewDto(Guid Id, Guid UserId, string Username, string Title, str
 
 public record CreateAlbumReviewRequest(Guid AlbumId, Guid UserId, string Username, string Title, string Body, int? UserRating);
 public record CreateBandReviewRequest(Guid BandId, Guid UserId, string Username, string Title, string Body, int? UserRating);
-public record UpdateReviewRequest(string Title, string Body);
+public record UpdateReviewRequest(string Title, string Body, int? UserRating);

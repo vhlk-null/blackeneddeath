@@ -416,9 +416,28 @@ public class UserContentService(
         review.Title = request.Title;
         review.Body = request.Body;
 
+        if (request.UserRating.HasValue)
+        {
+            Album album = await repo.GetByAsync<Album>(a => a.Id == review.AlbumId, cancellationToken: ct)
+                ?? throw new NotFoundException("Album", review.AlbumId);
+
+            if (review.Rating is null)
+            {
+                album.AverageRating = ((album.AverageRating ?? 0) * album.RatingsCount + request.UserRating.Value) / (album.RatingsCount + 1);
+                album.RatingsCount++;
+            }
+            else
+            {
+                album.AverageRating = (album.AverageRating!.Value * album.RatingsCount - review.Rating.Value + request.UserRating.Value) / album.RatingsCount;
+            }
+
+            review.Rating = request.UserRating;
+            review.RatedAt = DateTime.UtcNow;
+        }
+
         await repo.SaveChangesAsync(ct);
 
-        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, null);
+        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, review.Rating);
     }
 
     public async Task DeleteAlbumReviewAsync(Guid reviewId, CancellationToken ct = default)
@@ -495,9 +514,28 @@ public class UserContentService(
         review.Title = request.Title;
         review.Body = request.Body;
 
+        if (request.UserRating.HasValue)
+        {
+            Band band = await repo.GetByAsync<Band>(b => b.BandId == review.BandId, cancellationToken: ct)
+                ?? throw new NotFoundException("Band", review.BandId);
+
+            if (review.Rating is null)
+            {
+                band.AverageRating = ((band.AverageRating ?? 0) * band.RatingsCount + request.UserRating.Value) / (band.RatingsCount + 1);
+                band.RatingsCount++;
+            }
+            else
+            {
+                band.AverageRating = (band.AverageRating!.Value * band.RatingsCount - review.Rating.Value + request.UserRating.Value) / band.RatingsCount;
+            }
+
+            review.Rating = request.UserRating;
+            review.RatedAt = DateTime.UtcNow;
+        }
+
         await repo.SaveChangesAsync(ct);
 
-        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, null);
+        return new ReviewDto(review.Id, review.UserId, review.Username, review.Title, review.Body, review.CreatedAt, review.Rating);
     }
 
     public async Task DeleteBandReviewAsync(Guid reviewId, CancellationToken ct = default)
