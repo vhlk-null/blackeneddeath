@@ -261,12 +261,10 @@ public static class UserContentModelBuilderExtensions
                 .HasColumnName("username");
 
             entity.Property(e => e.Title)
-                .IsRequired()
                 .HasMaxLength(120)
                 .HasColumnName("title");
 
             entity.Property(e => e.Body)
-                .IsRequired()
                 .HasColumnType("text")
                 .HasColumnName("body");
 
@@ -315,7 +313,6 @@ public static class UserContentModelBuilderExtensions
                 .HasColumnName("title");
 
             entity.Property(e => e.Body)
-                .IsRequired()
                 .HasColumnType("text")
                 .HasColumnName("body");
 
