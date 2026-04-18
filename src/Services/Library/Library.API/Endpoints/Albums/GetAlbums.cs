@@ -12,23 +12,25 @@ public class GetAlbums : ICarterModule
                 ISender sender,
                 ILibraryDbContext db,
                 CancellationToken ct,
+                HttpContext httpContext,
                 AlbumSortBy sortBy = AlbumSortBy.Newest,
-                Guid? genreId = null,
-                Guid? labelId = null,
-                Guid? countryId = null,
                 AlbumType? type = null,
                 int? yearFrom = null,
                 int? yearTo = null,
-                string? name = null,
-                string? genreName = null,
-                string? labelName = null,
-                string? countryName = null) =>
+                string? name = null) =>
             {
+                List<string> genreNames   = httpContext.Request.Query["genreName"].Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
+                List<string> labelNames   = httpContext.Request.Query["labelName"].Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
+                List<string> countryNames = httpContext.Request.Query["countryName"].Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
+                List<Guid>   genreIds     = httpContext.Request.Query["genreId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
+                List<Guid>   labelIds     = httpContext.Request.Query["labelId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
+                List<Guid>   countryIds   = httpContext.Request.Query["countryId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
+
                 ISpecification<Album>? filter;
-                if (genreName != null || labelName != null || countryName != null)
-                    filter = await AlbumFilterBuilder.BuildByNameAsync(db, genreName, labelName, countryName, type, yearFrom, yearTo, name, ct);
+                if (genreNames.Count > 0 || labelNames.Count > 0 || countryNames.Count > 0)
+                    filter = await AlbumFilterBuilder.BuildByNameAsync(db, genreNames, labelNames, countryNames, type, yearFrom, yearTo, name, ct);
                 else
-                    filter = AlbumFilterBuilder.Build(genreId, labelId, countryId, type, yearFrom, yearTo, name);
+                    filter = AlbumFilterBuilder.Build(genreIds, labelIds, countryIds, type, yearFrom, yearTo, name);
 
                 Application.Services.Albums.Queries.GetAlbums.GetAlbumsResult result = await sender.Send(new GetAlbumsQuery(paginationRequest, sortBy, filter));
                 return Results.Ok(result.Adapt<GetAlbumsResult>());
@@ -37,7 +39,7 @@ public class GetAlbums : ICarterModule
             .Produces<GetAlbumsResult>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Albums")
-            .WithDescription("Get Albums with optional filters: genreId, labelId, countryId, type, yearFrom, yearTo, genreName, labelName, countryName")
+            .WithDescription("Get Albums with optional multi-value filters: genreId[], labelId[], countryId[], genreName[], labelName[], countryName[], type, yearFrom, yearTo, name")
             .WithTags("Albums");
     }
 }

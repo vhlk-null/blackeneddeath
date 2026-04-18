@@ -11,15 +11,16 @@ public class GetAllBands : ICarterModule
         app.MapGet("/admin/bands", async (
                 [AsParameters] PaginationRequest paginationRequest,
                 ISender sender,
+                HttpContext httpContext,
                 BandSortBy sortBy = BandSortBy.Newest,
-                Guid? genreId = null,
-                Guid? countryId = null,
                 BandStatus? status = null,
                 int? yearFrom = null,
                 int? yearTo = null,
                 string? name = null) =>
             {
-                ISpecification<Band>? filter = BandFilterBuilder.Build(genreId, countryId, status, yearFrom, yearTo, name);
+                List<Guid> genreIds   = httpContext.Request.Query["genreId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
+                List<Guid> countryIds = httpContext.Request.Query["countryId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
+                ISpecification<Band>? filter = BandFilterBuilder.Build(genreIds, countryIds, status, yearFrom, yearTo, name);
                 Application.Services.Bands.Queries.GetBands.GetBandsResult result = await sender.Send(new GetBandsQuery(paginationRequest, sortBy, filter, ApprovedOnly: false));
                 return Results.Ok(result.Adapt<GetAllBandsResult>());
             })

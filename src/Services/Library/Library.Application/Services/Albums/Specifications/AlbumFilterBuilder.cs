@@ -3,9 +3,9 @@ namespace Library.Application.Services.Albums.Specifications;
 public static class AlbumFilterBuilder
 {
     public static ISpecification<Album>? Build(
-        Guid? genreId,
-        Guid? labelId,
-        Guid? countryId,
+        List<Guid> genreIds,
+        List<Guid> labelIds,
+        List<Guid> countryIds,
         AlbumType? type,
         int? yearFrom,
         int? yearTo,
@@ -13,9 +13,9 @@ public static class AlbumFilterBuilder
     {
         ISpecification<Album>? filter = null;
 
-        if (genreId.HasValue)                    filter = Combine(filter, new AlbumByGenreSpec(genreId.Value));
-        if (labelId.HasValue)                    filter = Combine(filter, new AlbumByLabelSpec(labelId.Value));
-        if (countryId.HasValue)                  filter = Combine(filter, new AlbumByCountrySpec(countryId.Value));
+        if (genreIds.Count > 0)   filter = Combine(filter, genreIds.Select(id => (ISpecification<Album>)new AlbumByGenreSpec(id)).Aggregate((a, b) => a.Or(b)));
+        if (labelIds.Count > 0)   filter = Combine(filter, labelIds.Select(id => (ISpecification<Album>)new AlbumByLabelSpec(id)).Aggregate((a, b) => a.Or(b)));
+        if (countryIds.Count > 0) filter = Combine(filter, countryIds.Select(id => (ISpecification<Album>)new AlbumByCountrySpec(id)).Aggregate((a, b) => a.Or(b)));
         if (type.HasValue)                       filter = Combine(filter, new AlbumByTypeSpec(type.Value));
         if (yearFrom.HasValue || yearTo.HasValue) filter = Combine(filter, new AlbumByYearRangeSpec(yearFrom, yearTo));
         if (!string.IsNullOrWhiteSpace(name))    filter = Combine(filter, new AlbumByNameSpec(name));
@@ -23,78 +23,49 @@ public static class AlbumFilterBuilder
         return filter;
     }
 
-    public static async Task<ISpecification<Album>?> BuildBySlugAsync(
-        ILibraryDbContext context,
-        string? genreSlug,
-        string? labelId,
-        string? countryId,
-        AlbumType? type,
-        int? yearFrom,
-        int? yearTo,
-        string? name = null,
-        CancellationToken cancellationToken = default)
-    {
-        Guid? resolvedGenreId = null;
-        Guid? resolvedLabelId = null;
-        Guid? resolvedCountryId = null;
-
-        if (!string.IsNullOrWhiteSpace(genreSlug))
-        {
-            Genre? genre = await context.Genres.AsNoTracking()
-                .FirstOrDefaultAsync(g => g.Slug == genreSlug, cancellationToken);
-            if (genre is not null)
-                resolvedGenreId = genre.Id.Value;
-        }
-
-        if (!string.IsNullOrWhiteSpace(labelId) && Guid.TryParse(labelId, out Guid parsedLabelId))
-            resolvedLabelId = parsedLabelId;
-
-        if (!string.IsNullOrWhiteSpace(countryId) && Guid.TryParse(countryId, out Guid parsedCountryId))
-            resolvedCountryId = parsedCountryId;
-
-        return Build(resolvedGenreId, resolvedLabelId, resolvedCountryId, type, yearFrom, yearTo, name);
-    }
-
     public static async Task<ISpecification<Album>?> BuildByNameAsync(
         ILibraryDbContext context,
-        string? genreName,
-        string? labelName,
-        string? countryName,
+        List<string> genreNames,
+        List<string> labelNames,
+        List<string> countryNames,
         AlbumType? type,
         int? yearFrom,
         int? yearTo,
         string? name = null,
         CancellationToken cancellationToken = default)
     {
-        Guid? resolvedGenreId = null;
-        Guid? resolvedLabelId = null;
-        Guid? resolvedCountryId = null;
+        List<Guid> resolvedGenreIds = [];
+        List<Guid> resolvedLabelIds = [];
+        List<Guid> resolvedCountryIds = [];
 
-        if (!string.IsNullOrWhiteSpace(genreName))
+        if (genreNames.Count > 0)
         {
-            Genre? genre = await context.Genres.AsNoTracking()
-                .FirstOrDefaultAsync(g => g.Name.ToLower() == genreName.ToLower(), cancellationToken);
-            if (genre is not null)
-                resolvedGenreId = genre.Id.Value;
+            List<string> lower = genreNames.Select(n => n.ToLower()).ToList();
+            resolvedGenreIds = await context.Genres.AsNoTracking()
+                .Where(g => lower.Contains(g.Name.ToLower()))
+                .Select(g => g.Id.Value)
+                .ToListAsync(cancellationToken);
         }
 
-        if (!string.IsNullOrWhiteSpace(labelName))
+        if (labelNames.Count > 0)
         {
-            Label? label = await context.Labels.AsNoTracking()
-                .FirstOrDefaultAsync(l => l.Name.ToLower() == labelName.ToLower(), cancellationToken);
-            if (label is not null)
-                resolvedLabelId = label.Id.Value;
+            List<string> lower = labelNames.Select(n => n.ToLower()).ToList();
+            resolvedLabelIds = await context.Labels.AsNoTracking()
+                .Where(l => lower.Contains(l.Name.ToLower()))
+                .Select(l => l.Id.Value)
+                .ToListAsync(cancellationToken);
         }
 
-        if (!string.IsNullOrWhiteSpace(countryName))
+        if (countryNames.Count > 0)
         {
-            Country? country = await context.Countries.AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Name.ToLower() == countryName.ToLower(), cancellationToken);
-            if (country is not null)
-                resolvedCountryId = country.Id.Value;
+            List<string> lower = countryNames.Select(n => n.ToLower()).ToList();
+            resolvedCountryIds = await context.Countries.AsNoTracking()
+                .Where(c => lower.Contains(c.Name.ToLower()))
+                .Select(c => c.Id.Value)
+                .ToListAsync(cancellationToken);
         }
 
-        return Build(resolvedGenreId, resolvedLabelId, resolvedCountryId, type, yearFrom, yearTo, name);
+        return Build(resolvedGenreIds, resolvedLabelIds, resolvedCountryIds, type, yearFrom, yearTo, name);
     }
 
     private static ISpecification<Album> Combine(ISpecification<Album>? current, ISpecification<Album> next) =>

@@ -20,9 +20,10 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
 
         long totalCount = await filteredQuery.LongCountAsync(cancellationToken);
 
-        IIncludableQueryable<Album, IReadOnlyList<AlbumGenre>> albumsQuery = filteredQuery
+        IQueryable<Album> albumsQuery = filteredQuery
             .Include(a => a.AlbumBands)
-            .Include(a => a.AlbumGenres);
+            .Include(a => a.AlbumGenres)
+            .Include(a => a.AlbumCountries);
 
         IOrderedQueryable<Album> sorted = query.SortBy switch
         {
@@ -49,7 +50,7 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
             .Where(g => genreIds.Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, cancellationToken);
 
-        List<CountryId> countryIds = bands.Values.SelectMany(b => b.BandCountries.Select(bc => bc.CountryId)).Distinct().ToList();
+        List<CountryId> countryIds = albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)).Distinct().ToList();
 
         Dictionary<CountryId, Country> countries = await context.Countries.AsNoTracking()
             .Where(c => countryIds.Contains(c.Id))
@@ -71,11 +72,8 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
                 .Where(ab => bands.ContainsKey(ab.BandId))
                 .Select(ab => new BandRefDto(bands[ab.BandId].Id.Value, bands[ab.BandId].Name, bands[ab.BandId].Slug))
                 .ToList(),
-            a.AlbumBands
-                .Where(ab => bands.ContainsKey(ab.BandId))
-                .SelectMany(ab => bands[ab.BandId].BandCountries)
-                .Select(bc => bc.CountryId)
-                .Distinct()
+            a.AlbumCountries
+                .Select(ac => ac.CountryId)
                 .Where(cid => countries.ContainsKey(cid))
                 .Select(cid => new CountryDto(countries[cid].Id.Value, countries[cid].Name, countries[cid].Code))
                 .ToList()
