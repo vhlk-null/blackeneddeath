@@ -177,7 +177,7 @@ public class UserContentService(
 
     public async Task<(double? AverageRating, int RatingsCount)> RateAlbumAsync(Guid userId, Guid albumId, int rating, CancellationToken ct = default)
     {
-        await EnsureUserProfileAsync(userId, ct);
+        UserProfileInfo profile = await EnsureUserProfileAsync(userId, ct);
 
         Album album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct)
             ?? throw new NotFoundException("Album", albumId);
@@ -187,8 +187,6 @@ public class UserContentService(
 
         if (review is null)
         {
-            UserProfileInfo profile = await repo.GetByAsync<UserProfileInfo>(p => p.UserId == userId, cancellationToken: ct)
-                ?? throw new NotFoundException("UserProfile", userId);
             review = new AlbumReview
             {
                 Id = Guid.NewGuid(),
@@ -225,7 +223,7 @@ public class UserContentService(
 
     public async Task<(double? AverageRating, int RatingsCount)> RateBandAsync(Guid userId, Guid bandId, int rating, CancellationToken ct = default)
     {
-        await EnsureUserProfileAsync(userId, ct);
+        UserProfileInfo profile = await EnsureUserProfileAsync(userId, ct);
 
         Band band = await repo.GetByAsync<Band>(b => b.BandId == bandId, cancellationToken: ct)
             ?? throw new NotFoundException("Band", bandId);
@@ -235,8 +233,6 @@ public class UserContentService(
 
         if (review is null)
         {
-            UserProfileInfo profile = await repo.GetByAsync<UserProfileInfo>(p => p.UserId == userId, cancellationToken: ct)
-                ?? throw new NotFoundException("UserProfile", userId);
             review = new BandReview
             {
                 Id = Guid.NewGuid(),
