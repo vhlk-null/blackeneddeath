@@ -15,6 +15,7 @@ public class GetAlbums : ICarterModule
                 HttpContext httpContext,
                 AlbumSortBy sortBy = AlbumSortBy.Newest,
                 AlbumType? type = null,
+                int? year = null,
                 int? yearFrom = null,
                 int? yearTo = null,
                 string? name = null) =>
@@ -26,11 +27,14 @@ public class GetAlbums : ICarterModule
                 List<Guid>   labelIds     = httpContext.Request.Query["labelId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
                 List<Guid>   countryIds   = httpContext.Request.Query["countryId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
 
+                int? resolvedYearFrom = year ?? yearFrom;
+                int? resolvedYearTo   = year ?? yearTo;
+
                 ISpecification<Album>? filter;
                 if (genreNames.Count > 0 || labelNames.Count > 0 || countryNames.Count > 0)
-                    filter = await AlbumFilterBuilder.BuildByNameAsync(db, genreNames, labelNames, countryNames, type, yearFrom, yearTo, name, ct);
+                    filter = await AlbumFilterBuilder.BuildByNameAsync(db, genreNames, labelNames, countryNames, type, resolvedYearFrom, resolvedYearTo, name, ct);
                 else
-                    filter = AlbumFilterBuilder.Build(genreIds, labelIds, countryIds, type, yearFrom, yearTo, name);
+                    filter = AlbumFilterBuilder.Build(genreIds, labelIds, countryIds, type, resolvedYearFrom, resolvedYearTo, name);
 
                 Application.Services.Albums.Queries.GetAlbums.GetAlbumsResult result = await sender.Send(new GetAlbumsQuery(paginationRequest, sortBy, filter));
                 return Results.Ok(result.Adapt<GetAlbumsResult>());
@@ -39,7 +43,7 @@ public class GetAlbums : ICarterModule
             .Produces<GetAlbumsResult>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Albums")
-            .WithDescription("Get Albums with optional multi-value filters: genreId[], labelId[], countryId[], genreName[], labelName[], countryName[], type, yearFrom, yearTo, name")
+            .WithDescription("Get Albums with optional multi-value filters: genreId[], labelId[], countryId[], genreName[], labelName[], countryName[], type, year, yearFrom, yearTo, name")
             .WithTags("Albums");
     }
 }
