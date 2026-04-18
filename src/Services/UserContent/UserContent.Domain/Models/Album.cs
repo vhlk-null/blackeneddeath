@@ -11,6 +11,7 @@ public class Album
     public int Type { get; set; }
     public string? PrimaryGenreName { get; set; }
     public string? PrimaryGenreSlug { get; set; }
+    public string? BandIds { get; set; }
     public string? BandNames { get; set; }
     public string? BandSlugs { get; set; }
     public string? CountryNames { get; set; }

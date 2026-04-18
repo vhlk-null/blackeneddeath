@@ -17,6 +17,9 @@ public class AlbumCreatedConsumer(IRepository<UserContentContext> repo, ILogger<
             Type = consumeContext.Message.Type,
             PrimaryGenreName = consumeContext.Message.PrimaryGenre?.Name,
             PrimaryGenreSlug = consumeContext.Message.PrimaryGenre?.Slug,
+            BandIds = consumeContext.Message.Bands.Count > 0
+                ? string.Join(",", consumeContext.Message.Bands.Select(b => b.Id))
+                : null,
             BandNames = consumeContext.Message.Bands.Count > 0
                 ? string.Join(",", consumeContext.Message.Bands.Select(b => b.Name))
                 : null,

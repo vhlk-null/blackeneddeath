@@ -8,6 +8,15 @@ namespace UserContent.API.Endpoints.BandReviews;
 [Authorize]
 public class BandReviewsController(IUserContentService service) : ControllerBase
 {
+    [HttpGet("{bandId:guid}/album-reviews")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(PaginatedResult<ReviewDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetBandAlbumReviews(Guid bandId, CancellationToken ct, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 20, [FromQuery] ReviewOrderBy orderBy = ReviewOrderBy.Newest)
+    {
+        PaginatedResult<ReviewDto> result = await service.GetBandAlbumReviewsAsync(bandId, pageIndex, pageSize, orderBy, ct);
+        return Ok(result);
+    }
+
     [HttpGet("{bandId:guid}")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(PaginatedResult<ReviewDto>), StatusCodes.Status200OK)]

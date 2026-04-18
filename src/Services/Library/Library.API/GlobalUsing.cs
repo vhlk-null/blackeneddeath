@@ -85,6 +85,7 @@ global using Library.Domain.ValueObjects.Ids;
 global using Library.Grpc;
 global using Library.Infrastructure;
 global using Library.Infrastructure.Data;
+global using Library.Application.Data;
 global using Library.Infrastructure.Data.Extensions;
 global using Mapster;
 global using Mediator;

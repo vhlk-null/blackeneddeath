@@ -383,6 +383,33 @@ public class UserContentService(
         return new PaginatedResult<BandCardDto>(pagination.PageIndex, pagination.PageSize, periodCount, periodData);
     }
 
+    public async Task<PaginatedResult<ReviewDto>> GetBandAlbumReviewsAsync(Guid bandId, int pageIndex, int pageSize, ReviewOrderBy orderBy, CancellationToken ct = default)
+    {
+        string bandIdStr = bandId.ToString();
+
+        IQueryable<AlbumReview> baseQuery = repo.Filter<AlbumReview>(
+            r => r.Album != null && r.Album.BandIds != null && r.Album.BandIds.Contains(bandIdStr)
+                 && (!string.IsNullOrEmpty(r.Title) || !string.IsNullOrEmpty(r.Body)),
+            asTracked: false);
+
+        var ordered = orderBy switch
+        {
+            ReviewOrderBy.Oldest => baseQuery.OrderBy(r => r.CreatedAt),
+            ReviewOrderBy.HighestRated => baseQuery.OrderByDescending(r => r.Rating),
+            ReviewOrderBy.LowestRated => baseQuery.OrderBy(r => r.Rating),
+            _ => baseQuery.OrderByDescending(r => r.CreatedAt)
+        };
+
+        int totalCount = await baseQuery.CountAsync(ct);
+        List<ReviewDto> items = await ordered
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .Select(r => new ReviewDto(r.Id, r.UserId, r.Username, r.Title, r.Body, r.CreatedAt, r.Rating))
+            .ToListAsync(ct);
+
+        return new PaginatedResult<ReviewDto>(pageIndex, pageSize, totalCount, items);
+    }
+
     public async Task<PaginatedResult<ReviewDto>> GetAlbumReviewsAsync(Guid albumId, int pageIndex, int pageSize, ReviewOrderBy orderBy, CancellationToken ct = default)
     {
         IQueryable<AlbumReview> baseQuery = repo.Filter<AlbumReview>(r => r.AlbumId == albumId && ((!string.IsNullOrEmpty(r.Title)) || (!string.IsNullOrEmpty(r.Body))), asTracked: false);

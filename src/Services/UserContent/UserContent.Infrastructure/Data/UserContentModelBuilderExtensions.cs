@@ -88,6 +88,10 @@ public static class UserContentModelBuilderExtensions
                 .HasMaxLength(150)
                 .HasColumnName("primary_genre_slug");
 
+            entity.Property(e => e.BandIds)
+                .HasColumnType("text")
+                .HasColumnName("band_ids");
+
             entity.Property(e => e.BandNames)
                 .HasColumnType("text")
                 .HasColumnName("band_names");

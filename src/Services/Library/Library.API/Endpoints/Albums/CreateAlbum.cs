@@ -1,5 +1,4 @@
 namespace Library.API.Endpoints.Albums;
-
 public record CreateAlbumRequest
 {
     public string Album { get; init; } = string.Empty;

@@ -21,6 +21,9 @@ public class AlbumUpdatedConsumer(IRepository<UserContentContext> repo) : IConsu
                 Type = consumeContext.Message.Type,
                 PrimaryGenreName = consumeContext.Message.PrimaryGenre?.Name,
                 PrimaryGenreSlug = consumeContext.Message.PrimaryGenre?.Slug,
+                BandIds = consumeContext.Message.Bands.Count > 0
+                    ? string.Join(",", consumeContext.Message.Bands.Select(b => b.Id))
+                    : null,
                 BandNames = consumeContext.Message.Bands.Count > 0
                     ? string.Join(",", consumeContext.Message.Bands.Select(b => b.Name))
                     : null,
@@ -47,6 +50,9 @@ public class AlbumUpdatedConsumer(IRepository<UserContentContext> repo) : IConsu
         album.Type = consumeContext.Message.Type;
         album.PrimaryGenreName = consumeContext.Message.PrimaryGenre?.Name;
         album.PrimaryGenreSlug = consumeContext.Message.PrimaryGenre?.Slug;
+        album.BandIds = consumeContext.Message.Bands.Count > 0
+            ? string.Join(",", consumeContext.Message.Bands.Select(b => b.Id))
+            : null;
         album.BandNames = consumeContext.Message.Bands.Count > 0
             ? string.Join(",", consumeContext.Message.Bands.Select(b => b.Name))
             : null;

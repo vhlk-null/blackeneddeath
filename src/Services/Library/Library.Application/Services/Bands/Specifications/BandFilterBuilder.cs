@@ -48,6 +48,38 @@ public static class BandFilterBuilder
         return Build(resolvedGenreId, resolvedCountryId, status, yearFrom, yearTo, name);
     }
 
+    public static async Task<ISpecification<Band>?> BuildByNameAsync(
+        ILibraryDbContext context,
+        string? genreName,
+        string? countryName,
+        BandStatus? status,
+        int? yearFrom,
+        int? yearTo,
+        string? name = null,
+        CancellationToken cancellationToken = default)
+    {
+        Guid? resolvedGenreId = null;
+        Guid? resolvedCountryId = null;
+
+        if (!string.IsNullOrWhiteSpace(genreName))
+        {
+            Genre? genre = await context.Genres.AsNoTracking()
+                .FirstOrDefaultAsync(g => g.Name.ToLower() == genreName.ToLower(), cancellationToken);
+            if (genre is not null)
+                resolvedGenreId = genre.Id.Value;
+        }
+
+        if (!string.IsNullOrWhiteSpace(countryName))
+        {
+            Country? country = await context.Countries.AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Name.ToLower() == countryName.ToLower(), cancellationToken);
+            if (country is not null)
+                resolvedCountryId = country.Id.Value;
+        }
+
+        return Build(resolvedGenreId, resolvedCountryId, status, yearFrom, yearTo, name);
+    }
+
     private static ISpecification<Band> Combine(ISpecification<Band>? current, ISpecification<Band> next) =>
         current is null ? next : current.And(next);
 }
