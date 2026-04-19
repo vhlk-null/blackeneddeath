@@ -5,7 +5,8 @@ namespace UserContent.Application.Services;
 
 public class UserContentService(
     IRepository<UserContentContext> repo,
-    IHttpContextAccessor httpContextAccessor)
+    IHttpContextAccessor httpContextAccessor,
+    ILogger<UserContentService> logger)
     : IUserContentService
 {
     private async Task<UserProfileInfo> EnsureUserProfileAsync(Guid userId, CancellationToken ct)
@@ -177,93 +178,29 @@ public class UserContentService(
 
     public async Task<(double? AverageRating, int RatingsCount)> RateAlbumAsync(Guid userId, Guid albumId, int rating, CancellationToken ct = default)
     {
-        UserProfileInfo profile = await EnsureUserProfileAsync(userId, ct);
+        ClaimsPrincipal? user = httpContextAccessor.HttpContext?.User;
+        string username = user?.FindFirst(ClaimTypes.Name)?.Value ?? userId.ToString();
 
-        Album album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct)
+        ReviewDto review = await CreateAlbumReviewAsync(
+            new CreateAlbumReviewRequest(albumId, userId, username, null, null, rating), ct);
+
+        Album album = await repo.GetByAsync<Album>(a => a.Id == albumId, asTracked: false, cancellationToken: ct)
             ?? throw new NotFoundException("Album", albumId);
 
-        AlbumReview? review = await repo.GetByAsync<AlbumReview>(
-            r => r.UserId == userId && r.AlbumId == albumId, cancellationToken: ct);
-
-        if (review is null)
-        {
-            review = new AlbumReview
-            {
-                Id = Guid.NewGuid(),
-                AlbumId = albumId,
-                UserId = userId,
-                Username = profile.Username,
-                CreatedAt = DateTime.UtcNow
-            };
-            await repo.AddAsync(review, ct);
-        }
-
-        if (review.Rating is null)
-        {
-            review.Rating = rating;
-            review.RatedAt = DateTime.UtcNow;
-            album.AverageRating = double.IsFinite(album.AverageRating ?? 0)
-                ? ((album.AverageRating ?? 0) * album.RatingsCount + rating) / (album.RatingsCount + 1)
-                : rating;
-            album.RatingsCount++;
-        }
-        else
-        {
-            double oldRating = review.Rating.Value;
-            review.Rating = rating;
-            review.RatedAt = DateTime.UtcNow;
-            album.AverageRating = album.RatingsCount > 0 && double.IsFinite(album.AverageRating ?? 0)
-                ? (album.AverageRating!.Value * album.RatingsCount - oldRating + rating) / album.RatingsCount
-                : rating;
-        }
-
-        await repo.SaveChangesAsync(ct);
         return (album.AverageRating, album.RatingsCount);
     }
 
     public async Task<(double? AverageRating, int RatingsCount)> RateBandAsync(Guid userId, Guid bandId, int rating, CancellationToken ct = default)
     {
-        UserProfileInfo profile = await EnsureUserProfileAsync(userId, ct);
+        ClaimsPrincipal? user = httpContextAccessor.HttpContext?.User;
+        string username = user?.FindFirst(ClaimTypes.Name)?.Value ?? userId.ToString();
 
-        Band band = await repo.GetByAsync<Band>(b => b.BandId == bandId, cancellationToken: ct)
+        ReviewDto review = await CreateBandReviewAsync(
+            new CreateBandReviewRequest(bandId, userId, username, null, null, rating), ct);
+
+        Band band = await repo.GetByAsync<Band>(b => b.BandId == bandId, asTracked: false, cancellationToken: ct)
             ?? throw new NotFoundException("Band", bandId);
 
-        BandReview? review = await repo.GetByAsync<BandReview>(
-            r => r.UserId == userId && r.BandId == bandId, cancellationToken: ct);
-
-        if (review is null)
-        {
-            review = new BandReview
-            {
-                Id = Guid.NewGuid(),
-                BandId = bandId,
-                UserId = userId,
-                Username = profile.Username,
-                CreatedAt = DateTime.UtcNow
-            };
-            await repo.AddAsync(review, ct);
-        }
-
-        if (review.Rating is null)
-        {
-            review.Rating = rating;
-            review.RatedAt = DateTime.UtcNow;
-            band.AverageRating = double.IsFinite(band.AverageRating ?? 0)
-                ? ((band.AverageRating ?? 0) * band.RatingsCount + rating) / (band.RatingsCount + 1)
-                : rating;
-            band.RatingsCount++;
-        }
-        else
-        {
-            double oldRating = review.Rating.Value;
-            review.Rating = rating;
-            review.RatedAt = DateTime.UtcNow;
-            band.AverageRating = band.RatingsCount > 0 && double.IsFinite(band.AverageRating ?? 0)
-                ? (band.AverageRating!.Value * band.RatingsCount - oldRating + rating) / band.RatingsCount
-                : rating;
-        }
-
-        await repo.SaveChangesAsync(ct);
         return (band.AverageRating, band.RatingsCount);
     }
 
@@ -433,6 +370,7 @@ public class UserContentService(
 
     public async Task<ReviewDto> CreateAlbumReviewAsync(CreateAlbumReviewRequest request, CancellationToken ct = default)
     {
+        request = request with { UserRating = request.UserRating is > 0 ? request.UserRating : null };
         await EnsureUserProfileAsync(request.UserId, ct);
 
         AlbumReview? existing = await repo.GetByAsync<AlbumReview>(
@@ -448,20 +386,24 @@ public class UserContentService(
                 Album album = await repo.GetByAsync<Album>(a => a.Id == request.AlbumId, cancellationToken: ct)
                     ?? throw new NotFoundException("Album", request.AlbumId);
 
-                if (existing.Rating is null)
+                if (existing.Rating is null or 0)
                 {
-                    album.AverageRating = ((album.AverageRating ?? 0) * album.RatingsCount + request.UserRating.Value) / (album.RatingsCount + 1);
+                    double newAvg = ((album.AverageRating ?? 0) * album.RatingsCount + request.UserRating.Value) / (album.RatingsCount + 1);
+                    album.AverageRating = newAvg;
                     album.RatingsCount++;
+                    existing.Rating = null;
                 }
                 else
                 {
-                    album.AverageRating = album.RatingsCount > 0 && double.IsFinite(album.AverageRating ?? 0)
+                    double newAvg = album.RatingsCount > 0 && double.IsFinite(album.AverageRating ?? 0)
                         ? (album.AverageRating!.Value * album.RatingsCount - existing.Rating.Value + request.UserRating.Value) / album.RatingsCount
                         : request.UserRating.Value;
+                    album.AverageRating = newAvg;
                 }
 
                 existing.Rating = request.UserRating;
                 existing.RatedAt = DateTime.UtcNow;
+                repo.Update(album);
             }
 
             await repo.SaveChangesAsync(ct);
@@ -487,8 +429,10 @@ public class UserContentService(
         {
             Album album = await repo.GetByAsync<Album>(a => a.Id == request.AlbumId, cancellationToken: ct)
                 ?? throw new NotFoundException("Album", request.AlbumId);
-            album.AverageRating = ((album.AverageRating ?? 0) * album.RatingsCount + request.UserRating.Value) / (album.RatingsCount + 1);
+            double newAvg = ((album.AverageRating ?? 0) * album.RatingsCount + request.UserRating.Value) / (album.RatingsCount + 1);
+            album.AverageRating = newAvg;
             album.RatingsCount++;
+            repo.Update(album);
         }
 
         await repo.SaveChangesAsync(ct);
@@ -497,6 +441,7 @@ public class UserContentService(
 
     public async Task<ReviewDto> UpdateAlbumReviewAsync(Guid reviewId, UpdateReviewRequest request, CancellationToken ct = default)
     {
+        request = request with { UserRating = request.UserRating is > 0 ? request.UserRating : null };
         AlbumReview review = await repo.GetByAsync<AlbumReview>(r => r.Id == reviewId, cancellationToken: ct)
             ?? throw new AlbumReviewNotFoundException(reviewId);
 
@@ -520,6 +465,7 @@ public class UserContentService(
 
             review.Rating = request.UserRating;
             review.RatedAt = DateTime.UtcNow;
+            repo.Update(album);
         }
 
         await repo.SaveChangesAsync(ct);
@@ -563,6 +509,7 @@ public class UserContentService(
 
     public async Task<ReviewDto> CreateBandReviewAsync(CreateBandReviewRequest request, CancellationToken ct = default)
     {
+        request = request with { UserRating = request.UserRating is > 0 ? request.UserRating : null };
         await EnsureUserProfileAsync(request.UserId, ct);
 
         BandReview? existing = await repo.GetByAsync<BandReview>(
@@ -578,20 +525,24 @@ public class UserContentService(
                 Band band = await repo.GetByAsync<Band>(b => b.BandId == request.BandId, cancellationToken: ct)
                     ?? throw new NotFoundException("Band", request.BandId);
 
-                if (existing.Rating is null)
+                if (existing.Rating is null or 0)
                 {
-                    band.AverageRating = ((band.AverageRating ?? 0) * band.RatingsCount + request.UserRating.Value) / (band.RatingsCount + 1);
+                    double newAvg = ((band.AverageRating ?? 0) * band.RatingsCount + request.UserRating.Value) / (band.RatingsCount + 1);
+                    band.AverageRating = newAvg;
                     band.RatingsCount++;
+                    existing.Rating = null;
                 }
                 else
                 {
-                    band.AverageRating = band.RatingsCount > 0 && double.IsFinite(band.AverageRating ?? 0)
+                    double newAvg = band.RatingsCount > 0 && double.IsFinite(band.AverageRating ?? 0)
                         ? (band.AverageRating!.Value * band.RatingsCount - existing.Rating.Value + request.UserRating.Value) / band.RatingsCount
                         : request.UserRating.Value;
+                    band.AverageRating = newAvg;
                 }
 
                 existing.Rating = request.UserRating;
                 existing.RatedAt = DateTime.UtcNow;
+                repo.Update(band);
             }
 
             await repo.SaveChangesAsync(ct);
@@ -617,8 +568,10 @@ public class UserContentService(
         {
             Band band = await repo.GetByAsync<Band>(b => b.BandId == request.BandId, cancellationToken: ct)
                 ?? throw new NotFoundException("Band", request.BandId);
-            band.AverageRating = ((band.AverageRating ?? 0) * band.RatingsCount + request.UserRating.Value) / (band.RatingsCount + 1);
+            double newBandAvg = ((band.AverageRating ?? 0) * band.RatingsCount + request.UserRating.Value) / (band.RatingsCount + 1);
+            band.AverageRating = newBandAvg;
             band.RatingsCount++;
+            repo.Update(band);
         }
 
         await repo.SaveChangesAsync(ct);
@@ -627,6 +580,7 @@ public class UserContentService(
 
     public async Task<ReviewDto> UpdateBandReviewAsync(Guid reviewId, UpdateReviewRequest request, CancellationToken ct = default)
     {
+        request = request with { UserRating = request.UserRating is > 0 ? request.UserRating : null };
         BandReview review = await repo.GetByAsync<BandReview>(r => r.Id == reviewId, cancellationToken: ct)
             ?? throw new BandReviewNotFoundException(reviewId);
 
@@ -650,6 +604,7 @@ public class UserContentService(
 
             review.Rating = request.UserRating;
             review.RatedAt = DateTime.UtcNow;
+            repo.Update(band);
         }
 
         await repo.SaveChangesAsync(ct);

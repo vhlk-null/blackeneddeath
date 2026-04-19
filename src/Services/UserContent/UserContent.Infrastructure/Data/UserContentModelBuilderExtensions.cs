@@ -112,8 +112,7 @@ public static class UserContentModelBuilderExtensions
                 .HasColumnName("average_rating");
 
             entity.Property(e => e.RatingsCount)
-                .HasColumnName("ratings_count")
-                .HasDefaultValue(0);
+                .HasColumnName("ratings_count");
         });
     }
 
@@ -171,8 +170,7 @@ public static class UserContentModelBuilderExtensions
                 .HasColumnName("average_rating");
 
             entity.Property(e => e.RatingsCount)
-                .HasColumnName("ratings_count")
-                .HasDefaultValue(0);
+                .HasColumnName("ratings_count");
         });
     }
 

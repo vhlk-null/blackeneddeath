@@ -26,7 +26,7 @@ public class UserContentServiceTests
     {
         _repoMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext?)null);
-        _sut = new UserContentService(_repoMock.Object, _httpContextAccessorMock.Object);
+        _sut = new UserContentService(_repoMock.Object, _httpContextAccessorMock.Object, Microsoft.Extensions.Logging.Abstractions.NullLogger<UserContentService>.Instance);
     }
 
     // ── GetUserProfile ────────────────────────────────────────────────────────
