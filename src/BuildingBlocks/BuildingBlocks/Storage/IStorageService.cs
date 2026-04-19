@@ -1,4 +1,4 @@
-namespace Library.Application.Data;
+namespace BuildingBlocks.Storage;
 
 public interface IStorageService
 {

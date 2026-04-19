@@ -1,5 +1,6 @@
 ﻿global using System.Text.RegularExpressions;
 global using BuildingBlocks.Behaviors;
+global using BuildingBlocks.Storage;
 global using BuildingBlocks.Exceptions;
 global using BuildingBlocks.Helpers;
 global using BuildingBlocks.Messaging.Events;

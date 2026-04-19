@@ -1,3 +1,5 @@
+using BuildingBlocks.Storage;
+
 namespace Library.Infrastructure.Repositories;
 
 public class StorageUrlResolver(IConfiguration configuration) : IStorageUrlResolver

@@ -20,4 +20,5 @@ public class Album
     public int RatingsCount { get; set; }
     public List<FavoriteAlbum> FavoriteAlbums { get; set; } = new();
     public List<AlbumReview> Reviews { get; set; } = new();
+    public List<CollectionAlbum> CollectionAlbums { get; set; } = new();
 }

@@ -6,7 +6,7 @@ public static class AlbumFilterBuilder
         List<Guid> genreIds,
         List<Guid> labelIds,
         List<Guid> countryIds,
-        AlbumType? type,
+        List<AlbumType> types,
         int? yearFrom,
         int? yearTo,
         string? name = null)
@@ -16,7 +16,7 @@ public static class AlbumFilterBuilder
         if (genreIds.Count > 0)   filter = Combine(filter, genreIds.Select(id => (ISpecification<Album>)new AlbumByGenreSpec(id)).Aggregate((a, b) => a.Or(b)));
         if (labelIds.Count > 0)   filter = Combine(filter, labelIds.Select(id => (ISpecification<Album>)new AlbumByLabelSpec(id)).Aggregate((a, b) => a.Or(b)));
         if (countryIds.Count > 0) filter = Combine(filter, countryIds.Select(id => (ISpecification<Album>)new AlbumByCountrySpec(id)).Aggregate((a, b) => a.Or(b)));
-        if (type.HasValue)                       filter = Combine(filter, new AlbumByTypeSpec(type.Value));
+        if (types.Count > 0)                     filter = Combine(filter, new AlbumByTypeSpec(types));
         if (yearFrom.HasValue || yearTo.HasValue) filter = Combine(filter, new AlbumByYearRangeSpec(yearFrom, yearTo));
         if (!string.IsNullOrWhiteSpace(name))    filter = Combine(filter, new AlbumByNameSpec(name));
 
@@ -28,7 +28,7 @@ public static class AlbumFilterBuilder
         List<string> genreNames,
         List<string> labelNames,
         List<string> countryNames,
-        AlbumType? type,
+        List<AlbumType> types,
         int? yearFrom,
         int? yearTo,
         string? name = null,
@@ -65,7 +65,7 @@ public static class AlbumFilterBuilder
                 .ToListAsync(cancellationToken);
         }
 
-        return Build(resolvedGenreIds, resolvedLabelIds, resolvedCountryIds, type, yearFrom, yearTo, name);
+        return Build(resolvedGenreIds, resolvedLabelIds, resolvedCountryIds, types, yearFrom, yearTo, name);
     }
 
     private static ISpecification<Album> Combine(ISpecification<Album>? current, ISpecification<Album> next) =>

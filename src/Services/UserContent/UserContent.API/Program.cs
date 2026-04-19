@@ -3,7 +3,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // ===== SERVICES =====
 builder.Services
     .AddApplicationServices(builder.Configuration)
-    .AddInfrastructureServices(builder.Configuration)
+    .AddInfrastructureServices(builder.Configuration, builder.Environment)
     .AddApiServices();
 
 builder.Services.ConfigureHttpJsonOptions(options =>

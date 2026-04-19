@@ -1,3 +1,5 @@
+using BuildingBlocks.Storage;
+
 namespace Library.Infrastructure;
 
 public static class DependencyInjection
@@ -6,17 +8,7 @@ public static class DependencyInjection
     {
         string? connectionString = configuration.GetConnectionString("LibraryDb");
 
-        Account cloudinaryAccount = new Account(
-            configuration["Storage:CloudName"],
-            configuration["Storage:ApiKey"],
-            configuration["Storage:ApiSecret"]);
-
-        string environmentPrefix = environment.IsProduction() ? "production" : "local";
-
-        services.AddSingleton(new Cloudinary(cloudinaryAccount) { Api = { Secure = true } });
-        services.AddScoped<IStorageService>(sp => new CloudinaryStorageService(
-            sp.GetRequiredService<Cloudinary>(), environmentPrefix));
-        services.AddSingleton<IStorageUrlResolver, StorageUrlResolver>();
+        services.AddStorageService(configuration, environment);
 
         services.AddHttpContextAccessor();
         services.AddScoped<AuditableEntityInterceptor>();

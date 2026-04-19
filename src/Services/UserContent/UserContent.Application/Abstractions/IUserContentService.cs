@@ -32,4 +32,15 @@ public interface IUserContentService
     Task<ReviewDto> CreateBandReviewAsync(CreateBandReviewRequest request, CancellationToken ct = default);
     Task<ReviewDto> UpdateBandReviewAsync(Guid reviewId, UpdateReviewRequest request, CancellationToken ct = default);
     Task DeleteBandReviewAsync(Guid reviewId, CancellationToken ct = default);
+
+    Task<List<CollectionSummaryDto>> GetUserCollectionsAsync(Guid userId, CancellationToken ct = default);
+    Task<CollectionDetailDto> GetCollectionAsync(Guid collectionId, CancellationToken ct = default);
+    Task<CollectionDto> CreateCollectionAsync(CreateCollectionRequest request, Stream? coverImage, string? coverContentType, string? coverFileName, CancellationToken ct = default);
+    Task<CollectionDto> UpdateCollectionAsync(Guid collectionId, UpdateCollectionRequest request, CancellationToken ct = default);
+    Task<CollectionDto> UpdateCollectionCoverAsync(Guid collectionId, Stream coverImage, string coverContentType, string coverFileName, CancellationToken ct = default);
+    Task DeleteCollectionAsync(Guid collectionId, CancellationToken ct = default);
+    Task AddAlbumToCollectionAsync(Guid collectionId, Guid albumId, CancellationToken ct = default);
+    Task RemoveAlbumFromCollectionAsync(Guid collectionId, Guid albumId, CancellationToken ct = default);
+    Task AddBandToCollectionAsync(Guid collectionId, Guid bandId, CancellationToken ct = default);
+    Task RemoveBandFromCollectionAsync(Guid collectionId, Guid bandId, CancellationToken ct = default);
 }

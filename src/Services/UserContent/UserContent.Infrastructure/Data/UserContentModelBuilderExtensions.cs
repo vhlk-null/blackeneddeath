@@ -239,6 +239,35 @@ public static class UserContentModelBuilderExtensions
         });
     }
 
+    public static void SetupCollectionBand(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<CollectionBand>(entity =>
+        {
+            entity.ToTable("collection_bands");
+
+            entity.HasKey(e => new { e.CollectionId, e.BandId });
+
+            entity.Property(e => e.CollectionId)
+                .HasColumnName("collection_id");
+
+            entity.Property(e => e.BandId)
+                .HasColumnName("band_id");
+
+            entity.Property(e => e.AddedDate)
+                .HasColumnName("added_date");
+
+            entity.HasOne(e => e.Collection)
+                .WithMany(c => c.CollectionBands)
+                .HasForeignKey(e => e.CollectionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Band)
+                .WithMany(b => b.CollectionBands)
+                .HasForeignKey(e => e.BandId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
     public static void SetupAlbumReview(this ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AlbumReview>(entity =>
@@ -286,7 +315,77 @@ public static class UserContentModelBuilderExtensions
         });
     }
 
-    public static void SetupBandReview(this ModelBuilder modelBuilder)
+    public static void SetupCollection(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Collection>(entity =>
+        {
+            entity.ToTable("collections");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnName("name");
+
+            entity.Property(e => e.Description)
+                .HasColumnType("text")
+                .HasColumnName("description");
+
+            entity.Property(e => e.Type)
+                .HasColumnName("type");
+
+            entity.Property(e => e.CoverUrl)
+                .HasMaxLength(500)
+                .HasColumnName("cover_url");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at");
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.Collections)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
+    public static void SetupCollectionAlbum(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<CollectionAlbum>(entity =>
+        {
+            entity.ToTable("collection_albums");
+
+            entity.HasKey(e => new { e.CollectionId, e.AlbumId });
+
+            entity.Property(e => e.CollectionId)
+                .HasColumnName("collection_id");
+
+            entity.Property(e => e.AlbumId)
+                .HasColumnName("album_id");
+
+            entity.Property(e => e.AddedDate)
+                .HasColumnName("added_date");
+
+            entity.HasOne(e => e.Collection)
+                .WithMany(c => c.CollectionAlbums)
+                .HasForeignKey(e => e.CollectionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Album)
+                .WithMany(a => a.CollectionAlbums)
+                .HasForeignKey(e => e.AlbumId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
+public static void SetupBandReview(this ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BandReview>(entity =>
         {

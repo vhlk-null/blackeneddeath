@@ -14,7 +14,6 @@ public class GetAlbums : ICarterModule
                 CancellationToken ct,
                 HttpContext httpContext,
                 AlbumSortBy sortBy = AlbumSortBy.Newest,
-                AlbumType? type = null,
                 int? year = null,
                 int? yearFrom = null,
                 int? yearTo = null,
@@ -26,15 +25,16 @@ public class GetAlbums : ICarterModule
                 List<Guid>   genreIds     = httpContext.Request.Query["genreId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
                 List<Guid>   labelIds     = httpContext.Request.Query["labelId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
                 List<Guid>   countryIds   = httpContext.Request.Query["countryId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
+                List<AlbumType> types     = httpContext.Request.Query["type"].Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => Enum.TryParse<AlbumType>(s, true, out AlbumType t) ? (AlbumType?)t : null).Where(t => t.HasValue).Select(t => t!.Value).ToList();
 
                 int? resolvedYearFrom = year ?? yearFrom;
                 int? resolvedYearTo   = year ?? yearTo;
 
                 ISpecification<Album>? filter;
                 if (genreNames.Count > 0 || labelNames.Count > 0 || countryNames.Count > 0)
-                    filter = await AlbumFilterBuilder.BuildByNameAsync(db, genreNames, labelNames, countryNames, type, resolvedYearFrom, resolvedYearTo, name, ct);
+                    filter = await AlbumFilterBuilder.BuildByNameAsync(db, genreNames, labelNames, countryNames, types, resolvedYearFrom, resolvedYearTo, name, ct);
                 else
-                    filter = AlbumFilterBuilder.Build(genreIds, labelIds, countryIds, type, resolvedYearFrom, resolvedYearTo, name);
+                    filter = AlbumFilterBuilder.Build(genreIds, labelIds, countryIds, types, resolvedYearFrom, resolvedYearTo, name);
 
                 Application.Services.Albums.Queries.GetAlbums.GetAlbumsResult result = await sender.Send(new GetAlbumsQuery(paginationRequest, sortBy, filter));
                 return Results.Ok(result.Adapt<GetAlbumsResult>());

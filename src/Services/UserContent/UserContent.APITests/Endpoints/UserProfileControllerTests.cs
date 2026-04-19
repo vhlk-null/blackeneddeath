@@ -24,7 +24,7 @@ public class UserProfileControllerTests : IClassFixture<UserContentWebAppFactory
     {
         Guid userId = Guid.NewGuid();
         UserProfileDto dto = new UserProfileDto(userId, "metal_head", "user@example.com",
-            null, DateTime.UtcNow, null, null, 0, 0, 0, [], []);
+            null, DateTime.UtcNow, null, null, 0, 0, [], [], []);
         _factory.ServiceMock
             .Setup(s => s.GetUserProfileAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(dto);

@@ -5,6 +5,8 @@ namespace UserContent.Application.Services;
 
 public class UserContentService(
     IRepository<UserContentContext> repo,
+    IStorageService storage,
+    IStorageUrlResolver urlResolver,
     IHttpContextAccessor httpContextAccessor,
     ILogger<UserContentService> logger)
     : IUserContentService
@@ -39,7 +41,18 @@ public class UserContentService(
                   .Include(u => u.FavoriteBands).ThenInclude(fb => fb.Band),
             ct) ?? throw new UserProfileNotFoundException(userId);
 
-        return profile.Adapt<UserProfileDto>();
+        List<Collection> collections = await repo.Filter<Collection>(c => c.UserId == userId, asTracked: false)
+            .Include(c => c.CollectionAlbums).ThenInclude(ca => ca.Album)
+            .Include(c => c.CollectionBands).ThenInclude(cb => cb.Band)
+            .OrderByDescending(c => c.CreatedAt)
+            .ToListAsync(ct);
+
+        List<CollectionDto> collectionDtos = collections.Select(c => new CollectionDto(
+            c.Id, c.UserId, c.Name, c.Description, ((CollectionType)c.Type).ToString(), c.CreatedAt,
+            c.CollectionAlbums.Count, c.CollectionBands.Count, urlResolver.Resolve(c.CoverUrl))).ToList();
+
+        UserProfileDto dto = profile.Adapt<UserProfileDto>();
+        return dto with { Collections = collectionDtos };
     }
 
     public async Task<PaginatedResult<AlbumCardDto>> GetFavoriteAlbumsAsync(Guid userId, int pageIndex, int pageSize, CancellationToken ct = default)
@@ -618,6 +631,168 @@ public class UserContentService(
             ?? throw new BandReviewNotFoundException(reviewId);
 
         repo.Delete(review);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    public async Task<List<CollectionSummaryDto>> GetUserCollectionsAsync(Guid userId, CancellationToken ct = default)
+    {
+        List<Collection> collections = await repo.Filter<Collection>(c => c.UserId == userId, asTracked: false)
+            .OrderByDescending(c => c.CreatedAt)
+            .ToListAsync(ct);
+
+        return collections.Select(c => new CollectionSummaryDto(
+            c.Id, c.UserId, c.Name, ((CollectionType)c.Type).ToString(), urlResolver.Resolve(c.CoverUrl))).ToList();
+    }
+
+    public async Task<CollectionDetailDto> GetCollectionAsync(Guid collectionId, CancellationToken ct = default)
+    {
+        Collection collection = await repo.Filter<Collection>(c => c.Id == collectionId, asTracked: false)
+            .Include(c => c.CollectionAlbums).ThenInclude(ca => ca.Album)
+            .Include(c => c.CollectionBands).ThenInclude(cb => cb.Band)
+            .FirstOrDefaultAsync(ct) ?? throw new CollectionNotFoundException(collectionId);
+
+        List<CollectionAlbumItemDto> albums = collection.CollectionAlbums
+            .Select(ca => new CollectionAlbumItemDto(ca.Album.Id, ca.Album.Title, ca.Album.Slug, ca.Album.CoverUrl, ca.Album.ReleaseDate, ca.Album.BandNames))
+            .ToList();
+
+        List<CollectionBandItemDto> bands = collection.CollectionBands
+            .Select(cb => new CollectionBandItemDto(cb.Band.BandId, cb.Band.BandName, cb.Band.Slug, cb.Band.LogoUrl, cb.Band.FormedYear))
+            .ToList();
+
+        return new CollectionDetailDto(collection.Id, collection.UserId, collection.Name, collection.Description, ((CollectionType)collection.Type).ToString(), collection.CreatedAt, albums.Count, bands.Count, albums, bands, urlResolver.Resolve(collection.CoverUrl));
+    }
+
+    public async Task<CollectionDto> CreateCollectionAsync(CreateCollectionRequest request, Stream? coverImage, string? coverContentType, string? coverFileName, CancellationToken ct = default)
+    {
+        await EnsureUserProfileAsync(request.UserId, ct);
+
+        string? coverUrl = null;
+        if (coverImage is not null && coverFileName is not null && coverContentType is not null)
+        {
+            string slug = request.Name.ToLowerInvariant().Replace(" ", "-");
+            coverUrl = await storage.UploadFileAsync($"collections/{request.UserId}", $"{slug}{Path.GetExtension(coverFileName)}", coverImage, coverContentType, ct);
+        }
+
+        Collection collection = new()
+        {
+            Id = Guid.NewGuid(),
+            UserId = request.UserId,
+            Name = request.Name,
+            Description = request.Description,
+            Type = (int)request.Type,
+            CoverUrl = coverUrl,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await repo.AddAsync(collection, ct);
+        await repo.SaveChangesAsync(ct);
+
+        return new CollectionDto(collection.Id, collection.UserId, collection.Name, collection.Description, request.Type.ToString(), collection.CreatedAt, 0, 0, urlResolver.Resolve(collection.CoverUrl));
+    }
+
+    public async Task<CollectionDto> UpdateCollectionCoverAsync(Guid collectionId, Stream coverImage, string coverContentType, string coverFileName, CancellationToken ct = default)
+    {
+        Collection collection = await repo.Filter<Collection>(c => c.Id == collectionId)
+            .Include(c => c.CollectionAlbums)
+            .Include(c => c.CollectionBands)
+            .FirstOrDefaultAsync(ct) ?? throw new CollectionNotFoundException(collectionId);
+
+        if (collection.CoverUrl is not null)
+            await storage.DeleteFileAsync(collection.CoverUrl, ct);
+
+        string slug = collection.Name.ToLowerInvariant().Replace(" ", "-");
+        collection.CoverUrl = await storage.UploadFileAsync($"collections/{collection.UserId}", $"{slug}{Path.GetExtension(coverFileName)}", coverImage, coverContentType, ct);
+
+        repo.Update(collection);
+        await repo.SaveChangesAsync(ct);
+
+        return new CollectionDto(collection.Id, collection.UserId, collection.Name, collection.Description, ((CollectionType)collection.Type).ToString(), collection.CreatedAt,
+            collection.CollectionAlbums.Count, collection.CollectionBands.Count, urlResolver.Resolve(collection.CoverUrl));
+    }
+
+    public async Task<CollectionDto> UpdateCollectionAsync(Guid collectionId, UpdateCollectionRequest request, CancellationToken ct = default)
+    {
+        Collection collection = await repo.Filter<Collection>(c => c.Id == collectionId)
+            .Include(c => c.CollectionAlbums).ThenInclude(ca => ca.Album)
+            .Include(c => c.CollectionBands).ThenInclude(cb => cb.Band)
+            .FirstOrDefaultAsync(ct) ?? throw new CollectionNotFoundException(collectionId);
+
+        collection.Name = request.Name;
+        collection.Description = request.Description;
+
+        repo.Update(collection);
+        await repo.SaveChangesAsync(ct);
+
+        return new CollectionDto(collection.Id, collection.UserId, collection.Name, collection.Description, ((CollectionType)collection.Type).ToString(), collection.CreatedAt,
+            collection.CollectionAlbums.Count, collection.CollectionBands.Count, urlResolver.Resolve(collection.CoverUrl));
+    }
+
+    public async Task DeleteCollectionAsync(Guid collectionId, CancellationToken ct = default)
+    {
+        Collection collection = await repo.GetByAsync<Collection>(c => c.Id == collectionId, cancellationToken: ct)
+            ?? throw new CollectionNotFoundException(collectionId);
+
+        repo.Delete(collection);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    public async Task AddAlbumToCollectionAsync(Guid collectionId, Guid albumId, CancellationToken ct = default)
+    {
+        Collection collection = await repo.GetByAsync<Collection>(c => c.Id == collectionId, cancellationToken: ct)
+            ?? throw new CollectionNotFoundException(collectionId);
+
+        if (collection.Type != (int)CollectionType.Albums)
+            throw new BadRequestException("This collection is for bands only.");
+
+        Album album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct)
+            ?? throw new NotFoundException("Album", albumId);
+
+        CollectionAlbum? existing = await repo.GetByAsync<CollectionAlbum>(
+            ca => ca.CollectionId == collectionId && ca.AlbumId == albumId, cancellationToken: ct);
+
+        if (existing is not null) return;
+
+        await repo.AddAsync(new CollectionAlbum { CollectionId = collectionId, AlbumId = albumId, AddedDate = DateTime.UtcNow }, ct);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    public async Task RemoveAlbumFromCollectionAsync(Guid collectionId, Guid albumId, CancellationToken ct = default)
+    {
+        CollectionAlbum ca = await repo.GetByAsync<CollectionAlbum>(
+            ca => ca.CollectionId == collectionId && ca.AlbumId == albumId, cancellationToken: ct)
+            ?? throw new NotFoundException("CollectionAlbum", albumId);
+
+        repo.Delete(ca);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    public async Task AddBandToCollectionAsync(Guid collectionId, Guid bandId, CancellationToken ct = default)
+    {
+        Collection collection = await repo.GetByAsync<Collection>(c => c.Id == collectionId, cancellationToken: ct)
+            ?? throw new CollectionNotFoundException(collectionId);
+
+        if (collection.Type != (int)CollectionType.Bands)
+            throw new BadRequestException("This collection is for albums only.");
+
+        Band band = await repo.GetByAsync<Band>(b => b.BandId == bandId, cancellationToken: ct)
+            ?? throw new NotFoundException("Band", bandId);
+
+        CollectionBand? existing = await repo.GetByAsync<CollectionBand>(
+            cb => cb.CollectionId == collectionId && cb.BandId == bandId, cancellationToken: ct);
+
+        if (existing is not null) return;
+
+        await repo.AddAsync(new CollectionBand { CollectionId = collectionId, BandId = bandId, AddedDate = DateTime.UtcNow }, ct);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    public async Task RemoveBandFromCollectionAsync(Guid collectionId, Guid bandId, CancellationToken ct = default)
+    {
+        CollectionBand cb = await repo.GetByAsync<CollectionBand>(
+            cb => cb.CollectionId == collectionId && cb.BandId == bandId, cancellationToken: ct)
+            ?? throw new NotFoundException("CollectionBand", bandId);
+
+        repo.Delete(cb);
         await repo.SaveChangesAsync(ct);
     }
 }

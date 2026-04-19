@@ -1,8 +1,10 @@
 using System.Linq.Expressions;
 using BuildingBlocks.Exceptions;
 using BuildingBlocks.Repositories;
+using BuildingBlocks.Storage;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using UserContent.Application.Dtos;
 using UserContent.Application.Exceptions;
@@ -17,6 +19,7 @@ namespace UserContent.InfrastructureTests.Services;
 public class UserContentServiceTests
 {
     private readonly Mock<IRepository<UserContentContext>> _repoMock = new();
+    private readonly Mock<IStorageService> _storageMock = new();
     private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new();
     private readonly UserContentService _sut;
 
@@ -26,7 +29,7 @@ public class UserContentServiceTests
     {
         _repoMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
         _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext?)null);
-        _sut = new UserContentService(_repoMock.Object, _httpContextAccessorMock.Object, Microsoft.Extensions.Logging.Abstractions.NullLogger<UserContentService>.Instance);
+        _sut = new UserContentService(_repoMock.Object, _storageMock.Object, Mock.Of<IStorageUrlResolver>(), _httpContextAccessorMock.Object, NullLogger<UserContentService>.Instance);
     }
 
     // ── GetUserProfile ────────────────────────────────────────────────────────

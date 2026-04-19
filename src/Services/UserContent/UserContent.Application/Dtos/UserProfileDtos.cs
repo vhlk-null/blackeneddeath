@@ -31,13 +31,32 @@ public record BandCardDto(
     double? AverageRating,
     int RatingsCount);
 
-public record FavoriteAlbumDto(Guid AlbumId, string AlbumTitle, string? CoverUrl,
-    int ReleaseDate, DateTime AddedDate, string? UserReview);
+public record FavoriteAlbumDto(
+    Guid AlbumId,
+    string AlbumTitle,
+    string? Slug,
+    string? CoverUrl,
+    int ReleaseDate,
+    string? AlbumType,
+    string? BandName,
+    string? BandSlug,
+    string? CountryNames,
+    DateTime AddedDate,
+    string? UserReview);
 
-public record FavoriteBandDto(Guid BandId, string BandName, string? LogoUrl,
-    int? FormedYear, DateTime AddedDate, bool IsFollowing);
+public record FavoriteBandDto(
+    Guid BandId,
+    string BandName,
+    string? Slug,
+    string? LogoUrl,
+    int? FormedYear,
+    string? PrimaryGenreName,
+    string? CountryNames,
+    DateTime AddedDate,
+    bool IsFollowing);
 
 public record UserProfileDto(Guid UserId, string Username, string Email,
     string? AvatarUrl, DateTime RegisteredDate, DateTime? LastLoginDate, string? Bio,
-    int FavoriteBandsCount, int FavoriteAlbumsCount, int ReviewsCount,
-    List<FavoriteAlbumDto> FavoriteAlbums, List<FavoriteBandDto> FavoriteBands);
+    int FavoriteBandsCount, int FavoriteAlbumsCount,
+    List<FavoriteAlbumDto> FavoriteAlbums, List<FavoriteBandDto> FavoriteBands,
+    List<CollectionDto> Collections);

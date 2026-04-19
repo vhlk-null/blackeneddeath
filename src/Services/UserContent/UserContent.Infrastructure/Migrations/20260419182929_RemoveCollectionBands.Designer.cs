@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UserContent.Infrastructure.Data;
@@ -11,9 +12,11 @@ using UserContent.Infrastructure.Data;
 namespace UserContent.Infrastructure.Migrations
 {
     [DbContext(typeof(UserContentContext))]
-    partial class UserContentContextModelSnapshot : ModelSnapshot
+    [Migration("20260419182929_RemoveCollectionBands")]
+    partial class RemoveCollectionBands
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -267,11 +270,6 @@ namespace UserContent.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("CoverUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("cover_url");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -285,10 +283,6 @@ namespace UserContent.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasColumnName("name");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
@@ -320,27 +314,6 @@ namespace UserContent.Infrastructure.Migrations
                     b.HasIndex("AlbumId");
 
                     b.ToTable("collection_albums", (string)null);
-                });
-
-            modelBuilder.Entity("UserContent.Domain.Models.CollectionBand", b =>
-                {
-                    b.Property<Guid>("CollectionId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("collection_id");
-
-                    b.Property<Guid>("BandId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("band_id");
-
-                    b.Property<DateTime>("AddedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("added_date");
-
-                    b.HasKey("CollectionId", "BandId");
-
-                    b.HasIndex("BandId");
-
-                    b.ToTable("collection_bands", (string)null);
                 });
 
             modelBuilder.Entity("UserContent.Domain.Models.FavoriteAlbum", b =>
@@ -490,25 +463,6 @@ namespace UserContent.Infrastructure.Migrations
                     b.Navigation("Collection");
                 });
 
-            modelBuilder.Entity("UserContent.Domain.Models.CollectionBand", b =>
-                {
-                    b.HasOne("UserContent.Domain.Models.Band", "Band")
-                        .WithMany("CollectionBands")
-                        .HasForeignKey("BandId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("UserContent.Domain.Models.Collection", "Collection")
-                        .WithMany("CollectionBands")
-                        .HasForeignKey("CollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Band");
-
-                    b.Navigation("Collection");
-                });
-
             modelBuilder.Entity("UserContent.Domain.Models.FavoriteAlbum", b =>
                 {
                     b.HasOne("UserContent.Domain.Models.Album", "Album")
@@ -558,8 +512,6 @@ namespace UserContent.Infrastructure.Migrations
 
             modelBuilder.Entity("UserContent.Domain.Models.Band", b =>
                 {
-                    b.Navigation("CollectionBands");
-
                     b.Navigation("FavoriteBands");
 
                     b.Navigation("Reviews");
@@ -568,8 +520,6 @@ namespace UserContent.Infrastructure.Migrations
             modelBuilder.Entity("UserContent.Domain.Models.Collection", b =>
                 {
                     b.Navigation("CollectionAlbums");
-
-                    b.Navigation("CollectionBands");
                 });
 
             modelBuilder.Entity("UserContent.Domain.Models.UserProfileInfo", b =>

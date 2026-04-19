@@ -1,11 +1,17 @@
+using BuildingBlocks.Storage;
+using Microsoft.Extensions.Hosting;
+
 namespace UserContent.Infrastructure;
 
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IHostEnvironment environment)
     {
+        services.AddStorageService(configuration, environment);
+
         string dbConnection = configuration.GetConnectionString("UserContentDB")
                               ?? throw new InvalidOperationException("UserContentDB connection string is missing");
 
@@ -17,7 +23,7 @@ public static class DependencyInjection
             options.UseNpgsql(dbConnection));
 
         services.AddScoped<IRepository<UserContentContext>, UserContentRepository>();
-        services.Decorate<IRepository<UserContentContext>, CachedUserContentRepository>();
+        // services.Decorate<IRepository<UserContentContext>, CachedUserContentRepository>();
 
         // Redis
         ConfigurationOptions redisOptions = ConfigurationOptions.Parse(redisConnection);
