@@ -637,11 +637,17 @@ public class UserContentService(
     public async Task<List<CollectionSummaryDto>> GetUserCollectionsAsync(Guid userId, CancellationToken ct = default)
     {
         List<Collection> collections = await repo.Filter<Collection>(c => c.UserId == userId, asTracked: false)
+            .Include(c => c.CollectionAlbums).ThenInclude(ca => ca.Album)
+            .Include(c => c.CollectionBands).ThenInclude(cb => cb.Band)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync(ct);
 
         return collections.Select(c => new CollectionSummaryDto(
-            c.Id, c.UserId, c.Name, ((CollectionType)c.Type).ToString(), urlResolver.Resolve(c.CoverUrl))).ToList();
+            c.Id, c.UserId, c.Name, ((CollectionType)c.Type).ToString(),
+            c.CollectionAlbums.Count, c.CollectionBands.Count,
+            c.CollectionAlbums.Select(ca => new CollectionAlbumItemDto(ca.Album.Id, ca.Album.Title, ca.Album.Slug, ca.Album.CoverUrl, ca.Album.ReleaseDate, ca.Album.BandNames)).ToList(),
+            c.CollectionBands.Select(cb => new CollectionBandItemDto(cb.Band.BandId, cb.Band.BandName, cb.Band.Slug, cb.Band.LogoUrl, cb.Band.FormedYear)).ToList(),
+            urlResolver.Resolve(c.CoverUrl))).ToList();
     }
 
     public async Task<CollectionDetailDto> GetCollectionAsync(Guid collectionId, CancellationToken ct = default)

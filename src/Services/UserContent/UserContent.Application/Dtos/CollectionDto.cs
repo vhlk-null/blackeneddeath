@@ -39,7 +39,7 @@ public record CollectionDetailDto(
     List<CollectionBandItemDto> Bands,
     string? CoverUrl);
 
-public record CollectionSummaryDto(Guid Id, Guid UserId, string Name, string Type, string? CoverUrl);
+public record CollectionSummaryDto(Guid Id, Guid UserId, string Name, string Type, int AlbumsCount, int BandsCount, List<CollectionAlbumItemDto> Albums, List<CollectionBandItemDto> Bands, string? CoverUrl);
 
 public record CreateCollectionRequest(Guid UserId, string Name, string? Description, CollectionType Type);
 public record UpdateCollectionRequest(string Name, string? Description);
