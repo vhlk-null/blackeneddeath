@@ -113,6 +113,10 @@ public static class UserContentModelBuilderExtensions
 
             entity.Property(e => e.RatingsCount)
                 .HasColumnName("ratings_count");
+
+            entity.Property(e => e.IsExplicit)
+                .HasDefaultValue(false)
+                .HasColumnName("is_explicit");
         });
     }
 

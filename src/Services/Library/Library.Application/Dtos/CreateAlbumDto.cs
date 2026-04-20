@@ -13,6 +13,7 @@ public record CreateAlbumDto(
     List<Guid> GenreIds,
     List<Guid> TagIds,
     List<StreamingLinkDto> StreamingLinks,
-    List<TrackInputDto>? Tracks);
+    List<TrackInputDto>? Tracks,
+    bool IsExplicit = false);
 
 public record TrackInputDto(string Title, int TrackNumber, string? Duration = null);

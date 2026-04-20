@@ -133,7 +133,7 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
     {
         AlbumRelease albumRelease = AlbumRelease.Of(album.ReleaseDate, album.Format);
 
-        Album newAlbum = Album.Create(album.Title, album.Type, albumRelease, coverKey, labelId, slug: slug);
+        Album newAlbum = Album.Create(album.Title, album.Type, albumRelease, coverKey, labelId, slug: slug, isExplicit: album.IsExplicit);
 
         foreach (BandId bandId in bandIds)
             newAlbum.AddBand(bandId);

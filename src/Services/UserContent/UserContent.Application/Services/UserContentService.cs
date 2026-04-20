@@ -76,7 +76,7 @@ public class UserContentService(
             ((AlbumFormat)a.Format).ToString(), ((AlbumType)a.Type).ToString(),
             a.PrimaryGenreName, a.PrimaryGenreSlug,
             a.BandNames, a.BandSlugs, a.CountryNames,
-            a.AverageRating, a.RatingsCount); }).ToList();
+            a.AverageRating, a.RatingsCount, a.IsExplicit); }).ToList();
 
         return new PaginatedResult<AlbumCardDto>(pageIndex, pageSize, totalCount, items);
     }
@@ -162,18 +162,18 @@ public class UserContentService(
         await repo.SaveChangesAsync(ct);
     }
 
-    public async Task<(int? UserRating, double? AverageRating, int RatingsCount)> GetAlbumRatingAsync(Guid userId, Guid albumId, CancellationToken ct = default)
+    public async Task<(int? UserRating, double? AverageRating, int RatingsCount, bool IsExplicit)> GetAlbumRatingAsync(Guid userId, Guid albumId, CancellationToken ct = default)
     {
         AlbumReview? review = await repo.GetByAsync<AlbumReview>(
             r => r.UserId == userId && r.AlbumId == albumId, cancellationToken: ct);
         Album? album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct);
-        return (review?.Rating, album?.AverageRating, album?.RatingsCount ?? 0);
+        return (review?.Rating, album?.AverageRating, album?.RatingsCount ?? 0, album?.IsExplicit ?? false);
     }
 
-    public async Task<(double? AverageRating, int RatingsCount)> GetAlbumAverageRatingAsync(Guid albumId, CancellationToken ct = default)
+    public async Task<(double? AverageRating, int RatingsCount, bool IsExplicit)> GetAlbumAverageRatingAsync(Guid albumId, CancellationToken ct = default)
     {
         Album? album = await repo.GetByAsync<Album>(a => a.Id == albumId, cancellationToken: ct);
-        return (album?.AverageRating, album?.RatingsCount ?? 0);
+        return (album?.AverageRating, album?.RatingsCount ?? 0, album?.IsExplicit ?? false);
     }
 
     public async Task<(int? UserRating, double? AverageRating, int RatingsCount)> GetBandRatingAsync(Guid userId, Guid bandId, CancellationToken ct = default)
@@ -190,7 +190,7 @@ public class UserContentService(
         return (band?.AverageRating, band?.RatingsCount ?? 0);
     }
 
-    public async Task<(double? AverageRating, int RatingsCount)> RateAlbumAsync(Guid userId, Guid albumId, int rating, CancellationToken ct = default)
+    public async Task<(double? AverageRating, int RatingsCount, bool IsExplicit)> RateAlbumAsync(Guid userId, Guid albumId, int rating, CancellationToken ct = default)
     {
         ClaimsPrincipal? user = httpContextAccessor.HttpContext?.User;
         string username = user?.FindFirst(ClaimTypes.Name)?.Value ?? userId.ToString();
@@ -201,7 +201,7 @@ public class UserContentService(
         Album album = await repo.GetByAsync<Album>(a => a.Id == albumId, asTracked: false, cancellationToken: ct)
             ?? throw new NotFoundException("Album", albumId);
 
-        return (album.AverageRating, album.RatingsCount);
+        return (album.AverageRating, album.RatingsCount, album.IsExplicit);
     }
 
     public async Task<(double? AverageRating, int RatingsCount)> RateBandAsync(Guid userId, Guid bandId, int rating, CancellationToken ct = default)
@@ -235,7 +235,7 @@ public class UserContentService(
                     a.Id, a.Title, a.Slug, a.CoverUrl, a.ReleaseDate,
                     ((AlbumFormat)a.Format).ToString(), ((AlbumType)a.Type).ToString(),
                     a.PrimaryGenreName, a.PrimaryGenreSlug, a.BandNames, a.BandSlugs,
-                    a.CountryNames, a.AverageRating, a.RatingsCount))
+                    a.CountryNames, a.AverageRating, a.RatingsCount, a.IsExplicit))
                 .ToListAsync(ct);
 
             return new PaginatedResult<AlbumCardDto>(pagination.PageIndex, pagination.PageSize, count, data);
@@ -269,7 +269,7 @@ public class UserContentService(
                 a.Id, a.Title, a.Slug, a.CoverUrl, a.ReleaseDate,
                 ((AlbumFormat)a.Format).ToString(), ((AlbumType)a.Type).ToString(),
                 a.PrimaryGenreName, a.PrimaryGenreSlug, a.BandNames, a.BandSlugs,
-                a.CountryNames, t.Avg, t.Count))
+                a.CountryNames, t.Avg, t.Count, a.IsExplicit))
             .ToList();
 
         return new PaginatedResult<AlbumCardDto>(pagination.PageIndex, pagination.PageSize, periodCount, periodData);

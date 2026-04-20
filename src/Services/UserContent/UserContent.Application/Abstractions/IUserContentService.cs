@@ -11,10 +11,10 @@ public interface IUserContentService
     Task<bool> IsBandFavoriteAsync(Guid userId, Guid bandId, CancellationToken ct = default);
     Task<Guid> AddFavoriteBandAsync(Guid userId, Guid bandId, CancellationToken ct = default);
     Task DeleteFavoriteBandAsync(Guid userId, Guid bandId, CancellationToken ct = default);
-    Task<(double? AverageRating, int RatingsCount)> RateAlbumAsync(Guid userId, Guid albumId, int rating, CancellationToken ct = default);
+    Task<(double? AverageRating, int RatingsCount, bool IsExplicit)> RateAlbumAsync(Guid userId, Guid albumId, int rating, CancellationToken ct = default);
     Task<(double? AverageRating, int RatingsCount)> RateBandAsync(Guid userId, Guid bandId, int rating, CancellationToken ct = default);
-    Task<(int? UserRating, double? AverageRating, int RatingsCount)> GetAlbumRatingAsync(Guid userId, Guid albumId, CancellationToken ct = default);
-    Task<(double? AverageRating, int RatingsCount)> GetAlbumAverageRatingAsync(Guid albumId, CancellationToken ct = default);
+    Task<(int? UserRating, double? AverageRating, int RatingsCount, bool IsExplicit)> GetAlbumRatingAsync(Guid userId, Guid albumId, CancellationToken ct = default);
+    Task<(double? AverageRating, int RatingsCount, bool IsExplicit)> GetAlbumAverageRatingAsync(Guid albumId, CancellationToken ct = default);
     Task<(int? UserRating, double? AverageRating, int RatingsCount)> GetBandRatingAsync(Guid userId, Guid bandId, CancellationToken ct = default);
     Task<(double? AverageRating, int RatingsCount)> GetBandAverageRatingAsync(Guid bandId, CancellationToken ct = default);
     Task<PaginatedResult<AlbumCardDto>> GetTopRatedAlbumsAsync(PaginationRequest pagination, RatingPeriod period, CancellationToken ct = default);

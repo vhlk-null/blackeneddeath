@@ -14,7 +14,8 @@ public record AlbumCardDto(
     string? BandSlugs,
     string? CountryNames,
     double? AverageRating,
-    int RatingsCount);
+    int RatingsCount,
+    bool IsExplicit);
 
 public record BandCardDto(
     Guid Id,

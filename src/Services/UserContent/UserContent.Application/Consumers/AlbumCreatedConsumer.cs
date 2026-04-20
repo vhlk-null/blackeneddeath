@@ -31,7 +31,8 @@ public class AlbumCreatedConsumer(IRepository<UserContentContext> repo, ILogger<
                 : null,
             CountryCodes = consumeContext.Message.Countries.Count > 0
                 ? string.Join(",", consumeContext.Message.Countries.Select(c => c.Code ?? ""))
-                : null
+                : null,
+            IsExplicit = consumeContext.Message.IsExplicit
         };
 
         await repo.AddAsync(album, consumeContext.CancellationToken);

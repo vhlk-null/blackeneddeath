@@ -46,7 +46,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
             ? await GenerateUniqueSlugAsync(command.Album.Title, command.Album.ReleaseDate, album.Id, cancellationToken)
             : album.Slug;
 
-        album.Update(command.Album.Title, newSlug, command.Album.Type, albumRelease, coverKey, labelId);
+        album.Update(command.Album.Title, newSlug, command.Album.Type, albumRelease, coverKey, labelId, command.Album.IsExplicit);
         album.Approve();
 
         List<BandId> bandIds = await ResolveBandIdsAsync(command.Album, cancellationToken);

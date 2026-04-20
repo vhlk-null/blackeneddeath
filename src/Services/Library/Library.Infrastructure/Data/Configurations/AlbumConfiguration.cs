@@ -54,6 +54,10 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
             .HasDefaultValue(false)
             .HasColumnName("is_approved");
 
+        entity.Property(e => e.IsExplicit)
+            .HasDefaultValue(false)
+            .HasColumnName("is_explicit");
+
         entity.Navigation(e => e.AlbumBands).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumGenres).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumCountries).UsePropertyAccessMode(PropertyAccessMode.Field);

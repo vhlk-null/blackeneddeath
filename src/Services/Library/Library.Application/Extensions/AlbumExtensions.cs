@@ -212,6 +212,7 @@ public static class AlbumExtensions
                 .ToList(),
             ComputeTotalDuration(
                 album.AlbumTracks.Select(at => tracks.TryGetValue(at.TrackId, out Track? t) ? t.Duration : null)),
-            BuildDiscographyGroups(rootBandIds, album.Id, discographyByBand, bands, genres, countries, urlResolver));
+            BuildDiscographyGroups(rootBandIds, album.Id, discographyByBand, bands, genres, countries, urlResolver),
+            album.IsExplicit);
     }
 }

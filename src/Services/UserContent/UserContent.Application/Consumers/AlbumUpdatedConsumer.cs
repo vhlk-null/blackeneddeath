@@ -35,7 +35,8 @@ public class AlbumUpdatedConsumer(IRepository<UserContentContext> repo) : IConsu
                     : null,
                 CountryCodes = consumeContext.Message.Countries.Count > 0
                     ? string.Join(",", consumeContext.Message.Countries.Select(c => c.Code ?? ""))
-                    : null
+                    : null,
+                IsExplicit = consumeContext.Message.IsExplicit
             };
             await repo.AddAsync(album, consumeContext.CancellationToken);
             await repo.SaveChangesAsync(consumeContext.CancellationToken);
@@ -65,6 +66,7 @@ public class AlbumUpdatedConsumer(IRepository<UserContentContext> repo) : IConsu
         album.CountryCodes = consumeContext.Message.Countries.Count > 0
             ? string.Join(",", consumeContext.Message.Countries.Select(c => c.Code ?? ""))
             : null;
+        album.IsExplicit = consumeContext.Message.IsExplicit;
 
         repo.Update(album);
         await repo.SaveChangesAsync(consumeContext.CancellationToken);

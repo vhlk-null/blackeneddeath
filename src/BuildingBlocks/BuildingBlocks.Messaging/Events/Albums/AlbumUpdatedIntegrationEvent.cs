@@ -12,4 +12,5 @@ public class AlbumUpdatedIntegrationEvent : IntegrationEvent
     public List<AlbumBandInfo> Bands { get; set; } = [];
     public AlbumGenreInfo? PrimaryGenre { get; set; }
     public List<AlbumCountryInfo> Countries { get; set; } = [];
+    public bool IsExplicit { get; set; }
 }

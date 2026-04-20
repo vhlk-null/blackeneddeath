@@ -76,7 +76,8 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
                 .Select(ac => ac.CountryId)
                 .Where(cid => countries.ContainsKey(cid))
                 .Select(cid => new CountryDto(countries[cid].Id.Value, countries[cid].Name, countries[cid].Code))
-                .ToList()
+                .ToList(),
+            a.IsExplicit
         )).ToList();
 
         return new GetAlbumsResult(new PaginatedResult<AlbumCardDto>(pageIndex, pageSize, totalCount, albumDtos));

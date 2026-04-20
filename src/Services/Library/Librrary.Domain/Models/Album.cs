@@ -9,6 +9,7 @@ public class Album : Aggregate<AlbumId>
     public string? CoverUrl { get; private set; }
     public LabelId? LabelId { get; private set; }
     public bool IsApproved { get; private set; }
+    public bool IsExplicit { get; private set; }
     
     private readonly List<AlbumBand> _albumBands = [];
     private readonly List<AlbumGenre> _albumGenres = [];
@@ -26,7 +27,7 @@ public class Album : Aggregate<AlbumId>
 
     private Album() { }
 
-    public static Album Create(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelId? labelId, AlbumId? id = null, string? slug = null)
+    public static Album Create(string title, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelId? labelId, AlbumId? id = null, string? slug = null, bool isExplicit = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentNullException.ThrowIfNull(albumRelease);
@@ -39,7 +40,8 @@ public class Album : Aggregate<AlbumId>
             Type = type,
             AlbumRelease = albumRelease,
             CoverUrl = coverUrl,
-            LabelId = labelId
+            LabelId = labelId,
+            IsExplicit = isExplicit
         };
 
         album.AddDomainEvent(new AlbumCreatedEvent(album));
@@ -57,7 +59,7 @@ public class Album : Aggregate<AlbumId>
         AddDomainEvent(new AlbumRemovedEvent(this));
     }
 
-    public Album Update(string title, string slug, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelId? labelId)
+    public Album Update(string title, string slug, AlbumType type, AlbumRelease albumRelease, string? coverUrl, LabelId? labelId, bool isExplicit = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
         ArgumentException.ThrowIfNullOrWhiteSpace(slug);
@@ -69,6 +71,7 @@ public class Album : Aggregate<AlbumId>
         AlbumRelease = albumRelease;
         CoverUrl = coverUrl;
         LabelId = labelId;
+        IsExplicit = isExplicit;
 
         AddDomainEvent(new AlbumUpdatedEvent(this));
 

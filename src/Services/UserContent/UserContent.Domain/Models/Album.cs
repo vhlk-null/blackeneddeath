@@ -18,6 +18,7 @@ public class Album
     public string? CountryCodes { get; set; }
     public double? AverageRating { get; set; }
     public int RatingsCount { get; set; }
+    public bool IsExplicit { get; set; }
     public List<FavoriteAlbum> FavoriteAlbums { get; set; } = new();
     public List<AlbumReview> Reviews { get; set; } = new();
     public List<CollectionAlbum> CollectionAlbums { get; set; } = new();

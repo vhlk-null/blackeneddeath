@@ -79,7 +79,8 @@ public class GetAlbumsByGenreCardQueryHandler(ILibraryDbContext context, IStorag
                 .Distinct()
                 .Where(cid => countries.ContainsKey(cid))
                 .Select(cid => new CountryDto(countries[cid].Id.Value, countries[cid].Name, countries[cid].Code))
-                .ToList()
+                .ToList(),
+            a.IsExplicit
         )).ToList();
 
         return new GetAlbumsByGenreCardResult(new PaginatedResult<AlbumCardDto>(pageIndex, pageSize, totalCount, albumDtos));

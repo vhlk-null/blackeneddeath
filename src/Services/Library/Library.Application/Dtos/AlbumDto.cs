@@ -16,7 +16,8 @@ public record AlbumDto(
     List<GenreDto> Genres,
     List<TagDto> Tags,
     string? TotalDuration,
-    List<DiscographyGroupDto> DiscographyGroups);
+    List<DiscographyGroupDto> DiscographyGroups,
+    bool IsExplicit);
 
 public record AlbumDetailDto(
     Guid Id,
@@ -35,5 +36,6 @@ public record AlbumDetailDto(
     List<TagDto> Tags,
     string? TotalDuration,
     List<DiscographyGroupDto> DiscographyGroups,
+    bool IsExplicit,
     List<VideoBandDto> Videos,
     PaginatedResult<AlbumSummaryDto> SimilarAlbums);

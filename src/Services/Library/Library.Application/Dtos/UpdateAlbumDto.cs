@@ -14,4 +14,5 @@ public record UpdateAlbumDto(
     List<Guid> GenreIds,
     List<Guid> TagIds,
     List<StreamingLinkDto> StreamingLinks,
-    List<TrackInputDto>? Tracks);
+    List<TrackInputDto>? Tracks,
+    bool IsExplicit = false);

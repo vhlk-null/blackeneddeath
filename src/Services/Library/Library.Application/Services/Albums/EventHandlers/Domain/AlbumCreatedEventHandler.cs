@@ -57,7 +57,8 @@ public sealed class AlbumCreatedEventHandler(
             PrimaryGenre = primaryGenre is not null
                 ? new AlbumGenreInfo(primaryGenre.Id.Value, primaryGenre.Name, primaryGenre.Slug)
                 : null,
-            Countries = countries.Select(c => new AlbumCountryInfo(c.Id.Value, c.Name, c.Code)).ToList()
+            Countries = countries.Select(c => new AlbumCountryInfo(c.Id.Value, c.Name, c.Code)).ToList(),
+            IsExplicit = album.IsExplicit
         };
 
         logger.LogInformation("AlbumCreatedEventHandler: Publishing integration event for AlbumId: {AlbumId}", album.Id.Value);
