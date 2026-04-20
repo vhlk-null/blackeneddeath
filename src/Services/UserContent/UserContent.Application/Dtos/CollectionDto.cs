@@ -22,8 +22,7 @@ public record CollectionDto(
     string? Description,
     string Type,
     DateTime CreatedAt,
-    int AlbumsCount,
-    int BandsCount,
+    int Count,
     string? CoverUrl);
 
 public record CollectionDetailDto(
@@ -33,13 +32,12 @@ public record CollectionDetailDto(
     string? Description,
     string Type,
     DateTime CreatedAt,
-    int AlbumsCount,
-    int BandsCount,
+    int Count,
     List<CollectionAlbumItemDto> Albums,
     List<CollectionBandItemDto> Bands,
     string? CoverUrl);
 
-public record CollectionSummaryDto(Guid Id, Guid UserId, string Name, string Type, int AlbumsCount, int BandsCount, List<CollectionAlbumItemDto> Albums, List<CollectionBandItemDto> Bands, string? CoverUrl);
+public record CollectionSummaryDto(Guid Id, Guid UserId, string Name, string Type, int Count, List<CollectionAlbumItemDto> Albums, List<CollectionBandItemDto> Bands, string? CoverUrl);
 
 public record CreateCollectionRequest(Guid UserId, string Name, string? Description, CollectionType Type);
 public record UpdateCollectionRequest(string Name, string? Description);

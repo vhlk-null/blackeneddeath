@@ -49,7 +49,8 @@ public class UserContentService(
 
         List<CollectionDto> collectionDtos = collections.Select(c => new CollectionDto(
             c.Id, c.UserId, c.Name, c.Description, ((CollectionType)c.Type).ToString(), c.CreatedAt,
-            c.CollectionAlbums.Count, c.CollectionBands.Count, urlResolver.Resolve(c.CoverUrl))).ToList();
+            c.Type == (int)CollectionType.Albums ? c.CollectionAlbums.Count : c.CollectionBands.Count,
+            urlResolver.Resolve(c.CoverUrl))).ToList();
 
         UserProfileDto dto = profile.Adapt<UserProfileDto>();
         return dto with { Collections = collectionDtos };
@@ -644,7 +645,7 @@ public class UserContentService(
 
         return collections.Select(c => new CollectionSummaryDto(
             c.Id, c.UserId, c.Name, ((CollectionType)c.Type).ToString(),
-            c.CollectionAlbums.Count, c.CollectionBands.Count,
+            c.Type == (int)CollectionType.Albums ? c.CollectionAlbums.Count : c.CollectionBands.Count,
             c.CollectionAlbums.Select(ca => new CollectionAlbumItemDto(ca.Album.Id, ca.Album.Title, ca.Album.Slug, ca.Album.CoverUrl, ca.Album.ReleaseDate, ca.Album.BandNames)).ToList(),
             c.CollectionBands.Select(cb => new CollectionBandItemDto(cb.Band.BandId, cb.Band.BandName, cb.Band.Slug, cb.Band.LogoUrl, cb.Band.FormedYear)).ToList(),
             urlResolver.Resolve(c.CoverUrl))).ToList();
@@ -665,7 +666,8 @@ public class UserContentService(
             .Select(cb => new CollectionBandItemDto(cb.Band.BandId, cb.Band.BandName, cb.Band.Slug, cb.Band.LogoUrl, cb.Band.FormedYear))
             .ToList();
 
-        return new CollectionDetailDto(collection.Id, collection.UserId, collection.Name, collection.Description, ((CollectionType)collection.Type).ToString(), collection.CreatedAt, albums.Count, bands.Count, albums, bands, urlResolver.Resolve(collection.CoverUrl));
+        int count = collection.Type == (int)CollectionType.Albums ? albums.Count : bands.Count;
+        return new CollectionDetailDto(collection.Id, collection.UserId, collection.Name, collection.Description, ((CollectionType)collection.Type).ToString(), collection.CreatedAt, count, albums, bands, urlResolver.Resolve(collection.CoverUrl));
     }
 
     public async Task<CollectionDto> CreateCollectionAsync(CreateCollectionRequest request, Stream? coverImage, string? coverContentType, string? coverFileName, CancellationToken ct = default)
@@ -693,7 +695,7 @@ public class UserContentService(
         await repo.AddAsync(collection, ct);
         await repo.SaveChangesAsync(ct);
 
-        return new CollectionDto(collection.Id, collection.UserId, collection.Name, collection.Description, request.Type.ToString(), collection.CreatedAt, 0, 0, urlResolver.Resolve(collection.CoverUrl));
+        return new CollectionDto(collection.Id, collection.UserId, collection.Name, collection.Description, request.Type.ToString(), collection.CreatedAt, 0, urlResolver.Resolve(collection.CoverUrl));
     }
 
     public async Task<CollectionDto> UpdateCollectionCoverAsync(Guid collectionId, Stream coverImage, string coverContentType, string coverFileName, CancellationToken ct = default)
@@ -712,8 +714,9 @@ public class UserContentService(
         repo.Update(collection);
         await repo.SaveChangesAsync(ct);
 
+        int count = collection.Type == (int)CollectionType.Albums ? collection.CollectionAlbums.Count : collection.CollectionBands.Count;
         return new CollectionDto(collection.Id, collection.UserId, collection.Name, collection.Description, ((CollectionType)collection.Type).ToString(), collection.CreatedAt,
-            collection.CollectionAlbums.Count, collection.CollectionBands.Count, urlResolver.Resolve(collection.CoverUrl));
+            count, urlResolver.Resolve(collection.CoverUrl));
     }
 
     public async Task<CollectionDto> UpdateCollectionAsync(Guid collectionId, UpdateCollectionRequest request, CancellationToken ct = default)
@@ -729,8 +732,9 @@ public class UserContentService(
         repo.Update(collection);
         await repo.SaveChangesAsync(ct);
 
+        int count = collection.Type == (int)CollectionType.Albums ? collection.CollectionAlbums.Count : collection.CollectionBands.Count;
         return new CollectionDto(collection.Id, collection.UserId, collection.Name, collection.Description, ((CollectionType)collection.Type).ToString(), collection.CreatedAt,
-            collection.CollectionAlbums.Count, collection.CollectionBands.Count, urlResolver.Resolve(collection.CoverUrl));
+            count, urlResolver.Resolve(collection.CoverUrl));
     }
 
     public async Task DeleteCollectionAsync(Guid collectionId, CancellationToken ct = default)
