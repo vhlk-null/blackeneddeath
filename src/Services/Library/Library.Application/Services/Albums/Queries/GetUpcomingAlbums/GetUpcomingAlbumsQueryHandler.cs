@@ -16,7 +16,7 @@ public class GetUpcomingAlbumsQueryHandler(ILibraryDbContext context, IStorageUr
                 && a.AlbumRelease.ReleaseDay != null
                 && (a.AlbumRelease.ReleaseYear < currentYear
                     || (a.AlbumRelease.ReleaseYear == currentYear && a.AlbumRelease.ReleaseMonth < now.Month)
-                    || (a.AlbumRelease.ReleaseYear == currentYear && a.AlbumRelease.ReleaseMonth == now.Month && a.AlbumRelease.ReleaseDay < now.Day)))
+                    || (a.AlbumRelease.ReleaseYear == currentYear && a.AlbumRelease.ReleaseMonth == now.Month && a.AlbumRelease.ReleaseDay <= now.Day)))
             .ExecuteUpdateAsync(s => s
                 .SetProperty(a => a.AlbumRelease.ReleaseMonth, (int?)null)
                 .SetProperty(a => a.AlbumRelease.ReleaseDay, (int?)null),
