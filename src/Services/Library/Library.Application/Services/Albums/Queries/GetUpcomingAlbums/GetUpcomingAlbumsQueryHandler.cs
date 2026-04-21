@@ -10,7 +10,10 @@ public class GetUpcomingAlbumsQueryHandler(ILibraryDbContext context, IStorageUr
         int pageSize = query.PaginationRequest.PageSize;
 
         IQueryable<Album> baseQuery = context.Albums.AsNoTracking()
-            .Where(a => a.IsApproved && a.AlbumRelease.ReleaseYear >= currentYear);
+            .Where(a => a.IsApproved
+                && a.AlbumRelease.ReleaseMonth != null
+                && a.AlbumRelease.ReleaseDay != null
+                && a.AlbumRelease.ReleaseYear >= currentYear);
 
         long totalCount = await baseQuery.LongCountAsync(cancellationToken);
 
