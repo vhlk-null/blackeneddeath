@@ -25,12 +25,15 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries);
 
+        bool desc = query.SortDir == SortDir.Desc;
         IOrderedQueryable<Album> sorted = query.SortBy switch
         {
-            AlbumSortBy.Oldest      => albumsQuery.OrderBy(a => a.CreatedAt),
-            AlbumSortBy.ReleaseDate => albumsQuery.OrderByDescending(a => a.AlbumRelease.ReleaseYear),
-            AlbumSortBy.Title       => albumsQuery.OrderBy(a => a.Title),
-            _                       => albumsQuery.OrderByDescending(a => a.CreatedAt)
+            AlbumSortBy.Title => desc
+                ? albumsQuery.OrderByDescending(a => a.Title)
+                : albumsQuery.OrderBy(a => a.Title),
+            _ => desc
+                ? albumsQuery.OrderByDescending(a => a.AlbumRelease.ReleaseYear)
+                : albumsQuery.OrderBy(a => a.AlbumRelease.ReleaseYear)
         };
 
         List<Album> albums = await sorted

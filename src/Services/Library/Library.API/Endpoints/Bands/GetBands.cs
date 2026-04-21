@@ -14,12 +14,14 @@ public class GetBands : ICarterModule
                 ILibraryDbContext db,
                 CancellationToken ct,
                 HttpContext httpContext,
-                BandSortBy sortBy = BandSortBy.Newest,
+                BandSortBy sortBy = BandSortBy.FormedYear,
                 BandStatus? status = null,
                 int? yearFrom = null,
                 int? yearTo = null,
                 string? name = null) =>
             {
+                SortDir sortDir = Enum.TryParse<SortDir>(httpContext.Request.Query["sortDir"], ignoreCase: true, out SortDir sd) ? sd : SortDir.Desc;
+
                 List<string> genreNames   = httpContext.Request.Query["genreName"].Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
                 List<string> countryNames = httpContext.Request.Query["countryName"].Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
                 List<Guid>   genreIds     = httpContext.Request.Query["genreId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
@@ -31,7 +33,7 @@ public class GetBands : ICarterModule
                 else
                     filter = BandFilterBuilder.Build(genreIds, countryIds, status, yearFrom, yearTo, name);
 
-                Application.Services.Bands.Queries.GetBands.GetBandsResult result = await sender.Send(new GetBandsQuery(paginationRequest, sortBy, filter));
+                Application.Services.Bands.Queries.GetBands.GetBandsResult result = await sender.Send(new GetBandsQuery(paginationRequest, sortBy, sortDir, filter));
                 return Results.Ok(result.Adapt<GetBandsResult>());
             })
             .WithName("GetBands")

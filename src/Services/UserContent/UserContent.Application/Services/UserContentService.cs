@@ -218,15 +218,15 @@ public class UserContentService(
         return (band.AverageRating, band.RatingsCount);
     }
 
-    public async Task<PaginatedResult<AlbumCardDto>> GetTopRatedAlbumsAsync(PaginationRequest pagination, RatingPeriod period, CancellationToken ct = default)
+    public async Task<PaginatedResult<AlbumCardDto>> GetTopRatedAlbumsAsync(PaginationRequest pagination, RatingPeriod period, SortDir sortDir = SortDir.Desc, CancellationToken ct = default)
     {
+        bool desc = sortDir == SortDir.Desc;
         if (period == RatingPeriod.All)
         {
-            IQueryable<Album> query = repo.All<Album>()
-                .Where(a => a.Slug != null && a.Slug != "")
-                .OrderByDescending(a => a.AverageRating.HasValue)
-                .ThenByDescending(a => a.AverageRating)
-                .ThenByDescending(a => a.RatingsCount);
+            IQueryable<Album> baseAlbums = repo.All<Album>().Where(a => a.Slug != null && a.Slug != "");
+            IQueryable<Album> query = desc
+                ? baseAlbums.OrderByDescending(a => a.AverageRating.HasValue).ThenByDescending(a => a.AverageRating).ThenByDescending(a => a.RatingsCount)
+                : baseAlbums.OrderBy(a => a.AverageRating.HasValue).ThenBy(a => a.AverageRating).ThenBy(a => a.RatingsCount);
 
             long count = await query.LongCountAsync(ct);
 
@@ -261,8 +261,8 @@ public class UserContentService(
                 Count = r != null ? r.Count : 0
             })
             .OrderByDescending(x => x.Avg.HasValue)
-            .ThenByDescending(x => x.Avg)
-            .ThenByDescending(x => x.Count)
+            .ThenBy(x => desc ? (x.Avg == null ? 0.0 : -x.Avg.Value) : (x.Avg ?? 0.0))
+            .ThenBy(x => desc ? -x.Count : x.Count)
             .Select(x => new AlbumCardDto(
                 x.Album.Id, x.Album.Title, x.Album.Slug, x.Album.CoverUrl, x.Album.ReleaseDate,
                 ((AlbumFormat)x.Album.Format).ToString(), ((AlbumType)x.Album.Type).ToString(),
@@ -280,15 +280,15 @@ public class UserContentService(
         return new PaginatedResult<AlbumCardDto>(pagination.PageIndex, pagination.PageSize, periodCount, page);
     }
 
-    public async Task<PaginatedResult<BandCardDto>> GetTopRatedBandsAsync(PaginationRequest pagination, RatingPeriod period, CancellationToken ct = default)
+    public async Task<PaginatedResult<BandCardDto>> GetTopRatedBandsAsync(PaginationRequest pagination, RatingPeriod period, SortDir sortDir = SortDir.Desc, CancellationToken ct = default)
     {
+        bool desc = sortDir == SortDir.Desc;
         if (period == RatingPeriod.All)
         {
-            IQueryable<Band> query = repo.All<Band>()
-                .Where(b => b.Slug != null && b.Slug != "")
-                .OrderByDescending(b => b.AverageRating.HasValue)
-                .ThenByDescending(b => b.AverageRating)
-                .ThenByDescending(b => b.RatingsCount);
+            IQueryable<Band> baseBands = repo.All<Band>().Where(b => b.Slug != null && b.Slug != "");
+            IQueryable<Band> query = desc
+                ? baseBands.OrderByDescending(b => b.AverageRating.HasValue).ThenByDescending(b => b.AverageRating).ThenByDescending(b => b.RatingsCount)
+                : baseBands.OrderBy(b => b.AverageRating.HasValue).ThenBy(b => b.AverageRating).ThenBy(b => b.RatingsCount);
 
             long count = await query.LongCountAsync(ct);
 
@@ -322,8 +322,8 @@ public class UserContentService(
                 Count = r != null ? r.Count : 0
             })
             .OrderByDescending(x => x.Avg.HasValue)
-            .ThenByDescending(x => x.Avg)
-            .ThenByDescending(x => x.Count)
+            .ThenBy(x => desc ? (x.Avg == null ? 0.0 : -x.Avg.Value) : (x.Avg ?? 0.0))
+            .ThenBy(x => desc ? -x.Count : x.Count)
             .Select(x => new BandCardDto(
                 x.Band.BandId, x.Band.BandName, x.Band.Slug, x.Band.LogoUrl, x.Band.FormedYear, x.Band.DisbandedYear,
                 ((BandStatus)x.Band.Status).ToString(), x.Band.PrimaryGenreName, x.Band.PrimaryGenreSlug,

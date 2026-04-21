@@ -24,12 +24,15 @@ public class GetBandsQueryHandler(ILibraryDbContext context, IStorageUrlResolver
             .Include(b => b.BandCountries)
             .Include(b => b.BandGenres);
 
+        bool desc = query.SortDir == SortDir.Desc;
         IOrderedQueryable<Band> sorted = query.SortBy switch
         {
-            BandSortBy.Oldest     => bandsQuery.OrderBy(b => b.CreatedAt),
-            BandSortBy.Name       => bandsQuery.OrderBy(b => b.Name),
-            BandSortBy.FormedYear => bandsQuery.OrderByDescending(b => b.Activity.FormedYear),
-            _                     => bandsQuery.OrderByDescending(b => b.CreatedAt)
+            BandSortBy.Name => desc
+                ? bandsQuery.OrderByDescending(b => b.Name)
+                : bandsQuery.OrderBy(b => b.Name),
+            _ => desc
+                ? bandsQuery.OrderByDescending(b => b.Activity.FormedYear)
+                : bandsQuery.OrderBy(b => b.Activity.FormedYear)
         };
 
         List<Band> bands = await sorted

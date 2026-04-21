@@ -10,11 +10,14 @@ public class TopRatedController(IUserContentService service) : ControllerBase
     public async Task<IActionResult> GetTopRatedAlbums(
         [FromQuery] int pageIndex = 0,
         [FromQuery] int pageSize = 20,
-        [FromQuery] RatingPeriod period = RatingPeriod.All,
+        [FromQuery] string? period = null,
+        [FromQuery] string? sortDir = null,
         CancellationToken ct = default)
     {
+        RatingPeriod ratingPeriod = Enum.TryParse<RatingPeriod>(period, ignoreCase: true, out RatingPeriod p) ? p : RatingPeriod.All;
+        SortDir dir = Enum.TryParse<SortDir>(sortDir, ignoreCase: true, out SortDir sd) ? sd : SortDir.Desc;
         PaginatedResult<AlbumCardDto> result = await service.GetTopRatedAlbumsAsync(
-            new PaginationRequest(pageIndex, pageSize), period, ct);
+            new PaginationRequest(pageIndex, pageSize), ratingPeriod, dir, ct);
         return Ok(result);
     }
 
@@ -23,11 +26,14 @@ public class TopRatedController(IUserContentService service) : ControllerBase
     public async Task<IActionResult> GetTopRatedBands(
         [FromQuery] int pageIndex = 0,
         [FromQuery] int pageSize = 20,
-        [FromQuery] RatingPeriod period = RatingPeriod.All,
+        [FromQuery] string? period = null,
+        [FromQuery] string? sortDir = null,
         CancellationToken ct = default)
     {
+        RatingPeriod ratingPeriod = Enum.TryParse<RatingPeriod>(period, ignoreCase: true, out RatingPeriod p) ? p : RatingPeriod.All;
+        SortDir dir = Enum.TryParse<SortDir>(sortDir, ignoreCase: true, out SortDir sd) ? sd : SortDir.Desc;
         PaginatedResult<BandCardDto> result = await service.GetTopRatedBandsAsync(
-            new PaginationRequest(pageIndex, pageSize), period, ct);
+            new PaginationRequest(pageIndex, pageSize), ratingPeriod, dir, ct);
         return Ok(result);
     }
 }

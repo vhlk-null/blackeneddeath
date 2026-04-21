@@ -1,10 +1,11 @@
 namespace Library.Application.Services.Albums.Queries.GetAlbums;
 
-public enum AlbumSortBy { Newest, Oldest, ReleaseDate, Title }
+public enum AlbumSortBy { ReleaseDate, Title }
 
 public record GetAlbumsQuery(
     PaginationRequest PaginationRequest,
-    AlbumSortBy SortBy = AlbumSortBy.Newest,
+    AlbumSortBy SortBy = AlbumSortBy.ReleaseDate,
+    SortDir SortDir = SortDir.Desc,
     ISpecification<Album>? Filter = null,
     bool ApprovedOnly = true) : BuildingBlocks.CQRS.IQuery<GetAlbumsResult>;
 
