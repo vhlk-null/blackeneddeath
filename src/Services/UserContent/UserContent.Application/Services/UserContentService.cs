@@ -223,6 +223,7 @@ public class UserContentService(
         if (period == RatingPeriod.All)
         {
             IQueryable<Album> query = repo.All<Album>()
+                .Where(a => a.Slug != null && a.Slug != "")
                 .OrderByDescending(a => a.AverageRating.HasValue)
                 .ThenByDescending(a => a.AverageRating)
                 .ThenByDescending(a => a.RatingsCount);
@@ -251,6 +252,7 @@ public class UserContentService(
             .Select(g => new { AlbumId = g.Key, Avg = (double?)g.Average(r => (double)r.Rating!.Value), Count = g.Count() });
 
         var periodData = await repo.All<Album>()
+            .Where(a => a.Slug != null && a.Slug != "")
             .GroupJoin(grouped, a => a.Id, g => g.AlbumId, (a, ratings) => new { Album = a, Ratings = ratings })
             .SelectMany(x => x.Ratings.DefaultIfEmpty(), (x, r) => new
             {
@@ -283,6 +285,7 @@ public class UserContentService(
         if (period == RatingPeriod.All)
         {
             IQueryable<Band> query = repo.All<Band>()
+                .Where(b => b.Slug != null && b.Slug != "")
                 .OrderByDescending(b => b.AverageRating.HasValue)
                 .ThenByDescending(b => b.AverageRating)
                 .ThenByDescending(b => b.RatingsCount);
@@ -310,6 +313,7 @@ public class UserContentService(
             .Select(g => new { BandId = g.Key, Avg = (double?)g.Average(r => (double)r.Rating!.Value), Count = g.Count() });
 
         var periodData = await repo.All<Band>()
+            .Where(b => b.Slug != null && b.Slug != "")
             .GroupJoin(grouped, b => b.BandId, g => g.BandId, (b, ratings) => new { Band = b, Ratings = ratings })
             .SelectMany(x => x.Ratings.DefaultIfEmpty(), (x, r) => new
             {
