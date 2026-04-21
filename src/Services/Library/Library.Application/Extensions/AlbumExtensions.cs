@@ -55,7 +55,8 @@ public static class AlbumExtensions
                 .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
                 .ToList(),
             primaryBand.Id.Value,
-            primaryBand.Name);
+            primaryBand.Name,
+            a.IsExplicit);
 
     // Builds a deduplicated discography group list for all bands of an album combined.
     // Each album appears exactly once — either under a solo band group or a collab group.

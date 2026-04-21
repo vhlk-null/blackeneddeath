@@ -138,7 +138,8 @@ public class GetAlbumBySlugQueryHandler(ILibraryDbContext context, IStorageUrlRe
                     .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
                     .ToList(),
                 primaryBand?.Id.Value ?? Guid.Empty,
-                primaryBand?.Name ?? string.Empty);
+                primaryBand?.Name ?? string.Empty,
+                a.IsExplicit);
         }).ToList();
 
         PaginatedResult<AlbumSummaryDto> similarAlbumDtos = new(query.SimilarPageNumber, query.SimilarPageSize, similarTotalCount, similarAlbumItems);

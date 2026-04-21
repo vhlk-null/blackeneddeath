@@ -11,4 +11,5 @@ public record AlbumSummaryDto(
     IReadOnlyList<GenreDto> Genres,
     IReadOnlyList<CountryDto> Countries,
     Guid BandId,
-    string BandName);
+    string BandName,
+    bool IsExplicit);

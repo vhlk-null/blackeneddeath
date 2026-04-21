@@ -35,7 +35,8 @@ public static class BandExtensions
                         .Select(ac => new CountryDto(countries[ac.CountryId].Id.Value, countries[ac.CountryId].Name, countries[ac.CountryId].Code))
                         .ToList(),
                     band.Id.Value,
-                    band.Name))
+                    band.Name,
+                    a.IsExplicit))
                 .ToList(),
             band.BandGenres
                 .Where(bg => genres.ContainsKey(bg.GenreId))
