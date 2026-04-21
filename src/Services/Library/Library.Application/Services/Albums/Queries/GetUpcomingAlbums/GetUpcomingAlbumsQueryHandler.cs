@@ -5,14 +5,13 @@ public class GetUpcomingAlbumsQueryHandler(ILibraryDbContext context, IStorageUr
 {
     public async ValueTask<GetUpcomingAlbumsResult> Handle(GetUpcomingAlbumsQuery query, CancellationToken cancellationToken)
     {
-        int currentYear = DateTime.UtcNow.Year;
+        DateTime now = DateTime.UtcNow;
+        int currentYear = now.Year;
         int pageIndex = query.PaginationRequest.PageIndex;
         int pageSize = query.PaginationRequest.PageSize;
 
         IQueryable<Album> baseQuery = context.Albums.AsNoTracking()
             .Where(a => a.IsApproved
-                && a.AlbumRelease.ReleaseMonth != null
-                && a.AlbumRelease.ReleaseDay != null
                 && a.AlbumRelease.ReleaseYear >= currentYear);
 
         long totalCount = await baseQuery.LongCountAsync(cancellationToken);
@@ -45,13 +44,17 @@ public class GetUpcomingAlbumsQueryHandler(ILibraryDbContext context, IStorageUr
             .Where(c => countryIds.Contains(c.Id))
             .ToDictionaryAsync(c => c.Id, cancellationToken);
 
-        List<AlbumCardDto> albumDtos = albums.Select(a => new AlbumCardDto(
+        List<AlbumCardDto> albumDtos = albums.Select(a =>
+        {
+            bool datePassed = a.AlbumRelease.ReleaseMonth.HasValue && a.AlbumRelease.ReleaseDay.HasValue
+                && new DateTime(a.AlbumRelease.ReleaseYear, a.AlbumRelease.ReleaseMonth.Value, a.AlbumRelease.ReleaseDay.Value) < now;
+            return new AlbumCardDto(
             a.Id.Value,
             a.Title,
             a.Slug,
             a.AlbumRelease.ReleaseYear,
-            a.AlbumRelease.ReleaseMonth,
-            a.AlbumRelease.ReleaseDay,
+            datePassed ? null : a.AlbumRelease.ReleaseMonth,
+            datePassed ? null : a.AlbumRelease.ReleaseDay,
             urlResolver.Resolve(a.CoverUrl),
             a.Type,
             a.AlbumRelease.Format,
@@ -69,7 +72,8 @@ public class GetUpcomingAlbumsQueryHandler(ILibraryDbContext context, IStorageUr
                 .Select(cid => new CountryDto(countries[cid].Id.Value, countries[cid].Name, countries[cid].Code))
                 .ToList(),
             a.IsExplicit
-        )).ToList();
+            );
+        }).ToList();
 
         return new GetUpcomingAlbumsResult(new PaginatedResult<AlbumCardDto>(pageIndex, pageSize, totalCount, albumDtos));
     }
