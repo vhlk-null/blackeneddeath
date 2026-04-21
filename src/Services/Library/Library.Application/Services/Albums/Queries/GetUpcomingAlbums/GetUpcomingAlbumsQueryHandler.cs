@@ -24,7 +24,8 @@ public class GetUpcomingAlbumsQueryHandler(ILibraryDbContext context, IStorageUr
 
         IQueryable<Album> baseQuery = context.Albums.AsNoTracking()
             .Where(a => a.IsApproved
-                && a.AlbumRelease.ReleaseYear >= currentYear);
+                && a.AlbumRelease.ReleaseYear >= currentYear
+                && !(a.AlbumRelease.ReleaseMonth == null && a.AlbumRelease.ReleaseYear <= currentYear));
 
         long totalCount = await baseQuery.LongCountAsync(cancellationToken);
 
