@@ -1,45 +1,33 @@
-using Microsoft.EntityFrameworkCore.Query;
+namespace Library.Application.Services.Albums.Queries.GetUpcomingAlbums;
 
-namespace Library.Application.Services.Albums.Queries.GetAlbums;
-
-public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver)
-    : BuildingBlocks.CQRS.IQueryHandler<GetAlbumsQuery, GetAlbumsResult>
+public class GetUpcomingAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver)
+    : BuildingBlocks.CQRS.IQueryHandler<GetUpcomingAlbumsQuery, GetUpcomingAlbumsResult>
 {
-    public async ValueTask<GetAlbumsResult> Handle(GetAlbumsQuery query, CancellationToken cancellationToken)
+    public async ValueTask<GetUpcomingAlbumsResult> Handle(GetUpcomingAlbumsQuery query, CancellationToken cancellationToken)
     {
+        int currentYear = DateTime.UtcNow.Year;
         int pageIndex = query.PaginationRequest.PageIndex;
         int pageSize = query.PaginationRequest.PageSize;
 
-        IQueryable<Album> filteredQuery = context.Albums.AsNoTracking();
+        IQueryable<Album> baseQuery = context.Albums.AsNoTracking()
+            .Where(a => a.IsApproved && a.AlbumRelease.ReleaseYear >= currentYear);
 
-        if (query.ApprovedOnly)
-            filteredQuery = filteredQuery.Where(a => a.IsApproved);
+        long totalCount = await baseQuery.LongCountAsync(cancellationToken);
 
-        if (query.Filter is not null)
-            filteredQuery = filteredQuery.Where(query.Filter.Criteria);
-
-        long totalCount = await filteredQuery.LongCountAsync(cancellationToken);
-
-        IQueryable<Album> albumsQuery = filteredQuery
+        List<Album> albums = await baseQuery
             .Include(a => a.AlbumBands)
             .Include(a => a.AlbumGenres)
-            .Include(a => a.AlbumCountries);
-
-        IOrderedQueryable<Album> sorted = query.SortBy switch
-        {
-            AlbumSortBy.Oldest      => albumsQuery.OrderBy(a => a.CreatedAt),
-            AlbumSortBy.ReleaseDate => albumsQuery.OrderByDescending(a => a.AlbumRelease.ReleaseYear),
-            AlbumSortBy.Title       => albumsQuery.OrderBy(a => a.Title),
-            _                       => albumsQuery.OrderByDescending(a => a.CreatedAt)
-        };
-
-        List<Album> albums = await sorted
+            .Include(a => a.AlbumCountries)
+            .OrderBy(a => a.AlbumRelease.ReleaseYear)
+            .ThenBy(a => a.AlbumRelease.ReleaseMonth)
+            .ThenBy(a => a.AlbumRelease.ReleaseDay)
             .Skip(pageSize * pageIndex)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        List<BandId> bandIds  = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
+        List<BandId> bandIds = albums.SelectMany(a => a.AlbumBands.Select(ab => ab.BandId)).Distinct().ToList();
         List<GenreId> genreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)).Distinct().ToList();
+        List<CountryId> countryIds = albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)).Distinct().ToList();
 
         Dictionary<BandId, Band> bands = await context.Bands.AsNoTracking()
             .Include(b => b.BandCountries)
@@ -49,8 +37,6 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
         Dictionary<GenreId, Genre> genres = await context.Genres.AsNoTracking()
             .Where(g => genreIds.Contains(g.Id))
             .ToDictionaryAsync(g => g.Id, cancellationToken);
-
-        List<CountryId> countryIds = albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)).Distinct().ToList();
 
         Dictionary<CountryId, Country> countries = await context.Countries.AsNoTracking()
             .Where(c => countryIds.Contains(c.Id))
@@ -82,6 +68,6 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
             a.IsExplicit
         )).ToList();
 
-        return new GetAlbumsResult(new PaginatedResult<AlbumCardDto>(pageIndex, pageSize, totalCount, albumDtos));
+        return new GetUpcomingAlbumsResult(new PaginatedResult<AlbumCardDto>(pageIndex, pageSize, totalCount, albumDtos));
     }
 }

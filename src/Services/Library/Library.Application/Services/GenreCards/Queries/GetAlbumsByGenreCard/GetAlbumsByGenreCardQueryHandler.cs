@@ -61,6 +61,8 @@ public class GetAlbumsByGenreCardQueryHandler(ILibraryDbContext context, IStorag
             a.Title,
             a.Slug,
             a.AlbumRelease.ReleaseYear,
+            a.AlbumRelease.ReleaseMonth,
+            a.AlbumRelease.ReleaseDay,
             urlResolver.Resolve(a.CoverUrl),
             a.Type,
             a.AlbumRelease.Format,

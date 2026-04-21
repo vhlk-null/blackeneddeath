@@ -40,6 +40,8 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
         entity.ComplexProperty(e => e.AlbumRelease, ar =>
         {
             ar.Property(r => r.ReleaseYear).HasColumnName("release_year");
+            ar.Property(r => r.ReleaseMonth).HasColumnName("release_month").IsRequired(false);
+            ar.Property(r => r.ReleaseDay).HasColumnName("release_day").IsRequired(false);
             ar.Property(r => r.Format)
                 .HasConversion<string>()
                 .HasColumnName("format");

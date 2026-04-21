@@ -5,6 +5,8 @@ public record AlbumAdminDto(
     string Title,
     string? Slug,
     int ReleaseDate,
+    int? ReleaseMonth,
+    int? ReleaseDay,
     string? CoverUrl,
     AlbumType Type,
     AlbumFormat Format,

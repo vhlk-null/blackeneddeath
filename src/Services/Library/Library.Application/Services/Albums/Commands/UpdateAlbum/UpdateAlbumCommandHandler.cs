@@ -39,7 +39,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
             coverKey = await storage.UploadFileAsync(folder, $"{Guid.NewGuid()}{extension}", command.CoverImage, command.CoverImageContentType, cancellationToken);
         }
 
-        AlbumRelease albumRelease = AlbumRelease.Of(command.Album.ReleaseDate, command.Album.Format);
+        AlbumRelease albumRelease = AlbumRelease.Of(command.Album.ReleaseDate, command.Album.Format, command.Album.ReleaseMonth, command.Album.ReleaseDay);
         LabelId? labelId = await ResolveLabelAsync(command.Album, cancellationToken);
 
         string newSlug = album.Title != command.Album.Title

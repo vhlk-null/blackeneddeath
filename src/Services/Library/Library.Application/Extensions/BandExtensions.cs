@@ -27,6 +27,7 @@ public static class BandExtensions
                 .OrderByDescending(a => a.AlbumRelease.ReleaseYear)
                 .Select(a => new AlbumSummaryDto(
                     a.Id.Value, a.Title, a.Slug ?? string.Empty, a.AlbumRelease.ReleaseYear,
+                    a.AlbumRelease.ReleaseMonth, a.AlbumRelease.ReleaseDay,
                     urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
                     a.AlbumGenres.Where(ag => genres.ContainsKey(ag.GenreId))
                         .Select(ag => new GenreDto(genres[ag.GenreId].Id.Value, genres[ag.GenreId].Name, genres[ag.GenreId].Slug, ag.IsPrimary))

@@ -22,6 +22,18 @@ public class CreateAlbumCommandValidator : AbstractValidator<CreateAlbumCommand>
             RuleFor(x => x.Album.ReleaseDate)
                 .GreaterThanOrEqualTo(1960).WithMessage(ValidationMessages.ReleaseYearTooOld)
                 .LessThanOrEqualTo(DateTime.UtcNow.Year + 1).WithMessage(ValidationMessages.ReleaseYearInFuture);
+
+            When(x => x.Album.ReleaseMonth.HasValue, () =>
+            {
+                RuleFor(x => x.Album.ReleaseMonth!.Value)
+                    .InclusiveBetween(1, 12).WithMessage("Release month must be between 1 and 12.");
+            });
+
+            When(x => x.Album.ReleaseDay.HasValue, () =>
+            {
+                RuleFor(x => x.Album.ReleaseDay!.Value)
+                    .InclusiveBetween(1, 31).WithMessage("Release day must be between 1 and 31.");
+            });
         });
     }
 }

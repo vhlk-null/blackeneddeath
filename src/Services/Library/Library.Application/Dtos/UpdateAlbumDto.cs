@@ -4,6 +4,8 @@ public record UpdateAlbumDto(
     Guid Id,
     string Title,
     int ReleaseDate,
+    int? ReleaseMonth,
+    int? ReleaseDay,
     AlbumType Type,
     AlbumFormat Format,
     List<Guid>? LabelIds,

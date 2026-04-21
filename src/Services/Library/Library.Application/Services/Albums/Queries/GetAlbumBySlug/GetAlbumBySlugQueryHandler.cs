@@ -128,6 +128,7 @@ public class GetAlbumBySlugQueryHandler(ILibraryDbContext context, IStorageUrlRe
                 .FirstOrDefault(b => b is not null);
             return new AlbumSummaryDto(
                 a.Id.Value, a.Title, a.Slug, a.AlbumRelease.ReleaseYear,
+                a.AlbumRelease.ReleaseMonth, a.AlbumRelease.ReleaseDay,
                 urlResolver.Resolve(a.CoverUrl), a.Type, a.AlbumRelease.Format,
                 a.AlbumGenres
                     .Where(ag => genres.ContainsKey(ag.GenreId))
@@ -156,6 +157,7 @@ public class GetAlbumBySlugQueryHandler(ILibraryDbContext context, IStorageUrlRe
 
         return new GetAlbumBySlugResult(new AlbumDetailDto(
             albumDto.Id, albumDto.Title, albumDto.Slug, albumDto.ReleaseDate,
+            albumDto.ReleaseMonth, albumDto.ReleaseDay,
             albumDto.CoverUrl, albumDto.Type, albumDto.Format, albumDto.Label,
             albumDto.Bands, albumDto.Countries, albumDto.StreamingLinks,
             albumDto.Tracks, albumDto.Genres, albumDto.Tags, albumDto.TotalDuration,

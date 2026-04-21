@@ -27,6 +27,7 @@ global using Library.Application.Services.Albums.Queries.GetAlbumBySlug;
 global using Library.Application.Services.Albums.Queries.GetAlbums;
 global using Library.Application.Services.Albums.Specifications;
 global using Library.Application.Services.Albums.Queries.GetAlbumNames;
+global using Library.Application.Services.Albums.Queries.GetUpcomingAlbums;
 global using Library.Application.Services.Bands.Commands.ApproveBand;
 global using Library.Application.Services.Bands.Commands.ApproveVideoBand;
 global using Library.Application.Services.Bands.Queries.GetPendingApprovalBands;

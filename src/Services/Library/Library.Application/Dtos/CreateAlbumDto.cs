@@ -3,6 +3,8 @@ namespace Library.Application.Dtos;
 public record CreateAlbumDto(
     string Title,
     int ReleaseDate,
+    int? ReleaseMonth,
+    int? ReleaseDay,
     AlbumType Type,
     AlbumFormat Format,
     List<Guid>? LabelIds,

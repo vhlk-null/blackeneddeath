@@ -131,7 +131,7 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
 
     private Album CreateNewAlbum(CreateAlbumDto album, string? coverKey, string slug, LabelId? labelId, List<BandId> bandIds)
     {
-        AlbumRelease albumRelease = AlbumRelease.Of(album.ReleaseDate, album.Format);
+        AlbumRelease albumRelease = AlbumRelease.Of(album.ReleaseDate, album.Format, album.ReleaseMonth, album.ReleaseDay);
 
         Album newAlbum = Album.Create(album.Title, album.Type, albumRelease, coverKey, labelId, slug: slug, isExplicit: album.IsExplicit);
 
