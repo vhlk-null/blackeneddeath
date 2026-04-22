@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Albums.Queries.GetAlbums;
 
-public enum AlbumSortBy { ReleaseDate, Title }
+public enum AlbumSortBy { ReleaseDate, Title, CreatedAt }
 
 public record GetAlbumsQuery(
     PaginationRequest PaginationRequest,

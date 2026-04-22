@@ -30,6 +30,9 @@ public class GetBandsQueryHandler(ILibraryDbContext context, IStorageUrlResolver
             BandSortBy.Name => desc
                 ? bandsQuery.OrderByDescending(b => b.Name)
                 : bandsQuery.OrderBy(b => b.Name),
+            BandSortBy.CreatedAt => desc
+                ? bandsQuery.OrderByDescending(b => b.CreatedAt)
+                : bandsQuery.OrderBy(b => b.CreatedAt),
             _ => desc
                 ? bandsQuery.OrderByDescending(b => b.Activity.FormedYear)
                 : bandsQuery.OrderBy(b => b.Activity.FormedYear)

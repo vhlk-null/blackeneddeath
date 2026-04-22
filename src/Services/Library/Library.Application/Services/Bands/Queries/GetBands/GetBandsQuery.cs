@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Bands.Queries.GetBands;
 
-public enum BandSortBy { FormedYear, Name }
+public enum BandSortBy { FormedYear, Name, CreatedAt }
 
 public record GetBandsQuery(
     PaginationRequest PaginationRequest,

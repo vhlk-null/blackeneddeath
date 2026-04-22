@@ -31,6 +31,9 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
             AlbumSortBy.Title => desc
                 ? albumsQuery.OrderByDescending(a => a.Title)
                 : albumsQuery.OrderBy(a => a.Title),
+            AlbumSortBy.CreatedAt => desc
+                ? albumsQuery.OrderByDescending(a => a.CreatedAt)
+                : albumsQuery.OrderBy(a => a.CreatedAt),
             _ => desc
                 ? albumsQuery.OrderByDescending(a => a.AlbumRelease.ReleaseYear)
                 : albumsQuery.OrderBy(a => a.AlbumRelease.ReleaseYear)
