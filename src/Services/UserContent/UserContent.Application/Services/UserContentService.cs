@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace UserContent.Application.Services;
 
@@ -218,12 +218,13 @@ public class UserContentService(
         return (band.AverageRating, band.RatingsCount);
     }
 
-    public async Task<PaginatedResult<AlbumCardDto>> GetTopRatedAlbumsAsync(PaginationRequest pagination, RatingPeriod period, SortDir sortDir = SortDir.Desc, CancellationToken ct = default)
+    public async Task<PaginatedResult<AlbumCardDto>> GetTopRatedAlbumsAsync(PaginationRequest pagination, RatingPeriod period, SortDir sortDir = SortDir.Desc, ISpecification<Album>? filter = null, CancellationToken ct = default)
     {
         bool desc = sortDir == SortDir.Desc;
         if (period == RatingPeriod.All)
         {
             IQueryable<Album> baseAlbums = repo.All<Album>().Where(a => a.Slug != null && a.Slug != "");
+            if (filter is not null) baseAlbums = baseAlbums.Where(filter.Criteria);
             IQueryable<Album> query = desc
                 ? baseAlbums.OrderByDescending(a => a.AverageRating.HasValue).ThenByDescending(a => a.AverageRating).ThenByDescending(a => a.RatingsCount)
                 : baseAlbums.OrderBy(a => a.AverageRating.HasValue).ThenBy(a => a.AverageRating).ThenBy(a => a.RatingsCount);
@@ -251,8 +252,10 @@ public class UserContentService(
             .GroupBy(r => r.AlbumId)
             .Select(g => new { AlbumId = g.Key, Avg = (double?)g.Average(r => (double)r.Rating!.Value), Count = g.Count() });
 
-        var periodData = await repo.All<Album>()
-            .Where(a => a.Slug != null && a.Slug != "")
+        IQueryable<Album> periodBase = repo.All<Album>().Where(a => a.Slug != null && a.Slug != "");
+        if (filter is not null) periodBase = periodBase.Where(filter.Criteria);
+
+        var periodData = await periodBase
             .GroupJoin(grouped, a => a.Id, g => g.AlbumId, (a, ratings) => new { Album = a, Ratings = ratings })
             .SelectMany(x => x.Ratings.DefaultIfEmpty(), (x, r) => new
             {
@@ -280,12 +283,13 @@ public class UserContentService(
         return new PaginatedResult<AlbumCardDto>(pagination.PageIndex, pagination.PageSize, periodCount, page);
     }
 
-    public async Task<PaginatedResult<BandCardDto>> GetTopRatedBandsAsync(PaginationRequest pagination, RatingPeriod period, SortDir sortDir = SortDir.Desc, CancellationToken ct = default)
+    public async Task<PaginatedResult<BandCardDto>> GetTopRatedBandsAsync(PaginationRequest pagination, RatingPeriod period, SortDir sortDir = SortDir.Desc, ISpecification<Band>? filter = null, CancellationToken ct = default)
     {
         bool desc = sortDir == SortDir.Desc;
         if (period == RatingPeriod.All)
         {
             IQueryable<Band> baseBands = repo.All<Band>().Where(b => b.Slug != null && b.Slug != "");
+            if (filter is not null) baseBands = baseBands.Where(filter.Criteria);
             IQueryable<Band> query = desc
                 ? baseBands.OrderByDescending(b => b.AverageRating.HasValue).ThenByDescending(b => b.AverageRating).ThenByDescending(b => b.RatingsCount)
                 : baseBands.OrderBy(b => b.AverageRating.HasValue).ThenBy(b => b.AverageRating).ThenBy(b => b.RatingsCount);
@@ -312,8 +316,10 @@ public class UserContentService(
             .GroupBy(r => r.BandId)
             .Select(g => new { BandId = g.Key, Avg = (double?)g.Average(r => (double)r.Rating!.Value), Count = g.Count() });
 
-        var periodData = await repo.All<Band>()
-            .Where(b => b.Slug != null && b.Slug != "")
+        IQueryable<Band> periodBase = repo.All<Band>().Where(b => b.Slug != null && b.Slug != "");
+        if (filter is not null) periodBase = periodBase.Where(filter.Criteria);
+
+        var periodData = await periodBase
             .GroupJoin(grouped, b => b.BandId, g => g.BandId, (b, ratings) => new { Band = b, Ratings = ratings })
             .SelectMany(x => x.Ratings.DefaultIfEmpty(), (x, r) => new
             {

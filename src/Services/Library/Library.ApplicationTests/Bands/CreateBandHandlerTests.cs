@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using FluentAssertions;
 using Library.Application.Data;
 using Library.Application.Dtos;
@@ -11,7 +12,6 @@ using Library.Domain.ValueObjects.Ids;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System.Security.Claims;
 using Xunit;
 
 namespace Library.ApplicationTests.Bands;

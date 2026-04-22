@@ -1,9 +1,9 @@
 using IdentityServer.Data;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
-using Npgsql;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

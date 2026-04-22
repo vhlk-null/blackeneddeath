@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UserContent.API.Endpoints.Collections;
 
