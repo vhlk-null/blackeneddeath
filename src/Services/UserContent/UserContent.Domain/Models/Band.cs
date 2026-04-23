@@ -18,4 +18,5 @@ public class Band
     public List<FavoriteBand> FavoriteBands { get; set; } = new();
     public List<BandReview> Reviews { get; set; } = new();
     public List<CollectionBand> CollectionBands { get; set; } = new();
+    public List<BandComment> Comments { get; set; } = new();
 }

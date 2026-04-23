@@ -821,4 +821,144 @@ public class UserContentService(
         repo.Delete(cb);
         await repo.SaveChangesAsync(ct);
     }
+
+    public async Task<PaginatedResult<CommentDto>> GetAlbumCommentsAsync(Guid albumId, int pageIndex, int pageSize, CancellationToken ct = default)
+    {
+        IQueryable<AlbumComment> baseQuery = repo.Filter<AlbumComment>(
+            c => c.AlbumId == albumId && c.ParentCommentId == null, asTracked: false)
+            .Include(c => c.Replies)
+            .OrderByDescending(c => c.CreatedAt);
+
+        int totalCount = await repo.Filter<AlbumComment>(c => c.AlbumId == albumId && c.ParentCommentId == null, asTracked: false).CountAsync(ct);
+
+        List<AlbumComment> comments = await baseQuery
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        List<CommentDto> items = comments.Select(MapAlbumComment).ToList();
+        return new PaginatedResult<CommentDto>(pageIndex, pageSize, totalCount, items);
+    }
+
+    public async Task<CommentDto> CreateAlbumCommentAsync(CreateAlbumCommentRequest request, CancellationToken ct = default)
+    {
+        await EnsureUserProfileAsync(request.UserId, ct);
+
+        if (request.ParentCommentId.HasValue)
+        {
+            bool parentExists = await repo.Filter<AlbumComment>(
+                c => c.Id == request.ParentCommentId.Value && c.AlbumId == request.AlbumId, asTracked: false).AnyAsync(ct);
+            if (!parentExists)
+                throw new AlbumCommentNotFoundException(request.ParentCommentId.Value);
+        }
+
+        AlbumComment comment = new()
+        {
+            Id = Guid.NewGuid(),
+            AlbumId = request.AlbumId,
+            UserId = request.UserId,
+            Username = request.Username,
+            Body = request.Body,
+            ParentCommentId = request.ParentCommentId,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await repo.AddAsync(comment, ct);
+        await repo.SaveChangesAsync(ct);
+        return MapAlbumComment(comment);
+    }
+
+    public async Task<CommentDto> UpdateAlbumCommentAsync(Guid commentId, UpdateCommentRequest request, CancellationToken ct = default)
+    {
+        AlbumComment comment = await repo.GetByAsync<AlbumComment>(c => c.Id == commentId, cancellationToken: ct)
+            ?? throw new AlbumCommentNotFoundException(commentId);
+
+        comment.Body = request.Body;
+        comment.UpdatedAt = DateTime.UtcNow;
+        await repo.SaveChangesAsync(ct);
+        return MapAlbumComment(comment);
+    }
+
+    public async Task DeleteAlbumCommentAsync(Guid commentId, CancellationToken ct = default)
+    {
+        AlbumComment comment = await repo.GetByAsync<AlbumComment>(c => c.Id == commentId, cancellationToken: ct)
+            ?? throw new AlbumCommentNotFoundException(commentId);
+
+        repo.Delete(comment);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    public async Task<PaginatedResult<CommentDto>> GetBandCommentsAsync(Guid bandId, int pageIndex, int pageSize, CancellationToken ct = default)
+    {
+        IQueryable<BandComment> baseQuery = repo.Filter<BandComment>(
+            c => c.BandId == bandId && c.ParentCommentId == null, asTracked: false)
+            .Include(c => c.Replies)
+            .OrderByDescending(c => c.CreatedAt);
+
+        int totalCount = await repo.Filter<BandComment>(c => c.BandId == bandId && c.ParentCommentId == null, asTracked: false).CountAsync(ct);
+
+        List<BandComment> comments = await baseQuery
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        List<CommentDto> items = comments.Select(MapBandComment).ToList();
+        return new PaginatedResult<CommentDto>(pageIndex, pageSize, totalCount, items);
+    }
+
+    public async Task<CommentDto> CreateBandCommentAsync(CreateBandCommentRequest request, CancellationToken ct = default)
+    {
+        await EnsureUserProfileAsync(request.UserId, ct);
+
+        if (request.ParentCommentId.HasValue)
+        {
+            bool parentExists = await repo.Filter<BandComment>(
+                c => c.Id == request.ParentCommentId.Value && c.BandId == request.BandId, asTracked: false).AnyAsync(ct);
+            if (!parentExists)
+                throw new BandCommentNotFoundException(request.ParentCommentId.Value);
+        }
+
+        BandComment comment = new()
+        {
+            Id = Guid.NewGuid(),
+            BandId = request.BandId,
+            UserId = request.UserId,
+            Username = request.Username,
+            Body = request.Body,
+            ParentCommentId = request.ParentCommentId,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await repo.AddAsync(comment, ct);
+        await repo.SaveChangesAsync(ct);
+        return MapBandComment(comment);
+    }
+
+    public async Task<CommentDto> UpdateBandCommentAsync(Guid commentId, UpdateCommentRequest request, CancellationToken ct = default)
+    {
+        BandComment comment = await repo.GetByAsync<BandComment>(c => c.Id == commentId, cancellationToken: ct)
+            ?? throw new BandCommentNotFoundException(commentId);
+
+        comment.Body = request.Body;
+        comment.UpdatedAt = DateTime.UtcNow;
+        await repo.SaveChangesAsync(ct);
+        return MapBandComment(comment);
+    }
+
+    public async Task DeleteBandCommentAsync(Guid commentId, CancellationToken ct = default)
+    {
+        BandComment comment = await repo.GetByAsync<BandComment>(c => c.Id == commentId, cancellationToken: ct)
+            ?? throw new BandCommentNotFoundException(commentId);
+
+        repo.Delete(comment);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    private static CommentDto MapAlbumComment(AlbumComment c) =>
+        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.CreatedAt, c.UpdatedAt,
+            c.Replies.Select(MapAlbumComment).ToList());
+
+    private static CommentDto MapBandComment(BandComment c) =>
+        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.CreatedAt, c.UpdatedAt,
+            c.Replies.Select(MapBandComment).ToList());
 }

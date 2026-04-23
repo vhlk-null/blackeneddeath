@@ -20,6 +20,8 @@ public class UserContentContext : DbContext
     public virtual DbSet<Collection> Collections { get; set; }
     public virtual DbSet<CollectionAlbum> CollectionAlbums { get; set; }
     public virtual DbSet<CollectionBand> CollectionBands { get; set; }
+    public virtual DbSet<AlbumComment> AlbumComments { get; set; }
+    public virtual DbSet<BandComment> BandComments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,5 +37,7 @@ public class UserContentContext : DbContext
         modelBuilder.SetupCollection();
         modelBuilder.SetupCollectionAlbum();
         modelBuilder.SetupCollectionBand();
+        modelBuilder.SetupAlbumComment();
+        modelBuilder.SetupBandComment();
     }
 }

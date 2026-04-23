@@ -43,4 +43,14 @@ public interface IUserContentService
     Task RemoveAlbumFromCollectionAsync(Guid collectionId, Guid albumId, CancellationToken ct = default);
     Task AddBandToCollectionAsync(Guid collectionId, Guid bandId, CancellationToken ct = default);
     Task RemoveBandFromCollectionAsync(Guid collectionId, Guid bandId, CancellationToken ct = default);
+
+    Task<PaginatedResult<CommentDto>> GetAlbumCommentsAsync(Guid albumId, int pageIndex, int pageSize, CancellationToken ct = default);
+    Task<CommentDto> CreateAlbumCommentAsync(CreateAlbumCommentRequest request, CancellationToken ct = default);
+    Task<CommentDto> UpdateAlbumCommentAsync(Guid commentId, UpdateCommentRequest request, CancellationToken ct = default);
+    Task DeleteAlbumCommentAsync(Guid commentId, CancellationToken ct = default);
+
+    Task<PaginatedResult<CommentDto>> GetBandCommentsAsync(Guid bandId, int pageIndex, int pageSize, CancellationToken ct = default);
+    Task<CommentDto> CreateBandCommentAsync(CreateBandCommentRequest request, CancellationToken ct = default);
+    Task<CommentDto> UpdateBandCommentAsync(Guid commentId, UpdateCommentRequest request, CancellationToken ct = default);
+    Task DeleteBandCommentAsync(Guid commentId, CancellationToken ct = default);
 }

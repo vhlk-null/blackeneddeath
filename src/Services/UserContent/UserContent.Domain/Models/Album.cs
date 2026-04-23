@@ -22,4 +22,5 @@ public class Album
     public List<FavoriteAlbum> FavoriteAlbums { get; set; } = new();
     public List<AlbumReview> Reviews { get; set; } = new();
     public List<CollectionAlbum> CollectionAlbums { get; set; } = new();
+    public List<AlbumComment> Comments { get; set; } = new();
 }

@@ -389,7 +389,105 @@ public static class UserContentModelBuilderExtensions
         });
     }
 
-public static void SetupBandReview(this ModelBuilder modelBuilder)
+public static void SetupAlbumComment(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<AlbumComment>(entity =>
+        {
+            entity.ToTable("album_comments");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.AlbumId)
+                .HasColumnName("album_id");
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.Username)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("username");
+
+            entity.Property(e => e.Body)
+                .IsRequired()
+                .HasColumnType("text")
+                .HasColumnName("body");
+
+            entity.Property(e => e.ParentCommentId)
+                .HasColumnName("parent_comment_id");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at");
+
+            entity.HasOne(e => e.Album)
+                .WithMany(a => a.Comments)
+                .HasForeignKey(e => e.AlbumId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.ParentComment)
+                .WithMany(c => c.Replies)
+                .HasForeignKey(e => e.ParentCommentId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    public static void SetupBandComment(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BandComment>(entity =>
+        {
+            entity.ToTable("band_comments");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .HasColumnName("id")
+                .ValueGeneratedNever();
+
+            entity.Property(e => e.BandId)
+                .HasColumnName("band_id");
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.Username)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("username");
+
+            entity.Property(e => e.Body)
+                .IsRequired()
+                .HasColumnType("text")
+                .HasColumnName("body");
+
+            entity.Property(e => e.ParentCommentId)
+                .HasColumnName("parent_comment_id");
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at");
+
+            entity.HasOne(e => e.Band)
+                .WithMany(b => b.Comments)
+                .HasForeignKey(e => e.BandId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.ParentComment)
+                .WithMany(c => c.Replies)
+                .HasForeignKey(e => e.ParentCommentId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    public static void SetupBandReview(this ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BandReview>(entity =>
         {
