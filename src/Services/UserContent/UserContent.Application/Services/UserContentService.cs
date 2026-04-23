@@ -824,19 +824,21 @@ public class UserContentService(
 
     public async Task<PaginatedResult<CommentDto>> GetAlbumCommentsAsync(Guid albumId, int pageIndex, int pageSize, CancellationToken ct = default)
     {
-        IQueryable<AlbumComment> baseQuery = repo.Filter<AlbumComment>(
-            c => c.AlbumId == albumId && c.ParentCommentId == null, asTracked: false)
-            .Include(c => c.Replies)
-            .OrderByDescending(c => c.CreatedAt);
-
-        int totalCount = await repo.Filter<AlbumComment>(c => c.AlbumId == albumId && c.ParentCommentId == null, asTracked: false).CountAsync(ct);
-
-        List<AlbumComment> comments = await baseQuery
-            .Skip((pageIndex - 1) * pageSize)
-            .Take(pageSize)
+        List<AlbumComment> all = await repo.Filter<AlbumComment>(c => c.AlbumId == albumId, asTracked: false)
+            .OrderByDescending(c => c.CreatedAt)
             .ToListAsync(ct);
 
-        List<CommentDto> items = comments.Select(MapAlbumComment).ToList();
+        ILookup<Guid?, AlbumComment> byParent = all.ToLookup(c => c.ParentCommentId);
+
+        List<AlbumComment> roots = byParent[null].ToList();
+        int totalCount = roots.Count;
+
+        List<CommentDto> items = roots
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .Select(c => MapAlbumComment(c, byParent))
+            .ToList();
+
         return new PaginatedResult<CommentDto>(pageIndex, pageSize, totalCount, items);
     }
 
@@ -860,6 +862,8 @@ public class UserContentService(
             Username = request.Username,
             Body = request.Body,
             ParentCommentId = request.ParentCommentId,
+            ReplyToCommentId = request.ReplyToCommentId,
+            ReplyToUsername = request.ReplyToUsername,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -890,19 +894,21 @@ public class UserContentService(
 
     public async Task<PaginatedResult<CommentDto>> GetBandCommentsAsync(Guid bandId, int pageIndex, int pageSize, CancellationToken ct = default)
     {
-        IQueryable<BandComment> baseQuery = repo.Filter<BandComment>(
-            c => c.BandId == bandId && c.ParentCommentId == null, asTracked: false)
-            .Include(c => c.Replies)
-            .OrderByDescending(c => c.CreatedAt);
-
-        int totalCount = await repo.Filter<BandComment>(c => c.BandId == bandId && c.ParentCommentId == null, asTracked: false).CountAsync(ct);
-
-        List<BandComment> comments = await baseQuery
-            .Skip((pageIndex - 1) * pageSize)
-            .Take(pageSize)
+        List<BandComment> all = await repo.Filter<BandComment>(c => c.BandId == bandId, asTracked: false)
+            .OrderByDescending(c => c.CreatedAt)
             .ToListAsync(ct);
 
-        List<CommentDto> items = comments.Select(MapBandComment).ToList();
+        ILookup<Guid?, BandComment> byParent = all.ToLookup(c => c.ParentCommentId);
+
+        List<BandComment> roots = byParent[null].ToList();
+        int totalCount = roots.Count;
+
+        List<CommentDto> items = roots
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .Select(c => MapBandComment(c, byParent))
+            .ToList();
+
         return new PaginatedResult<CommentDto>(pageIndex, pageSize, totalCount, items);
     }
 
@@ -926,6 +932,8 @@ public class UserContentService(
             Username = request.Username,
             Body = request.Body,
             ParentCommentId = request.ParentCommentId,
+            ReplyToCommentId = request.ReplyToCommentId,
+            ReplyToUsername = request.ReplyToUsername,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -942,7 +950,7 @@ public class UserContentService(
         comment.Body = request.Body;
         comment.UpdatedAt = DateTime.UtcNow;
         await repo.SaveChangesAsync(ct);
-        return MapBandComment(comment);
+        return MapBandComment(comment);  // no replies needed for single-comment responses
     }
 
     public async Task DeleteBandCommentAsync(Guid commentId, CancellationToken ct = default)
@@ -955,10 +963,16 @@ public class UserContentService(
     }
 
     private static CommentDto MapAlbumComment(AlbumComment c) =>
-        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.CreatedAt, c.UpdatedAt,
-            c.Replies.Select(MapAlbumComment).ToList());
+        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername, c.CreatedAt, c.UpdatedAt, []);
+
+    private static CommentDto MapAlbumComment(AlbumComment c, ILookup<Guid?, AlbumComment> byParent) =>
+        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername, c.CreatedAt, c.UpdatedAt,
+            byParent[c.Id].Select(r => MapAlbumComment(r, byParent)).ToList());
 
     private static CommentDto MapBandComment(BandComment c) =>
-        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.CreatedAt, c.UpdatedAt,
-            c.Replies.Select(MapBandComment).ToList());
+        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername, c.CreatedAt, c.UpdatedAt, []);
+
+    private static CommentDto MapBandComment(BandComment c, ILookup<Guid?, BandComment> byParent) =>
+        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername, c.CreatedAt, c.UpdatedAt,
+            byParent[c.Id].Select(r => MapBandComment(r, byParent)).ToList());
 }

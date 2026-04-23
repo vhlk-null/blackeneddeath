@@ -44,13 +44,17 @@ public interface IUserContentService
     Task AddBandToCollectionAsync(Guid collectionId, Guid bandId, CancellationToken ct = default);
     Task RemoveBandFromCollectionAsync(Guid collectionId, Guid bandId, CancellationToken ct = default);
 
-    Task<PaginatedResult<CommentDto>> GetAlbumCommentsAsync(Guid albumId, int pageIndex, int pageSize, CancellationToken ct = default);
+    Task<PaginatedResult<CommentDto>> GetAlbumCommentsAsync(Guid albumId, int pageIndex, int pageSize, Guid? requestingUserId = null, CancellationToken ct = default);
     Task<CommentDto> CreateAlbumCommentAsync(CreateAlbumCommentRequest request, CancellationToken ct = default);
     Task<CommentDto> UpdateAlbumCommentAsync(Guid commentId, UpdateCommentRequest request, CancellationToken ct = default);
     Task DeleteAlbumCommentAsync(Guid commentId, CancellationToken ct = default);
+    Task<CommentDto> ReactToAlbumCommentAsync(Guid commentId, ReactToCommentRequest request, CancellationToken ct = default);
+    Task DeleteAlbumCommentReactionAsync(Guid commentId, Guid userId, CancellationToken ct = default);
 
-    Task<PaginatedResult<CommentDto>> GetBandCommentsAsync(Guid bandId, int pageIndex, int pageSize, CancellationToken ct = default);
+    Task<PaginatedResult<CommentDto>> GetBandCommentsAsync(Guid bandId, int pageIndex, int pageSize, Guid? requestingUserId = null, CancellationToken ct = default);
     Task<CommentDto> CreateBandCommentAsync(CreateBandCommentRequest request, CancellationToken ct = default);
     Task<CommentDto> UpdateBandCommentAsync(Guid commentId, UpdateCommentRequest request, CancellationToken ct = default);
     Task DeleteBandCommentAsync(Guid commentId, CancellationToken ct = default);
+    Task<CommentDto> ReactToBandCommentAsync(Guid commentId, ReactToCommentRequest request, CancellationToken ct = default);
+    Task DeleteBandCommentReactionAsync(Guid commentId, Guid userId, CancellationToken ct = default);
 }

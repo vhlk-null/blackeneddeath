@@ -420,6 +420,13 @@ public static void SetupAlbumComment(this ModelBuilder modelBuilder)
             entity.Property(e => e.ParentCommentId)
                 .HasColumnName("parent_comment_id");
 
+            entity.Property(e => e.ReplyToCommentId)
+                .HasColumnName("reply_to_comment_id");
+
+            entity.Property(e => e.ReplyToUsername)
+                .HasMaxLength(100)
+                .HasColumnName("reply_to_username");
+
             entity.Property(e => e.CreatedAt)
                 .HasColumnName("created_at");
 
@@ -469,6 +476,13 @@ public static void SetupAlbumComment(this ModelBuilder modelBuilder)
             entity.Property(e => e.ParentCommentId)
                 .HasColumnName("parent_comment_id");
 
+            entity.Property(e => e.ReplyToCommentId)
+                .HasColumnName("reply_to_comment_id");
+
+            entity.Property(e => e.ReplyToUsername)
+                .HasMaxLength(100)
+                .HasColumnName("reply_to_username");
+
             entity.Property(e => e.CreatedAt)
                 .HasColumnName("created_at");
 
@@ -484,6 +498,70 @@ public static void SetupAlbumComment(this ModelBuilder modelBuilder)
                 .WithMany(c => c.Replies)
                 .HasForeignKey(e => e.ParentCommentId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    public static void SetupAlbumCommentReaction(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<AlbumCommentReaction>(entity =>
+        {
+            entity.ToTable("album_comment_reactions");
+
+            entity.HasKey(e => new { e.UserId, e.CommentId });
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.CommentId)
+                .HasColumnName("comment_id");
+
+            entity.Property(e => e.IsLike)
+                .HasColumnName("is_like");
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.AlbumCommentReactions)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Comment)
+                .WithMany(c => c.Reactions)
+                .HasForeignKey(e => e.CommentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.CommentId)
+                .HasDatabaseName("IX_album_comment_reactions_comment_id");
+        });
+    }
+
+    public static void SetupBandCommentReaction(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BandCommentReaction>(entity =>
+        {
+            entity.ToTable("band_comment_reactions");
+
+            entity.HasKey(e => new { e.UserId, e.CommentId });
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.CommentId)
+                .HasColumnName("comment_id");
+
+            entity.Property(e => e.IsLike)
+                .HasColumnName("is_like");
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.BandCommentReactions)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Comment)
+                .WithMany(c => c.Reactions)
+                .HasForeignKey(e => e.CommentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.CommentId)
+                .HasDatabaseName("IX_band_comment_reactions_comment_id");
         });
     }
 

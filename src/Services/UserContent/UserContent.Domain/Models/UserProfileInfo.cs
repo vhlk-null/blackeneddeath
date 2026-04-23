@@ -15,4 +15,6 @@ public class UserProfileInfo
     public List<FavoriteAlbum> FavoriteAlbums { get; set; } = new();
     public List<FavoriteBand> FavoriteBands { get; set; } = new();
     public List<Collection> Collections { get; set; } = new();
+    public List<AlbumCommentReaction> AlbumCommentReactions { get; set; } = new();
+    public List<BandCommentReaction> BandCommentReactions { get; set; } = new();
 }
