@@ -9,9 +9,9 @@ public class BandCommentsController(IUserContentService service) : ControllerBas
     [HttpGet("{bandId:guid}")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(PaginatedResult<CommentDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetBandComments(Guid bandId, CancellationToken ct, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 20)
+    public async Task<IActionResult> GetBandComments(Guid bandId, CancellationToken ct, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 20, [FromQuery] Guid? userId = null)
     {
-        PaginatedResult<CommentDto> result = await service.GetBandCommentsAsync(bandId, pageIndex, pageSize, ct);
+        PaginatedResult<CommentDto> result = await service.GetBandCommentsAsync(bandId, pageIndex, pageSize, userId, ct);
         return Ok(result);
     }
 
@@ -39,6 +39,24 @@ public class BandCommentsController(IUserContentService service) : ControllerBas
     public async Task<IActionResult> DeleteBandComment(Guid commentId, CancellationToken ct)
     {
         await service.DeleteBandCommentAsync(commentId, ct);
+        return NoContent();
+    }
+
+    [HttpPost("{commentId:guid}/reactions")]
+    [ProducesResponseType(typeof(CommentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ReactToBandComment(Guid commentId, ReactToCommentRequest request, CancellationToken ct)
+    {
+        CommentDto comment = await service.ReactToBandCommentAsync(commentId, request, ct);
+        return Ok(comment);
+    }
+
+    [HttpDelete("{commentId:guid}/reactions/{userId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteBandCommentReaction(Guid commentId, Guid userId, CancellationToken ct)
+    {
+        await service.DeleteBandCommentReactionAsync(commentId, userId, ct);
         return NoContent();
     }
 }

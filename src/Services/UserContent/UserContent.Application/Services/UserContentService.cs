@@ -822,9 +822,10 @@ public class UserContentService(
         await repo.SaveChangesAsync(ct);
     }
 
-    public async Task<PaginatedResult<CommentDto>> GetAlbumCommentsAsync(Guid albumId, int pageIndex, int pageSize, CancellationToken ct = default)
+    public async Task<PaginatedResult<CommentDto>> GetAlbumCommentsAsync(Guid albumId, int pageIndex, int pageSize, Guid? requestingUserId = null, CancellationToken ct = default)
     {
         List<AlbumComment> all = await repo.Filter<AlbumComment>(c => c.AlbumId == albumId, asTracked: false)
+            .Include(c => c.Reactions)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync(ct);
 
@@ -836,7 +837,7 @@ public class UserContentService(
         List<CommentDto> items = roots
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
-            .Select(c => MapAlbumComment(c, byParent))
+            .Select(c => MapAlbumComment(c, byParent, requestingUserId))
             .ToList();
 
         return new PaginatedResult<CommentDto>(pageIndex, pageSize, totalCount, items);
@@ -892,9 +893,10 @@ public class UserContentService(
         await repo.SaveChangesAsync(ct);
     }
 
-    public async Task<PaginatedResult<CommentDto>> GetBandCommentsAsync(Guid bandId, int pageIndex, int pageSize, CancellationToken ct = default)
+    public async Task<PaginatedResult<CommentDto>> GetBandCommentsAsync(Guid bandId, int pageIndex, int pageSize, Guid? requestingUserId = null, CancellationToken ct = default)
     {
         List<BandComment> all = await repo.Filter<BandComment>(c => c.BandId == bandId, asTracked: false)
+            .Include(c => c.Reactions)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync(ct);
 
@@ -906,7 +908,7 @@ public class UserContentService(
         List<CommentDto> items = roots
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
-            .Select(c => MapBandComment(c, byParent))
+            .Select(c => MapBandComment(c, byParent, requestingUserId))
             .ToList();
 
         return new PaginatedResult<CommentDto>(pageIndex, pageSize, totalCount, items);
@@ -962,17 +964,83 @@ public class UserContentService(
         await repo.SaveChangesAsync(ct);
     }
 
-    private static CommentDto MapAlbumComment(AlbumComment c) =>
-        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername, c.CreatedAt, c.UpdatedAt, []);
+    public async Task<CommentDto> ReactToAlbumCommentAsync(Guid commentId, ReactToCommentRequest request, CancellationToken ct = default)
+    {
+        AlbumComment comment = await repo.Filter<AlbumComment>(c => c.Id == commentId, asTracked: true)
+            .Include(c => c.Reactions)
+            .FirstOrDefaultAsync(ct)
+            ?? throw new AlbumCommentNotFoundException(commentId);
 
-    private static CommentDto MapAlbumComment(AlbumComment c, ILookup<Guid?, AlbumComment> byParent) =>
-        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername, c.CreatedAt, c.UpdatedAt,
-            byParent[c.Id].Select(r => MapAlbumComment(r, byParent)).ToList());
+        AlbumCommentReaction? existing = comment.Reactions.FirstOrDefault(r => r.UserId == request.UserId);
+        if (existing is not null)
+            existing.IsLike = request.IsLike;
+        else
+            comment.Reactions.Add(new AlbumCommentReaction { UserId = request.UserId, CommentId = commentId, IsLike = request.IsLike });
 
-    private static CommentDto MapBandComment(BandComment c) =>
-        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername, c.CreatedAt, c.UpdatedAt, []);
+        await repo.SaveChangesAsync(ct);
+        return MapAlbumComment(comment, null);
+    }
 
-    private static CommentDto MapBandComment(BandComment c, ILookup<Guid?, BandComment> byParent) =>
-        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername, c.CreatedAt, c.UpdatedAt,
-            byParent[c.Id].Select(r => MapBandComment(r, byParent)).ToList());
+    public async Task DeleteAlbumCommentReactionAsync(Guid commentId, Guid userId, CancellationToken ct = default)
+    {
+        AlbumCommentReaction reaction = await repo.GetByAsync<AlbumCommentReaction>(
+            r => r.CommentId == commentId && r.UserId == userId, cancellationToken: ct)
+            ?? throw new AlbumCommentReactionNotFoundException(commentId, userId);
+
+        repo.Delete(reaction);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    public async Task<CommentDto> ReactToBandCommentAsync(Guid commentId, ReactToCommentRequest request, CancellationToken ct = default)
+    {
+        BandComment comment = await repo.Filter<BandComment>(c => c.Id == commentId, asTracked: true)
+            .Include(c => c.Reactions)
+            .FirstOrDefaultAsync(ct)
+            ?? throw new BandCommentNotFoundException(commentId);
+
+        BandCommentReaction? existing = comment.Reactions.FirstOrDefault(r => r.UserId == request.UserId);
+        if (existing is not null)
+            existing.IsLike = request.IsLike;
+        else
+            comment.Reactions.Add(new BandCommentReaction { UserId = request.UserId, CommentId = commentId, IsLike = request.IsLike });
+
+        await repo.SaveChangesAsync(ct);
+        return MapBandComment(comment, null);
+    }
+
+    public async Task DeleteBandCommentReactionAsync(Guid commentId, Guid userId, CancellationToken ct = default)
+    {
+        BandCommentReaction reaction = await repo.GetByAsync<BandCommentReaction>(
+            r => r.CommentId == commentId && r.UserId == userId, cancellationToken: ct)
+            ?? throw new BandCommentReactionNotFoundException(commentId, userId);
+
+        repo.Delete(reaction);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    private static CommentDto MapAlbumComment(AlbumComment c, Guid? userId = null) =>
+        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername,
+            c.Reactions.Count(r => r.IsLike), c.Reactions.Count(r => !r.IsLike),
+            userId.HasValue ? c.Reactions.FirstOrDefault(r => r.UserId == userId.Value)?.IsLike : null,
+            c.CreatedAt, c.UpdatedAt, []);
+
+    private static CommentDto MapAlbumComment(AlbumComment c, ILookup<Guid?, AlbumComment>? byParent, Guid? userId = null) =>
+        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername,
+            c.Reactions.Count(r => r.IsLike), c.Reactions.Count(r => !r.IsLike),
+            userId.HasValue ? c.Reactions.FirstOrDefault(r => r.UserId == userId.Value)?.IsLike : null,
+            c.CreatedAt, c.UpdatedAt,
+            byParent is null ? [] : byParent[c.Id].Select(r => MapAlbumComment(r, byParent, userId)).ToList());
+
+    private static CommentDto MapBandComment(BandComment c, Guid? userId = null) =>
+        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername,
+            c.Reactions.Count(r => r.IsLike), c.Reactions.Count(r => !r.IsLike),
+            userId.HasValue ? c.Reactions.FirstOrDefault(r => r.UserId == userId.Value)?.IsLike : null,
+            c.CreatedAt, c.UpdatedAt, []);
+
+    private static CommentDto MapBandComment(BandComment c, ILookup<Guid?, BandComment>? byParent, Guid? userId = null) =>
+        new(c.Id, c.UserId, c.Username, c.Body, c.ParentCommentId, c.ReplyToCommentId, c.ReplyToUsername,
+            c.Reactions.Count(r => r.IsLike), c.Reactions.Count(r => !r.IsLike),
+            userId.HasValue ? c.Reactions.FirstOrDefault(r => r.UserId == userId.Value)?.IsLike : null,
+            c.CreatedAt, c.UpdatedAt,
+            byParent is null ? [] : byParent[c.Id].Select(r => MapBandComment(r, byParent, userId)).ToList());
 }
