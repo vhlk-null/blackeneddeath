@@ -824,19 +824,24 @@ public class UserContentService(
 
     public async Task<PaginatedResult<CommentDto>> GetAlbumCommentsAsync(Guid albumId, int pageIndex, int pageSize, Guid? requestingUserId = null, CancellationToken ct = default)
     {
-        List<AlbumComment> all = await repo.Filter<AlbumComment>(c => c.AlbumId == albumId, asTracked: false)
+        int totalCount = await repo.CountAsync<AlbumComment>(c => c.AlbumId == albumId && c.ParentCommentId == null, ct);
+
+        List<AlbumComment> roots = await repo.Filter<AlbumComment>(c => c.AlbumId == albumId && c.ParentCommentId == null, asTracked: false)
             .Include(c => c.Reactions)
             .OrderByDescending(c => c.CreatedAt)
-            .ToListAsync(ct);
-
-        ILookup<Guid?, AlbumComment> byParent = all.ToLookup(c => c.ParentCommentId);
-
-        List<AlbumComment> roots = byParent[null].ToList();
-        int totalCount = roots.Count;
-
-        List<CommentDto> items = roots
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
+            .ToListAsync(ct);
+
+        List<Guid> rootIds = roots.Select(c => c.Id).ToList();
+
+        List<AlbumComment> replies = await repo.Filter<AlbumComment>(c => c.AlbumId == albumId && c.ParentCommentId != null, asTracked: false)
+            .Include(c => c.Reactions)
+            .ToListAsync(ct);
+
+        ILookup<Guid?, AlbumComment> byParent = replies.ToLookup(c => c.ParentCommentId);
+
+        List<CommentDto> items = roots
             .Select(c => MapAlbumComment(c, byParent, requestingUserId))
             .ToList();
 
@@ -895,19 +900,22 @@ public class UserContentService(
 
     public async Task<PaginatedResult<CommentDto>> GetBandCommentsAsync(Guid bandId, int pageIndex, int pageSize, Guid? requestingUserId = null, CancellationToken ct = default)
     {
-        List<BandComment> all = await repo.Filter<BandComment>(c => c.BandId == bandId, asTracked: false)
+        int totalCount = await repo.CountAsync<BandComment>(c => c.BandId == bandId && c.ParentCommentId == null, ct);
+
+        List<BandComment> roots = await repo.Filter<BandComment>(c => c.BandId == bandId && c.ParentCommentId == null, asTracked: false)
             .Include(c => c.Reactions)
             .OrderByDescending(c => c.CreatedAt)
-            .ToListAsync(ct);
-
-        ILookup<Guid?, BandComment> byParent = all.ToLookup(c => c.ParentCommentId);
-
-        List<BandComment> roots = byParent[null].ToList();
-        int totalCount = roots.Count;
-
-        List<CommentDto> items = roots
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
+            .ToListAsync(ct);
+
+        List<BandComment> replies = await repo.Filter<BandComment>(c => c.BandId == bandId && c.ParentCommentId != null, asTracked: false)
+            .Include(c => c.Reactions)
+            .ToListAsync(ct);
+
+        ILookup<Guid?, BandComment> byParent = replies.ToLookup(c => c.ParentCommentId);
+
+        List<CommentDto> items = roots
             .Select(c => MapBandComment(c, byParent, requestingUserId))
             .ToList();
 
