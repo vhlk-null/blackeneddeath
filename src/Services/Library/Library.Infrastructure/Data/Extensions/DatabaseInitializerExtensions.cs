@@ -37,8 +37,11 @@ public static class DatabaseInitializerExtensions
         {
             logger.LogInformation("Initializing Meilisearch indexes...");
 
-            await client.CreateIndexAsync(SearchIndexes.Albums, "id");
-            await client.CreateIndexAsync(SearchIndexes.Bands, "id");
+            var albumsTask = await client.CreateIndexAsync(SearchIndexes.Albums, "id");
+            var bandsTask = await client.CreateIndexAsync(SearchIndexes.Bands, "id");
+            await Task.WhenAll(
+                client.WaitForTaskAsync(albumsTask.TaskUid),
+                client.WaitForTaskAsync(bandsTask.TaskUid));
 
             var typoTolerance = new TypoTolerance
             {
