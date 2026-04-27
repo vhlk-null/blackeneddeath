@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Bands.EventHandlers.Domain;
 
-public sealed class BandCreatedEventHandler(ILogger<BandCreatedEventHandler> logger, IPublishEndpoint publishEndpoint, ILibraryDbContext context, IStorageUrlResolver urlResolver)
+public sealed class BandCreatedEventHandler(ILogger<BandCreatedEventHandler> logger, IPublishEndpoint publishEndpoint, ILibraryDbContext context, IStorageUrlResolver urlResolver, ISearchService searchService)
     : INotificationHandler<BandCreatedEvent>
 {
     public async ValueTask Handle(BandCreatedEvent domainEvent, CancellationToken cancellationToken)
@@ -46,5 +46,18 @@ public sealed class BandCreatedEventHandler(ILogger<BandCreatedEventHandler> log
         };
 
         await publishEndpoint.Publish(integrationEvent, cancellationToken);
+
+        await searchService.IndexBandAsync(new BandSearchDocument(
+            band.Id.Value.ToString(),
+            band.Name,
+            band.Slug,
+            urlResolver.Resolve(band.LogoUrl),
+            band.Activity.FormedYear,
+            band.Activity.DisbandedYear,
+            band.Status.ToString(),
+            genres.Select(g => g.Name).ToList(),
+            countries.Select(c => c.Name).ToList(),
+            band.CreatedAt.HasValue ? new DateTimeOffset(band.CreatedAt.Value).ToUnixTimeSeconds() : 0
+        ), cancellationToken);
     }
 }

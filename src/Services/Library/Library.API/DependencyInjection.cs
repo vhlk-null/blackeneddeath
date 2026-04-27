@@ -7,12 +7,15 @@ public static class DependencyInjection
         services.ConfigureHttpJsonOptions(options =>
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-services.AddOpenApi();
+        services.AddOpenApi();
         services.AddMessageBroker(configuration);
         services.AddCarter();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
         services.AddGrpc();
+
+        services.AddSingleton(_ =>
+            new MeilisearchClient(configuration["Meilisearch:Url"]!, configuration["Meilisearch:ApiKey"]));
 
         // Auth is handled by YARP gateway; here we only check forwarded role header
         services.AddAuthentication("GatewayHeader")

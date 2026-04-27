@@ -1,5 +1,6 @@
 services:
   librarydb:
+    image: postgres:16
     container_name: librarydb
     environment:
       - POSTGRES_USER=postgres
@@ -17,6 +18,7 @@ services:
       retries: 5
 
   usercontentdb:
+    image: postgres:16
     container_name: usercontentdb
     environment:
       - POSTGRES_USER=postgres
@@ -33,7 +35,26 @@ services:
       timeout: 5s
       retries: 5
 
+  identitydb:
+    image: postgres:16
+    container_name: identitydb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=IdentityDb
+    restart: always
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_identity:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   messagebroker:
+    image: rabbitmq:management
     container_name: messagebroker
     hostname: blackenddeath
     environment:
@@ -52,6 +73,7 @@ services:
       retries: 5
 
   distributedcache:
+    image: redis:7.2
     container_name: distributedcache
     restart: always
     ports:
@@ -61,20 +83,20 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  identitydb:
-    container_name: identitydb
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=IdentityDb
+      
+  meilisearch:
+    image: getmeili/meilisearch:v1.12
+    container_name: meilisearch
     restart: always
     ports:
-      - "5436:5432"
+      - "7700:7700"
+    environment:
+      - MEILI_MASTER_KEY=BlackEndDeathMasterKey123!
+      - MEILI_ENV=development
     volumes:
-      - postgres_identity:/var/lib/postgresql/data/
+      - meilisearch_data:/meili_data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -106,8 +128,8 @@ services:
   library.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=
-      - ASPNETCORE_HTTPS_PORTS=
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
       - DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2UNENCRYPTEDSUPPORT=true
       - ConnectionStrings__LibraryDb=Host=librarydb;Port=5432;Database=LibraryDb;Username=postgres;Password=postgres
       - MessageBroker__Host=amqp://messagebroker:5672
@@ -118,10 +140,14 @@ services:
       - Storage__ApiKey=695255835435442
       - Storage__ApiSecret=IfARU4chBqqo_usv7spAL76YOL4
       - IdentityServer__Authority=http://identity.server:8080
+      - Meilisearch__Url=http://meilisearch:7700
+      - Meilisearch__ApiKey=BlackEndDeathMasterKey123!
     depends_on:
       librarydb:
         condition: service_healthy
       messagebroker:
+        condition: service_healthy
+      meilisearch:
         condition: service_healthy
       identity.server:
         condition: service_started
@@ -164,15 +190,6 @@ services:
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
-  blackenddeath.ui:
-    container_name: blackenddeath.ui
-    restart: always
-    ports:
-      - "4200:80"
-    depends_on:
-      yarpapigateway:
-        condition: service_started
-
   yarpapigateway:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -196,3 +213,20 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  blackenddeath.ui:
+    container_name: blackenddeath.ui
+    restart: always
+    ports:
+      - "4200:80"
+    depends_on:
+      yarpapigateway:
+        condition: service_started
+
+volumes:
+  postgres_library:
+  postgres_usercontent:
+  postgres_identity:
+  rabbitmq_data:
+  identity_dataprotection:
+  meilisearch_data:

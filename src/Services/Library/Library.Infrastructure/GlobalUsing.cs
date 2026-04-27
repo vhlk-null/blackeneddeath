@@ -1,4 +1,6 @@
 ﻿global using BuildingBlocks.Repositories;
+global using Library.Application.Search;
+global using Meilisearch;
 global using CloudinaryDotNet;
 global using CloudinaryDotNet.Actions;
 global using Library.Application.Data;

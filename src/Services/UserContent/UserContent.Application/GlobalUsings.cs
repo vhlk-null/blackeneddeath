@@ -14,7 +14,6 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
-global using StackExchange.Redis;
 global using UserContent.Application.Abstractions;
 global using UserContent.Application.Dtos;
 global using UserContent.Application.Enums;

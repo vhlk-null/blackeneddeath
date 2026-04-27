@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="CloudinaryDotNet" />
+    <PackageReference Include="MeiliSearch" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <PrivateAssets>all</PrivateAssets>

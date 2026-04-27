@@ -1,4 +1,5 @@
 using BuildingBlocks.Storage;
+using Library.Infrastructure.Search;
 
 namespace Library.Infrastructure;
 
@@ -31,6 +32,7 @@ public static class DependencyInjection
 
         services.AddScoped<ILibraryDbContext, LibraryContext>();
         services.AddScoped<IRepository<LibraryContext>, LibraryRepository>();
+        services.AddScoped<ISearchService, MeilisearchService>();
         return services;
     }
 }

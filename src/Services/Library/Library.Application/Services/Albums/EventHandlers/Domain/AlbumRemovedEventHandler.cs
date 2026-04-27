@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Albums.EventHandlers.Domain;
 
-public sealed class AlbumRemovedEventHandler(ILogger<AlbumRemovedEventHandler> logger, IPublishEndpoint publishEndpoint)
+public sealed class AlbumRemovedEventHandler(ILogger<AlbumRemovedEventHandler> logger, IPublishEndpoint publishEndpoint, ISearchService searchService)
     : INotificationHandler<AlbumRemovedEvent>
 {
     public async ValueTask Handle(AlbumRemovedEvent domainEvent, CancellationToken cancellationToken)
@@ -14,5 +14,7 @@ public sealed class AlbumRemovedEventHandler(ILogger<AlbumRemovedEventHandler> l
         };
 
         await publishEndpoint.Publish(integrationEvent, cancellationToken);
+
+        await searchService.RemoveAlbumAsync(domainEvent.Album.Id.Value.ToString(), cancellationToken);
     }
 }

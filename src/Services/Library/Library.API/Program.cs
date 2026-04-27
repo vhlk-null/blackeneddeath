@@ -14,6 +14,8 @@ app.UseApiServices();
 if (app.Environment.IsDevelopment())
     await app.InitializeDatabaseAsync();
 
+await app.InitializeMeilisearchAsync();
+
 using (IServiceScope warmUpScope = app.Services.CreateScope())
 {
     LibraryContext ctx = warmUpScope.ServiceProvider.GetRequiredService<LibraryContext>();

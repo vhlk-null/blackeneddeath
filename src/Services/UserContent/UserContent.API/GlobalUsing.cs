@@ -19,4 +19,3 @@ global using UserContent.Application.Services.Bands.Specifications;
 global using UserContent.Domain.Models;
 global using UserContent.Infrastructure;
 global using UserContent.Infrastructure.Data.Extensions;
-global using CollectionType = UserContent.Application.Enums.CollectionType;

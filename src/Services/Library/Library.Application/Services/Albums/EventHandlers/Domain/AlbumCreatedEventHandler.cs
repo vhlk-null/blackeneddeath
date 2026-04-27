@@ -4,7 +4,8 @@ public sealed class AlbumCreatedEventHandler(
     ILogger<AlbumCreatedEventHandler> logger,
     IPublishEndpoint publishEndpoint,
     ILibraryDbContext context,
-    IStorageUrlResolver urlResolver)
+    IStorageUrlResolver urlResolver,
+    ISearchService searchService)
     : INotificationHandler<AlbumCreatedEvent>
 {
     public async ValueTask Handle(AlbumCreatedEvent domainEvent, CancellationToken cancellationToken)
@@ -15,6 +16,7 @@ public sealed class AlbumCreatedEventHandler(
             .Include(a => a.AlbumBands)
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
+            .Include(a => a.AlbumTracks)
             .FirstOrDefaultAsync(a => a.Id == domainEvent.Album.Id, cancellationToken);
 
         if (album is null)
@@ -36,6 +38,11 @@ public sealed class AlbumCreatedEventHandler(
         List<CountryId> countryIds = album.AlbumCountries.Select(ac => ac.CountryId).ToList();
         List<Country> countries = countryIds.Count > 0
             ? await context.Countries.Where(c => countryIds.Contains(c.Id)).ToListAsync(cancellationToken)
+            : [];
+
+        List<TrackId> trackIds = album.AlbumTracks.Select(at => at.TrackId).ToList();
+        List<Track> tracks = trackIds.Count > 0
+            ? await context.Tracks.Where(t => trackIds.Contains(t.Id)).ToListAsync(cancellationToken)
             : [];
 
         AlbumGenre? primaryAlbumGenre = album.AlbumGenres.FirstOrDefault(ag => ag.IsPrimary);
@@ -63,5 +70,21 @@ public sealed class AlbumCreatedEventHandler(
 
         logger.LogInformation("AlbumCreatedEventHandler: Publishing integration event for AlbumId: {AlbumId}", album.Id.Value);
         await publishEndpoint.Publish(integrationEvent, cancellationToken);
+
+        await searchService.IndexAlbumAsync(new AlbumSearchDocument(
+            album.Id.Value.ToString(),
+            album.Title,
+            album.Slug,
+            urlResolver.Resolve(album.CoverUrl),
+            album.AlbumRelease.ReleaseYear,
+            album.Type.ToString(),
+            album.AlbumRelease.Format.ToString(),
+            bands.Select(b => b.Name).ToList(),
+            genres.Select(g => g.Name).ToList(),
+            [],
+            countries.Select(c => c.Name).ToList(),
+            tracks.Select(t => t.Title).ToList(),
+            album.CreatedAt.HasValue ? new DateTimeOffset(album.CreatedAt.Value).ToUnixTimeSeconds() : 0
+        ), cancellationToken);
     }
 }
