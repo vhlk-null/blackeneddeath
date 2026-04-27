@@ -43,7 +43,7 @@ public static class DatabaseInitializerExtensions
             var typoTolerance = new TypoTolerance
             {
                 Enabled = true,
-                MinWordSizeForTypos = new TypoTolerance.TypoSize { OneTypo = 4, TwoTypos = 8 }
+                MinWordSizeForTypos = new TypoTolerance.TypoSize { OneTypo = 3, TwoTypos = 5 }
             };
 
             var albumsIndex = client.Index(SearchIndexes.Albums);
