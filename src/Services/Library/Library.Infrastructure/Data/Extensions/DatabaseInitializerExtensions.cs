@@ -40,15 +40,23 @@ public static class DatabaseInitializerExtensions
             await client.CreateIndexAsync(SearchIndexes.Albums, "id");
             await client.CreateIndexAsync(SearchIndexes.Bands, "id");
 
+            var typoTolerance = new TypoTolerance
+            {
+                Enabled = true,
+                MinWordSizeForTypos = new TypoTolerance.TypoSize { OneTypo = 4, TwoTypos = 8 }
+            };
+
             var albumsIndex = client.Index(SearchIndexes.Albums);
             await albumsIndex.UpdateFilterableAttributesAsync(SearchIndexes.AlbumAttributes.Filterable);
             await albumsIndex.UpdateSortableAttributesAsync(SearchIndexes.AlbumAttributes.Sortable);
             await albumsIndex.UpdateSearchableAttributesAsync(SearchIndexes.AlbumAttributes.Searchable);
+            await albumsIndex.UpdateTypoToleranceAsync(typoTolerance);
 
             var bandsIndex = client.Index(SearchIndexes.Bands);
             await bandsIndex.UpdateFilterableAttributesAsync(SearchIndexes.BandAttributes.Filterable);
             await bandsIndex.UpdateSortableAttributesAsync(SearchIndexes.BandAttributes.Sortable);
             await bandsIndex.UpdateSearchableAttributesAsync(SearchIndexes.BandAttributes.Searchable);
+            await bandsIndex.UpdateTypoToleranceAsync(typoTolerance);
 
             logger.LogInformation("Meilisearch indexes initialized successfully.");
 
