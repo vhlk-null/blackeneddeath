@@ -84,7 +84,9 @@ public sealed class AlbumCreatedEventHandler(
             [],
             countries.Select(c => c.Name).ToList(),
             tracks.Select(t => t.Title).ToList(),
-            album.CreatedAt.HasValue ? new DateTimeOffset(album.CreatedAt.Value).ToUnixTimeSeconds() : 0
+            album.CreatedAt.HasValue ? new DateTimeOffset(album.CreatedAt.Value).ToUnixTimeSeconds() : 0,
+            album.AverageRating,
+            album.RatingsCount
         ), cancellationToken);
     }
 }

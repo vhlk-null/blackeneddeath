@@ -13,4 +13,6 @@ public record AlbumSearchDocument(
     List<string> Tags,
     List<string> Countries,
     List<string> Tracks,
-    long CreatedAt);
+    long CreatedAt,
+    double? AverageRating = null,
+    int RatingsCount = 0);

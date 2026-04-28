@@ -10,4 +10,6 @@ public record BandSearchDocument(
     string Status,
     List<string> Genres,
     List<string> Countries,
-    long CreatedAt);
+    long CreatedAt,
+    double? AverageRating = null,
+    int RatingsCount = 0);

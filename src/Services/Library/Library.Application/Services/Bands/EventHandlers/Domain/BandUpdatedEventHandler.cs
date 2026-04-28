@@ -57,7 +57,9 @@ public sealed class BandUpdatedEventHandler(ILogger<BandUpdatedEventHandler> log
             band.Status.ToString(),
             genres.Select(g => g.Name).ToList(),
             countries.Select(c => c.Name).ToList(),
-            band.CreatedAt.HasValue ? new DateTimeOffset(band.CreatedAt.Value).ToUnixTimeSeconds() : 0
+            band.CreatedAt.HasValue ? new DateTimeOffset(band.CreatedAt.Value).ToUnixTimeSeconds() : 0,
+            band.AverageRating,
+            band.RatingsCount
         ), cancellationToken);
     }
 }

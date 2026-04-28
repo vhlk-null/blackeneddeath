@@ -4,7 +4,6 @@ using Library.Domain.Models;
 using Library.Domain.ValueObjects.Ids;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using Index = Meilisearch.Index;
 
 namespace Library.Infrastructure.Data.Extensions;
@@ -133,7 +132,9 @@ public static class DatabaseInitializerExtensions
             [],
             a.AlbumCountries.Select(ac => countryNames.TryGetValue(ac.CountryId, out string? n) ? n : "").Where(n => n != "").ToList(),
             a.AlbumTracks.Select(at => trackTitles.TryGetValue(at.TrackId, out string? n) ? n : "").Where(n => n != "").ToList(),
-            a.CreatedAt.HasValue ? new DateTimeOffset(a.CreatedAt.Value).ToUnixTimeSeconds() : 0
+            a.CreatedAt.HasValue ? new DateTimeOffset(a.CreatedAt.Value).ToUnixTimeSeconds() : 0,
+            a.AverageRating,
+            a.RatingsCount
         )).ToList();
 
         await index.AddDocumentsAsync(documents);
@@ -183,7 +184,9 @@ public static class DatabaseInitializerExtensions
             b.Status.ToString(),
             b.BandGenres.Select(bg => genreNames.TryGetValue(bg.GenreId, out string? n) ? n : "").Where(n => n != "").ToList(),
             b.BandCountries.Select(bc => countryNames.TryGetValue(bc.CountryId, out string? n) ? n : "").Where(n => n != "").ToList(),
-            b.CreatedAt.HasValue ? new DateTimeOffset(b.CreatedAt.Value).ToUnixTimeSeconds() : 0
+            b.CreatedAt.HasValue ? new DateTimeOffset(b.CreatedAt.Value).ToUnixTimeSeconds() : 0,
+            b.AverageRating,
+            b.RatingsCount
         )).ToList();
 
         await index.AddDocumentsAsync(documents);
@@ -192,47 +195,9 @@ public static class DatabaseInitializerExtensions
 
     private static async Task ApplyMigrationsAsync(LibraryContext context, ILogger logger)
     {
-        try
-        {
-            logger.LogInformation("Applying database migrations...");
-            await context.Database.MigrateAsync();
-            logger.LogInformation("Migrations applied successfully.");
-        }
-        catch (PostgresException ex) when (ex.SqlState == "42P07")
-        {
-            // 42P07 = "relation already exists". This happens when the schema was
-            // created (e.g. by a previous run that deadlocked before recording the
-            // migration history), so the tables exist but __EFMigrationsHistory has
-            // no entry.  Recover by marking all migrations as applied.
-            logger.LogWarning(
-                "Database schema already exists without recorded migration history. " +
-                "Inserting missing migration records and continuing...");
-
-            await EnsureMigrationHistoryAsync(context);
-        }
-    }
-
-    private static async Task EnsureMigrationHistoryAsync(LibraryContext context)
-    {
-        const string productVersion = "10.0.3";
-
-        await context.Database.ExecuteSqlRawAsync("""
-            CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
-                "MigrationId"   character varying(150) NOT NULL,
-                "ProductVersion" character varying(32)  NOT NULL,
-                CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId")
-            )
-            """);
-
-        foreach (string migrationId in context.Database.GetMigrations())
-        {
-            await context.Database.ExecuteSqlAsync(
-                $"""
-                INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-                VALUES ({migrationId}, {productVersion})
-                ON CONFLICT DO NOTHING
-                """);
-        }
+        logger.LogInformation("Applying database migrations...");
+        await context.Database.MigrateAsync();
+        logger.LogInformation("Migrations applied successfully.");
     }
 
     private static async Task SeedAsync(LibraryContext context, ILogger logger)
