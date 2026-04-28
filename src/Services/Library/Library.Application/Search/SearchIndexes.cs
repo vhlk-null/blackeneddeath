@@ -9,7 +9,7 @@ public static class SearchIndexes
     {
         public static readonly string[] Filterable = ["genres", "tags", "countries", "type", "format", "releaseYear"];
         public static readonly string[] Sortable = ["title", "releaseYear", "createdAt"];
-        public static readonly string[] Searchable = ["title", "tracks"];
+        public static readonly string[] Searchable = ["title"];
     }
 
     public static class BandAttributes

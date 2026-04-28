@@ -1,4 +1,3 @@
-using CloudinaryDotNet.Actions;
 using Meilisearch;
 
 namespace Library.Application.Services.Albums.Queries.SearchAlbums;
@@ -20,7 +19,8 @@ public class SearchAlbumsQueryHandler(MeilisearchClient client)
                 query.Type,
                 query.ReleaseYearFrom,
                 query.ReleaseYearTo),
-            Sort = [$"{query.SortBy}:{sortDir}"]
+            Sort = [$"{query.SortBy}:{sortDir}"],
+            AttributesToSearchOn = query.IncludeTracks ? ["title", "tracks"] : ["title"]
         };
 
         PaginatedSearchResult<AlbumSearchDocument> result = (PaginatedSearchResult<AlbumSearchDocument>)await client
