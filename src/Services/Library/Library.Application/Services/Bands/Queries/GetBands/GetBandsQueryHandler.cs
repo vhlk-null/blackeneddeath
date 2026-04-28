@@ -15,9 +15,6 @@ public class GetBandsQueryHandler(ILibraryDbContext context, IStorageUrlResolver
         if (query.ApprovedOnly)
             filteredQuery = filteredQuery.Where(b => b.IsApproved);
 
-        if (query.Filter is not null)
-            filteredQuery = filteredQuery.Where(query.Filter.Criteria);
-
         long totalCount = await filteredQuery.LongCountAsync(cancellationToken);
 
         IIncludableQueryable<Band, IReadOnlyList<BandGenre>> bandsQuery = filteredQuery

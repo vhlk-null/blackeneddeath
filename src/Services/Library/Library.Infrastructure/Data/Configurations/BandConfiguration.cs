@@ -51,6 +51,13 @@ public class BandConfiguration : IEntityTypeConfiguration<Band>
             .HasDefaultValue(false)
             .HasColumnName("is_approved");
 
+        entity.Property(e => e.AverageRating)
+            .HasColumnName("average_rating");
+
+        entity.Property(e => e.RatingsCount)
+            .HasDefaultValue(0)
+            .HasColumnName("ratings_count");
+
         entity.ComplexProperty(e => e.Activity, ba =>
         {
             ba.Property(a => a.FormedYear).HasColumnName("formed_year");
@@ -60,5 +67,6 @@ public class BandConfiguration : IEntityTypeConfiguration<Band>
         entity.Navigation(e => e.BandCountries).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.BandGenres).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.VideoBands).UsePropertyAccessMode(PropertyAccessMode.Field);
+        entity.Navigation(e => e.BandRatings).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

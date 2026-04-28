@@ -23,5 +23,8 @@ public interface ILibraryDbContext
     DbSet<GenreCardGenre> GenreCardGenres { get; }
     DbSet<GenreCardTag> GenreCardTags { get; }
 
+    DbSet<AlbumRating> AlbumRatings { get; }
+    DbSet<BandRating> BandRatings { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore.Query;
-
 namespace Library.Application.Services.Albums.Queries.GetAlbums;
 
 public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver)
@@ -14,9 +12,6 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context, IStorageUrlResolve
 
         if (query.ApprovedOnly)
             filteredQuery = filteredQuery.Where(a => a.IsApproved);
-
-        if (query.Filter is not null)
-            filteredQuery = filteredQuery.Where(query.Filter.Criteria);
 
         long totalCount = await filteredQuery.LongCountAsync(cancellationToken);
 

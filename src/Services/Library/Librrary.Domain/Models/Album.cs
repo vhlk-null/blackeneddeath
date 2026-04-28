@@ -11,12 +11,16 @@ public class Album : Aggregate<AlbumId>
     public bool IsApproved { get; private set; }
     public bool IsExplicit { get; private set; }
     
+    public double? AverageRating { get; private set; }
+    public int RatingsCount { get; private set; }
+
     private readonly List<AlbumBand> _albumBands = [];
     private readonly List<AlbumGenre> _albumGenres = [];
     private readonly List<AlbumCountry> _albumCountries = [];
     private readonly List<AlbumTrack> _albumTracks = [];
     private readonly List<AlbumTag> _albumTags = [];
     private readonly List<StreamingLink> _streamingLinks = [];
+    private readonly List<AlbumRating> _albumRatings = [];
 
     public IReadOnlyList<AlbumBand> AlbumBands => _albumBands.AsReadOnly();
     public IReadOnlyList<AlbumGenre> AlbumGenres => _albumGenres.AsReadOnly();
@@ -24,6 +28,7 @@ public class Album : Aggregate<AlbumId>
     public IReadOnlyList<AlbumTrack> AlbumTracks => _albumTracks.AsReadOnly();
     public IReadOnlyList<AlbumTag> AlbumTags => _albumTags.AsReadOnly();
     public IReadOnlyList<StreamingLink> StreamingLinks => _streamingLinks.AsReadOnly();
+    public IReadOnlyList<AlbumRating> AlbumRatings => _albumRatings.AsReadOnly();
 
     private Album() { }
 
@@ -206,5 +211,11 @@ public class Album : Aggregate<AlbumId>
                               ?? throw new DomainException("Streaming link not found.");
 
         _streamingLinks.Remove(entry);
+    }
+
+    public void UpdateRatingStats(double? averageRating, int ratingsCount)
+    {
+        AverageRating = averageRating;
+        RatingsCount = ratingsCount;
     }
 }

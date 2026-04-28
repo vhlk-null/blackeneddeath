@@ -1,8 +1,1 @@
-namespace UserContent.Application.Exceptions;
-
-public class BandRatingNotFoundException : NotFoundException
-{
-    public BandRatingNotFoundException(Guid bandId) : base("BandRating", bandId)
-    {
-    }
-}
+// Moved to Library.Application

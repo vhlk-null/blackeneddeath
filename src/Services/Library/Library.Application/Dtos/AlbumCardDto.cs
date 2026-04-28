@@ -13,4 +13,6 @@ public record AlbumCardDto(
     GenreDto? PrimaryGenre,
     List<BandRefDto> Bands,
     List<CountryDto> Countries,
-    bool IsExplicit);
+    bool IsExplicit,
+    double? AverageRating = null,
+    int RatingsCount = 0);

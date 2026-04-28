@@ -60,11 +60,19 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
             .HasDefaultValue(false)
             .HasColumnName("is_explicit");
 
+        entity.Property(e => e.AverageRating)
+            .HasColumnName("average_rating");
+
+        entity.Property(e => e.RatingsCount)
+            .HasDefaultValue(0)
+            .HasColumnName("ratings_count");
+
         entity.Navigation(e => e.AlbumBands).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumGenres).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumCountries).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumTracks).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumTags).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.StreamingLinks).UsePropertyAccessMode(PropertyAccessMode.Field);
+        entity.Navigation(e => e.AlbumRatings).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

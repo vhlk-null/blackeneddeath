@@ -5,7 +5,6 @@ global using BuildingBlocks.Messaging.Events.Bands;
 global using BuildingBlocks.Messaging.MassTransit;
 global using BuildingBlocks.Pagination;
 global using BuildingBlocks.Repositories;
-global using BuildingBlocks.Specifications;
 global using BuildingBlocks.Storage;
 global using Library.Grpc;
 global using Mapster;

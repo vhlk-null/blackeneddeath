@@ -35,6 +35,10 @@ public class LibraryContext : DbContext, ILibraryDbContext
     public virtual DbSet<GenreCardGenre> GenreCardGenres { get; set; }
     public virtual DbSet<GenreCardTag> GenreCardTags { get; set; }
 
+    // Ratings
+    public virtual DbSet<AlbumRating> AlbumRatings { get; set; }
+    public virtual DbSet<BandRating> BandRatings { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

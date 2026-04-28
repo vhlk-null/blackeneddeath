@@ -37,4 +37,9 @@
     </Protobuf>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Albums\" />
+    <Folder Include="Services\Bands\" />
+  </ItemGroup>
+
 </Project>

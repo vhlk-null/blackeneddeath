@@ -14,14 +14,18 @@ public class Band : Aggregate<BandId>
     public string? Twitter { get; private set; }
     public string? Website { get; private set; }
     public bool IsApproved { get; private set; }
+    public double? AverageRating { get; private set; }
+    public int RatingsCount { get; private set; }
 
     private readonly List<BandCountry> _bandCountries = [];
     private readonly List<BandGenre> _bandGenres = [];
     private readonly List<VideoBand> _videoBands = [];
+    private readonly List<BandRating> _bandRatings = [];
 
     public IReadOnlyList<BandCountry> BandCountries => _bandCountries.AsReadOnly();
     public IReadOnlyList<BandGenre> BandGenres => _bandGenres.AsReadOnly();
     public IReadOnlyList<VideoBand> VideoBands => _videoBands.AsReadOnly();
+    public IReadOnlyList<BandRating> BandRatings => _bandRatings.AsReadOnly();
 
     private Band() { }
 
@@ -125,5 +129,11 @@ public class Band : Aggregate<BandId>
                             ?? throw new DomainException("Country is not associated with this band.");
 
         _bandCountries.Remove(entry);
+    }
+
+    public void UpdateRatingStats(double? averageRating, int ratingsCount)
+    {
+        AverageRating = averageRating;
+        RatingsCount = ratingsCount;
     }
 }

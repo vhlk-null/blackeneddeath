@@ -1,5 +1,3 @@
-using BuildingBlocks.Specifications;
-
 namespace Library.API.Endpoints.Bands.Admin;
 
 public record GetAllBandsResult(PaginatedResult<BandCardDto> Bands);
@@ -13,17 +11,11 @@ public class GetAllBands : ICarterModule
                 ISender sender,
                 HttpContext httpContext,
                 BandSortBy sortBy = BandSortBy.FormedYear,
-                BandStatus? status = null,
-                int? yearFrom = null,
-                int? yearTo = null,
-                string? name = null) =>
+                BandStatus? status = null) =>
             {
                 SortDir sortDir = Enum.TryParse<SortDir>(httpContext.Request.Query["sortDir"], ignoreCase: true, out SortDir sd) ? sd : SortDir.Desc;
 
-                List<Guid> genreIds   = httpContext.Request.Query["genreId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
-                List<Guid> countryIds = httpContext.Request.Query["countryId"].Select(s => Guid.TryParse(s, out Guid g) ? (Guid?)g : null).Where(g => g.HasValue).Select(g => g!.Value).ToList();
-                ISpecification<Band>? filter = BandFilterBuilder.Build(genreIds, countryIds, status, yearFrom, yearTo, name);
-                Application.Services.Bands.Queries.GetBands.GetBandsResult result = await sender.Send(new GetBandsQuery(paginationRequest, sortBy, sortDir, filter, ApprovedOnly: false));
+                Application.Services.Bands.Queries.GetBands.GetBandsResult result = await sender.Send(new GetBandsQuery(paginationRequest, sortBy, sortDir, ApprovedOnly: false));
                 return Results.Ok(result.Adapt<GetAllBandsResult>());
             })
             .WithName("AdminGetBands")

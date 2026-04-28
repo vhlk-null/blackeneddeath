@@ -9,4 +9,6 @@ public record BandCardDto(
     int? FormedYear,
     int? DisbandedYear,
     GenreDto? PrimaryGenre,
-    List<CountryDto> Countries);
+    List<CountryDto> Countries,
+    double? AverageRating = null,
+    int RatingsCount = 0);
