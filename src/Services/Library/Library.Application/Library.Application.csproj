@@ -10,10 +10,13 @@
   <ItemGroup>
     <Compile Remove="Albums\**" />
     <Compile Remove="Bands\**" />
+    <Compile Remove="Services\Albums\EventHandlers\Integration\**" />
     <EmbeddedResource Remove="Albums\**" />
     <EmbeddedResource Remove="Bands\**" />
+    <EmbeddedResource Remove="Services\Albums\EventHandlers\Integration\**" />
     <None Remove="Albums\**" />
     <None Remove="Bands\**" />
+    <None Remove="Services\Albums\EventHandlers\Integration\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,7 +40,6 @@
 
   <ItemGroup>
     <Folder Include="Exceptions\" />
-    <Folder Include="Services\Albums\EventHandlers\Integration\" />
   </ItemGroup>
 
   <ItemGroup>

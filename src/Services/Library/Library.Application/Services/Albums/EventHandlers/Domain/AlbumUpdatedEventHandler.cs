@@ -21,6 +21,8 @@ public sealed class AlbumUpdatedEventHandler(
 
         if (album is null) return;
 
+        if (!album.IsApproved) return;
+
         List<BandId> bandIds = album.AlbumBands.Select(ab => ab.BandId).ToList();
         List<Band> bands = bandIds.Count > 0
             ? await context.Bands.Where(b => bandIds.Contains(b.Id)).ToListAsync(cancellationToken)
@@ -73,10 +75,10 @@ public sealed class AlbumUpdatedEventHandler(
             album.AlbumRelease.ReleaseYear,
             album.Type.ToString(),
             album.AlbumRelease.Format.ToString(),
-            bands.Select(b => b.Name).ToList(),
+            bands.Select(b => new AlbumBandRef(b.Id.Value, b.Name, b.Slug)).ToList(),
             genres.Select(g => g.Name).ToList(),
             [],
-            countries.Select(c => c.Name).ToList(),
+            countries.Select(c => new AlbumCountryRef(c.Name, c.Code)).ToList(),
             tracks.Select(t => t.Title).ToList(),
             album.CreatedAt.HasValue ? new DateTimeOffset(album.CreatedAt.Value).ToUnixTimeSeconds() : 0,
             album.AverageRating,

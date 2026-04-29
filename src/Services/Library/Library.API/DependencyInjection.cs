@@ -12,7 +12,7 @@ public static class DependencyInjection
         services.AddCarter();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
-        services.AddGrpc();
+        //services.AddGrpc();
 
         services.AddSingleton(_ =>
             new MeilisearchClient(configuration["Meilisearch:Url"]!, configuration["Meilisearch:ApiKey"]));
@@ -48,7 +48,7 @@ public static class DependencyInjection
         app.UseAuthorization();
 
         app.MapCarter();
-        app.MapGrpcService<LibraryService>();
+        //app.MapGrpcService<LibraryService>();
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse

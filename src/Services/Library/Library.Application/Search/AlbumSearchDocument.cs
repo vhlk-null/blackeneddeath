@@ -1,5 +1,8 @@
 namespace Library.Application.Search;
 
+public record AlbumBandRef(Guid Id, string Name, string? Slug);
+public record AlbumCountryRef(string Name, string? Code);
+
 public record AlbumSearchDocument(
     string Id,
     string Title,
@@ -8,10 +11,10 @@ public record AlbumSearchDocument(
     int ReleaseYear,
     string Type,
     string Format,
-    List<string> Bands,
+    List<AlbumBandRef> Bands,
     List<string> Genres,
     List<string> Tags,
-    List<string> Countries,
+    List<AlbumCountryRef> Countries,
     List<string> Tracks,
     long CreatedAt,
     double? AverageRating = null,

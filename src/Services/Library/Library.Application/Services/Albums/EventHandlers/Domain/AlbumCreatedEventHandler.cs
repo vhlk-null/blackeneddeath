@@ -25,6 +25,12 @@ public sealed class AlbumCreatedEventHandler(
             return;
         }
 
+        if (!album.IsApproved)
+        {
+            logger.LogInformation("AlbumCreatedEventHandler: Album {AlbumId} is not approved — skipping indexing and integration event", domainEvent.Album.Id.Value);
+            return;
+        }
+
         List<BandId> bandIds = album.AlbumBands.Select(ab => ab.BandId).ToList();
         List<Band> bands = bandIds.Count > 0
             ? await context.Bands.Where(b => bandIds.Contains(b.Id)).ToListAsync(cancellationToken)
@@ -79,10 +85,10 @@ public sealed class AlbumCreatedEventHandler(
             album.AlbumRelease.ReleaseYear,
             album.Type.ToString(),
             album.AlbumRelease.Format.ToString(),
-            bands.Select(b => b.Name).ToList(),
+            bands.Select(b => new AlbumBandRef(b.Id.Value, b.Name, b.Slug)).ToList(),
             genres.Select(g => g.Name).ToList(),
             [],
-            countries.Select(c => c.Name).ToList(),
+            countries.Select(c => new AlbumCountryRef(c.Name, c.Code)).ToList(),
             tracks.Select(t => t.Title).ToList(),
             album.CreatedAt.HasValue ? new DateTimeOffset(album.CreatedAt.Value).ToUnixTimeSeconds() : 0,
             album.AverageRating,

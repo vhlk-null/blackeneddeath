@@ -14,6 +14,8 @@ public sealed class BandCreatedEventHandler(ILogger<BandCreatedEventHandler> log
 
         if (band is null) return;
 
+        if (!band.IsApproved) return;
+
         List<GenreId> genreIds = band.BandGenres.Select(bg => bg.GenreId).ToList();
         List<Genre> genres = genreIds.Count > 0
             ? await context.Genres.Where(g => genreIds.Contains(g.Id)).ToListAsync(cancellationToken)

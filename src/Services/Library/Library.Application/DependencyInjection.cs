@@ -1,4 +1,6 @@
-﻿namespace Library.Application;
+﻿using Library.Application.Services.Import;
+
+namespace Library.Application;
 
 public static class DependencyInjection
 {
@@ -12,6 +14,7 @@ public static class DependencyInjection
 
         services.AddMediator();
         services.AddFeatureManagement();
+        services.AddSingleton<ImportStatusService>();
         return services;
     }
 }

@@ -19,8 +19,8 @@ public static class DatabaseInitializerExtensions
 
         await ApplyMigrationsAsync(context, logger);
 
-        if (app.Environment.IsDevelopment())
-            await SeedAsync(context, logger);
+        //if (app.Environment.IsDevelopment())
+        //    await SeedAsync(context, logger);
     }
 
     public static async Task InitializeMeilisearchAsync(this WebApplication app)
@@ -99,9 +99,9 @@ public static class DatabaseInitializerExtensions
         List<CountryId> allCountryIds = albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)).Distinct().ToList();
         List<TrackId> allTrackIds = albums.SelectMany(a => a.AlbumTracks.Select(at => at.TrackId)).Distinct().ToList();
 
-        Dictionary<BandId, string> bandNames = allBandIds.Count > 0
+        Dictionary<BandId, AlbumBandRef> bandNames = allBandIds.Count > 0
             ? await context.Bands.Where(b => allBandIds.Contains(b.Id)).AsNoTracking()
-                .ToDictionaryAsync(b => b.Id, b => b.Name)
+                .ToDictionaryAsync(b => b.Id, b => new AlbumBandRef(b.Id.Value, b.Name, b.Slug))
             : [];
 
         Dictionary<GenreId, string> genreNames = allGenreIds.Count > 0
@@ -109,9 +109,9 @@ public static class DatabaseInitializerExtensions
                 .ToDictionaryAsync(g => g.Id, g => g.Name)
             : [];
 
-        Dictionary<CountryId, string> countryNames = allCountryIds.Count > 0
+        Dictionary<CountryId, AlbumCountryRef> countryNames = allCountryIds.Count > 0
             ? await context.Countries.Where(c => allCountryIds.Contains(c.Id)).AsNoTracking()
-                .ToDictionaryAsync(c => c.Id, c => c.Name)
+                .ToDictionaryAsync(c => c.Id, c => new AlbumCountryRef(c.Name, c.Code))
             : [];
 
         Dictionary<TrackId, string> trackTitles = allTrackIds.Count > 0
@@ -127,10 +127,10 @@ public static class DatabaseInitializerExtensions
             a.AlbumRelease.ReleaseYear,
             a.Type.ToString(),
             a.AlbumRelease.Format.ToString(),
-            a.AlbumBands.Select(ab => bandNames.TryGetValue(ab.BandId, out string? n) ? n : "").Where(n => n != "").ToList(),
+            a.AlbumBands.Where(ab => bandNames.ContainsKey(ab.BandId)).Select(ab => bandNames[ab.BandId]).ToList(),
             a.AlbumGenres.Select(ag => genreNames.TryGetValue(ag.GenreId, out string? n) ? n : "").Where(n => n != "").ToList(),
             [],
-            a.AlbumCountries.Select(ac => countryNames.TryGetValue(ac.CountryId, out string? n) ? n : "").Where(n => n != "").ToList(),
+            a.AlbumCountries.Where(ac => countryNames.ContainsKey(ac.CountryId)).Select(ac => countryNames[ac.CountryId]).ToList(),
             a.AlbumTracks.Select(at => trackTitles.TryGetValue(at.TrackId, out string? n) ? n : "").Where(n => n != "").ToList(),
             a.CreatedAt.HasValue ? new DateTimeOffset(a.CreatedAt.Value).ToUnixTimeSeconds() : 0,
             a.AverageRating,

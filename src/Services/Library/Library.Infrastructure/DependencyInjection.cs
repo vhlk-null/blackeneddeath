@@ -1,4 +1,6 @@
 using BuildingBlocks.Storage;
+using Library.Application.Services.Import;
+using Library.Infrastructure.MusicBrainz;
 using Library.Infrastructure.Search;
 
 namespace Library.Infrastructure;
@@ -33,6 +35,17 @@ public static class DependencyInjection
         services.AddScoped<ILibraryDbContext, LibraryContext>();
         services.AddScoped<IRepository<LibraryContext>, LibraryRepository>();
         services.AddScoped<ISearchService, MeilisearchService>();
+
+        string contactEmail = configuration["MusicBrainz:ContactEmail"] ?? "unknown";
+        services.AddHttpClient<MusicBrainzService>(client =>
+        {
+            client.BaseAddress = new Uri("https://musicbrainz.org/ws/2/");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd($"MetalArchiveSite/1.0 ({contactEmail})");
+            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+        services.AddScoped<IMusicBrainzImportService>(sp => sp.GetRequiredService<MusicBrainzService>());
+
         return services;
     }
 }
