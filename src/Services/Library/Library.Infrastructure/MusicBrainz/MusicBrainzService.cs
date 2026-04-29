@@ -38,7 +38,7 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
             .ToList();
     }
 
-    public async Task<BandPreviewResult> PreviewByMbIdAsync(string mbId, CancellationToken ct = default)
+    public async Task<BandPreviewResult> PreviewByMbIdAsync(string mbId, IReadOnlySet<string> existingSlugs, CancellationToken ct = default)
     {
         try
         {
@@ -51,10 +51,18 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
             List<BandPreviewAlbum> albums = (detail.ReleaseGroups ?? [])
                 .Where(rg => IsAllowedType(rg.PrimaryType, rg.SecondaryTypes))
                 .OrderBy(rg => rg.FirstReleaseDate)
-                .Select(rg => new BandPreviewAlbum(
-                    Title: rg.Title,
-                    Year: ParseYear(rg.FirstReleaseDate),
-                    Type: rg.PrimaryType ?? "Unknown"))
+                .Select(rg =>
+                {
+                    int? year = ParseYear(rg.FirstReleaseDate);
+                    string slug = $"{SlugHelper.Generate(rg.Title)}-{year}";
+                    return new BandPreviewAlbum(
+                        Title: rg.Title,
+                        Year: year,
+                        Type: rg.PrimaryType ?? "Unknown",
+                        Slug: slug,
+                        MbUrl: $"https://musicbrainz.org/release-group/{rg.Id}",
+                        ExistsInDb: existingSlugs.Contains(slug));
+                })
                 .ToList();
 
             return new BandPreviewResult(
@@ -80,6 +88,7 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
     public async Task<AppImportResult> ImportByMbIdAsync(
         string mbId,
         string bandName,
+        IReadOnlySet<string>? selectedAlbumMbIds = null,
         IProgress<ImportProgressEvent>? progress = null,
         CancellationToken ct = default)
     {
@@ -97,7 +106,7 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
             progress?.Report(new ImportProgressEvent(ImportProgressStage.BandFound, $"Found: {detail.Name}"));
 
             var bandData = MapBand(detail);
-            var albums = await FetchAlbumsAsync(detail, progress, ct);
+            var albums = await FetchAlbumsAsync(detail, selectedAlbumMbIds, progress, ct);
 
             progress?.Report(new ImportProgressEvent(ImportProgressStage.Saving, "Saving to database..."));
 
@@ -171,11 +180,13 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
 
     private async Task<List<AppAlbumData>> FetchAlbumsAsync(
         MbArtistDetail detail,
+        IReadOnlySet<string>? selectedAlbumMbIds,
         IProgress<ImportProgressEvent>? progress,
         CancellationToken ct)
     {
         var allowedGroups = (detail.ReleaseGroups ?? [])
             .Where(rg => IsAllowedType(rg.PrimaryType, rg.SecondaryTypes))
+            .Where(rg => selectedAlbumMbIds is null or { Count: 0 } || selectedAlbumMbIds.Contains(rg.Id))
             .ToList();
 
         logger.LogInformation("Release groups after filter: {Count}/{Total}",

@@ -16,7 +16,7 @@ public class ImportBandSse : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/admin/import/band/stream",
-                async (string mbId, string bandName, ISender sender, HttpResponse response, CancellationToken ct) =>
+                async (string mbId, string bandName, [FromQuery] string[]? albumMbIds, ISender sender, HttpResponse response, CancellationToken ct) =>
                 {
                     response.Headers.ContentType = "text/event-stream";
                     response.Headers.CacheControl = "no-cache";
@@ -28,12 +28,16 @@ public class ImportBandSse : ICarterModule
                     var progress = new Progress<ImportProgressEvent>(evt =>
                         channel.Writer.TryWrite(evt));
 
+                    IReadOnlySet<string>? selectedIds = albumMbIds is { Length: > 0 }
+                        ? albumMbIds.ToHashSet()
+                        : null;
+
                     // Run import in background — not tied to HTTP cancellation
                     var importTask = Task.Run(async () =>
                     {
                         try
                         {
-                            await sender.Send(new ImportBandCommand(mbId, bandName, progress), CancellationToken.None);
+                            await sender.Send(new ImportBandCommand(mbId, bandName, progress, SelectedAlbumMbIds: selectedIds), CancellationToken.None);
                         }
                         finally
                         {

@@ -3,7 +3,7 @@ using Library.Application.Services.Import;
 namespace Library.API.Endpoints.Bands.Admin.Import;
 
 public record BandSearchCandidateResponse(string MbId, string Name, string? Disambiguation, string? Country, int? FormedYear);
-public record BandPreviewAlbumResponse(string Title, int? Year, string Type);
+public record BandPreviewAlbumResponse(string Title, int? Year, string Type, string Slug, string MbUrl, bool ExistsInDb);
 public record BandPreviewResponse(
     bool Found,
     string? ErrorMessage,
@@ -36,9 +36,9 @@ public class PreviewImportBand : ICarterModule
             .WithSummary("Search MusicBrainz for band candidates by name");
 
         app.MapGet("/admin/import/band/preview",
-                async (string mbId, IMusicBrainzImportService musicBrainz, CancellationToken ct) =>
+                async (string mbId, ISender sender, CancellationToken ct) =>
                 {
-                    BandPreviewResult result = await musicBrainz.PreviewByMbIdAsync(mbId, ct);
+                    BandPreviewResult result = await sender.Send(new PreviewImportBandQuery(mbId), ct);
                     return Results.Ok(result.Adapt<BandPreviewResponse>());
                 })
             .WithName("PreviewImportBand")

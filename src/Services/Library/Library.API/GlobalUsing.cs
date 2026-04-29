@@ -35,6 +35,7 @@ global using Library.Application.Services.Albums.Commands.RateAlbum;
 global using Library.Application.Services.Bands.Queries.GetBandRating;
 global using Library.Application.Services.Bands.Commands.RateBand;
 global using Library.Application.Search;
+global using Library.Application.Services.Import.Queries.PreviewImportBand;
 global using Library.Application.Services.Bands.Commands.ApproveBand;
 global using Library.Application.Services.Bands.Commands.ApproveVideoBand;
 global using Library.Application.Services.Bands.Commands.CreateBand;

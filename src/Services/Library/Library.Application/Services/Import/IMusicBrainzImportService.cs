@@ -4,11 +4,12 @@ public interface IMusicBrainzImportService
 {
     Task<List<BandSearchCandidate>> SearchCandidatesAsync(string bandName, CancellationToken ct = default);
 
-    Task<BandPreviewResult> PreviewByMbIdAsync(string mbId, CancellationToken ct = default);
+    Task<BandPreviewResult> PreviewByMbIdAsync(string mbId, IReadOnlySet<string> existingSlugs, CancellationToken ct = default);
 
     Task<MusicBrainzImportResult> ImportByMbIdAsync(
         string mbId,
         string bandName,
+        IReadOnlySet<string>? selectedAlbumMbIds = null,
         IProgress<ImportProgressEvent>? progress = null,
         CancellationToken ct = default);
 }
@@ -33,7 +34,7 @@ public record BandPreviewResult(
     int ReleaseGroupCount,
     List<BandPreviewAlbum> Albums);
 
-public record BandPreviewAlbum(string Title, int? Year, string Type);
+public record BandPreviewAlbum(string Title, int? Year, string Type, string Slug, string MbUrl, bool ExistsInDb = false);
 
 public record ImportProgressEvent(
     ImportProgressStage Stage,
