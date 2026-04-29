@@ -29,7 +29,7 @@ public class GenreFilter(List<string> genres) : IMeilesearchFilter
 public class CountryFilter(List<string> countries) : IMeilesearchFilter
 {
     public string ToFilterString() =>
-        string.Join(" OR ", countries.Select(c => $"countries = \"{c}\""));
+        string.Join(" OR ", countries.Select(c => $"countries.name = \"{c}\""));
 }
 
 public class TypeFilter(string type) : IMeilesearchFilter
