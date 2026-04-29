@@ -18,6 +18,7 @@ public static class DatabaseInitializerExtensions
         ILogger<LibraryContext> logger  = scope.ServiceProvider.GetRequiredService<ILogger<LibraryContext>>();
 
         await ApplyMigrationsAsync(context, logger);
+        await SeedCountriesAsync(context, logger);
 
         //if (app.Environment.IsDevelopment())
         //    await SeedAsync(context, logger);
@@ -234,12 +235,48 @@ public static class DatabaseInitializerExtensions
 
     private static async Task SeedCountriesAsync(LibraryContext context, ILogger logger)
     {
-        if (await context.Countries.AnyAsync()) return;
 
-        logger.LogInformation("Seeding countries...");
-        await context.Countries.AddRangeAsync(InitialData.Countries);
+        logger.LogInformation("Seeding countries from embedded resource...");
+
+        using System.IO.Stream stream = typeof(DatabaseInitializerExtensions).Assembly
+            .GetManifestResourceStream("Library.Infrastructure.Data.all-countries.json")!;
+
+        List<RestCountryDto>? restCountries = await System.Text.Json.JsonSerializer.DeserializeAsync<List<RestCountryDto>>(stream);
+
+        if (restCountries is null || restCountries.Count == 0)
+        {
+            logger.LogWarning("No countries in embedded resource, skipping.");
+            return;
+        }
+
+        HashSet<string> existingNames = (await context.Countries
+            .Select(c => c.Name)
+            .ToListAsync())
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        List<Country> newCountries = restCountries
+            .Where(c => !string.IsNullOrWhiteSpace(c.Name?.Common) && !existingNames.Contains(c.Name!.Common!))
+            .OrderBy(c => c.Name?.Common)
+            .Select(c => Country.Create(CountryId.Of(Guid.NewGuid()), c.Name!.Common!, c.Cca2))
+            .ToList();
+
+        if (newCountries.Count == 0)
+        {
+            logger.LogInformation("All countries already in DB, nothing to seed.");
+            return;
+        }
+
+        await context.Countries.AddRangeAsync(newCountries);
         await context.SaveChangesAsync();
+        logger.LogInformation("Seeded {Count} new countries.", newCountries.Count);
     }
+
+    private sealed record RestCountryDto(
+        [property: System.Text.Json.Serialization.JsonPropertyName("name")] RestCountryName? Name,
+        [property: System.Text.Json.Serialization.JsonPropertyName("cca2")] string? Cca2);
+
+    private sealed record RestCountryName(
+        [property: System.Text.Json.Serialization.JsonPropertyName("common")] string? Common);
 
     private static async Task SeedGenresAsync(LibraryContext context, ILogger logger)
     {

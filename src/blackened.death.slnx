@@ -48,6 +48,7 @@
     <Project Path="Services/UserContent/UserContent.InfrastructureTests/UserContent.InfrastructureTests.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
+    <File Path="all-countries.json" />
     <File Path="Directory.Packages.props" />
   </Folder>
   <Project Path="docker-compose.dcproj">

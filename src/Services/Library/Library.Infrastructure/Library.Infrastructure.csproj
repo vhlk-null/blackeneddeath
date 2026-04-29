@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Data\all-countries.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CloudinaryDotNet" />
     <PackageReference Include="MeiliSearch" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />

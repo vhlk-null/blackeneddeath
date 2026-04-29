@@ -1,6 +1,6 @@
 using Library.Application.Services.Import;
 
-namespace Library.API.Endpoints.Import;
+namespace Library.API.Endpoints.Bands.Admin.Import;
 
 public class ImportBandStatus : ICarterModule
 {
@@ -11,7 +11,9 @@ public class ImportBandStatus : ICarterModule
                     Results.Ok(importStatus.Current))
             .WithName("GetImportBandStatus")
             .WithTags("Admin")
-            .AllowAnonymous()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly")
             .WithSummary("Get current band import status");
     }
 }

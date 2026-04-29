@@ -147,11 +147,11 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
                 Current: i + 1,
                 Total: total));
 
-            // Get the earliest official release in this group
+            // Get official releases in this group
             var releases = await BrowseReleasesAsync(rg.Id, ct);
-            var release = releases.OrderBy(r => r.Date).FirstOrDefault();
+            var earliestRelease = releases.OrderBy(r => r.Date).FirstOrDefault();
 
-            var releaseDate = release?.Date ?? rg.FirstReleaseDate;
+            var releaseDate = earliestRelease?.Date ?? rg.FirstReleaseDate;
             var (year, month, day) = ParseDate(releaseDate);
 
             if (year is null)
@@ -160,8 +160,8 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
                 continue;
             }
 
-            var releaseDetail = release is not null ? await GetReleaseDetailAsync(release.Id, ct) : null;
-            var coverUrl = release is not null ? await FetchCoverUrlAsync(release.Id, ct) : null;
+            var releaseDetail = earliestRelease is not null ? await GetReleaseDetailAsync(earliestRelease.Id, ct) : null;
+            var coverUrl = earliestRelease is not null ? await FetchCoverUrlAsync(earliestRelease.Id, ct) : null;
             var tracks = MapTracks(releaseDetail?.Media);
 
             string? labelName = releaseDetail?.LabelInfo?

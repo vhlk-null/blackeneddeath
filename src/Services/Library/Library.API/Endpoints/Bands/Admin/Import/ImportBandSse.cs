@@ -3,7 +3,7 @@ using System.Threading.Channels;
 using Library.Application.Services.Import;
 using Library.Application.Services.Import.Commands.ImportBand;
 
-namespace Library.API.Endpoints.Import;
+namespace Library.API.Endpoints.Bands.Admin.Import;
 
 public class ImportBandSse : ICarterModule
 {
@@ -61,7 +61,9 @@ public class ImportBandSse : ICarterModule
                 })
             .WithName("ImportBandStream")
             .WithTags("Admin")
-            .AllowAnonymous()
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .RequireAuthorization("AdminOnly")
             .WithSummary("Import band from MusicBrainz with SSE progress");
     }
 }
