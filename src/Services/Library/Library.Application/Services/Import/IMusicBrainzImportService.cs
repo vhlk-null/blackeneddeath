@@ -2,12 +2,38 @@ namespace Library.Application.Services.Import;
 
 public interface IMusicBrainzImportService
 {
-    Task<MusicBrainzImportResult> ImportByNameAsync(
+    Task<List<BandSearchCandidate>> SearchCandidatesAsync(string bandName, CancellationToken ct = default);
+
+    Task<BandPreviewResult> PreviewByMbIdAsync(string mbId, CancellationToken ct = default);
+
+    Task<MusicBrainzImportResult> ImportByMbIdAsync(
+        string mbId,
         string bandName,
         IProgress<ImportProgressEvent>? progress = null,
-        bool includeAlbums = true,
         CancellationToken ct = default);
 }
+
+public record BandSearchCandidate(
+    string MbId,
+    string Name,
+    string? Disambiguation,
+    string? Country,
+    int? FormedYear);
+
+public record BandPreviewResult(
+    bool Found,
+    string? ErrorMessage,
+    string? MbId,
+    string? Name,
+    string? Country,
+    int? FormedYear,
+    int? DisbandedYear,
+    bool IsActive,
+    List<string> Tags,
+    int ReleaseGroupCount,
+    List<BandPreviewAlbum> Albums);
+
+public record BandPreviewAlbum(string Title, int? Year, string Type);
 
 public record ImportProgressEvent(
     ImportProgressStage Stage,

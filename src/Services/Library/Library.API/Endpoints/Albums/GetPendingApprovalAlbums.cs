@@ -1,6 +1,7 @@
 namespace Library.API.Endpoints.Albums;
 
-public record GetPendingApprovalAlbumsResponse(List<PendingApprovalDto> Albums);
+public record PendingApprovalBandGroupResponse(Guid BandId, string BandName, string? BandSlug, List<PendingApprovalDto> Albums);
+public record GetPendingApprovalAlbumsResponse(List<PendingApprovalBandGroupResponse> Groups);
 
 public class GetPendingApprovalAlbums : ICarterModule
 {

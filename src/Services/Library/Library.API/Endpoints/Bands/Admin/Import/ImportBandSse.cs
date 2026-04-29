@@ -16,7 +16,7 @@ public class ImportBandSse : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/admin/import/band/stream",
-                async (string bandName, ISender sender, HttpResponse response, CancellationToken ct) =>
+                async (string mbId, string bandName, ISender sender, HttpResponse response, CancellationToken ct) =>
                 {
                     response.Headers.ContentType = "text/event-stream";
                     response.Headers.CacheControl = "no-cache";
@@ -33,7 +33,7 @@ public class ImportBandSse : ICarterModule
                     {
                         try
                         {
-                            await sender.Send(new ImportBandCommand(bandName, progress), CancellationToken.None);
+                            await sender.Send(new ImportBandCommand(mbId, bandName, progress), CancellationToken.None);
                         }
                         finally
                         {

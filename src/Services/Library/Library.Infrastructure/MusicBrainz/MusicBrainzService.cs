@@ -19,37 +19,84 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
         Converters = { new FlexibleBoolConverter() }
     };
 
-    public async Task<AppImportResult> ImportByNameAsync(
+    public async Task<List<BandSearchCandidate>> SearchCandidatesAsync(string bandName, CancellationToken ct = default)
+    {
+        var url = $"artist/?query=artist:\"{Uri.EscapeDataString(bandName)}\"+AND+type:group&limit=5&fmt=json";
+        logger.LogInformation("MusicBrainz search URL: {Url}", url);
+
+        var response = await http.GetFromJsonAsync<MbArtistSearchResponse>(url, JsonOpts, ct);
+
+        logger.LogInformation("MusicBrainz search returned {Count} artists", response?.Artists?.Count ?? 0);
+
+        return (response?.Artists ?? [])
+            .Select(a => new BandSearchCandidate(
+                MbId: a.Id,
+                Name: a.Name,
+                Disambiguation: a.Disambiguation,
+                Country: a.Country,
+                FormedYear: ParseYear(a.LifeSpan?.Begin)))
+            .ToList();
+    }
+
+    public async Task<BandPreviewResult> PreviewByMbIdAsync(string mbId, CancellationToken ct = default)
+    {
+        try
+        {
+            var detail = await GetArtistDetailAsync(mbId, ct);
+            if (detail is null)
+                return new BandPreviewResult(false, "Could not load artist details.", null, null, null, null, null, false, [], 0, []);
+
+            var band = MapBand(detail);
+
+            List<BandPreviewAlbum> albums = (detail.ReleaseGroups ?? [])
+                .Where(rg => IsAllowedType(rg.PrimaryType, rg.SecondaryTypes))
+                .OrderBy(rg => rg.FirstReleaseDate)
+                .Select(rg => new BandPreviewAlbum(
+                    Title: rg.Title,
+                    Year: ParseYear(rg.FirstReleaseDate),
+                    Type: rg.PrimaryType ?? "Unknown"))
+                .ToList();
+
+            return new BandPreviewResult(
+                Found: true,
+                ErrorMessage: null,
+                MbId: mbId,
+                Name: band.Name,
+                Country: band.Country,
+                FormedYear: band.FormedYear,
+                DisbandedYear: band.DisbandedYear,
+                IsActive: band.IsActive,
+                Tags: band.Tags,
+                ReleaseGroupCount: albums.Count,
+                Albums: albums);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "MusicBrainz preview failed for mbId '{MbId}'", mbId);
+            return new BandPreviewResult(false, ex.Message, null, null, null, null, null, false, [], 0, []);
+        }
+    }
+
+    public async Task<AppImportResult> ImportByMbIdAsync(
+        string mbId,
         string bandName,
         IProgress<ImportProgressEvent>? progress = null,
-        bool includeAlbums = true,
         CancellationToken ct = default)
     {
         try
         {
-            progress?.Report(new ImportProgressEvent(ImportProgressStage.Searching, $"Searching for '{bandName}'..."));
+            progress?.Report(new ImportProgressEvent(ImportProgressStage.Searching, $"Loading '{bandName}'..."));
 
-            var artist = await SearchArtistAsync(bandName, ct);
-            if (artist is null)
-            {
-                progress?.Report(new ImportProgressEvent(ImportProgressStage.Failed, $"No artist found for '{bandName}'"));
-                return Fail($"No artist found for '{bandName}'");
-            }
-
-            progress?.Report(new ImportProgressEvent(ImportProgressStage.BandFound, $"Found: {artist.Name}"));
-
-            var detail = await GetArtistDetailAsync(artist.Id, ct);
+            var detail = await GetArtistDetailAsync(mbId, ct);
             if (detail is null)
             {
-                progress?.Report(new ImportProgressEvent(ImportProgressStage.Failed, $"Could not load artist details"));
-                return Fail($"Artist {artist.Id} not found");
+                progress?.Report(new ImportProgressEvent(ImportProgressStage.Failed, "Could not load artist details."));
+                return Fail("Could not load artist details.");
             }
 
+            progress?.Report(new ImportProgressEvent(ImportProgressStage.BandFound, $"Found: {detail.Name}"));
+
             var bandData = MapBand(detail);
-
-            if (!includeAlbums)
-                return new AppImportResult { Success = true, Band = bandData };
-
             var albums = await FetchAlbumsAsync(detail, progress, ct);
 
             progress?.Report(new ImportProgressEvent(ImportProgressStage.Saving, "Saving to database..."));
@@ -58,7 +105,7 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "MusicBrainz import failed for '{Name}'", bandName);
+            logger.LogError(ex, "MusicBrainz import failed for mbId '{MbId}'", mbId);
             progress?.Report(new ImportProgressEvent(ImportProgressStage.Failed, ex.Message));
             return Fail(ex.Message);
         }

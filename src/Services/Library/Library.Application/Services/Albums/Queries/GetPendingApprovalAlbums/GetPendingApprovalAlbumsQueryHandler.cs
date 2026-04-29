@@ -7,12 +7,38 @@ public class GetPendingApprovalAlbumsQueryHandler(ILibraryDbContext context)
         GetPendingApprovalAlbumsQuery query,
         CancellationToken cancellationToken)
     {
-        List<PendingApprovalDto> albums = await context.Albums
+        List<Album> albums = await context.Albums
             .AsNoTracking()
             .Where(a => !a.IsApproved)
-            .Select(a => new PendingApprovalDto(a.Id.Value, a.Title, a.Slug, a.CreatedBy))
+            .Include(a => a.AlbumBands)
             .ToListAsync(cancellationToken);
 
-        return new GetPendingApprovalAlbumsResult(albums);
+        List<BandId> bandIds = albums
+            .SelectMany(a => a.AlbumBands.Select(ab => ab.BandId))
+            .Distinct()
+            .ToList();
+
+        Dictionary<BandId, Band> bands = await context.Bands
+            .AsNoTracking()
+            .Where(b => bandIds.Contains(b.Id))
+            .ToDictionaryAsync(b => b.Id, cancellationToken);
+
+        List<PendingApprovalBandGroup> groups = albums
+            .SelectMany(a => a.AlbumBands, (a, ab) => new { Album = a, ab.BandId })
+            .GroupBy(x => x.BandId)
+            .Select(g =>
+            {
+                Band? band = bands.GetValueOrDefault(g.Key);
+                return new PendingApprovalBandGroup(
+                    BandId: g.Key.Value,
+                    BandName: band?.Name ?? "Unknown",
+                    BandSlug: band?.Slug,
+                    Albums: g.Select(x => new PendingApprovalDto(
+                        x.Album.Id.Value, x.Album.Title, x.Album.Slug, x.Album.CreatedBy)).ToList());
+            })
+            .OrderBy(g => g.BandName)
+            .ToList();
+
+        return new GetPendingApprovalAlbumsResult(groups);
     }
 }

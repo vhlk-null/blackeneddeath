@@ -2,7 +2,7 @@ using Library.Application.Services.Import.Commands.ImportBand;
 
 namespace Library.API.Endpoints.Bands.Admin.Import;
 
-public record ImportBandRequest(string BandName);
+public record ImportBandRequest(string MbId, string BandName);
 public record ImportBandResponse(Guid BandId, string BandName, int AlbumsImported, int AlbumsSkipped);
 
 public class ImportBand : ICarterModule
@@ -12,7 +12,7 @@ public class ImportBand : ICarterModule
         app.MapPost("/admin/import/band",
                 async (ImportBandRequest request, ISender sender, CancellationToken ct) =>
                 {
-                    ImportBandResult result = await sender.Send(new ImportBandCommand(request.BandName), ct);
+                    ImportBandResult result = await sender.Send(new ImportBandCommand(request.MbId, request.BandName), ct);
                     return Results.Ok(result.Adapt<ImportBandResponse>());
                 })
             .WithName("ImportBandFromMusicBrainz")

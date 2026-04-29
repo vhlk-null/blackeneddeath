@@ -18,10 +18,7 @@ public static class DatabaseInitializerExtensions
         ILogger<LibraryContext> logger  = scope.ServiceProvider.GetRequiredService<ILogger<LibraryContext>>();
 
         await ApplyMigrationsAsync(context, logger);
-        await SeedCountriesAsync(context, logger);
-
-        //if (app.Environment.IsDevelopment())
-        //    await SeedAsync(context, logger);
+        await SeedAsync(context, logger);
     }
 
     public static async Task InitializeMeilisearchAsync(this WebApplication app)
@@ -81,6 +78,7 @@ public static class DatabaseInitializerExtensions
         logger.LogInformation("Reindexing albums into Meilisearch...");
 
         List<Album> albums = await context.Albums
+            .Where(a => a.IsApproved)
             .Include(a => a.AlbumBands)
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
@@ -235,46 +233,39 @@ public static class DatabaseInitializerExtensions
 
     private static async Task SeedCountriesAsync(LibraryContext context, ILogger logger)
     {
+        if (await context.Countries.AnyAsync()) return;
 
-        logger.LogInformation("Seeding countries from embedded resource...");
+        logger.LogInformation("Seeding countries...");
 
+        // Seed fixed-GUID countries first (referenced by band/album seed data)
+        List<Country> countries = InitialData.Countries.ToList();
+
+        HashSet<string> seededNames = countries
+            .Select(c => c.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // Merge remaining countries from embedded JSON
         using System.IO.Stream? stream = typeof(DatabaseInitializerExtensions).Assembly
             .GetManifestResourceStream("Library.Infrastructure.Data.all-countries.json");
 
-        if (stream is null)
+        if (stream is not null)
         {
-            logger.LogWarning("Embedded resource 'all-countries.json' not found, skipping.");
-            return;
+            List<RestCountryDto>? restCountries = await System.Text.Json.JsonSerializer.DeserializeAsync<List<RestCountryDto>>(stream);
+
+            if (restCountries is not null)
+            {
+                IEnumerable<Country> jsonCountries = restCountries
+                    .Where(c => !string.IsNullOrWhiteSpace(c.Name?.Common) && !seededNames.Contains(c.Name!.Common!))
+                    .OrderBy(c => c.Name?.Common)
+                    .Select(c => Country.Create(CountryId.Of(Guid.NewGuid()), c.Name!.Common!, c.Cca2));
+
+                countries.AddRange(jsonCountries);
+            }
         }
 
-        List<RestCountryDto>? restCountries = await System.Text.Json.JsonSerializer.DeserializeAsync<List<RestCountryDto>>(stream);
-
-        if (restCountries is null || restCountries.Count == 0)
-        {
-            logger.LogWarning("No countries in embedded resource, skipping.");
-            return;
-        }
-
-        HashSet<string> existingNames = (await context.Countries
-            .Select(c => c.Name)
-            .ToListAsync())
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        List<Country> newCountries = restCountries
-            .Where(c => !string.IsNullOrWhiteSpace(c.Name?.Common) && !existingNames.Contains(c.Name!.Common!))
-            .OrderBy(c => c.Name?.Common)
-            .Select(c => Country.Create(CountryId.Of(Guid.NewGuid()), c.Name!.Common!, c.Cca2))
-            .ToList();
-
-        if (newCountries.Count == 0)
-        {
-            logger.LogInformation("All countries already in DB, nothing to seed.");
-            return;
-        }
-
-        await context.Countries.AddRangeAsync(newCountries);
+        await context.Countries.AddRangeAsync(countries);
         await context.SaveChangesAsync();
-        logger.LogInformation("Seeded {Count} new countries.", newCountries.Count);
+        logger.LogInformation("Seeded {Count} countries.", countries.Count);
     }
 
     private sealed record RestCountryDto(

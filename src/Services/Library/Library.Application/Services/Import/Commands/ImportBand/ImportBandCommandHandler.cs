@@ -11,12 +11,18 @@ public class ImportBandCommandHandler(
 {
     public async ValueTask<ImportBandResult> Handle(ImportBandCommand command, CancellationToken cancellationToken)
     {
-        importStatus.Start(command.BandName);
+        bool alreadyExists = await context.Bands
+            .AnyAsync(b => b.Name.ToLower() == command.BandName.ToLower().Trim(), cancellationToken);
+
+        if (alreadyExists)
+            throw new BadRequestException($"Band '{command.BandName}' already exists in the database.");
+
+        CancellationToken importCt = importStatus.Start(command.BandName);
 
         var progress = new CompositeProgress(command.Progress, importStatus);
 
-        MusicBrainzImportResult result = await musicBrainz.ImportByNameAsync(
-            command.BandName, progress, includeAlbums: true, CancellationToken.None);
+        MusicBrainzImportResult result = await musicBrainz.ImportByMbIdAsync(
+            command.MbId, command.BandName, progress, importCt);
 
         if (!result.Success || result.Band is null)
         {
@@ -68,7 +74,7 @@ public class ImportBandCommandHandler(
             albumsImported++;
         }
 
-        await context.SaveChangesAsync(CancellationToken.None);
+        await context.SaveChangesAsync(importCt);
 
         logger.LogInformation("Imported band '{Name}': {Imported} albums saved, {Skipped} skipped",
             band.Name, albumsImported, albumsSkipped);
