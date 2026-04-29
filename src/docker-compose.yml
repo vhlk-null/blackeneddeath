@@ -32,6 +32,16 @@ services:
       context: .
       dockerfile: Services/Identity/IdentityServer/Dockerfile
 
+  seq:
+    image: datalust/seq:latest
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - "5341:5341"
+      - "8081:80"
+    volumes:
+      - seq_data:/data
+
   yarpapigateway:
     image: ${DOCKER_REGISTRY-}yarpapigateway
     build:
@@ -50,3 +60,4 @@ volumes:
   postgres_identity:
   rabbitmq_data:
   identity_dataprotection:
+  seq_data:

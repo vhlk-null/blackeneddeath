@@ -84,6 +84,18 @@ services:
       timeout: 5s
       retries: 5
       
+  seq:
+    container_name: seq
+    restart: always
+    ports:
+      - "5341:5341"
+      - "8082:80"
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORD=Admin123!
+    volumes:
+      - seq_data:/data
+
   meilisearch:
     image: getmeili/meilisearch:v1.12
     container_name: meilisearch
@@ -142,6 +154,7 @@ services:
       - IdentityServer__Authority=http://identity.server:8080
       - Meilisearch__Url=http://meilisearch:7700
       - Meilisearch__ApiKey=BlackEndDeathMasterKey123!
+      - Seq__ServerUrl=http://seq:5341
     depends_on:
       librarydb:
         condition: service_healthy
@@ -230,3 +243,4 @@ volumes:
   rabbitmq_data:
   identity_dataprotection:
   meilisearch_data:
+  seq_data:

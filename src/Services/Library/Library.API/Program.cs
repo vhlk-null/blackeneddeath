@@ -1,4 +1,20 @@
-﻿WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+﻿using Serilog;
+using Serilog.Debugging;
+
+SelfLog.Enable(Console.Error);
+
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((ctx, cfg) =>
+{
+    cfg.ReadFrom.Configuration(ctx.Configuration)
+       .Enrich.FromLogContext()
+       .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}");
+
+    string? seqUrl = ctx.Configuration["Seq:ServerUrl"];
+    if (!string.IsNullOrWhiteSpace(seqUrl))
+        cfg.WriteTo.Seq(seqUrl, apiKey: ctx.Configuration["Seq:ApiKey"]);
+});
 
 builder.Services
     .AddApplicationServices()
@@ -11,8 +27,7 @@ WebApplication app = builder.Build();
 
 app.UseApiServices();
 
-if (app.Environment.IsDevelopment())
-    await app.InitializeDatabaseAsync();
+await app.InitializeDatabaseAsync();
 
 await app.InitializeMeilisearchAsync();
 
