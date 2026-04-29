@@ -238,8 +238,14 @@ public static class DatabaseInitializerExtensions
 
         logger.LogInformation("Seeding countries from embedded resource...");
 
-        using System.IO.Stream stream = typeof(DatabaseInitializerExtensions).Assembly
-            .GetManifestResourceStream("Library.Infrastructure.Data.all-countries.json")!;
+        using System.IO.Stream? stream = typeof(DatabaseInitializerExtensions).Assembly
+            .GetManifestResourceStream("Library.Infrastructure.Data.all-countries.json");
+
+        if (stream is null)
+        {
+            logger.LogWarning("Embedded resource 'all-countries.json' not found, skipping.");
+            return;
+        }
 
         List<RestCountryDto>? restCountries = await System.Text.Json.JsonSerializer.DeserializeAsync<List<RestCountryDto>>(stream);
 
