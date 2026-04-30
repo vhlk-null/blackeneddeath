@@ -81,6 +81,7 @@ public sealed class AlbumUpdatedEventHandler(
             countries.Select(c => new AlbumCountryRef(c.Name, c.Code)).ToList(),
             tracks.Select(t => t.Title).ToList(),
             album.CreatedAt.HasValue ? new DateTimeOffset(album.CreatedAt.Value).ToUnixTimeSeconds() : 0,
+            album.IsApproved,
             album.AverageRating,
             album.RatingsCount
         ), cancellationToken);

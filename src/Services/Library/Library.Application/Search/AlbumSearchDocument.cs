@@ -17,5 +17,6 @@ public record AlbumSearchDocument(
     List<AlbumCountryRef> Countries,
     List<string> Tracks,
     long CreatedAt,
+    bool IsApproved = false,
     double? AverageRating = null,
     int RatingsCount = 0);

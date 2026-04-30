@@ -132,6 +132,7 @@ public static class DatabaseInitializerExtensions
             a.AlbumCountries.Where(ac => countryNames.ContainsKey(ac.CountryId)).Select(ac => countryNames[ac.CountryId]).ToList(),
             a.AlbumTracks.Select(at => trackTitles.TryGetValue(at.TrackId, out string? n) ? n : "").Where(n => n != "").ToList(),
             a.CreatedAt.HasValue ? new DateTimeOffset(a.CreatedAt.Value).ToUnixTimeSeconds() : 0,
+            a.IsApproved,
             a.AverageRating,
             a.RatingsCount
         )).ToList();
@@ -184,6 +185,7 @@ public static class DatabaseInitializerExtensions
             b.BandGenres.Select(bg => genreNames.TryGetValue(bg.GenreId, out string? n) ? n : "").Where(n => n != "").ToList(),
             b.BandCountries.Select(bc => countryNames.TryGetValue(bc.CountryId, out string? n) ? n : "").Where(n => n != "").ToList(),
             b.CreatedAt.HasValue ? new DateTimeOffset(b.CreatedAt.Value).ToUnixTimeSeconds() : 0,
+            b.IsApproved,
             b.AverageRating,
             b.RatingsCount
         )).ToList();

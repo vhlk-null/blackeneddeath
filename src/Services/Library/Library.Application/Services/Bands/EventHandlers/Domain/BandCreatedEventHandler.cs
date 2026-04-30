@@ -60,6 +60,7 @@ public sealed class BandCreatedEventHandler(ILogger<BandCreatedEventHandler> log
             genres.Select(g => g.Name).ToList(),
             countries.Select(c => c.Name).ToList(),
             band.CreatedAt.HasValue ? new DateTimeOffset(band.CreatedAt.Value).ToUnixTimeSeconds() : 0,
+            band.IsApproved,
             band.AverageRating,
             band.RatingsCount
         ), cancellationToken);
