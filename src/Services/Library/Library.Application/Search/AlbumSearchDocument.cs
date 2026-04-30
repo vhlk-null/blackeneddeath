@@ -1,6 +1,6 @@
 namespace Library.Application.Search;
 
-public record AlbumBandRef(Guid Id, string Name, string? Slug);
+public record AlbumBandRef(Guid Id, string Name, string? Slug, bool IsApproved = false);
 public record AlbumCountryRef(string Name, string? Code);
 
 public record AlbumSearchDocument(
@@ -17,6 +17,5 @@ public record AlbumSearchDocument(
     List<AlbumCountryRef> Countries,
     List<string> Tracks,
     long CreatedAt,
-    bool IsApproved = false,
     double? AverageRating = null,
     int RatingsCount = 0);

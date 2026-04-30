@@ -85,13 +85,12 @@ public sealed class AlbumCreatedEventHandler(
             album.AlbumRelease.ReleaseYear,
             album.Type.ToString(),
             album.AlbumRelease.Format.ToString(),
-            bands.Select(b => new AlbumBandRef(b.Id.Value, b.Name, b.Slug)).ToList(),
+            bands.Select(b => new AlbumBandRef(b.Id.Value, b.Name, b.Slug, b.IsApproved)).ToList(),
             genres.Select(g => g.Name).ToList(),
             [],
             countries.Select(c => new AlbumCountryRef(c.Name, c.Code)).ToList(),
             tracks.Select(t => t.Title).ToList(),
             album.CreatedAt.HasValue ? new DateTimeOffset(album.CreatedAt.Value).ToUnixTimeSeconds() : 0,
-            album.IsApproved,
             album.AverageRating,
             album.RatingsCount
         ), cancellationToken);
