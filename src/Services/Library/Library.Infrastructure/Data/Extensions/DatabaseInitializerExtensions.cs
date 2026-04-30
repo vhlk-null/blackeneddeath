@@ -100,7 +100,7 @@ public static class DatabaseInitializerExtensions
 
         Dictionary<BandId, AlbumBandRef> bandNames = allBandIds.Count > 0
             ? await context.Bands.Where(b => allBandIds.Contains(b.Id)).AsNoTracking()
-                .ToDictionaryAsync(b => b.Id, b => new AlbumBandRef(b.Id.Value, b.Name, b.Slug))
+                .ToDictionaryAsync(b => b.Id, b => new AlbumBandRef(b.Id.Value, b.Name, b.Slug, b.IsApproved))
             : [];
 
         Dictionary<GenreId, string> genreNames = allGenreIds.Count > 0
@@ -132,7 +132,6 @@ public static class DatabaseInitializerExtensions
             a.AlbumCountries.Where(ac => countryNames.ContainsKey(ac.CountryId)).Select(ac => countryNames[ac.CountryId]).ToList(),
             a.AlbumTracks.Select(at => trackTitles.TryGetValue(at.TrackId, out string? n) ? n : "").Where(n => n != "").ToList(),
             a.CreatedAt.HasValue ? new DateTimeOffset(a.CreatedAt.Value).ToUnixTimeSeconds() : 0,
-            a.IsApproved,
             a.AverageRating,
             a.RatingsCount
         )).ToList();
