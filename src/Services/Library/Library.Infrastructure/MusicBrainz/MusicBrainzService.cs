@@ -49,7 +49,6 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
             var band = MapBand(detail);
 
             List<BandPreviewAlbum> albums = (detail.ReleaseGroups ?? [])
-                .Where(rg => IsAllowedType(rg.PrimaryType, rg.SecondaryTypes))
                 .OrderBy(rg => rg.FirstReleaseDate)
                 .Select(rg =>
                 {
@@ -58,7 +57,7 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
                     return new BandPreviewAlbum(
                         Title: rg.Title,
                         Year: year,
-                        Type: rg.PrimaryType ?? "Unknown",
+                        Type: BuildTypeLabel(rg.PrimaryType, rg.SecondaryTypes),
                         Slug: slug,
                         MbUrl: $"https://musicbrainz.org/release-group/{rg.Id}",
                         ExistsInDb: existingSlugs.Contains(slug));
@@ -185,9 +184,7 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
         CancellationToken ct)
     {
         var allowedGroups = (detail.ReleaseGroups ?? [])
-            .Where(rg => selectedAlbumMbIds is { Count: > 0 }
-                ? selectedAlbumMbIds.Contains(rg.Id)
-                : IsAllowedType(rg.PrimaryType, rg.SecondaryTypes))
+            .Where(rg => selectedAlbumMbIds is not { Count: > 0 } || selectedAlbumMbIds.Contains(rg.Id))
             .ToList();
 
         logger.LogInformation("Release groups after filter: {Count}/{Total}",
@@ -271,18 +268,11 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
         return result;
     }
 
-    private static readonly HashSet<string> AllowedPrimaryTypes =
-        ["Album", "EP", "Single"];
-
-    private static readonly HashSet<string> BlockedSecondaryTypes =
-        ["Live", "Compilation", "Remix", "Soundtrack", "Demo", "DJ-mix", "Mixtape/Street"];
-
-    private static bool IsAllowedType(string? primaryType, List<string>? secondaryTypes)
+    private static string BuildTypeLabel(string? primaryType, List<string>? secondaryTypes)
     {
-        if (primaryType is null) return false;
-        if (!AllowedPrimaryTypes.Contains(primaryType)) return false;
-        if (secondaryTypes is { Count: > 0 } && secondaryTypes.Any(s => BlockedSecondaryTypes.Contains(s))) return false;
-        return true;
+        if (secondaryTypes is { Count: > 0 })
+            return string.Join(" + ", secondaryTypes);
+        return primaryType ?? "Unknown";
     }
 
     private static AppAlbumTypeHint MapAlbumTypeHint(string? mbType) => mbType?.ToLowerInvariant() switch
