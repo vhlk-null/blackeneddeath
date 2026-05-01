@@ -1,3 +1,3 @@
 namespace Library.Application.Dtos;
 
-public record PendingApprovalDto(Guid Id, string Name, string? Slug, string? CreatedBy);
+public record PendingApprovalDto(Guid Id, string Name, string? Slug, string? CreatedBy, DateTime? CreatedAt = null, int? ReleaseYear = null);

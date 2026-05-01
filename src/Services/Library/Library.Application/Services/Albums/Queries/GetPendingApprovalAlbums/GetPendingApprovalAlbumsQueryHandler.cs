@@ -33,8 +33,8 @@ public class GetPendingApprovalAlbumsQueryHandler(ILibraryDbContext context)
                     BandId: g.Key.Value,
                     BandName: band?.Name ?? "Unknown",
                     BandSlug: band?.Slug,
-                    Albums: g.Select(x => new PendingApprovalDto(
-                        x.Album.Id.Value, x.Album.Title, x.Album.Slug, x.Album.CreatedBy)).ToList());
+                    Albums: g.OrderBy(x => x.Album.AlbumRelease.ReleaseYear).Select(x => new PendingApprovalDto(
+                        x.Album.Id.Value, x.Album.Title, x.Album.Slug, x.Album.CreatedBy, x.Album.CreatedAt, x.Album.AlbumRelease.ReleaseYear)).ToList());
             })
             .OrderBy(g => g.BandName)
             .ToList();
