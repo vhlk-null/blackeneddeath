@@ -185,8 +185,9 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
         CancellationToken ct)
     {
         var allowedGroups = (detail.ReleaseGroups ?? [])
-            .Where(rg => IsAllowedType(rg.PrimaryType, rg.SecondaryTypes))
-            .Where(rg => selectedAlbumMbIds is null or { Count: 0 } || selectedAlbumMbIds.Contains(rg.Id))
+            .Where(rg => selectedAlbumMbIds is { Count: > 0 }
+                ? selectedAlbumMbIds.Contains(rg.Id)
+                : IsAllowedType(rg.PrimaryType, rg.SecondaryTypes))
             .ToList();
 
         logger.LogInformation("Release groups after filter: {Count}/{Total}",
@@ -209,12 +210,13 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
             var releases = await BrowseReleasesAsync(rg.Id, ct);
             var earliestRelease = releases.OrderBy(r => r.Date).FirstOrDefault();
 
-            var releaseDate = earliestRelease?.Date ?? rg.FirstReleaseDate;
+            var releaseDate = string.IsNullOrWhiteSpace(earliestRelease?.Date) ? rg.FirstReleaseDate : earliestRelease.Date;
             var (year, month, day) = ParseDate(releaseDate);
 
             if (year is null)
             {
-                logger.LogWarning("Skipping '{Title}' — no release year", rg.Title);
+                logger.LogWarning("Skipping '{Title}' — no release year (FirstReleaseDate='{Date}', EarliestRelease='{EarliestDate}')",
+                    rg.Title, rg.FirstReleaseDate, earliestRelease?.Date);
                 continue;
             }
 
