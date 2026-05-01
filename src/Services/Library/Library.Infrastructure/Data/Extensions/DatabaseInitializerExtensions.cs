@@ -100,7 +100,7 @@ public static class DatabaseInitializerExtensions
 
         Dictionary<BandId, AlbumBandRef> bandNames = allBandIds.Count > 0
             ? await context.Bands.Where(b => allBandIds.Contains(b.Id)).AsNoTracking()
-                .ToDictionaryAsync(b => b.Id, b => new AlbumBandRef(b.Id.Value, b.Name, b.Slug, b.IsApproved))
+                .ToDictionaryAsync(b => b.Id, b => new AlbumBandRef(b.Id.Value, b.Name, b.IsApproved ? b.Slug : null, b.IsApproved))
             : [];
 
         Dictionary<GenreId, string> genreNames = allGenreIds.Count > 0

@@ -192,7 +192,7 @@ public static class AlbumExtensions
             album.LabelId != null && labels.TryGetValue(album.LabelId, out Label? label) ? label.ToLabelDto() : null,
             rootBandIds
                 .Select(id => bands[id])
-                .Select(b => new BandSummaryDto(b.Id.Value, b.Name, b.Slug, b.Status))
+                .Select(b => new BandSummaryDto(b.Id.Value, b.Name, b.IsApproved ? b.Slug : null, b.Status))
                 .ToList(),
             album.AlbumCountries
                 .Where(ac => countries.ContainsKey(ac.CountryId))

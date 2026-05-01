@@ -75,7 +75,7 @@ public sealed class AlbumUpdatedEventHandler(
             album.AlbumRelease.ReleaseYear,
             album.Type.ToString(),
             album.AlbumRelease.Format.ToString(),
-            bands.Select(b => new AlbumBandRef(b.Id.Value, b.Name, b.Slug, b.IsApproved)).ToList(),
+            bands.Select(b => new AlbumBandRef(b.Id.Value, b.Name, b.IsApproved ? b.Slug : null, b.IsApproved)).ToList(),
             genres.Select(g => g.Name).ToList(),
             [],
             countries.Select(c => new AlbumCountryRef(c.Name, c.Code)).ToList(),
