@@ -99,8 +99,8 @@ public static class DatabaseInitializerExtensions
         List<TrackId> allTrackIds = albums.SelectMany(a => a.AlbumTracks.Select(at => at.TrackId)).Distinct().ToList();
 
         Dictionary<BandId, AlbumBandRef> bandNames = allBandIds.Count > 0
-            ? await context.Bands.Where(b => allBandIds.Contains(b.Id)).AsNoTracking()
-                .ToDictionaryAsync(b => b.Id, b => new AlbumBandRef(b.Id.Value, b.Name, b.IsApproved ? b.Slug : null, b.IsApproved))
+            ? await context.Bands.Where(b => allBandIds.Contains(b.Id) && b.IsApproved).AsNoTracking()
+                .ToDictionaryAsync(b => b.Id, b => new AlbumBandRef(b.Id.Value, b.Name, b.Slug))
             : [];
 
         Dictionary<GenreId, string> genreNames = allGenreIds.Count > 0
