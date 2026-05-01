@@ -10,7 +10,8 @@ public class GetPendingApprovalBandsQueryHandler(ILibraryDbContext context)
         List<PendingApprovalDto> bands = await context.Bands
             .AsNoTracking()
             .Where(b => !b.IsApproved)
-            .Select(b => new PendingApprovalDto(b.Id.Value, b.Name, b.Slug, b.CreatedBy))
+            .OrderBy(b => b.Activity.FormedYear)
+            .Select(b => new PendingApprovalDto(b.Id.Value, b.Name, b.Slug, b.CreatedBy, b.CreatedAt, b.Activity.FormedYear))
             .ToListAsync(cancellationToken);
 
         return new GetPendingApprovalBandsResult(bands);
