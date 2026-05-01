@@ -34,6 +34,10 @@ public static class DatabaseInitializerExtensions
         {
             logger.LogInformation("Initializing Meilisearch indexes...");
 
+            await Task.WhenAll(
+                DeleteIndexIfExistsAsync(client, SearchIndexes.Albums, logger),
+                DeleteIndexIfExistsAsync(client, SearchIndexes.Bands, logger));
+
             var albumsTask = await client.CreateIndexAsync(SearchIndexes.Albums, "id");
             var bandsTask = await client.CreateIndexAsync(SearchIndexes.Bands, "id");
             await Task.WhenAll(
@@ -149,6 +153,7 @@ public static class DatabaseInitializerExtensions
         logger.LogInformation("Reindexing bands into Meilisearch...");
 
         List<Band> bands = await context.Bands
+            .Where(b => b.IsApproved)
             .Include(b => b.BandGenres)
             .Include(b => b.BandCountries)
             .AsNoTracking()
@@ -184,13 +189,26 @@ public static class DatabaseInitializerExtensions
             b.BandGenres.Select(bg => genreNames.TryGetValue(bg.GenreId, out string? n) ? n : "").Where(n => n != "").ToList(),
             b.BandCountries.Select(bc => countryNames.TryGetValue(bc.CountryId, out string? n) ? n : "").Where(n => n != "").ToList(),
             b.CreatedAt.HasValue ? new DateTimeOffset(b.CreatedAt.Value).ToUnixTimeSeconds() : 0,
-            b.IsApproved,
             b.AverageRating,
             b.RatingsCount
         )).ToList();
 
         await index.AddDocumentsAsync(documents);
         logger.LogInformation("Reindexed {Count} bands into Meilisearch.", documents.Count);
+    }
+
+    private static async Task DeleteIndexIfExistsAsync(MeilisearchClient client, string indexName, ILogger logger)
+    {
+        try
+        {
+            var task = await client.DeleteIndexAsync(indexName);
+            await client.WaitForTaskAsync(task.TaskUid);
+            logger.LogInformation("Deleted Meilisearch index '{Index}'.", indexName);
+        }
+        catch (Exception)
+        {
+            // index didn't exist — ignore
+        }
     }
 
     private static async Task ApplyMigrationsAsync(LibraryContext context, ILogger logger)

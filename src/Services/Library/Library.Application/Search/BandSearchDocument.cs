@@ -11,6 +11,5 @@ public record BandSearchDocument(
     List<string> Genres,
     List<string> Countries,
     long CreatedAt,
-    bool IsApproved = false,
     double? AverageRating = null,
     int RatingsCount = 0);
