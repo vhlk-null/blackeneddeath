@@ -57,6 +57,7 @@ public class Album : Aggregate<AlbumId>
     public void Approve()
     {
         IsApproved = true;
+        CreatedAt = DateTime.UtcNow;
     }
 
     public void Delete()
