@@ -75,22 +75,17 @@ IIdentityServerBuilder identityServerBuilder = builder.Services
     .AddProfileService<CustomProfileService>(); // для roles в токені
 
 // ⬇ ПІДПИС — різна логіка для dev та prod
-if (builder.Environment.IsDevelopment())
+string? certPassword = builder.Configuration["IdentityServer:SigningCertPassword"];
+string? certPath = builder.Configuration["IdentityServer:SigningCertPath"];
+
+if (!string.IsNullOrEmpty(certPassword) && !string.IsNullOrEmpty(certPath))
 {
-    identityServerBuilder.AddDeveloperSigningCredential(persistKey: true);
+    var cert = new System.Security.Cryptography.X509Certificates.X509Certificate2(certPath, certPassword);
+    identityServerBuilder.AddSigningCredential(cert);
 }
 else
 {
-    // Реальний PFX сертифікат
-    string certPath = builder.Configuration["IdentityServer:SigningCertPath"]
-        ?? "/app/keys/signing-cert.pfx";
-    string certPassword = builder.Configuration["IdentityServer:SigningCertPassword"]
-        ?? throw new InvalidOperationException("SigningCertPassword is not configured.");
-
-    var cert = new System.Security.Cryptography.X509Certificates.X509Certificate2(
-        certPath, certPassword);
-
-    identityServerBuilder.AddSigningCredential(cert);
+    identityServerBuilder.AddDeveloperSigningCredential(persistKey: true);
 }
 
 if (!builder.Environment.IsDevelopment())
