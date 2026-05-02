@@ -68,6 +68,7 @@ global using Library.Application.Services.GenreCards.Commands.RemoveGenreFromGen
 global using Library.Application.Services.GenreCards.Commands.RemoveTagFromGenreCard;
 global using Library.Application.Services.GenreCards.Commands.UpdateGenreCard;
 global using Library.Application.Services.GenreCards.Commands.UpdateGenreCardCover;
+global using Library.Application.Services.GenreCards.Commands.ReorderGenreCards;
 global using Library.Application.Services.GenreCards.Queries.GetAlbumsByGenreCard;
 global using Library.Application.Services.GenreCards.Queries.GetGenreCardById;
 global using Library.Application.Services.GenreCards.Queries.GetGenreCards;

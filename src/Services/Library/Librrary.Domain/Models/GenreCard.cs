@@ -57,6 +57,8 @@ public class GenreCard : Aggregate<GenreCardId>
         _genreCardGenres.Add(new GenreCardGenre(Id, genreId));
     }
 
+    public void SetOrderNumber(int order) => OrderNumber = order;
+
     public void RemoveGenre(GenreId genreId)
     {
         GenreCardGenre item = _genreCardGenres.FirstOrDefault(g => g.GenreId == genreId)
