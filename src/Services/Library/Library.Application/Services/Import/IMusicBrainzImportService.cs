@@ -81,7 +81,10 @@ public class AlbumImportData
     public string? CoverUrl { get; init; }
     public string? LabelName { get; init; }
     public List<TrackImportData> Tracks { get; init; } = [];
+    public List<StreamingLinkImportData> StreamingLinks { get; init; } = [];
 }
+
+public record StreamingLinkImportData(StreamingPlatform Platform, string Url);
 
 public class TrackImportData
 {

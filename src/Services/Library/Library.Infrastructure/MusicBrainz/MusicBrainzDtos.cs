@@ -71,7 +71,8 @@ public record MbRelease(
     [property: JsonPropertyName("status")]         string? Status,
     [property: JsonPropertyName("release-group")] MbReleaseGroup? ReleaseGroup,
     [property: JsonPropertyName("media")]          List<MbMedia>? Media,
-    [property: JsonPropertyName("label-info")]     List<MbLabelInfo>? LabelInfo
+    [property: JsonPropertyName("label-info")]     List<MbLabelInfo>? LabelInfo,
+    [property: JsonPropertyName("relations")]      List<MbRelation>? Relations
 );
 
 public record MbLabelInfo(
@@ -88,12 +89,23 @@ public record MbReleaseGroup(
     [property: JsonPropertyName("title")]               string Title,
     [property: JsonPropertyName("primary-type")]        string? PrimaryType,
     [property: JsonPropertyName("secondary-types")]     List<string>? SecondaryTypes,
-    [property: JsonPropertyName("first-release-date")]  string? FirstReleaseDate
+    [property: JsonPropertyName("first-release-date")]  string? FirstReleaseDate,
+    [property: JsonPropertyName("relations")]           List<MbRelation>? Relations
+);
+
+public record MbRelation(
+    [property: JsonPropertyName("type")]  string Type,
+    [property: JsonPropertyName("url")]   MbUrl? Url
+);
+
+public record MbUrl(
+    [property: JsonPropertyName("resource")] string Resource
 );
 
 // ── Media / Tracks ───────────────────────────────────────────────────────────
 
 public record MbMedia(
+    [property: JsonPropertyName("format")] string? Format,
     [property: JsonPropertyName("tracks")] List<MbTrack>? Tracks
 );
 

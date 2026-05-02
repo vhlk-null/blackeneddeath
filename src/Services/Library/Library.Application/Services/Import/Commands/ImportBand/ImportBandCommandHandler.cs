@@ -72,6 +72,9 @@ public class ImportBandCommandHandler(
             foreach ((Track track, TrackImportData dto) in tracks.Zip(albumData.Tracks))
                 album.AddTrack(track.Id, dto.TrackNumber);
 
+            foreach (StreamingLinkImportData link in albumData.StreamingLinks)
+                album.AddStreamingLink(link.Platform, link.Url);
+
             context.Albums.Add(album);
             albumsImported++;
         }

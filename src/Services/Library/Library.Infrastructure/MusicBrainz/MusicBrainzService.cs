@@ -2,11 +2,13 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Library.Application.Services.Import;
 using Microsoft.Extensions.Logging;
-using AppImportResult  = Library.Application.Services.Import.MusicBrainzImportResult;
-using AppBandData      = Library.Application.Services.Import.BandImportData;
-using AppAlbumData     = Library.Application.Services.Import.AlbumImportData;
-using AppTrackData     = Library.Application.Services.Import.TrackImportData;
-using AppAlbumTypeHint = Library.Application.Services.Import.AlbumTypeHint;
+using AppImportResult    = Library.Application.Services.Import.MusicBrainzImportResult;
+using AppBandData        = Library.Application.Services.Import.BandImportData;
+using AppAlbumData       = Library.Application.Services.Import.AlbumImportData;
+using AppTrackData       = Library.Application.Services.Import.TrackImportData;
+using AppAlbumTypeHint   = Library.Application.Services.Import.AlbumTypeHint;
+using AppStreamingLink   = Library.Application.Services.Import.StreamingLinkImportData;
+using AppStreamingPlatform = Library.Domain.Enums.StreamingPlatform;
 
 namespace Library.Infrastructure.MusicBrainz;
 
@@ -135,7 +137,7 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
     private async Task<List<MbRelease>> BrowseReleasesAsync(string releaseGroupId, CancellationToken ct)
     {
         await RateLimit(ct);
-        var url = $"release?release-group={releaseGroupId}&status=official&fmt=json";
+        var url = $"release?release-group={releaseGroupId}&status=official&inc=media&fmt=json";
         var result = await http.GetFromJsonAsync<MbReleaseBrowseResult>(url, JsonOpts, ct);
         return result?.Releases ?? [];
     }
@@ -143,7 +145,7 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
     private async Task<MbRelease?> GetReleaseDetailAsync(string releaseId, CancellationToken ct)
     {
         await RateLimit(ct);
-        var url = $"release/{releaseId}?inc=recordings+labels&fmt=json";
+        var url = $"release/{releaseId}?inc=recordings+labels+url-rels&fmt=json";
         return await http.GetFromJsonAsync<MbRelease>(url, JsonOpts, ct);
     }
 
@@ -206,6 +208,8 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
             // Get official releases in this group
             var releases = await BrowseReleasesAsync(rg.Id, ct);
             var earliestRelease = releases.OrderBy(r => r.Date).FirstOrDefault();
+            var digitalRelease = releases.FirstOrDefault(r =>
+                r.Media?.Any(m => m.Format != null && m.Format.Contains("Digital", StringComparison.OrdinalIgnoreCase)) == true);
 
             var releaseDate = string.IsNullOrWhiteSpace(earliestRelease?.Date) ? rg.FirstReleaseDate : earliestRelease.Date;
             var (year, month, day) = ParseDate(releaseDate);
@@ -224,16 +228,45 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
             string? labelName = releaseDetail?.LabelInfo?
                 .FirstOrDefault(li => li.Label is not null)?.Label?.Name;
 
+            MbRelease? streamingSource = releaseDetail;
+            if (digitalRelease is not null)
+            {
+                logger.LogInformation("  → '{Title}' fetching digital release {Id} for streaming links", rg.Title, digitalRelease.Id);
+                streamingSource = await GetReleaseDetailAsync(digitalRelease.Id, ct);
+            }
+
+            var streamingLinks = MapStreamingLinks(streamingSource?.Relations);
+
+            if (streamingSource?.Relations is { Count: > 0 })
+            {
+                logger.LogInformation("  → '{Title}' raw relations ({Count}): {Relations}",
+                    rg.Title,
+                    streamingSource.Relations.Count,
+                    string.Join(", ", streamingSource.Relations.Select(r => $"{r.Type}={r.Url?.Resource}")));
+            }
+            else
+            {
+                logger.LogInformation("  → '{Title}' no url-rels returned from MusicBrainz", rg.Title);
+            }
+
+            if (streamingLinks.Count > 0)
+                logger.LogInformation("  → '{Title}' streaming links resolved: {Links}",
+                    rg.Title,
+                    string.Join(", ", streamingLinks.Select(l => $"{l.Platform}={l.Url}")));
+            else
+                logger.LogInformation("  → '{Title}' no streaming links matched", rg.Title);
+
             albums.Add(new AppAlbumData
             {
-                Title        = rg.Title,
-                ReleaseYear  = year.Value,
-                ReleaseMonth = month,
-                ReleaseDay   = day,
-                TypeHint     = MapAlbumTypeHint(rg.PrimaryType),
-                CoverUrl     = coverUrl,
-                LabelName    = labelName,
-                Tracks       = tracks
+                Title          = rg.Title,
+                ReleaseYear    = year.Value,
+                ReleaseMonth   = month,
+                ReleaseDay     = day,
+                TypeHint       = MapAlbumTypeHint(rg.PrimaryType),
+                CoverUrl       = coverUrl,
+                LabelName      = labelName,
+                Tracks         = tracks,
+                StreamingLinks = streamingLinks
             });
 
             progress?.Report(new ImportProgressEvent(
@@ -273,6 +306,42 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
         if (secondaryTypes is { Count: > 0 })
             return string.Join(" + ", secondaryTypes);
         return primaryType ?? "Unknown";
+    }
+
+    private static List<AppStreamingLink> MapStreamingLinks(List<MbRelation>? relations)
+    {
+        if (relations is null or { Count: 0 }) return [];
+
+        var result = new List<AppStreamingLink>();
+        var seen = new HashSet<AppStreamingPlatform>();
+
+        foreach (var rel in relations)
+        {
+            string? resource = rel.Url?.Resource;
+            if (string.IsNullOrWhiteSpace(resource)) continue;
+
+            if (!Uri.TryCreate(resource, UriKind.Absolute, out Uri? uri)) continue;
+
+            AppStreamingPlatform? platform = uri.Host switch
+            {
+                var h when h.Contains("spotify.com")      => AppStreamingPlatform.Spotify,
+                var h when h.Contains("music.apple.com")  => AppStreamingPlatform.AppleMusic,
+                var h when h.Contains("youtube.com")
+                        || h.Contains("youtu.be")         => AppStreamingPlatform.YouTube,
+                var h when h.Contains("deezer.com")       => AppStreamingPlatform.Deezer,
+                var h when h.Contains("soundcloud.com")   => AppStreamingPlatform.SoundCloud,
+                var h when h.Contains("tidal.com")        => AppStreamingPlatform.Tidal,
+                var h when h.Contains("music.amazon.com") => AppStreamingPlatform.AmazonMusic,
+                var h when h.Contains("bandcamp.com")     => AppStreamingPlatform.Bandcamp,
+                _                                         => (AppStreamingPlatform?)null
+            };
+
+            if (platform is null || !seen.Add(platform.Value)) continue;
+
+            result.Add(new AppStreamingLink(platform.Value, resource));
+        }
+
+        return result;
     }
 
     private static AppAlbumTypeHint MapAlbumTypeHint(string? mbType) => mbType?.ToLowerInvariant() switch
