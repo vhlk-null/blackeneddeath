@@ -56,6 +56,17 @@ public record FavoriteBandDto(
     DateTime AddedDate,
     bool IsFollowing);
 
+public record AdminUserDto(
+    Guid UserId,
+    string Username,
+    string? Email,
+    DateTime RegisteredDate,
+    int FavoriteAlbumsCount,
+    int FavoriteBandsCount,
+    int AlbumReviewsCount,
+    int BandReviewsCount,
+    int CollectionsCount);
+
 public record UserProfileDto(Guid UserId, string Username, string Email,
     string? AvatarUrl, DateTime RegisteredDate, DateTime? LastLoginDate, string? Bio,
     int FavoriteBandsCount, int FavoriteAlbumsCount,

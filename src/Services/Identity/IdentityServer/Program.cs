@@ -1,4 +1,5 @@
 using IdentityServer.Data;
+using IdentityServer.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -8,15 +9,12 @@ using Npgsql;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 string? issuerUri = builder.Configuration["IdentityServer:IssuerUri"];
-string? migrationsAssembly = typeof(Program).Assembly.GetName().Name;
+string migrationsAssembly = typeof(Program).Assembly.GetName().Name!;
 
 string rawConnectionString = builder.Configuration.GetConnectionString("IdentityDb")
     ?? throw new InvalidOperationException("IdentityDb connection string is not configured.");
 
-var csBuilder = new NpgsqlConnectionStringBuilder(rawConnectionString);
-
-string connectionString = csBuilder.ConnectionString;
-Console.WriteLine($"[DEBUG] Final ConnectionString: {connectionString}");
+string connectionString = new NpgsqlConnectionStringBuilder(rawConnectionString).ConnectionString;
 
 builder.Services.AddRazorPages();
 
@@ -46,8 +44,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+// Реєструємо Config через DI щоб SeedUsers міг його використовувати
+builder.Services.AddSingleton<Config>();
 
-IIdentityServerBuilder identityServerBuilder = builder.Services.AddIdentityServer(options =>
+IIdentityServerBuilder identityServerBuilder = builder.Services
+    .AddIdentityServer(options =>
     {
         if (!string.IsNullOrEmpty(issuerUri))
             options.IssuerUri = issuerUri;
@@ -57,37 +58,61 @@ IIdentityServerBuilder identityServerBuilder = builder.Services.AddIdentityServe
     })
     .AddConfigurationStore(opt =>
     {
-        opt.ConfigureDbContext = b => b.UseNpgsql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+        opt.ConfigureDbContext = b =>
+            b.UseNpgsql(connectionString, sql =>
+                sql.MigrationsAssembly(migrationsAssembly));
     })
     .AddOperationalStore(opt =>
     {
-        opt.ConfigureDbContext = b => b.UseNpgsql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+        opt.ConfigureDbContext = b =>
+            b.UseNpgsql(connectionString, sql =>
+                sql.MigrationsAssembly(migrationsAssembly));
+        // Автоматично чистить прострочені токени
+        opt.EnableTokenCleanup = true;
+        opt.TokenCleanupInterval = 3600;
     })
-    .AddAspNetIdentity<ApplicationUser>();
+    .AddAspNetIdentity<ApplicationUser>()
+    .AddProfileService<CustomProfileService>(); // для roles в токені
 
+// ⬇ ПІДПИС — різна логіка для dev та prod
 if (builder.Environment.IsDevelopment())
+{
     identityServerBuilder.AddDeveloperSigningCredential(persistKey: true);
+}
 else
-    identityServerBuilder.AddDeveloperSigningCredential(persistKey: true, filename: "/app/keys/signing-credential.jwk");
+{
+    // Реальний PFX сертифікат
+    string certPath = builder.Configuration["IdentityServer:SigningCertPath"]
+        ?? "/app/keys/signing-cert.pfx";
+    string certPassword = builder.Configuration["IdentityServer:SigningCertPassword"]
+        ?? throw new InvalidOperationException("SigningCertPassword is not configured.");
+
+    var cert = new System.Security.Cryptography.X509Certificates.X509Certificate2(
+        certPath, certPassword);
+
+    identityServerBuilder.AddSigningCredential(cert);
+}
 
 if (!builder.Environment.IsDevelopment())
 {
-    builder.Services.Configure<CookieAuthenticationOptions>(IdentityServerConstants.DefaultCookieAuthenticationScheme, options =>
-    {
-        options.Cookie.SameSite = SameSiteMode.None;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    });
+    builder.Services.Configure<CookieAuthenticationOptions>(
+        IdentityServerConstants.DefaultCookieAuthenticationScheme,
+        options =>
+        {
+            options.Cookie.SameSite = SameSiteMode.None;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        });
 }
 
 WebApplication app = builder.Build();
 
-ForwardedHeadersOptions forwardedOptions = new()
+app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-};
-forwardedOptions.KnownNetworks.Clear();
-forwardedOptions.KnownProxies.Clear();
-app.UseForwardedHeaders(forwardedOptions);
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+    // Очищаємо known networks щоб довіряти будь-якому проксі (обережно в публічних мережах)
+    KnownNetworks = { },
+    KnownProxies = { }
+});
 
 app.UseStaticFiles();
 app.UseRouting();

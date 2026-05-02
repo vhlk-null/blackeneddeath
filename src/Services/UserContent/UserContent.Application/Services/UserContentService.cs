@@ -56,6 +56,55 @@ public class UserContentService(
         return dto with { Collections = collectionDtos };
     }
 
+    public async Task<PaginatedResult<AdminUserDto>> GetAllUsersAsync(int pageIndex, int pageSize, CancellationToken ct = default)
+    {
+        int totalCount = await repo.Filter<UserProfileInfo>(_ => true, asTracked: false).CountAsync(ct);
+
+        List<UserProfileInfo> users = await repo.Filter<UserProfileInfo>(_ => true, asTracked: false)
+            .OrderBy(u => u.RegisteredDate)
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        List<Guid> userIds = users.Select(u => u.UserId).ToList();
+
+        var albumReviewCounts = await repo.Filter<AlbumReview>(r => userIds.Contains(r.UserId), asTracked: false)
+            .GroupBy(r => r.UserId)
+            .Select(g => new { UserId = g.Key, Count = g.Count() })
+            .ToListAsync(ct);
+
+        var bandReviewCounts = await repo.Filter<BandReview>(r => userIds.Contains(r.UserId), asTracked: false)
+            .GroupBy(r => r.UserId)
+            .Select(g => new { UserId = g.Key, Count = g.Count() })
+            .ToListAsync(ct);
+
+        var favAlbumCounts = await repo.Filter<FavoriteAlbum>(fa => userIds.Contains(fa.UserId), asTracked: false)
+            .GroupBy(fa => fa.UserId)
+            .Select(g => new { UserId = g.Key, Count = g.Count() })
+            .ToListAsync(ct);
+
+        var favBandCounts = await repo.Filter<FavoriteBand>(fb => userIds.Contains(fb.UserId), asTracked: false)
+            .GroupBy(fb => fb.UserId)
+            .Select(g => new { UserId = g.Key, Count = g.Count() })
+            .ToListAsync(ct);
+
+        var collectionCounts = await repo.Filter<Collection>(c => userIds.Contains(c.UserId), asTracked: false)
+            .GroupBy(c => c.UserId)
+            .Select(g => new { UserId = g.Key, Count = g.Count() })
+            .ToListAsync(ct);
+
+        List<AdminUserDto> items = users.Select(u => new AdminUserDto(
+            u.UserId, u.Username, u.Email, u.RegisteredDate,
+            favAlbumCounts.FirstOrDefault(x => x.UserId == u.UserId)?.Count ?? 0,
+            favBandCounts.FirstOrDefault(x => x.UserId == u.UserId)?.Count ?? 0,
+            albumReviewCounts.FirstOrDefault(x => x.UserId == u.UserId)?.Count ?? 0,
+            bandReviewCounts.FirstOrDefault(x => x.UserId == u.UserId)?.Count ?? 0,
+            collectionCounts.FirstOrDefault(x => x.UserId == u.UserId)?.Count ?? 0
+        )).ToList();
+
+        return new PaginatedResult<AdminUserDto>(pageIndex, pageSize, totalCount, items);
+    }
+
     public async Task<PaginatedResult<AlbumCardDto>> GetFavoriteAlbumsAsync(Guid userId, int pageIndex, int pageSize, CancellationToken ct = default)
     {
         IQueryable<FavoriteAlbum> favQuery = repo.Filter<FavoriteAlbum>(fa => fa.UserId == userId, asTracked: false);
