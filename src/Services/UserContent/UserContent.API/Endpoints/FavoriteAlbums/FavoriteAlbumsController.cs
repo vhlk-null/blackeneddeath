@@ -5,6 +5,7 @@ namespace UserContent.API.Endpoints.FavoriteAlbums;
 public record AddAlbumToFavoriteRequest(Guid AlbumId, Guid UserId);
 public record AddAlbumToFavoriteResponse(Guid UserId);
 public record DeleteFavoriteAlbumResponse(bool IsSuccess);
+public record ReorderFavoriteAlbumsRequest(Guid UserId, List<Guid> OrderedAlbumIds);
 
 [ApiController]
 [Route("favoriteAlbums")]
@@ -46,5 +47,13 @@ public class FavoriteAlbumsController(IUserContentService service) : ControllerB
     {
         await service.DeleteFavoriteAlbumAsync(userId, albumId, ct);
         return Ok(new DeleteFavoriteAlbumResponse(true));
+    }
+
+    [HttpPut("reorder")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ReorderFavoriteAlbums(ReorderFavoriteAlbumsRequest request, CancellationToken ct)
+    {
+        await service.ReorderFavoriteAlbumsAsync(request.UserId, request.OrderedAlbumIds, ct);
+        return NoContent();
     }
 }

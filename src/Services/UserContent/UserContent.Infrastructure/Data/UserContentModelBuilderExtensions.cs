@@ -195,6 +195,10 @@ public static class UserContentModelBuilderExtensions
             entity.Property(e => e.AddedDate)
                 .HasColumnName("added_date");
 
+            entity.Property(e => e.SortOrder)
+                .HasDefaultValue(0)
+                .HasColumnName("sort_order");
+
             entity.Property(e => e.UserReview)
                 .HasColumnType("text")
                 .HasColumnName("user_review");
@@ -228,6 +232,10 @@ public static class UserContentModelBuilderExtensions
             entity.Property(e => e.AddedDate)
                 .HasColumnName("added_date");
 
+            entity.Property(e => e.SortOrder)
+                .HasDefaultValue(0)
+                .HasColumnName("sort_order");
+
             entity.Property(e => e.IsFollowing)
                 .HasColumnName("is_following");
 
@@ -259,6 +267,10 @@ public static class UserContentModelBuilderExtensions
 
             entity.Property(e => e.AddedDate)
                 .HasColumnName("added_date");
+
+            entity.Property(e => e.SortOrder)
+                .HasDefaultValue(0)
+                .HasColumnName("sort_order");
 
             entity.HasOne(e => e.Collection)
                 .WithMany(c => c.CollectionBands)
@@ -376,6 +388,10 @@ public static class UserContentModelBuilderExtensions
 
             entity.Property(e => e.AddedDate)
                 .HasColumnName("added_date");
+
+            entity.Property(e => e.SortOrder)
+                .HasDefaultValue(0)
+                .HasColumnName("sort_order");
 
             entity.HasOne(e => e.Collection)
                 .WithMany(c => c.CollectionAlbums)

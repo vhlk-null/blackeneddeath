@@ -34,7 +34,8 @@ public static class MappingConfig
             .Map(dest => dest.AlbumType, src => ((AlbumType)src.Album.Type).ToString())
             .Map(dest => dest.BandName, src => src.Album.BandNames)
             .Map(dest => dest.BandSlug, src => src.Album.BandSlugs)
-            .Map(dest => dest.CountryNames, src => src.Album.CountryNames);
+            .Map(dest => dest.CountryNames, src => src.Album.CountryNames)
+            .Map(dest => dest.SortOrder, src => src.SortOrder);
     }
 
     private static void ConfigureFavoriteBandMappings()
@@ -45,14 +46,15 @@ public static class MappingConfig
             .Map(dest => dest.LogoUrl, src => src.Band.LogoUrl)
             .Map(dest => dest.FormedYear, src => src.Band.FormedYear)
             .Map(dest => dest.PrimaryGenreName, src => src.Band.PrimaryGenreName)
-            .Map(dest => dest.CountryNames, src => src.Band.CountryNames);
+            .Map(dest => dest.CountryNames, src => src.Band.CountryNames)
+            .Map(dest => dest.SortOrder, src => src.SortOrder);
     }
 
     private static void ConfigureUserProfileMappings()
     {
         TypeAdapterConfig<UserProfileInfo, UserProfileDto>.NewConfig()
-            .Map(dest => dest.FavoriteAlbums, src => src.FavoriteAlbums)
-            .Map(dest => dest.FavoriteBands, src => src.FavoriteBands)
+            .Map(dest => dest.FavoriteAlbums, src => src.FavoriteAlbums.OrderBy(fa => fa.SortOrder).ThenByDescending(fa => fa.AddedDate))
+            .Map(dest => dest.FavoriteBands, src => src.FavoriteBands.OrderBy(fb => fb.SortOrder).ThenByDescending(fb => fb.AddedDate))
             .Map(dest => dest.Collections, src => new List<CollectionDto>());
     }
 }

@@ -17,6 +17,7 @@ public record UpdateCollectionFormRequest
 
 public record AddAlbumToCollectionRequest(Guid AlbumId);
 public record AddBandToCollectionRequest(Guid BandId);
+public record ReorderCollectionItemsRequest(List<Guid> OrderedIds);
 
 [ApiController]
 [Route("collections")]
@@ -98,6 +99,14 @@ public class CollectionsController(IUserContentService service) : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{collectionId:guid}/albums/reorder")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ReorderAlbums(Guid collectionId, ReorderCollectionItemsRequest request, CancellationToken ct)
+    {
+        await service.ReorderCollectionAlbumsAsync(collectionId, request.OrderedIds, ct);
+        return NoContent();
+    }
+
     [HttpPost("{collectionId:guid}/bands")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -113,6 +122,14 @@ public class CollectionsController(IUserContentService service) : ControllerBase
     public async Task<IActionResult> RemoveBand(Guid collectionId, Guid bandId, CancellationToken ct)
     {
         await service.RemoveBandFromCollectionAsync(collectionId, bandId, ct);
+        return NoContent();
+    }
+
+    [HttpPut("{collectionId:guid}/bands/reorder")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ReorderBands(Guid collectionId, ReorderCollectionItemsRequest request, CancellationToken ct)
+    {
+        await service.ReorderCollectionBandsAsync(collectionId, request.OrderedIds, ct);
         return NoContent();
     }
 

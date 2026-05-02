@@ -111,8 +111,8 @@ public class UserContentService(
         IQueryable<Album> albumQuery = repo.Filter<Album>(_ => true, asTracked: false);
 
         var query = favQuery
-            .Join(albumQuery, fa => fa.AlbumId, a => a.Id, (fa, a) => new { fa.AddedDate, Album = a })
-            .OrderByDescending(x => x.AddedDate);
+            .Join(albumQuery, fa => fa.AlbumId, a => a.Id, (fa, a) => new { fa.AddedDate, fa.SortOrder, Album = a })
+            .OrderBy(x => x.SortOrder).ThenByDescending(x => x.AddedDate);
 
         int totalCount = await query.CountAsync(ct);
         var albums = await query
@@ -159,14 +159,29 @@ public class UserContentService(
         await repo.SaveChangesAsync(ct);
     }
 
+    public async Task ReorderFavoriteAlbumsAsync(Guid userId, List<Guid> orderedAlbumIds, CancellationToken ct = default)
+    {
+        List<FavoriteAlbum> favorites = await repo.Filter<FavoriteAlbum>(fa => fa.UserId == userId)
+            .ToListAsync(ct);
+
+        for (int i = 0; i < orderedAlbumIds.Count; i++)
+        {
+            FavoriteAlbum? fa = favorites.FirstOrDefault(f => f.AlbumId == orderedAlbumIds[i]);
+            if (fa is not null)
+                fa.SortOrder = i;
+        }
+
+        await repo.SaveChangesAsync(ct);
+    }
+
     public async Task<PaginatedResult<BandCardDto>> GetFavoriteBandsAsync(Guid userId, int pageIndex, int pageSize, CancellationToken ct = default)
     {
         IQueryable<FavoriteBand> favQuery = repo.Filter<FavoriteBand>(fb => fb.UserId == userId, asTracked: false);
         IQueryable<Band> bandQuery = repo.Filter<Band>(_ => true, asTracked: false);
 
         var query = favQuery
-            .Join(bandQuery, fb => fb.BandId, b => b.BandId, (fb, b) => new { fb.AddedDate, Band = b })
-            .OrderByDescending(x => x.AddedDate);
+            .Join(bandQuery, fb => fb.BandId, b => b.BandId, (fb, b) => new { fb.AddedDate, fb.SortOrder, Band = b })
+            .OrderBy(x => x.SortOrder).ThenByDescending(x => x.AddedDate);
 
         int totalCount = await query.CountAsync(ct);
         var bands = await query
@@ -208,6 +223,21 @@ public class UserContentService(
                           ?? throw new FavoriteBandNotFoundException(bandId);
 
         repo.Delete(fb);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    public async Task ReorderFavoriteBandsAsync(Guid userId, List<Guid> orderedBandIds, CancellationToken ct = default)
+    {
+        List<FavoriteBand> favorites = await repo.Filter<FavoriteBand>(fb => fb.UserId == userId)
+            .ToListAsync(ct);
+
+        for (int i = 0; i < orderedBandIds.Count; i++)
+        {
+            FavoriteBand? fb = favorites.FirstOrDefault(f => f.BandId == orderedBandIds[i]);
+            if (fb is not null)
+                fb.SortOrder = i;
+        }
+
         await repo.SaveChangesAsync(ct);
     }
 
@@ -657,6 +687,21 @@ public class UserContentService(
         await repo.SaveChangesAsync(ct);
     }
 
+    public async Task ReorderCollectionAlbumsAsync(Guid collectionId, List<Guid> orderedAlbumIds, CancellationToken ct = default)
+    {
+        List<CollectionAlbum> items = await repo.Filter<CollectionAlbum>(ca => ca.CollectionId == collectionId)
+            .ToListAsync(ct);
+
+        for (int i = 0; i < orderedAlbumIds.Count; i++)
+        {
+            CollectionAlbum? ca = items.FirstOrDefault(x => x.AlbumId == orderedAlbumIds[i]);
+            if (ca is not null)
+                ca.SortOrder = i;
+        }
+
+        await repo.SaveChangesAsync(ct);
+    }
+
     public async Task AddBandToCollectionAsync(Guid collectionId, Guid bandId, CancellationToken ct = default)
     {
         Collection collection = await repo.GetByAsync<Collection>(c => c.Id == collectionId, cancellationToken: ct)
@@ -684,6 +729,21 @@ public class UserContentService(
             ?? throw new NotFoundException("CollectionBand", bandId);
 
         repo.Delete(cb);
+        await repo.SaveChangesAsync(ct);
+    }
+
+    public async Task ReorderCollectionBandsAsync(Guid collectionId, List<Guid> orderedBandIds, CancellationToken ct = default)
+    {
+        List<CollectionBand> items = await repo.Filter<CollectionBand>(cb => cb.CollectionId == collectionId)
+            .ToListAsync(ct);
+
+        for (int i = 0; i < orderedBandIds.Count; i++)
+        {
+            CollectionBand? cb = items.FirstOrDefault(x => x.BandId == orderedBandIds[i]);
+            if (cb is not null)
+                cb.SortOrder = i;
+        }
+
         await repo.SaveChangesAsync(ct);
     }
 

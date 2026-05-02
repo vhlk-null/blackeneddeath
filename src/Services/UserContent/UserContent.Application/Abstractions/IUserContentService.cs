@@ -8,10 +8,12 @@ public interface IUserContentService
     Task<bool> IsAlbumFavoriteAsync(Guid userId, Guid albumId, CancellationToken ct = default);
     Task<Guid> AddFavoriteAlbumAsync(Guid userId, Guid albumId, CancellationToken ct = default);
     Task DeleteFavoriteAlbumAsync(Guid userId, Guid albumId, CancellationToken ct = default);
+    Task ReorderFavoriteAlbumsAsync(Guid userId, List<Guid> orderedAlbumIds, CancellationToken ct = default);
     Task<PaginatedResult<BandCardDto>> GetFavoriteBandsAsync(Guid userId, int pageIndex, int pageSize, CancellationToken ct = default);
     Task<bool> IsBandFavoriteAsync(Guid userId, Guid bandId, CancellationToken ct = default);
     Task<Guid> AddFavoriteBandAsync(Guid userId, Guid bandId, CancellationToken ct = default);
     Task DeleteFavoriteBandAsync(Guid userId, Guid bandId, CancellationToken ct = default);
+    Task ReorderFavoriteBandsAsync(Guid userId, List<Guid> orderedBandIds, CancellationToken ct = default);
     Task<PaginatedResult<ReviewDto>> GetBandAlbumReviewsAsync(Guid bandId, int pageIndex, int pageSize, ReviewOrderBy orderBy, CancellationToken ct = default);
     Task<PaginatedResult<ReviewDto>> GetAlbumReviewsAsync(Guid albumId, int pageIndex, int pageSize, ReviewOrderBy orderBy, CancellationToken ct = default);
     Task<int> GetAlbumReviewCountAsync(Guid albumId, CancellationToken ct = default);
@@ -33,8 +35,10 @@ public interface IUserContentService
     Task DeleteCollectionAsync(Guid collectionId, CancellationToken ct = default);
     Task AddAlbumToCollectionAsync(Guid collectionId, Guid albumId, CancellationToken ct = default);
     Task RemoveAlbumFromCollectionAsync(Guid collectionId, Guid albumId, CancellationToken ct = default);
+    Task ReorderCollectionAlbumsAsync(Guid collectionId, List<Guid> orderedAlbumIds, CancellationToken ct = default);
     Task AddBandToCollectionAsync(Guid collectionId, Guid bandId, CancellationToken ct = default);
     Task RemoveBandFromCollectionAsync(Guid collectionId, Guid bandId, CancellationToken ct = default);
+    Task ReorderCollectionBandsAsync(Guid collectionId, List<Guid> orderedBandIds, CancellationToken ct = default);
 
     Task<PaginatedResult<CommentDto>> GetAlbumCommentsAsync(Guid albumId, int pageIndex, int pageSize, Guid? requestingUserId = null, CancellationToken ct = default);
     Task<CommentDto> CreateAlbumCommentAsync(CreateAlbumCommentRequest request, CancellationToken ct = default);

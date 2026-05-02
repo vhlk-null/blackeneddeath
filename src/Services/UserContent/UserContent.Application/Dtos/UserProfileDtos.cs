@@ -43,6 +43,7 @@ public record FavoriteAlbumDto(
     string? BandSlug,
     string? CountryNames,
     DateTime AddedDate,
+    int SortOrder,
     string? UserReview);
 
 public record FavoriteBandDto(
@@ -54,6 +55,7 @@ public record FavoriteBandDto(
     string? PrimaryGenreName,
     string? CountryNames,
     DateTime AddedDate,
+    int SortOrder,
     bool IsFollowing);
 
 public record AdminUserDto(

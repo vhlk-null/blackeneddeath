@@ -3,6 +3,7 @@ namespace UserContent.API.Endpoints.FavoriteBands;
 public record AddBandToFavoriteRequest(Guid BandId, Guid UserId);
 public record AddBandToFavoriteResponse(Guid UserId);
 public record DeleteFavoriteBandResponse(bool IsSuccess);
+public record ReorderFavoriteBandsRequest(Guid UserId, List<Guid> OrderedBandIds);
 
 [ApiController]
 [Route("favoriteBands")]
@@ -44,5 +45,13 @@ public class FavoriteBandsController(IUserContentService service) : ControllerBa
     {
         await service.DeleteFavoriteBandAsync(userId, bandId, ct);
         return Ok(new DeleteFavoriteBandResponse(true));
+    }
+
+    [HttpPut("reorder")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ReorderFavoriteBands(ReorderFavoriteBandsRequest request, CancellationToken ct)
+    {
+        await service.ReorderFavoriteBandsAsync(request.UserId, request.OrderedBandIds, ct);
+        return NoContent();
     }
 }
