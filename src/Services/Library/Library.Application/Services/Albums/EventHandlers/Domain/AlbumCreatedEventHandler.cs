@@ -92,7 +92,8 @@ public sealed class AlbumCreatedEventHandler(
             tracks.Select(t => t.Title).ToList(),
             album.CreatedAt.HasValue ? new DateTimeOffset(album.CreatedAt.Value).ToUnixTimeSeconds() : 0,
             album.AverageRating,
-            album.RatingsCount
+            album.RatingsCount,
+            album.IsExplicit
         ), cancellationToken);
     }
 }

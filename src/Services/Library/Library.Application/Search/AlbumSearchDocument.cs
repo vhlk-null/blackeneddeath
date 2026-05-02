@@ -18,4 +18,5 @@ public record AlbumSearchDocument(
     List<string> Tracks,
     long CreatedAt,
     double? AverageRating = null,
-    int RatingsCount = 0);
+    int RatingsCount = 0,
+    bool IsExplicit = false);

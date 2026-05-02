@@ -137,7 +137,8 @@ public static class DatabaseInitializerExtensions
             a.AlbumTracks.Select(at => trackTitles.TryGetValue(at.TrackId, out string? n) ? n : "").Where(n => n != "").ToList(),
             a.CreatedAt.HasValue ? new DateTimeOffset(a.CreatedAt.Value).ToUnixTimeSeconds() : 0,
             a.AverageRating,
-            a.RatingsCount
+            a.RatingsCount,
+            a.IsExplicit
         )).ToList();
 
         await index.AddDocumentsAsync(documents);
