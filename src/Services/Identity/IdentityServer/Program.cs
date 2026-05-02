@@ -53,10 +53,6 @@ IIdentityServerBuilder identityServerBuilder = builder.Services
         if (!string.IsNullOrEmpty(issuerUri))
             options.IssuerUri = issuerUri;
 
-        string? publicOrigin = builder.Configuration["IdentityServer:PublicOrigin"];
-        if (!string.IsNullOrEmpty(publicOrigin))
-            options.PublicOrigin = publicOrigin;
-
         options.UserInteraction.LoginUrl = "/Account/Login";
         options.UserInteraction.LogoutUrl = "/Account/Logout";
     })
@@ -108,10 +104,18 @@ WebApplication app = builder.Build();
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
-    // Очищаємо known networks щоб довіряти будь-якому проксі (обережно в публічних мережах)
     KnownNetworks = { },
     KnownProxies = { }
 });
+
+if (!app.Environment.IsDevelopment())
+{
+    app.Use((ctx, next) =>
+    {
+        ctx.Request.Scheme = "https";
+        return next();
+    });
+}
 
 app.UseStaticFiles();
 app.UseRouting();
