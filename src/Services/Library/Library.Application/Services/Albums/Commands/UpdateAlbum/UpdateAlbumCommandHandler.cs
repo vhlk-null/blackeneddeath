@@ -47,7 +47,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
             : album.Slug;
 
         album.Update(command.Album.Title, newSlug, command.Album.Type, albumRelease, coverKey, labelId, command.Album.IsExplicit);
-        album.Approve();
+        album.MarkAsApproved();
 
         List<BandId> bandIds = await ResolveBandIdsAsync(command.Album, cancellationToken);
         ReconcileBands(album, bandIds);

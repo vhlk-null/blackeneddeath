@@ -11,7 +11,6 @@ public class ApproveAlbumCommandHandler(ILibraryDbContext context)
                       ?? throw new AlbumNotFoundException(command.AlbumId);
 
         album.Approve();
-        album.CreatedAt = DateTime.UtcNow;
         await context.SaveChangesAsync(cancellationToken);
 
         return new ApproveAlbumResult(true);

@@ -85,6 +85,11 @@ public class Band : Aggregate<BandId>
         CreatedAt = DateTime.UtcNow;
     }
 
+    public void MarkAsApproved()
+    {
+        IsApproved = true;
+    }
+
     public void Remove()
     {
         AddDomainEvent(new BandRemovedEvent(this));

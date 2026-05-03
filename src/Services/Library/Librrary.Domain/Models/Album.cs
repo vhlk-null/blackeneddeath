@@ -60,6 +60,11 @@ public class Album : Aggregate<AlbumId>
         CreatedAt = DateTime.UtcNow;
     }
 
+    public void MarkAsApproved()
+    {
+        IsApproved = true;
+    }
+
     public void Delete()
     {
         AddDomainEvent(new AlbumRemovedEvent(this));
