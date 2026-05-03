@@ -3,7 +3,7 @@ using Library.Application.Services.Import;
 namespace Library.Application.Services.Import.Commands.ImportBand;
 
 public class ImportBandCommandHandler(
-    IMusicBrainzImportService musicBrainz,
+    IBandImportService musicBrainz,
     ILibraryDbContext context,
     ImportStatusService importStatus,
     ILogger<ImportBandCommandHandler> logger)
@@ -23,7 +23,7 @@ public class ImportBandCommandHandler(
 
         var progress = new CompositeProgress(command.Progress, importStatus);
 
-        MusicBrainzImportResult result = await musicBrainz.ImportByMbIdAsync(
+        MusicBrainzImportResult result = await musicBrainz.ImportByIdAsync(
             command.MbId, command.BandName, command.SelectedAlbumMbIds, progress, importCt);
 
         if (!result.Success || result.Band is null)
@@ -43,6 +43,13 @@ public class ImportBandCommandHandler(
         foreach (AlbumImportData albumData in result.Albums)
         {
             string baseSlug = $"{SlugHelper.Generate(albumData.Title)}-{albumData.ReleaseYear}";
+
+            if (albumData.ReleaseYear <= 0)
+            {
+                logger.LogWarning("Skipping '{Title}' — no release year", albumData.Title);
+                albumsSkipped++;
+                continue;
+            }
 
             bool exists = await context.Albums.AnyAsync(a => a.Slug == baseSlug, cancellationToken);
             if (exists || usedSlugs.Contains(baseSlug))
@@ -66,6 +73,43 @@ public class ImportBandCommandHandler(
 
             foreach (StreamingLinkImportData link in albumData.StreamingLinks)
                 album.AddStreamingLink(link.Platform, link.Url);
+
+            logger.LogInformation("  '{Title}' — genres: [{Genres}], label: '{Label}'",
+                albumData.Title,
+                string.Join(", ", albumData.Genres),
+                albumData.LabelName ?? "none");
+
+            bool anyGenreAdded = false;
+            foreach (string genreName in albumData.Genres)
+            {
+                Genre? genre = await context.Genres
+                    .FirstOrDefaultAsync(g => g.Name.ToLower() == genreName.ToLower(), cancellationToken);
+                if (genre is null)
+                {
+                    logger.LogWarning("  Genre '{Genre}' not found in DB — skipping", genreName);
+                    continue;
+                }
+                album.AddGenre(genre.Id, isPrimary: !anyGenreAdded);
+                anyGenreAdded = true;
+                logger.LogInformation("  Genre '{Genre}' assigned", genreName);
+            }
+
+            if (albumData.LabelName is not null)
+            {
+                Label? label = await context.Labels
+                    .FirstOrDefaultAsync(l => l.Name.ToLower() == albumData.LabelName.ToLower(), cancellationToken);
+                if (label is null)
+                {
+                    label = Label.Create(LabelId.Of(Guid.NewGuid()), albumData.LabelName);
+                    context.Labels.Add(label);
+                    logger.LogInformation("  Label '{Label}' created", albumData.LabelName);
+                }
+                else
+                {
+                    logger.LogInformation("  Label '{Label}' found and assigned", albumData.LabelName);
+                }
+                album.AssignLabel(label.Id);
+            }
 
             context.Albums.Add(album);
             albumsImported++;

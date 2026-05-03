@@ -12,7 +12,7 @@ using AppStreamingPlatform = Library.Domain.Enums.StreamingPlatform;
 
 namespace Library.Infrastructure.MusicBrainz;
 
-public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> logger, IOdesliService odesli, IEnumerable<IStreamingLinkResolver> resolvers)
+public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> logger, IDiscogsService discogs, IOdesliService? odesli = null, IEnumerable<IStreamingLinkResolver>? resolvers = null)
     : IMusicBrainzImportService
 {
     private static readonly JsonSerializerOptions JsonOpts = new()
@@ -237,8 +237,20 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
             }
 
             var streamingLinks = MapStreamingLinks(streamingSource?.Relations);
-            streamingLinks = await EnrichWithOdesliAsync(streamingLinks, streamingSource?.Relations, rg.Title, progress, i + 1, total, ct);
-            streamingLinks = await EnrichWithResolversAsync(streamingLinks, bandName, rg.Title, progress, i + 1, total, ct);
+            // streamingLinks = await EnrichWithOdesliAsync(streamingLinks, streamingSource?.Relations, rg.Title, progress, i + 1, total, ct);
+            // streamingLinks = await EnrichWithResolversAsync(streamingLinks, bandName, rg.Title, progress, i + 1, total, ct);
+
+            string? discogsReleaseId = ExtractDiscogsReleaseId(releaseDetail?.Relations);
+            DiscogsReleaseData? discogsData = null;
+            if (discogsReleaseId is not null)
+            {
+                progress?.Report(new ImportProgressEvent(
+                    ImportProgressStage.FetchingAlbum,
+                    $"Fetching Discogs data for {rg.Title}...",
+                    Current: i + 1,
+                    Total: total));
+                discogsData = await discogs.GetReleaseAsync(discogsReleaseId, ct);
+            }
 
             if (streamingSource?.Relations is { Count: > 0 })
             {
@@ -267,7 +279,8 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
                 ReleaseDay     = day,
                 TypeHint       = MapAlbumTypeHint(rg.PrimaryType),
                 CoverUrl       = coverUrl,
-                LabelName      = labelName,
+                LabelName      = discogsData?.LabelName ?? labelName,
+                Genres         = discogsData?.Genres ?? [],
                 Tracks         = tracks,
                 StreamingLinks = streamingLinks
             });
@@ -410,6 +423,19 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
                 string.Join(", ", merged.Skip(existing.Count).Select(l => l.Platform)));
 
         return merged;
+    }
+
+    private static string? ExtractDiscogsReleaseId(List<MbRelation>? relations)
+    {
+        string? url = relations?
+            .Select(r => r.Url?.Resource)
+            .FirstOrDefault(r => r is not null && r.Contains("discogs.com/release/"));
+
+        if (url is null) return null;
+
+        // e.g. https://www.discogs.com/release/3530801
+        var parts = url.Split('/');
+        return parts.LastOrDefault();
     }
 
     private static List<AppStreamingLink> MapStreamingLinks(List<MbRelation>? relations)

@@ -4,6 +4,13 @@ namespace Library.Application.Services.Import;
 /// Resolves a single missing streaming platform link given artist + album names.
 /// Returns null if not found or on error.
 /// </summary>
+public record DiscogsReleaseData(string? LabelName, List<string> Genres);
+
+public interface IDiscogsService
+{
+    Task<DiscogsReleaseData?> GetReleaseAsync(string releaseId, CancellationToken ct = default);
+}
+
 public interface IStreamingLinkResolver
 {
     StreamingPlatform Platform { get; }
@@ -38,7 +45,8 @@ public record BandSearchCandidate(
     string Name,
     string? Disambiguation,
     string? Country,
-    int? FormedYear);
+    int? FormedYear,
+    string? ProfileUrl = null);
 
 public record BandPreviewResult(
     bool Found,
@@ -53,7 +61,7 @@ public record BandPreviewResult(
     int ReleaseGroupCount,
     List<BandPreviewAlbum> Albums);
 
-public record BandPreviewAlbum(string Title, int? Year, string Type, string Slug, string MbUrl, bool ExistsInDb = false);
+public record BandPreviewAlbum(string Title, int? Year, string Type, string Slug, string MbUrl, bool ExistsInDb = false, string? Format = null, string? SourceId = null);
 
 public record ImportProgressEvent(
     ImportProgressStage Stage,
@@ -99,6 +107,7 @@ public class AlbumImportData
     public AlbumTypeHint TypeHint { get; init; }
     public string? CoverUrl { get; init; }
     public string? LabelName { get; init; }
+    public List<string> Genres { get; init; } = [];
     public List<TrackImportData> Tracks { get; init; } = [];
     public List<StreamingLinkImportData> StreamingLinks { get; init; } = [];
 }

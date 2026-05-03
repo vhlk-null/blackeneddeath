@@ -1,7 +1,7 @@
 namespace Library.Application.Services.Import.Queries.PreviewImportBand;
 
 public class PreviewImportBandQueryHandler(
-    IMusicBrainzImportService musicBrainz,
+    IBandImportService musicBrainz,
     ILibraryDbContext context)
     : BuildingBlocks.CQRS.IQueryHandler<PreviewImportBandQuery, BandPreviewResult>
 {
@@ -14,6 +14,6 @@ public class PreviewImportBandQueryHandler(
             .Select(s => s!)
             .ToHashSet();
 
-        return await musicBrainz.PreviewByMbIdAsync(query.MbId, existingSlugs, cancellationToken);
+        return await musicBrainz.PreviewByIdAsync(query.MbId, existingSlugs, cancellationToken);
     }
 }

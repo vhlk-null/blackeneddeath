@@ -54,6 +54,8 @@ public class Album : Aggregate<AlbumId>
         return album;
     }
 
+    public void AssignLabel(LabelId labelId) => LabelId = labelId;
+
     public void Approve()
     {
         IsApproved = true;
