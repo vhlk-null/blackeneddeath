@@ -1,6 +1,9 @@
 using BuildingBlocks.Storage;
 using Library.Application.Services.Import;
+using Microsoft.Extensions.Logging;
 using Library.Infrastructure.MusicBrainz;
+using Library.Infrastructure.Odesli;
+using Library.Infrastructure.Resolvers;
 using Library.Infrastructure.Search;
 
 namespace Library.Infrastructure;
@@ -45,6 +48,37 @@ public static class DependencyInjection
             client.Timeout = TimeSpan.FromSeconds(30);
         });
         services.AddScoped<IMusicBrainzImportService>(sp => sp.GetRequiredService<MusicBrainzService>());
+
+        services.AddHttpClient<OdesliService>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.song.link/v1-alpha.1/");
+            client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
+        services.AddScoped<IOdesliService>(sp => sp.GetRequiredService<OdesliService>());
+
+        services.AddHttpClient<AppleMusicResolver>(client =>
+        {
+            client.BaseAddress = new Uri("https://itunes.apple.com/");
+            client.Timeout = TimeSpan.FromSeconds(10);
+        });
+        services.AddScoped<IStreamingLinkResolver>(sp => sp.GetRequiredService<AppleMusicResolver>());
+
+        // YouTube resolver — uncomment once API key is configured
+        // string youTubeApiKey = configuration["YouTube:ApiKey"] ?? string.Empty;
+        // if (!string.IsNullOrWhiteSpace(youTubeApiKey))
+        // {
+        //     services.AddHttpClient("YouTube", client =>
+        //     {
+        //         client.BaseAddress = new Uri("https://www.googleapis.com/youtube/v3/");
+        //         client.Timeout = TimeSpan.FromSeconds(10);
+        //     });
+        //     services.AddScoped<IStreamingLinkResolver>(sp =>
+        //         new YouTubeResolver(
+        //             sp.GetRequiredService<IHttpClientFactory>().CreateClient("YouTube"),
+        //             sp.GetRequiredService<ILogger<YouTubeResolver>>(),
+        //             youTubeApiKey));
+        // }
 
         return services;
     }

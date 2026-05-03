@@ -1,5 +1,24 @@
 namespace Library.Application.Services.Import;
 
+/// <summary>
+/// Resolves a single missing streaming platform link given artist + album names.
+/// Returns null if not found or on error.
+/// </summary>
+public interface IStreamingLinkResolver
+{
+    StreamingPlatform Platform { get; }
+    Task<string?> ResolveAsync(string artistName, string albumTitle, CancellationToken ct = default);
+}
+
+public interface IOdesliService
+{
+    /// <summary>
+    /// Given one known streaming URL, returns links for all platforms Odesli knows about.
+    /// Returns an empty list on failure (network error, not found, etc.).
+    /// </summary>
+    Task<List<StreamingLinkImportData>> GetLinksAsync(string knownUrl, CancellationToken ct = default);
+}
+
 public interface IMusicBrainzImportService
 {
     Task<List<BandSearchCandidate>> SearchCandidatesAsync(string bandName, CancellationToken ct = default);

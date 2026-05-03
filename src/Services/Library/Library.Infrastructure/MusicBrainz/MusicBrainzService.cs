@@ -12,7 +12,7 @@ using AppStreamingPlatform = Library.Domain.Enums.StreamingPlatform;
 
 namespace Library.Infrastructure.MusicBrainz;
 
-public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> logger)
+public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> logger, IOdesliService odesli, IEnumerable<IStreamingLinkResolver> resolvers)
     : IMusicBrainzImportService
 {
     private static readonly JsonSerializerOptions JsonOpts = new()
@@ -107,7 +107,7 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
             progress?.Report(new ImportProgressEvent(ImportProgressStage.BandFound, $"Found: {detail.Name}"));
 
             var bandData = MapBand(detail);
-            var albums = await FetchAlbumsAsync(detail, selectedAlbumMbIds, progress, ct);
+            var albums = await FetchAlbumsAsync(detail, detail.Name, selectedAlbumMbIds, progress, ct);
 
             progress?.Report(new ImportProgressEvent(ImportProgressStage.Saving, "Saving to database..."));
 
@@ -181,6 +181,7 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
 
     private async Task<List<AppAlbumData>> FetchAlbumsAsync(
         MbArtistDetail detail,
+        string bandName,
         IReadOnlySet<string>? selectedAlbumMbIds,
         IProgress<ImportProgressEvent>? progress,
         CancellationToken ct)
@@ -236,6 +237,8 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
             }
 
             var streamingLinks = MapStreamingLinks(streamingSource?.Relations);
+            streamingLinks = await EnrichWithOdesliAsync(streamingLinks, streamingSource?.Relations, rg.Title, progress, i + 1, total, ct);
+            streamingLinks = await EnrichWithResolversAsync(streamingLinks, bandName, rg.Title, progress, i + 1, total, ct);
 
             if (streamingSource?.Relations is { Count: > 0 })
             {
@@ -308,6 +311,107 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
         return primaryType ?? "Unknown";
     }
 
+    private async Task<List<AppStreamingLink>> EnrichWithResolversAsync(
+        List<AppStreamingLink> existing,
+        string bandName,
+        string albumTitle,
+        IProgress<ImportProgressEvent>? progress,
+        int current,
+        int total,
+        CancellationToken ct)
+    {
+        var covered = existing.Select(l => l.Platform).ToHashSet();
+        var missing = resolvers.Where(r => !covered.Contains(r.Platform)).ToList();
+        if (missing.Count == 0) return existing;
+
+        var merged = new List<AppStreamingLink>(existing);
+
+        foreach (var resolver in missing)
+        {
+            progress?.Report(new ImportProgressEvent(
+                ImportProgressStage.FetchingAlbum,
+                $"Looking up {resolver.Platform} for {albumTitle}...",
+                Current: current,
+                Total: total));
+
+            string? url = await resolver.ResolveAsync(bandName, albumTitle, ct);
+            if (url is null)
+            {
+                logger.LogInformation("  → '{Title}' {Platform} resolver returned no result", albumTitle, resolver.Platform);
+                continue;
+            }
+
+            merged.Add(new AppStreamingLink(resolver.Platform, url));
+            covered.Add(resolver.Platform);
+            logger.LogInformation("  → '{Title}' {Platform} resolved: {Url}", albumTitle, resolver.Platform, url);
+        }
+
+        return merged;
+    }
+
+    private static readonly IReadOnlySet<string> OdesliAcceptedHosts = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "itunes.apple.com", "music.apple.com", "spotify.com",
+        "deezer.com", "tidal.com", "soundcloud.com", "youtube.com", "youtu.be",
+        "music.amazon.com", "bandcamp.com",
+    };
+
+    private async Task<List<AppStreamingLink>> EnrichWithOdesliAsync(
+        List<AppStreamingLink> existing,
+        List<MbRelation>? allRelations,
+        string albumTitle,
+        IProgress<ImportProgressEvent>? progress,
+        int current,
+        int total,
+        CancellationToken ct)
+    {
+        string? seedUrl = existing.FirstOrDefault()?.Url
+            ?? allRelations?
+                .Select(r => r.Url?.Resource)
+                .FirstOrDefault(url =>
+                    !string.IsNullOrWhiteSpace(url)
+                    && Uri.TryCreate(url, UriKind.Absolute, out var u)
+                    && OdesliAcceptedHosts.Any(h => u.Host.Contains(h)));
+
+        if (seedUrl is null)
+        {
+            logger.LogInformation("  → '{Title}' no seed URL for Odesli lookup, skipping", albumTitle);
+            return existing;
+        }
+
+        var covered = existing.Select(l => l.Platform).ToHashSet();
+        if (covered.Count == Enum.GetValues<AppStreamingPlatform>().Length)
+            return existing;
+
+        progress?.Report(new ImportProgressEvent(
+            ImportProgressStage.FetchingAlbum,
+            $"Looking up streaming links for {albumTitle}...",
+            Current: current,
+            Total: total));
+
+        logger.LogInformation("  → '{Title}' enriching via Odesli (seed: {Url})", albumTitle, seedUrl);
+
+        var odesliLinks = await odesli.GetLinksAsync(seedUrl, ct);
+
+        var merged = new List<AppStreamingLink>(existing);
+        foreach (var link in odesliLinks)
+        {
+            if (!covered.Contains(link.Platform))
+            {
+                merged.Add(link);
+                covered.Add(link.Platform);
+            }
+        }
+
+        if (merged.Count > existing.Count)
+            logger.LogInformation("  → '{Title}' Odesli added {Count} platform(s): {Platforms}",
+                albumTitle,
+                merged.Count - existing.Count,
+                string.Join(", ", merged.Skip(existing.Count).Select(l => l.Platform)));
+
+        return merged;
+    }
+
     private static List<AppStreamingLink> MapStreamingLinks(List<MbRelation>? relations)
     {
         if (relations is null or { Count: 0 }) return [];
@@ -375,7 +479,7 @@ public class MusicBrainzService(HttpClient http, ILogger<MusicBrainzService> log
     {
         if (ms is null) return null;
         var span = TimeSpan.FromMilliseconds(ms.Value);
-        return span.Hours > 0 ? span.ToString(@"h\:mm\:ss") : span.ToString(@"m\:ss");
+        return span.Hours > 0 ? span.ToString(@"h\:mm\:ss") : span.ToString(@"mm\:ss");
     }
 
     private static Task RateLimit(CancellationToken ct) =>

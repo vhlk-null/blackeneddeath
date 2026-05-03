@@ -35,14 +35,10 @@ public class ImportBandCommandHandler(
         Band band = await ResolveOrCreateBandAsync(result.Band, cancellationToken);
 
         CountryId? bandCountryId = band.BandCountries.FirstOrDefault()?.CountryId;
-        GenreId? primaryGenreId = band.BandGenres.FirstOrDefault(g => g.IsPrimary)?.GenreId
-                               ?? band.BandGenres.FirstOrDefault()?.GenreId;
 
         int albumsImported = 0;
         int albumsSkipped = 0;
         HashSet<string> usedSlugs = [];
-        List<string> createdLabels = [];
-        Dictionary<string, LabelId> labelCache = [];
 
         foreach (AlbumImportData albumData in result.Albums)
         {
@@ -58,14 +54,10 @@ public class ImportBandCommandHandler(
             string slug = await GenerateUniqueSlugAsync(albumData.Title, albumData.ReleaseYear, usedSlugs, cancellationToken);
             usedSlugs.Add(slug);
 
-            LabelId? labelId = await ResolveOrCreateLabelAsync(albumData.LabelName, createdLabels, labelCache, cancellationToken);
-            (Album album, List<Track> tracks) = MapAlbum(albumData, band.Id, slug, labelId);
+            (Album album, List<Track> tracks) = MapAlbum(albumData, band.Id, slug, labelId: null);
 
             if (bandCountryId is not null)
                 album.AddCountry(bandCountryId);
-
-            if (primaryGenreId is not null)
-                album.AddGenre(primaryGenreId, isPrimary: true);
 
             await context.Tracks.AddRangeAsync(tracks, cancellationToken);
 
@@ -85,16 +77,12 @@ public class ImportBandCommandHandler(
             band.Name, albumsImported, albumsSkipped);
 
         var notices = new List<string>();
-        if (createdLabels.Count > 0)
-            notices.Add($"✓ New labels created: {string.Join(", ", createdLabels.Distinct())}");
-
-        string doneMessage = $"Done! {band.Name}: {albumsImported} albums imported, {albumsSkipped} skipped"
-            + (notices.Count > 0 ? " | " + string.Join(" | ", notices) : "");
+        string doneMessage = $"Done! {band.Name}: {albumsImported} albums imported, {albumsSkipped} skipped";
 
         importStatus.Complete(doneMessage);
         command.Progress?.Report(new ImportProgressEvent(ImportProgressStage.Done, doneMessage));
 
-        return new ImportBandResult(band.Id.Value, band.Name, albumsImported, albumsSkipped, createdLabels.Distinct().ToList());
+        return new ImportBandResult(band.Id.Value, band.Name, albumsImported, albumsSkipped, []);
     }
 
     private async Task<Band> ResolveOrCreateBandAsync(BandImportData data, CancellationToken ct)
@@ -171,31 +159,6 @@ public class ImportBandCommandHandler(
         return slug;
     }
 
-    private async Task<LabelId?> ResolveOrCreateLabelAsync(string? labelName, List<string> createdLabels, Dictionary<string, LabelId> labelCache, CancellationToken ct)
-    {
-        if (string.IsNullOrWhiteSpace(labelName)) return null;
-
-        string key = labelName.ToLower();
-
-        if (labelCache.TryGetValue(key, out LabelId? cached))
-            return cached;
-
-        Label? existing = await context.Labels
-            .FirstOrDefaultAsync(l => l.Name.ToLower() == key, ct);
-
-        if (existing is not null)
-        {
-            labelCache[key] = existing.Id;
-            return existing.Id;
-        }
-
-        Label label = Label.Create(LabelId.Of(Guid.NewGuid()), labelName);
-        context.Labels.Add(label);
-        labelCache[key] = label.Id;
-        createdLabels.Add(labelName);
-        logger.LogInformation("Created new label: '{Name}'", labelName);
-        return label.Id;
-    }
 
     private static (Album album, List<Track> tracks) MapAlbum(AlbumImportData data, BandId bandId, string slug, LabelId? labelId)
     {
