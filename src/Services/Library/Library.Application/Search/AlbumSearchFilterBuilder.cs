@@ -7,7 +7,7 @@ public interface IMeilesearchFilter
 
 public static class AlbumSearchFilterBuilder
 {
-    public static string? Build(List<string>? genres, List<string>? countries, string? type, int? releaseYearFrom, int? releaseYearTo)
+    public static string? Build(List<string>? genres, List<string>? countries, string? type, int? releaseYearFrom, int? releaseYearTo, string? labelName = null)
     {
         List<IMeilesearchFilter> filters = new();
         if (genres?.Count > 0) filters.Add(new GenreFilter(genres));
@@ -15,6 +15,7 @@ public static class AlbumSearchFilterBuilder
         if (type is not null) filters.Add(new TypeFilter(type));
         if (releaseYearFrom.HasValue) filters.Add(new ReleaseYearFromFilter(releaseYearFrom.Value));
         if (releaseYearTo.HasValue) filters.Add(new ReleaseYearToFilter(releaseYearTo.Value));
+        if (labelName is not null) filters.Add(new LabelFilter(labelName));
 
         return filters.Count > 0 ? string.Join(" AND ", filters.Select(f => f.ToFilterString())) : null;
     }
@@ -45,4 +46,9 @@ public class ReleaseYearFromFilter(int year) : IMeilesearchFilter
 public class ReleaseYearToFilter(int year) : IMeilesearchFilter
 {
     public string ToFilterString() => $"releaseYear <= {year}";
+}
+
+public class LabelFilter(string labelName) : IMeilesearchFilter
+{
+    public string ToFilterString() => $"label = \"{labelName}\"";
 }

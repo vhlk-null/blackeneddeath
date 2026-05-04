@@ -43,6 +43,10 @@ public sealed class AlbumUpdatedEventHandler(
             ? await context.Tracks.Where(t => trackIds.Contains(t.Id)).ToListAsync(cancellationToken)
             : [];
 
+        Label? label = album.LabelId is not null
+            ? await context.Labels.FirstOrDefaultAsync(l => l.Id == album.LabelId, cancellationToken)
+            : null;
+
         AlbumGenre? primaryAlbumGenre = album.AlbumGenres.FirstOrDefault(ag => ag.IsPrimary);
         Genre? primaryGenre = primaryAlbumGenre is not null
             ? genres.FirstOrDefault(g => g.Id == primaryAlbumGenre.GenreId)
@@ -83,7 +87,8 @@ public sealed class AlbumUpdatedEventHandler(
             album.CreatedAt.HasValue ? new DateTimeOffset(album.CreatedAt.Value).ToUnixTimeSeconds() : 0,
             album.AverageRating,
             album.RatingsCount,
-            album.IsExplicit
+            album.IsExplicit,
+            label?.Name
         ), cancellationToken);
     }
 }

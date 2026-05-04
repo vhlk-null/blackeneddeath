@@ -11,6 +11,7 @@ public record SearchAlbumsQuery(
     int? ReleaseYearTo = null,
     string SortBy = "createdAt",
     SortDir SortDir = SortDir.Desc,
-    bool IncludeTracks = false) : BuildingBlocks.CQRS.IQuery<SearchAlbumsResult>;
+    bool IncludeTracks = false,
+    string? LabelName = null) : BuildingBlocks.CQRS.IQuery<SearchAlbumsResult>;
 
 public record SearchAlbumsResult(PaginatedResult<AlbumSearchDocument> Albums);

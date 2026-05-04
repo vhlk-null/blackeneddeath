@@ -101,6 +101,7 @@ public static class DatabaseInitializerExtensions
         List<GenreId> allGenreIds = albums.SelectMany(a => a.AlbumGenres.Select(ag => ag.GenreId)).Distinct().ToList();
         List<CountryId> allCountryIds = albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)).Distinct().ToList();
         List<TrackId> allTrackIds = albums.SelectMany(a => a.AlbumTracks.Select(at => at.TrackId)).Distinct().ToList();
+        List<LabelId> allLabelIds = albums.Where(a => a.LabelId is not null).Select(a => a.LabelId!).Distinct().ToList();
 
         Dictionary<BandId, AlbumBandRef> bandNames = allBandIds.Count > 0
             ? await context.Bands.Where(b => allBandIds.Contains(b.Id)).AsNoTracking()
@@ -122,6 +123,11 @@ public static class DatabaseInitializerExtensions
                 .ToDictionaryAsync(t => t.Id, t => t.Title)
             : [];
 
+        Dictionary<LabelId, string> labelNames = allLabelIds.Count > 0
+            ? await context.Labels.Where(l => allLabelIds.Contains(l.Id)).AsNoTracking()
+                .ToDictionaryAsync(l => l.Id, l => l.Name)
+            : [];
+
         List<AlbumSearchDocument> documents = albums.Select(a => new AlbumSearchDocument(
             a.Id.Value.ToString(),
             a.Title,
@@ -138,7 +144,8 @@ public static class DatabaseInitializerExtensions
             a.CreatedAt.HasValue ? new DateTimeOffset(a.CreatedAt.Value).ToUnixTimeSeconds() : 0,
             a.AverageRating,
             a.RatingsCount,
-            a.IsExplicit
+            a.IsExplicit,
+            a.LabelId is not null && labelNames.TryGetValue(a.LabelId, out string? ln) ? ln : null
         )).ToList();
 
         await index.AddDocumentsAsync(documents);

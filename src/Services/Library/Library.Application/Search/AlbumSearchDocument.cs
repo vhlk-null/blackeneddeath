@@ -19,4 +19,5 @@ public record AlbumSearchDocument(
     long CreatedAt,
     double? AverageRating = null,
     int RatingsCount = 0,
-    bool IsExplicit = false);
+    bool IsExplicit = false,
+    string? Label = null);
