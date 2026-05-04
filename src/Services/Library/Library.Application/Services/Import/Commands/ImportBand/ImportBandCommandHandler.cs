@@ -40,6 +40,26 @@ public class ImportBandCommandHandler(
         int albumsSkipped = 0;
         HashSet<string> usedSlugs = [];
 
+        // Pre-resolve labels for the entire batch to avoid duplicate inserts
+        // when multiple albums share the same label name.
+        var labelCache = new Dictionary<string, Label>(StringComparer.OrdinalIgnoreCase);
+        foreach (string labelName in result.Albums
+            .Select(a => a.LabelName)
+            .Where(n => n is not null)
+            .Select(n => n!)
+            .Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            Label? existing = await context.Labels
+                .FirstOrDefaultAsync(l => l.Name.ToLower() == labelName.ToLower(), cancellationToken);
+            if (existing is null)
+            {
+                existing = Label.Create(LabelId.Of(Guid.NewGuid()), labelName);
+                context.Labels.Add(existing);
+                logger.LogInformation("Label '{Label}' created", labelName);
+            }
+            labelCache[labelName] = existing;
+        }
+
         foreach (AlbumImportData albumData in result.Albums)
         {
             string baseSlug = $"{SlugHelper.Generate(albumData.Title)}-{albumData.ReleaseYear}";
@@ -94,21 +114,10 @@ public class ImportBandCommandHandler(
                 logger.LogInformation("  Genre '{Genre}' assigned", genreName);
             }
 
-            if (albumData.LabelName is not null)
+            if (albumData.LabelName is not null && labelCache.TryGetValue(albumData.LabelName, out Label? label))
             {
-                Label? label = await context.Labels
-                    .FirstOrDefaultAsync(l => l.Name.ToLower() == albumData.LabelName.ToLower(), cancellationToken);
-                if (label is null)
-                {
-                    label = Label.Create(LabelId.Of(Guid.NewGuid()), albumData.LabelName);
-                    context.Labels.Add(label);
-                    logger.LogInformation("  Label '{Label}' created", albumData.LabelName);
-                }
-                else
-                {
-                    logger.LogInformation("  Label '{Label}' found and assigned", albumData.LabelName);
-                }
                 album.AssignLabel(label.Id);
+                logger.LogInformation("  Label '{Label}' assigned", albumData.LabelName);
             }
 
             context.Albums.Add(album);

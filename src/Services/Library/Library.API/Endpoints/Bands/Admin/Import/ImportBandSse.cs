@@ -39,9 +39,14 @@ public class ImportBandSse : ICarterModule
                         {
                             await sender.Send(new ImportBandCommand(mbId, bandName, progress, SelectedAlbumMbIds: selectedIds), CancellationToken.None);
                         }
+                        catch (Exception ex)
+                        {
+                            channel.Writer.TryWrite(new ImportProgressEvent(ImportProgressStage.Failed, ex.Message));
+                            channel.Writer.Complete();
+                        }
                         finally
                         {
-                            channel.Writer.Complete();
+                            channel.Writer.TryComplete();
                         }
                     });
 
