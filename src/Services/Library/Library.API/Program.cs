@@ -9,6 +9,7 @@ builder.Host.UseSerilog((ctx, cfg) =>
 {
     cfg.ReadFrom.Configuration(ctx.Configuration)
        .Enrich.FromLogContext()
+       .Enrich.WithProperty("Service", "Library")
        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}");
 
     string? seqUrl = ctx.Configuration["Seq:ServerUrl"];
