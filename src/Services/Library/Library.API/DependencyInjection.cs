@@ -8,7 +8,7 @@ public static class DependencyInjection
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
         services.AddOpenApi();
-        services.AddMessageBroker(configuration);
+        services.AddMessageBroker(configuration, "library");
         services.AddCarter();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();

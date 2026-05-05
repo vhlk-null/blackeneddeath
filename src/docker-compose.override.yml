@@ -173,6 +173,47 @@ services:
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
+  notificationsdb:
+    image: postgres:16
+    container_name: notificationsdb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=NotificationsDB
+    restart: always
+    ports:
+      - "5437:5432"
+    volumes:
+      - postgres_notifications:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  notifications.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__NotificationsDB=Host=notificationsdb;Port=5432;Database=NotificationsDB;Username=postgres;Password=postgres
+      - MessageBroker__Host=amqp://messagebroker:5672
+      - MessageBroker__Username=guest
+      - MessageBroker__Password=guest
+    depends_on:
+      notificationsdb:
+        condition: service_healthy
+      messagebroker:
+        condition: service_healthy
+    ports:
+      - "6040:8080"
+      - "6041:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
   usercontent.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -239,6 +280,7 @@ services:
 volumes:
   postgres_library:
   postgres_usercontent:
+  postgres_notifications:
   postgres_identity:
   rabbitmq_data:
   identity_dataprotection:

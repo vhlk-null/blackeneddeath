@@ -14,6 +14,15 @@ services:
   distributedcache:
     image: redis:7.2
 
+  notificationsdb:
+    image: postgres:16
+
+  notifications.api:
+    image: ${DOCKER_REGISTRY-}notificationsapi
+    build:
+      context: .
+      dockerfile: Services/Notifications/Notifications.API/Dockerfile
+
   usercontent.api:
     image: ${DOCKER_REGISTRY-}usercontentapi
     build:
@@ -57,6 +66,7 @@ services:
 volumes:
   postgres_library:
   postgres_usercontent:
+  postgres_notifications:
   postgres_identity:
   rabbitmq_data:
   identity_dataprotection:

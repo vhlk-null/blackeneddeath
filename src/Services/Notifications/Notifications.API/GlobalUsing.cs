@@ -1,0 +1,14 @@
+global using BuildingBlocks.Authentication;
+global using BuildingBlocks.Exceptions;
+global using HealthChecks.UI.Client;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.DependencyInjection;
+global using Notifications.API;
+global using Notifications.Application;
+global using Notifications.Application.Abstractions;
+global using Notifications.Application.Dtos;
+global using Notifications.Infrastructure;
+global using Notifications.Infrastructure.Data.Extensions;
+global using Scalar.AspNetCore;

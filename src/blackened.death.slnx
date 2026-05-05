@@ -32,6 +32,12 @@
     </Project>
     <Project Path="Services/Library/Librrary.Domain/Library.Domain.csproj" Id="eb062dac-c81c-4759-895d-c66aaae8320a" />
   </Folder>
+  <Folder Name="/Services/Notifications/">
+    <Project Path="Services/Notifications/Notifications.API/Notifications.API.csproj" />
+    <Project Path="Services/Notifications/Notifications.Application/Notifications.Application.csproj" />
+    <Project Path="Services/Notifications/Notifications.Domain/Notifications.Domain.csproj" />
+    <Project Path="Services/Notifications/Notifications.Infrastructure/Notifications.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Services/UserContent/">
     <Project Path="Services/UserContent/UserContent.API/UserContent.API.csproj">
       <Deploy Solution="Debug|*" />

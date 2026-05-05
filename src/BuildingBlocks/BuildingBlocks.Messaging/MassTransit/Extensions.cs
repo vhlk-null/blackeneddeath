@@ -11,11 +11,15 @@ public static class Extensions
     public static IServiceCollection AddMessageBroker(
         this IServiceCollection services,
         IConfiguration configuration,
+        string? queuePrefix = null,
         params Assembly[] consumerAssemblies)
     {
         services.AddMassTransit(config =>
         {
-            config.SetKebabCaseEndpointNameFormatter();
+            if (queuePrefix is not null)
+                config.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(queuePrefix, false));
+            else
+                config.SetKebabCaseEndpointNameFormatter();
 
             if (consumerAssemblies.Length > 0)
                 config.AddConsumers(consumerAssemblies);

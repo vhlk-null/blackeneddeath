@@ -1,0 +1,15 @@
+global using System.Reflection;
+global using BuildingBlocks.Exceptions;
+global using BuildingBlocks.Messaging.MassTransit;
+global using BuildingBlocks.Messaging.SSE;
+global using BuildingBlocks.Messaging.Events.Albums;
+global using BuildingBlocks.Repositories;
+global using MassTransit;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Notifications.Application.Abstractions;
+global using Notifications.Application.Dtos;
+global using Notifications.Application.Exceptions;
+global using Notifications.Application.Services;
+global using Notifications.Domain.Models;
+global using Notifications.Infrastructure.Data;

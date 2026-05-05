@@ -10,7 +10,7 @@ public static class DependencyInjection
         string grpcUrl = configuration["GrpcSettings:LibraryUrl"]
                          ?? throw new InvalidOperationException("GrpcSettings:LibraryUrl is missing");
 
-        services.AddMessageBroker(configuration, Assembly.GetExecutingAssembly());
+        services.AddMessageBroker(configuration, "usercontent", Assembly.GetExecutingAssembly());
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContentService, UserContentService>();
 
