@@ -37,7 +37,7 @@ public class NotificationService(IRepository<NotificationsContext> repo) : INoti
         await repo.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<SubscriptionDto> SubscribeAsync(string userId, string resourceType, string resourceId, CancellationToken cancellationToken = default)
+    public async Task<SubscriptionDto> SubscribeAsync(string userId, string resourceType, string resourceId, string resourceName, string resourceSlug, CancellationToken cancellationToken = default)
     {
         Subscription? existing = await repo.GetByAsync<Subscription>(
             s => s.UserId == userId && s.ResourceType == resourceType && s.ResourceId == resourceId,
@@ -46,7 +46,7 @@ public class NotificationService(IRepository<NotificationsContext> repo) : INoti
         if (existing is not null)
             return ToDto(existing);
 
-        Subscription subscription = Subscription.Create(userId, resourceType, resourceId);
+        Subscription subscription = Subscription.Create(userId, resourceType, resourceId, resourceName, resourceSlug);
         await repo.AddAsync(subscription, cancellationToken);
         await repo.SaveChangesAsync(cancellationToken);
 
@@ -65,6 +65,15 @@ public class NotificationService(IRepository<NotificationsContext> repo) : INoti
         await repo.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<bool> IsSubscribedAsync(string userId, string resourceType, string resourceId, CancellationToken cancellationToken = default)
+    {
+        Subscription? subscription = await repo.GetByAsync<Subscription>(
+            s => s.UserId == userId && s.ResourceType == resourceType && s.ResourceId == resourceId,
+            cancellationToken: cancellationToken);
+
+        return subscription is not null;
+    }
+
     public async Task<IReadOnlyList<SubscriptionDto>> GetSubscriptionsAsync(string userId, CancellationToken cancellationToken = default)
     {
         List<Subscription> subscriptions = await repo.FilterAsync<Subscription>(
@@ -78,5 +87,5 @@ public class NotificationService(IRepository<NotificationsContext> repo) : INoti
         new(n.Id, n.UserId, n.Title, n.Message, n.Type, n.ResourceId, n.IsRead, n.CreatedAt);
 
     private static SubscriptionDto ToDto(Subscription s) =>
-        new(s.Id, s.UserId, s.ResourceType, s.ResourceId, s.CreatedAt);
+        new(s.Id, s.UserId, s.ResourceType, s.ResourceId, s.ResourceName, s.ResourceSlug, s.CreatedAt);
 }

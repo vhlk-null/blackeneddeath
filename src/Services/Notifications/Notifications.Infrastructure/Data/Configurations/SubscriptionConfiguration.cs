@@ -10,6 +10,8 @@ public class SubscriptionConfiguration : IEntityTypeConfiguration<Subscription>
         builder.Property(s => s.UserId).HasColumnName("user_id").IsRequired();
         builder.Property(s => s.ResourceType).HasColumnName("resource_type").IsRequired();
         builder.Property(s => s.ResourceId).HasColumnName("resource_id").IsRequired();
+        builder.Property(s => s.ResourceName).HasColumnName("resource_name").IsRequired();
+        builder.Property(s => s.ResourceSlug).HasColumnName("resource_slug").IsRequired();
         builder.Property(s => s.CreatedAt).HasColumnName("created_at");
 
         builder.HasIndex(s => new { s.UserId, s.ResourceType, s.ResourceId })

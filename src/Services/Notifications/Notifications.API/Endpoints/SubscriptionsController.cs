@@ -16,10 +16,19 @@ public class SubscriptionsController(INotificationService notificationService) :
         return Ok(subscriptions);
     }
 
-    [HttpPost("{resourceType}/{resourceId}")]
-    public async Task<ActionResult<SubscriptionDto>> Subscribe(string resourceType, string resourceId, CancellationToken cancellationToken)
+    [HttpGet("{resourceType}/{resourceId}")]
+    public async Task<ActionResult<bool>> IsSubscribed(string resourceType, string resourceId, CancellationToken cancellationToken)
     {
-        SubscriptionDto subscription = await notificationService.SubscribeAsync(UserId, resourceType, resourceId, cancellationToken);
+        bool isSubscribed = await notificationService.IsSubscribedAsync(UserId, resourceType, resourceId, cancellationToken);
+        return Ok(isSubscribed);
+    }
+
+    public record SubscribeRequest(string ResourceName, string ResourceSlug);
+
+    [HttpPost("{resourceType}/{resourceId}")]
+    public async Task<ActionResult<SubscriptionDto>> Subscribe(string resourceType, string resourceId, [FromBody] SubscribeRequest request, CancellationToken cancellationToken)
+    {
+        SubscriptionDto subscription = await notificationService.SubscribeAsync(UserId, resourceType, resourceId, request.ResourceName, request.ResourceSlug, cancellationToken);
         return Ok(subscription);
     }
 

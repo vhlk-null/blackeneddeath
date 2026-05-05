@@ -15,4 +15,6 @@ public record SubscriptionDto(
     string UserId,
     string ResourceType,
     string ResourceId,
+    string ResourceName,
+    string ResourceSlug,
     DateTime CreatedAt);

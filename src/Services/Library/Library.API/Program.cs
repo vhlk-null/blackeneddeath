@@ -13,7 +13,7 @@ builder.Host.UseSerilog((ctx, cfg) =>
        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}");
 
     string? seqUrl = ctx.Configuration["Seq:ServerUrl"];
-    if (!string.IsNullOrWhiteSpace(seqUrl))
+    if (!string.IsNullOrWhiteSpace(seqUrl) && Uri.TryCreate(seqUrl, UriKind.Absolute, out _))
         cfg.WriteTo.Seq(seqUrl, apiKey: ctx.Configuration["Seq:ApiKey"]);
 });
 
