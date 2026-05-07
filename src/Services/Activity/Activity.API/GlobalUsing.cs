@@ -1,0 +1,14 @@
+global using Activity.API;
+global using Activity.Application;
+global using Activity.Application.Abstractions;
+global using Activity.Application.Dtos;
+global using Activity.Infrastructure;
+global using Activity.Infrastructure.Data.Extensions;
+global using BuildingBlocks.Authentication;
+global using BuildingBlocks.Exceptions;
+global using HealthChecks.UI.Client;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.DependencyInjection;
+global using Scalar.AspNetCore;

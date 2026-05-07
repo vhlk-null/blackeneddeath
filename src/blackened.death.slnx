@@ -11,6 +11,7 @@
   </Folder>
   <Folder Name="/BuildingBlocks/">
     <Project Path="BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj" Id="64b989a7-1e04-400f-8ff9-20b0b8292d3e" />
+    <Project Path="BuildingBlocks/BuildingBlocks.MongoDB/BuildingBlocks.MongoDB.csproj" />
     <Project Path="BuildingBlocks/BuildingBlocks/BuildingBlocks.csproj" Id="360266db-31f0-4e2f-9490-f5622bdc9f17" />
   </Folder>
   <Folder Name="/Services/" />
@@ -31,6 +32,15 @@
       <Build Solution="Debug|*" Project="false" />
     </Project>
     <Project Path="Services/Library/Librrary.Domain/Library.Domain.csproj" Id="eb062dac-c81c-4759-895d-c66aaae8320a" />
+  </Folder>
+  <Folder Name="/Services/Activity/">
+    <Project Path="Services/Activity/Activity.API/Activity.API.csproj" />
+    <Project Path="Services/Activity/Activity.Application/Activity.Application.csproj" />
+    <Project Path="Services/Activity/Activity.ApplicationTests/Activity.ApplicationTests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
+    <Project Path="Services/Activity/Activity.Domain/Activity.Domain.csproj" />
+    <Project Path="Services/Activity/Activity.Infrastructure/Activity.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Services/Notifications/">
     <Project Path="Services/Notifications/Notifications.API/Notifications.API.csproj" />

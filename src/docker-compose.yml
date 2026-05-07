@@ -14,8 +14,20 @@ services:
   distributedcache:
     image: redis:7.2
 
+  activitydb:
+    image: mongo:7
+
+  mongo-express:
+    image: mongo-express
+
   notificationsdb:
     image: postgres:16
+
+  activity.api:
+    image: ${DOCKER_REGISTRY-}activityapi
+    build:
+      context: .
+      dockerfile: Services/Activity/Activity.API/Dockerfile
 
   notifications.api:
     image: ${DOCKER_REGISTRY-}notificationsapi
@@ -64,6 +76,7 @@ services:
       dockerfile: Dockerfile
 
 volumes:
+  mongo_activity:
   postgres_library:
   postgres_usercontent:
   postgres_notifications:

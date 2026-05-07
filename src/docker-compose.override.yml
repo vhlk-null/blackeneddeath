@@ -173,6 +173,37 @@ services:
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
+  activitydb:
+    image: mongo:7
+    container_name: activitydb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_activity:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo-express:
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "8083:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=root
+      - ME_CONFIG_MONGODB_URL=mongodb://root:root@activitydb:27017
+      - ME_CONFIG_BASICAUTH=false
+    depends_on:
+      activitydb:
+        condition: service_healthy
+
   notificationsdb:
     image: postgres:16
     container_name: notificationsdb
@@ -190,6 +221,31 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  activity.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__MongoDB=mongodb://root:root@activitydb:27017
+      - MongoDB__DatabaseName=activitydb
+      - MessageBroker__Host=amqp://messagebroker:5672
+      - MessageBroker__Username=guest
+      - MessageBroker__Password=guest
+      - Seq__ServerUrl=http://seq:5341
+    depends_on:
+      activitydb:
+        condition: service_healthy
+      messagebroker:
+        condition: service_healthy
+    ports:
+      - "6060:8080"
+      - "6061:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   notifications.api:
     environment:
@@ -278,6 +334,7 @@ services:
         condition: service_started
 
 volumes:
+  mongo_activity:
   postgres_library:
   postgres_usercontent:
   postgres_notifications:

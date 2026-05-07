@@ -1,0 +1,11 @@
+global using Activity.Application.Abstractions;
+global using Activity.Application.Dtos;
+global using Activity.Application.Exceptions;
+global using Activity.Application.Services;
+global using Activity.Domain.Models;
+global using BuildingBlocks.Exceptions;
+global using BuildingBlocks.Messaging.MassTransit;
+global using BuildingBlocks.MongoDB.Repositories;
+global using MassTransit;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
