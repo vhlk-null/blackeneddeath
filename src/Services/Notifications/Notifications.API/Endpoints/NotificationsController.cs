@@ -39,7 +39,7 @@ public class NotificationsController(INotificationService notificationService, S
         Response.Headers.CacheControl = "no-cache";
         Response.Headers.Connection = "keep-alive";
 
-        var reader = sseService.Subscribe(UserId);
+        ChannelReader<string> reader = sseService.Subscribe(UserId);
         try
         {
             await foreach (var message in reader.ReadAllAsync(cancellationToken))
@@ -50,7 +50,7 @@ public class NotificationsController(INotificationService notificationService, S
         }
         finally
         {
-            sseService.Unsubscribe(UserId);
+            sseService.Unsubscribe(UserId, reader);
         }
     }
 }
