@@ -6,7 +6,6 @@ global using BuildingBlocks.Messaging.MassTransit;
 global using BuildingBlocks.Pagination;
 global using BuildingBlocks.Repositories;
 global using BuildingBlocks.Storage;
-global using Library.Grpc;
 global using Mapster;
 global using MassTransit;
 global using Microsoft.EntityFrameworkCore;

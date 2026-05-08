@@ -51,12 +51,4 @@ public static class ServiceCollectionDiExtensions
         services.AddEndpointsApiExplorer();
         return services;
     }
-
-
-
-    public static IServiceCollection AddGrpcServices(this IServiceCollection services)
-    {
-        services.AddGrpc();
-        return services;
-    }
 }

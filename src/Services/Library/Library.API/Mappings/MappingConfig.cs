@@ -4,49 +4,10 @@ public static class MappingConfig
 {
     public static void RegisterMappings()
     {
-        ConfigureGrpcMappings();
         ConfigureAlbumMappings();
-        //ConfigureBandMappings();
-    }
-
-    private static void ConfigureGrpcMappings()
-    {
-        TypeAdapterConfig<Album, GetAlbumResponse>.NewConfig()
-            .Map(dest => dest.Id, src => src.Id.Value.ToString())
-            .Map(dest => dest.Title, src => src.Title)
-            .Map(dest => dest.CoverUrl, src => src.CoverUrl ?? string.Empty)
-            .Map(dest => dest.ReleaseDate, src => src.AlbumRelease.ReleaseYear);
-
-        TypeAdapterConfig<Band, GetBandResponse>.NewConfig()
-            .Map(dest => dest.Id, src => src.Id.Value.ToString())
-            .Map(dest => dest.Title, src => src.Name)
-            .Map(dest => dest.LogoUrl, src => src.LogoUrl ?? string.Empty)
-            .Map(dest => dest.ReleaseDate, src => src.Activity.FormedYear ?? 0);
     }
 
     private static void ConfigureAlbumMappings()
     {
-//    TypeAdapterConfig<Album, AlbumDto>.NewConfig()
-    //        .Map(dest => dest.Bands,
-    //            src => src.Bands.Select(ab => new BandDto(ab.Band.Id, ab.Band.Name, ab.Band.LogoUrl)))
-    //        .Map(dest => dest.Countries,
-    //            src => src.Countries.Select(ac => new CountryDto(ac.Country.Id, ac.Country.Name, ac.Country.Code)))
-    //        .Map(dest => dest.Tracks,
-    //            src => src.Tracks.Select(at => new TrackDto(at.Track.Id, at.Track.Title)))
-    //        .Map(dest => dest.Genres,
-    //            src => src.Genres.Select(ag => new GenreDto(ag.Genre.Id, ag.Genre.Name)))
-    //        .Map(dest => dest.StreamingLinks,
-    //            src => src.StreamingLinks.Select(sl => sl.EmbedCode ?? ""));
-    }
-
-    private static void ConfigureBandMappings()
-    {
-    //    TypeAdapterConfig<Band, GetBands_BandDto>.NewConfig()
-    //        .Map(dest => dest.Country,
-    //            src => src.Country == null ? null : new GetBands_CountryDto(src.Country.Id, src.Country.Name, src.Country.Code))
-    //        .Map(dest => dest.Albums,
-    //            src => src.Albums.Select(ab => new GetBands_AlbumDto(ab.Album.Id, ab.Album.Title, ab.Album.ReleaseDate)))
-    //        .Map(dest => dest.Genres,
-    //            src => src.Genres.Select(bg => new GetBands_GenreDto(bg.Genre.Id, bg.Genre.Name)));
     }
 }

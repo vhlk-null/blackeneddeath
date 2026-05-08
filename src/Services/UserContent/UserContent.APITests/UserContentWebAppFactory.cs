@@ -21,7 +21,6 @@ public class UserContentWebAppFactory : WebApplicationFactory<Program>
             {
                 ["ConnectionStrings:UserContentDB"] = "Host=localhost;Database=test_db;Username=test;Password=test",
                 ["ConnectionStrings:Redis"] = "localhost:6379,abortConnect=false",
-                ["GrpcSettings:LibraryUrl"] = "http://localhost:5000",
                 ["MessageBroker:Host"] = "amqp://localhost:5672",
                 ["MessageBroker:UserName"] = "guest",
                 ["MessageBroker:Password"] = "guest"
