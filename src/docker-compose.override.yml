@@ -141,8 +141,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - DOTNET_GCConserveMemory=7
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__LibraryDb=Host=librarydb;Port=5432;Database=LibraryDb;Username=postgres;Password=postgres
       - MessageBroker__Host=amqp://messagebroker:5672
       - MessageBroker__UserName=guest
@@ -227,7 +225,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - DOTNET_GCConserveMemory=7
       - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__MongoDB=mongodb://root:root@activitydb:27017
       - MongoDB__DatabaseName=activitydb
       - MessageBroker__Host=amqp://messagebroker:5672
@@ -253,7 +250,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - DOTNET_GCConserveMemory=7
       - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__NotificationsDB=Host=notificationsdb;Port=5432;Database=NotificationsDB;Username=postgres;Password=postgres
       - MessageBroker__Host=amqp://messagebroker:5672
       - MessageBroker__Username=guest
@@ -277,7 +273,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - DOTNET_GCConserveMemory=7
       - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
       - ConnectionStrings__UserContentDB=Host=usercontentdb;Port=5432;Database=UserContentDB;Username=postgres;Password=postgres
       - ConnectionStrings__Redis=distributedcache:6379,abortConnect=false
       - MessageBroker__Host=amqp://messagebroker:5672

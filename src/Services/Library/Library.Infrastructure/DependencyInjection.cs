@@ -33,7 +33,8 @@ public static class DependencyInjection
                 npgsqlOptions.EnableRetryOnFailure(
                     maxRetryCount: 3,
                     maxRetryDelay: TimeSpan.FromSeconds(5),
-                    errorCodesToAdd: null));
+                    errorCodesToAdd: null)
+                .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
         });
 
         services.AddScoped<ILibraryDbContext, LibraryContext>();
