@@ -1,3 +1,4 @@
+using System.Threading.Channels;
 using BuildingBlocks.Messaging.SSE;
 
 namespace Notifications.API.Endpoints;
