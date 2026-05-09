@@ -1,7 +1,7 @@
 services:
   librarydb:
     image: postgres:16
-    container_name: librarydb
+    container_name: db-library
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -19,7 +19,7 @@ services:
 
   usercontentdb:
     image: postgres:16
-    container_name: usercontentdb
+    container_name: db-usercontent
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -37,7 +37,7 @@ services:
 
   identitydb:
     image: postgres:16
-    container_name: identitydb
+    container_name: db-identity
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -55,7 +55,7 @@ services:
 
   messagebroker:
     image: rabbitmq:management
-    container_name: messagebroker
+    container_name: infra-rabbitmq
     hostname: blackenddeath
     environment:
       - RABBITMQ_DEFAULT_USER=guest
@@ -74,7 +74,7 @@ services:
 
   distributedcache:
     image: redis:7.2
-    container_name: distributedcache
+    container_name: infra-redis
     restart: always
     ports:
       - "6379:6379"
@@ -85,7 +85,7 @@ services:
       retries: 5
       
   seq:
-    container_name: seq
+    container_name: infra-seq
     restart: always
     ports:
       - "5341:5341"
@@ -98,7 +98,7 @@ services:
 
   meilisearch:
     image: getmeili/meilisearch:v1.12
-    container_name: meilisearch
+    container_name: infra-meilisearch
     restart: always
     ports:
       - "7700:7700"
@@ -114,7 +114,7 @@ services:
       retries: 5
 
   identity.server:
-    container_name: identity.server
+    container_name: api-identity
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
@@ -138,6 +138,7 @@ services:
       - identity_dataprotection:/app/keys
 
   library.api:
+    container_name: api-library
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - DOTNET_GCConserveMemory=7
@@ -173,7 +174,7 @@ services:
 
   activitydb:
     image: mongo:7
-    container_name: activitydb
+    container_name: db-activity
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=root
@@ -189,7 +190,7 @@ services:
       retries: 5
 
   mongo-express:
-    container_name: mongo-express
+    container_name: infra-mongo-express
     restart: always
     ports:
       - "8083:8081"
@@ -204,7 +205,7 @@ services:
 
   notificationsdb:
     image: postgres:16
-    container_name: notificationsdb
+    container_name: db-notifications
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -221,6 +222,7 @@ services:
       retries: 5
 
   activity.api:
+    container_name: api-activity
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - DOTNET_GCConserveMemory=7
@@ -246,6 +248,7 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   notifications.api:
+    container_name: api-notifications
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - DOTNET_GCConserveMemory=7
@@ -269,6 +272,7 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   usercontent.api:
+    container_name: api-usercontent
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - DOTNET_GCConserveMemory=7
@@ -297,6 +301,7 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   yarpapigateway:
+    container_name: gw-yarp
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
@@ -321,7 +326,7 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   blackenddeath.ui:
-    container_name: blackenddeath.ui
+    container_name: ui-blackenddeath
     restart: always
     ports:
       - "4200:80"

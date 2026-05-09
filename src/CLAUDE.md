@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-.NET 10.0 microservices application for managing a music archive (albums, bands, tracks, genres). Both services use full N-Layer Domain-Driven Design (DDD): Domain → Application → Infrastructure → API.
+.NET 10.0 microservices application for managing a music archive (albums, bands, tracks, genres). All services use N-Layer Domain-Driven Design (DDD): Domain → Application → Infrastructure → API.
 
 ## Technology Stack
 
@@ -16,9 +16,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **FluentValidation 12.1.1** — request validation
 - **Mapster 7.4.0** — object mapping (`source.Adapt<T>()`)
 - **Scrutor** — decorator pattern for DI (CachedUserContentRepository)
-- **MassTransit** + **RabbitMQ** — async integration events (`BuildingBlocks.Messaging`); Library publishes, UserContent consumes
+- **MassTransit** + **RabbitMQ** — async integration events (`BuildingBlocks.Messaging`); Library publishes, UserContent and Notifications consume
 - **Microsoft.FeatureManagement** — feature flags in Library.Application (e.g., `FeatureFlags.AlbumFulfillment`)
 - **gRPC** — inter-service communication (Library.API = server, UserContent.Application = client)
+- **SSE (Server-Sent Events)** — real-time push from Notifications.API via `SseChannelService` (in `BuildingBlocks.Messaging/SSE/`)
+- **MongoDB 7** — document store for Activity service (via MongoDB.Driver)
+- **Meilisearch** — full-text search (Library service)
+- **Serilog** + **Seq** — structured logging across all services
+- **YARP** — API gateway (`ApiGateways/YarpApiGateway`)
 - **Docker Compose** — containerization
 
 ## Common Development Commands
@@ -30,6 +35,8 @@ dotnet build blackened.death.slnx
 # Run services locally
 dotnet run --project Services/Library/Library.API
 dotnet run --project Services/UserContent/UserContent.API
+dotnet run --project Services/Notifications/Notifications.API
+dotnet run --project Services/Activity/Activity.API
 
 # Run with Docker Compose (from src directory)
 docker-compose up --build
@@ -41,6 +48,7 @@ dotnet test Services/Library/Library.APITests/Library.APITests.csproj
 dotnet test Services/UserContent/UserContent.ApplicationTests/UserContent.ApplicationTests.csproj
 dotnet test Services/UserContent/UserContent.InfrastructureTests/UserContent.InfrastructureTests.csproj
 dotnet test Services/UserContent/UserContent.APITests/UserContent.APITests.csproj
+dotnet test Services/Activity/Activity.ApplicationTests/Activity.ApplicationTests.csproj
 
 # EF Core migrations for Library service (DbContext is in Library.Infrastructure)
 dotnet ef migrations add MigrationName --project Services/Library/Library.Infrastructure --startup-project Services/Library/Library.API
@@ -49,27 +57,46 @@ dotnet ef migrations remove --project Services/Library/Library.Infrastructure --
 
 # EF Core migrations for UserContent service (DbContext is in UserContent.Infrastructure)
 dotnet ef migrations add MigrationName --project Services/UserContent/UserContent.Infrastructure --startup-project Services/UserContent/UserContent.API
+
+# EF Core migrations for Notifications service (DbContext is in Notifications.Infrastructure)
+dotnet ef migrations add MigrationName --project Services/Notifications/Notifications.Infrastructure --startup-project Services/Notifications/Notifications.API
 ```
 
 > **Note**: Test projects are excluded from the default solution build configuration. Run them individually with the paths above.
 
 ## Docker Environment
 
-| Service            | Host Port | Container Port | Protocol  |
-|--------------------|-----------|----------------|-----------|
-| Library.API HTTP   | 6000      | 8080           | HTTP/1+2  |
-| Library.API HTTPS  | 6001      | 8081           | HTTP/1+2  |
-| UserContent HTTP   | 6010      | 8080           | HTTP      |
-| UserContent HTTPS  | 6011      | 8081           | HTTPS     |
-| librarydb          | 5432      | 5432           | PostgreSQL|
-| usercontentdb      | 5433      | 5432           | PostgreSQL|
-| Redis              | 6379      | 6379           | Redis     |
-| RabbitMQ AMQP      | 5672      | 5672           | AMQP      |
-| RabbitMQ UI        | 15672     | 15672          | HTTP      |
+| Service              | Host Port | Container Port | Protocol   |
+|----------------------|-----------|----------------|------------|
+| Library.API HTTP     | 6000      | 8080           | HTTP/1+2   |
+| Library.API HTTPS    | 6001      | 8081           | HTTP/1+2   |
+| UserContent HTTP     | 6010      | 8080           | HTTP       |
+| UserContent HTTPS    | 6011      | 8081           | HTTPS      |
+| Notifications HTTP   | 6040      | 8080           | HTTP       |
+| Notifications HTTPS  | 6041      | 8081           | HTTPS      |
+| Activity HTTP        | 6060      | 8080           | HTTP       |
+| Activity HTTPS       | 6061      | 8081           | HTTPS      |
+| Identity HTTP        | 6020      | 8080           | HTTP       |
+| Identity HTTPS       | 6021      | 8081           | HTTPS      |
+| YARP Gateway HTTP    | 6050      | 8080           | HTTP       |
+| YARP Gateway HTTPS   | 6051      | 8081           | HTTPS      |
+| Angular UI           | 4200      | 80             | HTTP       |
+| librarydb            | 5434      | 5432           | PostgreSQL |
+| usercontentdb        | 5435      | 5432           | PostgreSQL |
+| identitydb           | 5436      | 5432           | PostgreSQL |
+| notificationsdb      | 5437      | 5432           | PostgreSQL |
+| activitydb (MongoDB) | 27017     | 27017          | MongoDB    |
+| Redis                | 6379      | 6379           | Redis      |
+| RabbitMQ AMQP        | 5672      | 5672           | AMQP       |
+| RabbitMQ UI          | 15672     | 15672          | HTTP       |
+| Seq UI               | 8082      | 80             | HTTP       |
+| Seq ingest           | 5341      | 5341           | HTTP       |
+| Meilisearch          | 7700      | 7700           | HTTP       |
+| Mongo Express        | 8083      | 8081           | HTTP       |
 
 Library.API serves both REST and gRPC on the same ports (HTTP/1+2 via Kestrel `EndpointDefaults`). No separate gRPC port.
 
-Database credentials: `postgres/postgres` for both databases.
+Database credentials: `postgres/postgres` for all PostgreSQL databases. MongoDB: `root/root`. Meilisearch master key: `BlackEndDeathMasterKey123!`.
 
 ## Solution Structure
 
@@ -78,7 +105,10 @@ blackened.death.slnx                   # XML-format solution file (.slnx)
 Directory.Packages.props               # Central Package Management — ALL versions here
 BuildingBlocks/
   BuildingBlocks/                      # CQRS, Repository, Behaviors, Exceptions
-  BuildingBlocks.Messaging/            # Integration events + MassTransit RabbitMQ setup
+  BuildingBlocks.Messaging/            # Integration events + MassTransit RabbitMQ setup + SseChannelService
+ApiGateways/
+  YarpApiGateway/                      # YARP reverse proxy — routes /library, /usercontent, /notifications, /identity
+  YarpApiGateway.Tests/
 Services/
   Library/
     Librrary.Domain/                   # ⚠️ Folder typo (triple-r); csproj/namespace: Library.Domain
@@ -96,6 +126,19 @@ Services/
     UserContent.ApplicationTests/
     UserContent.InfrastructureTests/
     UserContent.APITests/
+  Notifications/
+    Notifications.Domain/              # Notification, Subscription plain models (no DDD aggregates)
+    Notifications.Application/         # INotificationService, NotificationService, AlbumCreatedConsumer
+    Notifications.Infrastructure/      # EF Core (PostgreSQL), NotificationsContext, migrations
+    Notifications.API/                 # MVC controllers: NotificationsController, SubscriptionsController
+  Activity/
+    Activity.Domain/                   # UserActivity model, IActivityRepository
+    Activity.Application/              # IActivityService, ActivityService, FavoriteAlbumAddedConsumer
+    Activity.Infrastructure/           # MongoDB repository, MongoIndexInitializer
+    Activity.API/                      # MVC controller: ActivityController
+    Activity.ApplicationTests/
+  Identity/
+    IdentityServer/                    # Duende IdentityServer (OpenID Connect / OAuth2)
 ```
 
 ### BuildingBlocks
@@ -110,7 +153,8 @@ Services/
 **BuildingBlocks.Messaging** (integration events + messaging):
 - `IntegrationEvent` base class (Id, OccuredOn, EventType)
 - Integration event types under `Events/Albums/` and `Events/Bands/` (Created/Updated/Removed variants)
-- `AddMessageBroker(IConfiguration, params Assembly[] consumerAssemblies)` — registers MassTransit with RabbitMQ; pass consumer assemblies to auto-register consumers. Config keys: `MessageBroker:Host`, `MessageBroker:Username`, `MessageBroker:Password`
+- `AddMessageBroker(IConfiguration, string clientName, params Assembly[] consumerAssemblies)` — registers MassTransit with RabbitMQ; pass consumer assemblies to auto-register consumers. Config keys: `MessageBroker:Host`, `MessageBroker:Username`, `MessageBroker:Password`
+- **`SSE/SseChannelService`** — Singleton; manages per-user `Channel<string>` lists for SSE push. `Subscribe(userId)` returns a `ChannelReader<string>`; `PublishAsync(userId, json)` broadcasts to all open connections; `Unsubscribe()` completes and removes the channel.
 
 ### Librrary.Domain
 
@@ -184,6 +228,58 @@ Uses `Mappings/MappingConfig.cs` for explicit Mapster type mappings (registered 
 
 **Data model**: Many-to-many between `UserProfileInfo` ↔ `Album` (via `FavoriteAlbum`) and `UserProfileInfo` ↔ `Band` (via `FavoriteBand`). Join tables use composite PKs `(UserId, AlbumId/BandId)`.
 
+### Notifications (N-Layer, no CQRS)
+
+Service-pattern (not CQRS). Responsible for user subscriptions to bands/albums and real-time push via SSE.
+
+**Notifications.Domain**: plain models (no aggregates, no domain events):
+- `Notification` — `(Id, UserId, Title, Message, Type, ResourceId, IsRead, CreatedAt)`; `MarkAsRead()` method; factory `Create(...)`
+- `Subscription` — `(Id, UserId, ResourceType, ResourceId, ResourceName, ResourceSlug, CreatedAt)`; factory `Create(...)`
+
+**Notifications.Application**:
+- `INotificationService` / `NotificationService` — CRUD over `Notification` and `Subscription` via `IRepository<NotificationsContext>`
+- `AlbumCreatedConsumer` — consumes `AlbumCreatedIntegrationEvent`; finds subscriptions for the album's bands; creates `Notification` rows; pushes JSON-serialized `NotificationDto` via `SseChannelService.PublishAsync()`
+- `DependencyInjection.cs` — calls `AddMessageBroker(configuration, "notifications", Assembly.GetExecutingAssembly())`; registers `SseChannelService` as Singleton
+
+**Notifications.Infrastructure**: EF Core (PostgreSQL), `NotificationsContext`, `NotificationsRepository`, migrations.
+
+**Notifications.API**: MVC controllers (not Carter), auth via custom `GatewayHeaderAuthenticationHandler` (reads user id injected by YARP gateway):
+- `NotificationsController` (`GET /`, `PATCH /{id}/read`, `PATCH /read-all`, `GET /stream`) — SSE endpoint streams from `SseChannelService`
+- `SubscriptionsController` (`GET /subscriptions`, `GET /subscriptions/{type}/{id}`, `POST /subscriptions/{type}/{id}`, `DELETE /subscriptions/{type}/{id}`)
+- `ExtractUserIdFilter` — action filter that reads `UserId` from `HttpContext.Items` (populated by auth handler) into a typed property
+
+**SSE endpoint** (`GET /stream`): sets `Content-Type: text/event-stream`, subscribes via `SseChannelService.Subscribe(userId)`, streams `data: {json}\n\n` lines, unsubscribes on cancellation. YARP `notifications-stream-route` has no rate-limit policy and a 30-minute `ActivityTimeout`.
+
+**EF migrations**: `dotnet ef migrations add Name --project Services/Notifications/Notifications.Infrastructure --startup-project Services/Notifications/Notifications.API`
+
+### Activity (N-Layer, no CQRS)
+
+Tracks user activity events. Uses **MongoDB** instead of PostgreSQL.
+
+**Activity.Domain**: `UserActivity` document model; `IActivityRepository` interface.
+
+**Activity.Application**:
+- `IActivityService` / `ActivityService` — delegates to `IActivityRepository`
+- `FavoriteAlbumAddedConsumer` — consumes integration events and records activity documents
+- `DependencyInjection.cs` — registers service + message broker
+
+**Activity.Infrastructure**: `ActivityRepository` (MongoDB.Driver); `MongoIndexInitializer` sets up indexes on startup.
+
+**Activity.API**: MVC controller `ActivityController`; `ExtractUserIdFilter` (same pattern as Notifications).
+
+Config keys: `ConnectionStrings:MongoDB`, `MongoDB:DatabaseName`.
+
+### ApiGateways / YarpApiGateway
+
+YARP reverse proxy — single entry point at `api.blackened-death.com`. Routes:
+- `/library/{**}` → `library.api:8080` (rate-limited)
+- `/usercontent/{**}` → `usercontent.api:8080` (rate-limited)
+- `/notifications/stream` → `notifications.api:8080/stream` (no rate limit, 30-min timeout)
+- `/notifications/{**}` → `notifications.api:8080` (rate-limited)
+- `/identity/{**}`, `/.well-known/{**}`, `/connect/{**}` → `identity.server:8080`
+
+Auth: validates JWT against IdentityServer (`IdentityServer:Authority`). CORS: `Cors:AllowedOrigins`. Rate limiter: fixed window, `RateLimiter:Window` / `RateLimiter:PermitLimit`.
+
 ## DDD Patterns
 
 ### Aggregates
@@ -236,7 +332,9 @@ Three interceptors run in pipeline order during `SaveChanges`:
 
 ### Messaging Flow
 - Library domain events → domain event handlers → MassTransit `IPublishEndpoint` → RabbitMQ
-- UserContent MassTransit consumers (in `UserContent.Application/Consumers/`) → update local `Album`/`Band` data
+- UserContent consumers (`UserContent.Application/Consumers/`) → update local `Album`/`Band` data
+- Notifications consumer (`Notifications.Application/Consumers/AlbumCreatedConsumer`) → create `Notification` rows + push via SSE
+- Activity consumers (`Activity.Application/Consumers/`) → record `UserActivity` documents in MongoDB
 - Queue names use kebab-case formatter (MassTransit default)
 
 ### Adding a New Package

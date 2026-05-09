@@ -39,6 +39,7 @@ public class NotificationsController(INotificationService notificationService, S
         Response.Headers.ContentType = "text/event-stream";
         Response.Headers.CacheControl = "no-cache";
         Response.Headers.Connection = "keep-alive";
+        Response.Headers.Append("X-Accel-Buffering", "no");
 
         ChannelReader<string> reader = sseService.Subscribe(UserId);
         try
