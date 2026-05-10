@@ -30,7 +30,7 @@ public class CreateVideoBandHandler(ILibraryDbContext context, IHttpContextAcces
         if (httpContextAccessor.HttpContext?.User.IsInRole("admin") == true)
             videoBand.Approve();
 
-        context.VideoBands.Add(videoBand);
+        await context.VideoBands.AddAsync(videoBand, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
         return new CreateVideoBandResult(videoBand.Id.Value);

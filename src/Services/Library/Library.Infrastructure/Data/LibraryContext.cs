@@ -39,6 +39,21 @@ public class LibraryContext : DbContext, ILibraryDbContext
     public virtual DbSet<AlbumRating> AlbumRatings { get; set; }
     public virtual DbSet<BandRating> BandRatings { get; set; }
 
+    public Task<List<Genre>> GetAllGenresAsync(CancellationToken cancellationToken = default) =>
+        Genres.AsNoTracking().ToListAsync(cancellationToken);
+
+    public Task<List<Country>> GetAllCountriesAsync(CancellationToken cancellationToken = default) =>
+        Countries.AsNoTracking().ToListAsync(cancellationToken);
+
+    public Task<List<Label>> GetAllLabelsAsync(CancellationToken cancellationToken = default) =>
+        Labels.AsNoTracking().ToListAsync(cancellationToken);
+
+    public Task<List<Tag>> GetAllTagsAsync(CancellationToken cancellationToken = default) =>
+        Tags.AsNoTracking().ToListAsync(cancellationToken);
+
+    public Task<List<GenreCard>> GetAllGenreCardsAsync(CancellationToken cancellationToken = default) =>
+        GenreCards.AsNoTracking().ToListAsync(cancellationToken);
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

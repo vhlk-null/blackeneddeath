@@ -1,11 +1,11 @@
 using BuildingBlocks.Storage;
 using Library.Application.Services.Import;
-using Microsoft.Extensions.Logging;
 using Library.Infrastructure.Discogs;
 using Library.Infrastructure.MusicBrainz;
 using Library.Infrastructure.Odesli;
 using Library.Infrastructure.Resolvers;
 using Library.Infrastructure.Search;
+using Microsoft.Extensions.Logging;
 
 namespace Library.Infrastructure;
 
@@ -38,7 +38,13 @@ public static class DependencyInjection
         });
 
         services.AddScoped<ILibraryDbContext, LibraryContext>();
-        services.AddScoped<IRepository<LibraryContext>, LibraryRepository>();
+        services.Decorate<ILibraryDbContext, CachingLibraryContext>();
+
+        string? redisConnection = configuration.GetConnectionString("Redis");
+        if (!string.IsNullOrWhiteSpace(redisConnection))
+            services.AddStackExchangeRedisCache(o => o.Configuration = redisConnection);
+        else
+            services.AddDistributedMemoryCache();
         services.AddScoped<ISearchService, MeilisearchService>();
 
         string contactEmail = configuration["MusicBrainz:ContactEmail"] ?? "unknown";

@@ -48,7 +48,6 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
                 throw new BandNotFoundException(id);
         }
 
-
         foreach (Guid id in album.CountryIds)
         {
             if (!await context.Countries.AnyAsync(c => c.Id == CountryId.Of(id), cancellationToken))
@@ -97,7 +96,7 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
                 return existing.Id;
 
             Label newLabel = Label.Create(LabelId.Of(Guid.NewGuid()), name);
-            await context.Labels.AddAsync(newLabel, cancellationToken);
+            context.Labels.Add(newLabel);
             return newLabel.Id;
         }
 
@@ -122,7 +121,7 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
             }
 
             Band newBand = Band.Create(trimmed, null, null, BandActivity.Of(null, null), BandStatus.Unknown);
-            await context.Bands.AddAsync(newBand, cancellationToken);
+            context.Bands.Add(newBand);
             result.Add(newBand.Id);
         }
 

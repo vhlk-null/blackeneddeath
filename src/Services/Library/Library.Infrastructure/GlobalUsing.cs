@@ -4,6 +4,7 @@ global using Library.Application.Search;
 global using Meilisearch;
 global using CloudinaryDotNet;
 global using CloudinaryDotNet.Actions;
+global using Library.Application.Abstractions;
 global using Library.Application.Data;
 global using Library.Domain.Abstractions;
 global using Library.Infrastructure.Data;

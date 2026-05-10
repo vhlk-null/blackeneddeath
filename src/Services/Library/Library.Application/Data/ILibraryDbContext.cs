@@ -27,4 +27,10 @@ public interface ILibraryDbContext
     DbSet<BandRating> BandRatings { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+
+    Task<List<Genre>> GetAllGenresAsync(CancellationToken cancellationToken = default);
+    Task<List<Country>> GetAllCountriesAsync(CancellationToken cancellationToken = default);
+    Task<List<Label>> GetAllLabelsAsync(CancellationToken cancellationToken = default);
+    Task<List<Tag>> GetAllTagsAsync(CancellationToken cancellationToken = default);
+    Task<List<GenreCard>> GetAllGenreCardsAsync(CancellationToken cancellationToken = default);
 }

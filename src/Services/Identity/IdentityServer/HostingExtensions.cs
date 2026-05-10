@@ -37,15 +37,28 @@ public static class HostingExtensions
         Config config = new(configuration);
 
         // --- Clients ---
-        // Проблема: було тільки "якщо порожньо" — жодних оновлень існуючих
-        // Рішення: upsert по ClientId
         foreach (var client in config.Clients)
         {
-            bool exists = await configContext.Clients
-                .AnyAsync(c => c.ClientId == client.ClientId);
+            var existing = await configContext.Clients
+                .FirstOrDefaultAsync(c => c.ClientId == client.ClientId);
 
-            if (!exists)
+            if (existing is null)
+            {
                 configContext.Clients.Add(client.ToEntity());
+            }
+            else
+            {
+                var entity = client.ToEntity();
+                existing.AccessTokenLifetime = entity.AccessTokenLifetime;
+                existing.IdentityTokenLifetime = entity.IdentityTokenLifetime;
+                existing.AbsoluteRefreshTokenLifetime = entity.AbsoluteRefreshTokenLifetime;
+                existing.SlidingRefreshTokenLifetime = entity.SlidingRefreshTokenLifetime;
+                existing.RefreshTokenUsage = entity.RefreshTokenUsage;
+                existing.RefreshTokenExpiration = entity.RefreshTokenExpiration;
+                existing.AllowOfflineAccess = entity.AllowOfflineAccess;
+                existing.RequirePkce = entity.RequirePkce;
+                existing.RequireClientSecret = entity.RequireClientSecret;
+            }
         }
 
         // --- ApiScopes ---

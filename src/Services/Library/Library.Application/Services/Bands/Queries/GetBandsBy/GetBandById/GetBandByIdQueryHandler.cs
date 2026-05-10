@@ -64,13 +64,13 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
             .Concat(albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)))
             .Distinct().ToList();
 
-        Dictionary<CountryId, Country> countries = await context.Countries.AsNoTracking()
+        Dictionary<CountryId, Country> countries = (await context.GetAllCountriesAsync(cancellationToken))
             .Where(c => allCountryIds.Contains(c.Id))
-            .ToDictionaryAsync(c => c.Id, cancellationToken);
+            .ToDictionary(c => c.Id);
 
-        Dictionary<GenreId, Genre> genres = await context.Genres.AsNoTracking()
+        Dictionary<GenreId, Genre> genres = (await context.GetAllGenresAsync(cancellationToken))
             .Where(g => allGenreIds.Contains(g.Id))
-            .ToDictionaryAsync(g => g.Id, cancellationToken);
+            .ToDictionary(g => g.Id);
 
         ILookup<BandId, Album> albumsByBand = albums.ToLookup(_ => band.Id);
 
@@ -81,9 +81,9 @@ public class GetBandByIdQueryHandler(ILibraryDbContext context, IStorageUrlResol
             .Except(allCountryIds)
             .Distinct().ToList();
 
-        foreach (KeyValuePair<CountryId, Country> entry in await context.Countries.AsNoTracking()
+        foreach (KeyValuePair<CountryId, Country> entry in (await context.GetAllCountriesAsync(cancellationToken))
             .Where(c => similarBandCountryIds.Contains(c.Id))
-            .ToDictionaryAsync(c => c.Id, cancellationToken))
+            .ToDictionary(c => c.Id))
         {
             countries[entry.Key] = entry.Value;
         }

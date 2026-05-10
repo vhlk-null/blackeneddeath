@@ -46,6 +46,8 @@ services:
     build:
       context: .
       dockerfile: Services/Library/Library.API/Dockerfile
+    environment:
+      - ConnectionStrings__Redis=distributedcache:6379
 
   identity.server:
     image: ${DOCKER_REGISTRY-}identityserver

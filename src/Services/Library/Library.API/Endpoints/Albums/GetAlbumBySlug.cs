@@ -6,9 +6,9 @@ public class GetAlbumBySlug : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/albums/slug/{slug}", async (string slug, ISender sender, int similarPageNumber = 1, int similarPageSize = 4) =>
+        app.MapGet("/albums/slug/{slug}", async (string slug, ISender sender) =>
             {
-                GetAlbumBySlugQuery query = new GetAlbumBySlugQuery(slug, SimilarPageNumber: similarPageNumber, SimilarPageSize: similarPageSize);
+                GetAlbumBySlugQuery query = new GetAlbumBySlugQuery(slug);
                 GetAlbumBySlugResult result = await sender.Send(query);
                 GetAlbumBySlugResponse response = result.Adapt<GetAlbumBySlugResponse>();
                 return Results.Ok(response);
@@ -19,6 +19,7 @@ public class GetAlbumBySlug : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Album by Slug")
             .WithDescription("Get Album by Slug")
-            .WithTags("Albums");
+            .WithTags("Albums")
+            .CacheOutput(OutputCachePolicies.AlbumBySlug);
     }
 }

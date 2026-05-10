@@ -49,13 +49,13 @@ public class GetUpcomingAlbumsQueryHandler(ILibraryDbContext context, IStorageUr
             .Where(b => bandIds.Contains(b.Id))
             .ToDictionaryAsync(b => b.Id, cancellationToken);
 
-        Dictionary<GenreId, Genre> genres = await context.Genres.AsNoTracking()
+        Dictionary<GenreId, Genre> genres = (await context.GetAllGenresAsync(cancellationToken))
             .Where(g => genreIds.Contains(g.Id))
-            .ToDictionaryAsync(g => g.Id, cancellationToken);
+            .ToDictionary(g => g.Id);
 
-        Dictionary<CountryId, Country> countries = await context.Countries.AsNoTracking()
+        Dictionary<CountryId, Country> countries = (await context.GetAllCountriesAsync(cancellationToken))
             .Where(c => countryIds.Contains(c.Id))
-            .ToDictionaryAsync(c => c.Id, cancellationToken);
+            .ToDictionary(c => c.Id);
 
         List<AlbumCardDto> albumDtos = albums.Select(a => new AlbumCardDto(
             a.Id.Value,

@@ -17,13 +17,7 @@ public class UpdateVideoBandHandler(ILibraryDbContext context)
                 throw new CountryNotFoundException(dto.CountryId.Value);
         }
 
-        videoBand.Update(
-            dto.Name,
-            dto.Year,
-            dto.CountryId.HasValue ? CountryId.Of(dto.CountryId.Value) : null,
-            dto.VideoType,
-            dto.YoutubeLink,
-            dto.Info);
+        videoBand.Update(dto.Name, dto.Year, dto.CountryId.HasValue ? CountryId.Of(dto.CountryId.Value) : null, dto.VideoType, dto.YoutubeLink, dto.Info);
         videoBand.Approve();
 
         await context.SaveChangesAsync(cancellationToken);

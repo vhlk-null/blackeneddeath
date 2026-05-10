@@ -15,8 +15,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="MessagePack" />
 		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
-		<PackageReference Include="AspNetCore.HealthChecks.Redis"/>
+		<PackageReference Include="AspNetCore.HealthChecks.Redis" />
 		<PackageReference Include="Scrutor" />
 		<PackageReference Include="CloudinaryDotNet" />
 		<PackageReference Include="MeiliSearch" />

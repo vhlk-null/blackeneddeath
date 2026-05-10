@@ -38,13 +38,13 @@ public class GetBandsQueryHandler(ILibraryDbContext context)
             .Concat(albums.SelectMany(a => a.AlbumCountries.Select(ac => ac.CountryId)))
             .Distinct().ToList();
 
-        var countries = await context.Countries.AsNoTracking()
+        var countries = (await context.GetAllCountriesAsync(cancellationToken))
             .Where(c => allCountryIds.Contains(c.Id))
-            .ToDictionaryAsync(c => c.Id, cancellationToken);
+            .ToDictionary(c => c.Id);
 
-        var genres = await context.Genres.AsNoTracking()
+        var genres = (await context.GetAllGenresAsync(cancellationToken))
             .Where(g => genreIds.Contains(g.Id))
-            .ToDictionaryAsync(g => g.Id, cancellationToken);
+            .ToDictionary(g => g.Id);
 
         var albumsById = albums.ToDictionary(a => a.Id);
         var albumsByBand = albumBands.ToLookup(ab => ab.BandId, ab => albumsById[ab.AlbumId]);

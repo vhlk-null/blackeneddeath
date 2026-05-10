@@ -18,6 +18,7 @@
 		</PackageReference>
 		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
 		<PackageReference Include="Carter" />
+		<PackageReference Include="Microsoft.AspNetCore.OutputCaching.StackExchangeRedis" />
 		<PackageReference Include="MeiliSearch" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" />

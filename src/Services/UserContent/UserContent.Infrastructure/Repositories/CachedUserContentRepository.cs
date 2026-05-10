@@ -10,6 +10,7 @@ public class CachedUserContentRepository(
     : IRepository<UserContentContext>
 {
     private static readonly TimeSpan DefaultCacheDuration = TimeSpan.FromMinutes(30);
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         ReferenceHandler = ReferenceHandler.IgnoreCycles

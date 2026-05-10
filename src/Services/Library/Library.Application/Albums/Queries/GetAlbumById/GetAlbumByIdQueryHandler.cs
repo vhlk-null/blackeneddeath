@@ -20,13 +20,16 @@ public class GetAlbumByIdQueryHandler(ILibraryDbContext context) : BuildingBlock
             .Where(b => album.AlbumBands.Select(ab => ab.BandId).Contains(b.Id))
             .ToDictionaryAsync(b => b.Id, cancellationToken);
 
-        var genres = await context.Genres.AsNoTracking()
-            .Where(g => album.AlbumGenres.Select(ag => ag.GenreId).Contains(g.Id))
-            .ToDictionaryAsync(g => g.Id, cancellationToken);
+        var genreIds = album.AlbumGenres.Select(ag => ag.GenreId).ToHashSet();
+        var countryIds = album.AlbumCountries.Select(ac => ac.CountryId).ToHashSet();
 
-        var countries = await context.Countries.AsNoTracking()
-            .Where(c => album.AlbumCountries.Select(ac => ac.CountryId).Contains(c.Id))
-            .ToDictionaryAsync(c => c.Id, cancellationToken);
+        var genres = (await context.GetAllGenresAsync(cancellationToken))
+            .Where(g => genreIds.Contains(g.Id))
+            .ToDictionary(g => g.Id);
+
+        var countries = (await context.GetAllCountriesAsync(cancellationToken))
+            .Where(c => countryIds.Contains(c.Id))
+            .ToDictionary(c => c.Id);
 
         var tracks = await context.Tracks.AsNoTracking()
             .Where(t => album.AlbumTracks.Select(at => at.TrackId).Contains(t.Id))

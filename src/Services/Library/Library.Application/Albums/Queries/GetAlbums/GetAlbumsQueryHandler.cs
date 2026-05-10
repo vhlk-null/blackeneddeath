@@ -30,13 +30,13 @@ public class GetAlbumsQueryHandler(ILibraryDbContext context)
             .Where(b => bandIds.Contains(b.Id))
             .ToDictionaryAsync(b => b.Id, cancellationToken);
 
-        var genres = await context.Genres.AsNoTracking()
+        var genres = (await context.GetAllGenresAsync(cancellationToken))
             .Where(g => genreIds.Contains(g.Id))
-            .ToDictionaryAsync(g => g.Id, cancellationToken);
+            .ToDictionary(g => g.Id);
 
-        var countries = await context.Countries.AsNoTracking()
+        var countries = (await context.GetAllCountriesAsync(cancellationToken))
             .Where(c => countryIds.Contains(c.Id))
-            .ToDictionaryAsync(c => c.Id, cancellationToken);
+            .ToDictionary(c => c.Id);
 
         var tracks = await context.Tracks.AsNoTracking()
             .Where(t => trackIds.Contains(t.Id))

@@ -90,7 +90,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
             }
 
             Band newBand = Band.Create(trimmed, null, null, BandActivity.Of(null, null), BandStatus.Unknown);
-            await context.Bands.AddAsync(newBand, cancellationToken);
+            context.Bands.Add(newBand);
             result.Add(newBand.Id);
         }
 
@@ -185,12 +185,11 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
             return;
 
         Dictionary<int, TrackInputDto> incomingByNumber = dto.Tracks.ToDictionary(t => t.TrackNumber);
-        Dictionary<TrackId, Track> tracksById       = currentTracks.ToDictionary(t => t.Id);
-        Dictionary<int, Track> currentByNumber  = album.AlbumTracks
+        Dictionary<TrackId, Track> tracksById = currentTracks.ToDictionary(t => t.Id);
+        Dictionary<int, Track> currentByNumber = album.AlbumTracks
             .Where(at => tracksById.ContainsKey(at.TrackId))
             .ToDictionary(at => at.TrackNumber, at => tracksById[at.TrackId]);
 
-        // Remove tracks no longer in the list
         foreach ((int number, Track track) in currentByNumber)
         {
             if (!incomingByNumber.ContainsKey(number))
@@ -200,7 +199,6 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
             }
         }
 
-        // Update existing or add new
         foreach (TrackInputDto incoming in dto.Tracks)
         {
             if (currentByNumber.TryGetValue(incoming.TrackNumber, out Track? existing))
@@ -208,7 +206,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
                 if (existing.Title != incoming.Title)
                     existing.UpdateTitle(incoming.Title);
 
-                if (existing.Duration != incoming.Duration) 
+                if (existing.Duration != incoming.Duration)
                     existing.UpdateDuration(incoming.Duration);
             }
             else
@@ -230,7 +228,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
                 return existing.Id;
 
             Label newLabel = Label.Create(LabelId.Of(Guid.NewGuid()), name);
-            await context.Labels.AddAsync(newLabel, cancellationToken);
+            context.Labels.Add(newLabel);
             return newLabel.Id;
         }
 

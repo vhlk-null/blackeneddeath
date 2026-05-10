@@ -41,5 +41,4 @@ public record AlbumDetailDto(
     string? TotalDuration,
     List<DiscographyGroupDto> DiscographyGroups,
     bool IsExplicit,
-    List<VideoBandDto> Videos,
-    PaginatedResult<AlbumSummaryDto> SimilarAlbums);
+    List<VideoBandDto> Videos);
