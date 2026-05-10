@@ -24,13 +24,18 @@ public class GetSimilarAlbumsQueryHandler(ILibraryDbContext context, IStorageUrl
 
         int totalCount = await baseFilter.CountAsync(cancellationToken);
 
-        List<Album> similarAlbums = await baseFilter
+        List<AlbumId> pageIds = await baseFilter
             .OrderBy(_ => EF.Functions.Random())
             .Skip((query.PageNumber - 1) * query.PageSize)
             .Take(query.PageSize)
+            .Select(a => a.Id)
+            .ToListAsync(cancellationToken);
+
+        List<Album> similarAlbums = await context.Albums.AsNoTracking()
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
             .Include(a => a.AlbumBands)
+            .Where(a => pageIds.Contains(a.Id))
             .ToListAsync(cancellationToken);
 
         List<BandId> bandIds = similarAlbums
