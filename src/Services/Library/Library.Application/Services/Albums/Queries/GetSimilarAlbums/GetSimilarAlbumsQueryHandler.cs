@@ -17,19 +17,20 @@ public class GetSimilarAlbumsQueryHandler(ILibraryDbContext context, IStorageUrl
         List<TagId> tagIds = album.AlbumTags.Select(at => at.TagId).ToList();
         HashSet<AlbumId> excludeIds = [album.Id];
 
-        IQueryable<Album> similarQuery = context.Albums.AsNoTracking()
+        IQueryable<Album> baseFilter = context.Albums.AsNoTracking()
+            .Where(a => (!query.ApprovedOnly || a.IsApproved) && !excludeIds.Contains(a.Id))
+            .Where(a => a.AlbumGenres.Any(ag => genreIds.Contains(ag.GenreId))
+                     || (tagIds.Count > 0 && a.AlbumTags.Any(at => tagIds.Contains(at.TagId))));
+
+        int totalCount = await baseFilter.CountAsync(cancellationToken);
+
+        List<Album> similarAlbums = await baseFilter
+            .OrderBy(_ => EF.Functions.Random())
+            .Skip((query.PageNumber - 1) * query.PageSize)
+            .Take(query.PageSize)
             .Include(a => a.AlbumGenres)
             .Include(a => a.AlbumCountries)
             .Include(a => a.AlbumBands)
-            .Where(a => (!query.ApprovedOnly || a.IsApproved) && !excludeIds.Contains(a.Id))
-            .Where(a => a.AlbumGenres.Any(ag => genreIds.Contains(ag.GenreId))
-                     || (tagIds.Count > 0 && a.AlbumTags.Any(at => tagIds.Contains(at.TagId))))
-            .OrderBy(_ => EF.Functions.Random());
-
-        int totalCount = await similarQuery.CountAsync(cancellationToken);
-        List<Album> similarAlbums = await similarQuery
-            .Skip((query.PageNumber - 1) * query.PageSize)
-            .Take(query.PageSize)
             .ToListAsync(cancellationToken);
 
         List<BandId> bandIds = similarAlbums

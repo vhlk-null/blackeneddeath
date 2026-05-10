@@ -15,8 +15,8 @@ public class CachingLibraryContext(
     ILogger<CachingLibraryContext> logger)
     : ILibraryDbContext
 {
-    private static readonly DistributedCacheEntryOptions LongOptions =
-        new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(7) };
+    private static readonly DistributedCacheEntryOptions StaticOptions =
+        new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30) };
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -169,7 +169,7 @@ public class CachingLibraryContext(
             try
             {
                 byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(result, JsonOptions);
-                await cache.SetAsync(key, bytes, LongOptions, ct);
+                await cache.SetAsync(key, bytes, StaticOptions, ct);
                 logger.LogDebug("Cache SET  [{Key}]", key);
             }
             catch (Exception ex)
