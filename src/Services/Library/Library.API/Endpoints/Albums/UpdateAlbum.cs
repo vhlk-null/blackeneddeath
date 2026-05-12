@@ -6,7 +6,7 @@ public record UpdateAlbumRequest
     public IFormFile? CoverImage { get; init; }
 }
 
-public record UpdateAlbumResponse(bool IsSuccess);
+public record UpdateAlbumResponse(bool IsSuccess, string Slug);
 public class UpdateAlbum : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)

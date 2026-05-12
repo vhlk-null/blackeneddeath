@@ -54,6 +54,17 @@ public class LibraryContext : DbContext, ILibraryDbContext
     public Task<List<GenreCard>> GetAllGenreCardsAsync(CancellationToken cancellationToken = default) =>
         GenreCards.AsNoTracking().ToListAsync(cancellationToken);
 
+    public Task<Album?> GetAlbumBySlugAsync(string slug, bool approvedOnly, CancellationToken cancellationToken = default) =>
+        Albums
+            .AsNoTracking()
+            .Include(a => a.AlbumBands)
+            .Include(a => a.AlbumGenres)
+            .Include(a => a.AlbumCountries)
+            .Include(a => a.AlbumTracks)
+            .Include(a => a.AlbumTags)
+            .Include(a => a.StreamingLinks)
+            .FirstOrDefaultAsync(a => a.Slug == slug && (!approvedOnly || a.IsApproved), cancellationToken);
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

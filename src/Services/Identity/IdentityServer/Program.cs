@@ -88,16 +88,21 @@ else
     identityServerBuilder.AddDeveloperSigningCredential(persistKey: true);
 }
 
-if (!builder.Environment.IsDevelopment())
-{
-    builder.Services.Configure<CookieAuthenticationOptions>(
-        IdentityServerConstants.DefaultCookieAuthenticationScheme,
-        options =>
-        {
-            options.Cookie.SameSite = SameSiteMode.None;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        });
-}
+builder.Services.Configure<CookieAuthenticationOptions>(
+    IdentityServerConstants.DefaultCookieAuthenticationScheme,
+    options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    });
+
+builder.Services.Configure<CookieAuthenticationOptions>(
+    IdentityConstants.ApplicationScheme,
+    options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    });
 
 WebApplication app = builder.Build();
 

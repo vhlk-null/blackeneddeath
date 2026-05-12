@@ -39,6 +39,7 @@ public static class DependencyInjection
 
         services.AddScoped<ILibraryDbContext, LibraryContext>();
         services.Decorate<ILibraryDbContext, CachingLibraryContext>();
+        services.AddScoped<IAlbumCacheInvalidator, AlbumCacheInvalidator>();
 
         string? redisConnection = configuration.GetConnectionString("Redis");
         if (!string.IsNullOrWhiteSpace(redisConnection))

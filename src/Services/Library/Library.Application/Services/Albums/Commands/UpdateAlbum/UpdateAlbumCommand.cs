@@ -7,7 +7,7 @@ public record UpdateAlbumCommand(
     string? CoverImageFileName = null)
     : BuildingBlocks.CQRS.ICommand<UpdateAlbumResult>;
 
-public record UpdateAlbumResult(bool IsSuccess);
+public record UpdateAlbumResult(bool IsSuccess, string Slug);
 
 public class UpdateAlbumCommandValidator : AbstractValidator<UpdateAlbumCommand>
 {

@@ -28,17 +28,6 @@ public static class DependencyInjection
                 policy.RequireRole("admin"));
         });
 
-        services.AddScoped<IAlbumCacheInvalidator, AlbumOutputCacheInvalidator>();
-
-        string? redisConnection = configuration.GetConnectionString("Redis");
-        if (!string.IsNullOrWhiteSpace(redisConnection))
-            services.AddStackExchangeRedisOutputCache(o => o.Configuration = redisConnection);
-
-        services.AddOutputCache(options =>
-        {
-            options.AddPolicy(OutputCachePolicies.AlbumBySlug, AlbumSlugCachePolicy.Instance);
-        });
-
         string? connectionString = configuration.GetConnectionString(ConnectionStrings.LibraryDatabase);
         services.AddHealthChecks()
             .AddNpgSql(connectionString ?? string.Empty, name: "postgresql");
@@ -57,8 +46,6 @@ public static class DependencyInjection
         app.UseExceptionHandler();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.UseOutputCache();
-
         app.MapCarter();
         //app.MapGrpcService<LibraryService>();
         app.MapHealthChecks("/health", new HealthCheckOptions

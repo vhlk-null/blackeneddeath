@@ -33,4 +33,5 @@ public interface ILibraryDbContext
     Task<List<Label>> GetAllLabelsAsync(CancellationToken cancellationToken = default);
     Task<List<Tag>> GetAllTagsAsync(CancellationToken cancellationToken = default);
     Task<List<GenreCard>> GetAllGenreCardsAsync(CancellationToken cancellationToken = default);
+    Task<Album?> GetAlbumBySlugAsync(string slug, bool approvedOnly, CancellationToken cancellationToken = default);
 }

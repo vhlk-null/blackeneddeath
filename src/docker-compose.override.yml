@@ -118,11 +118,14 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/aspnetapp.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=DevPassword123!
       - ConnectionStrings__IdentityDb=Host=identitydb;Port=5432;Database=IdentityDb;Username=postgres;Password=postgres
-      - IdentityServer__IssuerUri=https://localhost:6021
+      - IdentityServer__IssuerUri=http://localhost:6020
+      - IdentityServer__Clients__0__ClientId=blackened-death
+      - IdentityServer__Clients__0__ClientName=Blackened Death Client
+      - IdentityServer__Clients__0__AccessTokenLifetime=3600
+      - IdentityServer__Clients__0__AllowedCorsOrigins__0=http://localhost:4200
+      - IdentityServer__Clients__0__RedirectUris__0=http://localhost:4200/auth/callback
+      - IdentityServer__Clients__0__PostLogoutRedirectUris__0=http://localhost:4200
     restart: always
     ports:
       - "6020:8080"

@@ -5,7 +5,8 @@ namespace IdentityServer.Pages.Account;
 
 public class LoginModel(
     IIdentityServerInteractionService interaction,
-    SignInManager<ApplicationUser> signInManager) : PageModel
+    SignInManager<ApplicationUser> signInManager,
+    ILogger<LoginModel> logger) : PageModel
 {
     [BindProperty(SupportsGet = true)]
     public string? ReturnUrl { get; set; }
@@ -35,6 +36,9 @@ public class LoginModel(
 
         Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(
             Username, Password, RememberMe, lockoutOnFailure: false);
+
+        logger.LogInformation("Login attempt for {Username}: Succeeded={Succeeded}, IsLockedOut={IsLockedOut}, IsNotAllowed={IsNotAllowed}, RequiresTwoFactor={RequiresTwoFactor}",
+            Username, result.Succeeded, result.IsLockedOut, result.IsNotAllowed, result.RequiresTwoFactor);
 
         if (!result.Succeeded)
         {

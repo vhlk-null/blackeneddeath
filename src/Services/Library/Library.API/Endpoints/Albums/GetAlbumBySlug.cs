@@ -19,7 +19,6 @@ public class GetAlbumBySlug : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Get Album by Slug")
             .WithDescription("Get Album by Slug")
-            .WithTags("Albums")
-            .CacheOutput(OutputCachePolicies.AlbumBySlug);
+            .WithTags("Albums");
     }
 }

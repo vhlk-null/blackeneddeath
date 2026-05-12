@@ -5,15 +5,7 @@ public class GetAlbumBySlugQueryHandler(ILibraryDbContext context, IStorageUrlRe
 {
     public async ValueTask<GetAlbumBySlugResult> Handle(GetAlbumBySlugQuery query, CancellationToken cancellationToken)
     {
-        Album album = await context.Albums
-                          .AsNoTracking()
-                          .Include(a => a.AlbumBands)
-                          .Include(a => a.AlbumGenres)
-                          .Include(a => a.AlbumCountries)
-                          .Include(a => a.AlbumTracks)
-                          .Include(a => a.AlbumTags)
-                          .Include(a => a.StreamingLinks)
-                          .FirstOrDefaultAsync(a => a.Slug == query.Slug && (!query.ApprovedOnly || a.IsApproved), cancellationToken)
+        Album album = await context.GetAlbumBySlugAsync(query.Slug, query.ApprovedOnly, cancellationToken)
                       ?? throw new AlbumBySlugNotFoundException(query.Slug);
 
         AlbumId albumId = album.Id;

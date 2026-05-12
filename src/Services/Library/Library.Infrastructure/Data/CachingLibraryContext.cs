@@ -11,7 +11,6 @@ namespace Library.Infrastructure.Data;
 public class CachingLibraryContext(
     ILibraryDbContext inner,
     IDistributedCache cache,
-    IAlbumCacheInvalidator albumCacheInvalidator,
     ILogger<CachingLibraryContext> logger)
     : ILibraryDbContext
 {
@@ -25,14 +24,13 @@ public class CachingLibraryContext(
 
     // ── Cache keys ────────────────────────────────────────────────────────────
 
-    public static string AlbumBySlugCacheKey(string slug) => $"album:slug:{slug}";
-    public static string BandBySlugCacheKey(string slug) => $"band:slug:{slug}";
-
     private const string GenresKey = "genre:all";
     private const string CountriesKey = "countries:all";
     private const string LabelsKey = "labels:all";
     private const string TagsKey = "tags:all";
     private const string GenreCardsKey = "genrecards:all";
+
+    private static string AlbumSlugKey(string slug) => $"album:{slug}";
 
     // ── DbSet pass-through ────────────────────────────────────────────────────
 
@@ -77,34 +75,24 @@ public class CachingLibraryContext(
     public Task<List<GenreCard>> GetAllGenreCardsAsync(CancellationToken cancellationToken = default) =>
         GetOrSetAsync(GenreCardsKey, ct => inner.GetAllGenreCardsAsync(ct), cancellationToken);
 
+    public Task<Album?> GetAlbumBySlugAsync(string slug, bool approvedOnly, CancellationToken cancellationToken = default) =>
+        GetOrSetAsync(AlbumSlugKey(slug), ct => inner.GetAlbumBySlugAsync(slug, approvedOnly, ct), cancellationToken);
+
     // ── SaveChanges with automatic cache invalidation ─────────────────────────
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
     {
-        var entries = ((LibraryContext)inner).ChangeTracker.Entries()
+        var tracker = ((LibraryContext)inner).ChangeTracker;
+        var entries = tracker.Entries()
             .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
-            .Select(e => e.Entity)
             .ToList();
-
-        int result = await inner.SaveChangesAsync(cancellationToken);
-
-        if (entries.Count == 0)
-            return result;
 
         var keysToRemove = new HashSet<string>();
 
-        foreach (var entity in entries)
+        foreach (var entry in entries)
         {
-            switch (entity)
+            switch (entry.Entity)
             {
-                case Album album:
-                    keysToRemove.Add(AlbumBySlugCacheKey(album.Slug));
-                    break;
-
-                case Band band:
-                    keysToRemove.Add(BandBySlugCacheKey(band.Slug));
-                    break;
-
                 case Genre:
                     keysToRemove.Add(GenresKey);
                     break;
@@ -124,18 +112,25 @@ public class CachingLibraryContext(
                 case GenreCard:
                     keysToRemove.Add(GenreCardsKey);
                     break;
+
+                case Album album:
+                    keysToRemove.Add(AlbumSlugKey(album.Slug));
+                    if (entry.State == EntityState.Modified)
+                    {
+                        string? originalSlug = entry.OriginalValues[nameof(Album.Slug)] as string;
+                        if (originalSlug != null && originalSlug != album.Slug)
+                            keysToRemove.Add(AlbumSlugKey(originalSlug));
+                    }
+                    break;
             }
         }
 
-        var tasks = keysToRemove.Select(key => RemoveAsync(key, cancellationToken)).ToList();
+        int result = await inner.SaveChangesAsync(cancellationToken);
 
-        foreach (var entity in entries)
-        {
-            if (entity is Album album)
-                tasks.Add(albumCacheInvalidator.EvictBySlugAsync(album.Slug, cancellationToken));
-        }
+        if (keysToRemove.Count == 0)
+            return result;
 
-        await Task.WhenAll(tasks);
+        await Task.WhenAll(keysToRemove.Select(key => RemoveAsync(key, cancellationToken)));
 
         return result;
     }

@@ -42,7 +42,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
         AlbumRelease albumRelease = AlbumRelease.Of(command.Album.ReleaseDate, command.Album.Format, command.Album.ReleaseMonth, command.Album.ReleaseDay);
         LabelId? labelId = await ResolveLabelAsync(command.Album, cancellationToken);
 
-        string newSlug = album.Title != command.Album.Title
+        string newSlug = album.Title != command.Album.Title || album.AlbumRelease.ReleaseYear != command.Album.ReleaseDate
             ? await GenerateUniqueSlugAsync(command.Album.Title, command.Album.ReleaseDate, album.Id, cancellationToken)
             : album.Slug;
 
@@ -59,7 +59,7 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new UpdateAlbumResult(true);
+        return new UpdateAlbumResult(true, newSlug);
     }
 
     private async Task<string> GenerateUniqueSlugAsync(string title, int releaseYear, AlbumId excludeId, CancellationToken ct)
