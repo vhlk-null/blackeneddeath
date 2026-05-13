@@ -225,5 +225,6 @@ public class Album : Aggregate<AlbumId>
     {
         AverageRating = averageRating;
         RatingsCount = ratingsCount;
+        AddDomainEvent(new Events.Album.AlbumUpdatedEvent(this));
     }
 }

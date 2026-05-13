@@ -19,7 +19,9 @@ public class SearchAlbums : ICarterModule
                 int? releaseYearFrom = null,
                 int? releaseYearTo = null,
                 bool includeTracks = false,
-                string? labelName = null) =>
+                string? labelName = null,
+                double? ratingFrom = null,
+                double? ratingTo = null) =>
             {
                 List<string> genres = httpContext.Request.Query["genre"]
                     .Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
@@ -32,7 +34,8 @@ public class SearchAlbums : ICarterModule
                         genres.Count > 0 ? genres : null,
                         countries.Count > 0 ? countries : null,
                         type, releaseYearFrom, releaseYearTo,
-                        sortBy, sortDir, includeTracks, labelName), ct);
+                        sortBy, sortDir, includeTracks, labelName,
+                        ratingFrom, ratingTo), ct);
 
                 return Results.Ok(new SearchAlbumsResponse(result.Albums));
             })

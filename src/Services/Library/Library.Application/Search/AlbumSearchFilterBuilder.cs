@@ -7,7 +7,7 @@ public interface IMeilesearchFilter
 
 public static class AlbumSearchFilterBuilder
 {
-    public static string? Build(List<string>? genres, List<string>? countries, string? type, int? releaseYearFrom, int? releaseYearTo, string? labelName = null)
+    public static string? Build(List<string>? genres, List<string>? countries, string? type, int? releaseYearFrom, int? releaseYearTo, string? labelName = null, double? ratingFrom = null, double? ratingTo = null)
     {
         List<IMeilesearchFilter> filters = new();
         if (genres?.Count > 0) filters.Add(new GenreFilter(genres));
@@ -16,6 +16,8 @@ public static class AlbumSearchFilterBuilder
         if (releaseYearFrom.HasValue) filters.Add(new ReleaseYearFromFilter(releaseYearFrom.Value));
         if (releaseYearTo.HasValue) filters.Add(new ReleaseYearToFilter(releaseYearTo.Value));
         if (labelName is not null) filters.Add(new LabelFilter(labelName));
+        if (ratingFrom.HasValue) filters.Add(new RatingFromFilter(ratingFrom.Value));
+        if (ratingTo.HasValue) filters.Add(new RatingToFilter(ratingTo.Value));
 
         return filters.Count > 0 ? string.Join(" AND ", filters.Select(f => f.ToFilterString())) : null;
     }
@@ -51,4 +53,14 @@ public class ReleaseYearToFilter(int year) : IMeilesearchFilter
 public class LabelFilter(string labelName) : IMeilesearchFilter
 {
     public string ToFilterString() => $"label = \"{labelName}\"";
+}
+
+public class RatingFromFilter(double rating) : IMeilesearchFilter
+{
+    public string ToFilterString() => $"averageRating >= {rating}";
+}
+
+public class RatingToFilter(double rating) : IMeilesearchFilter
+{
+    public string ToFilterString() => $"averageRating <= {rating}";
 }

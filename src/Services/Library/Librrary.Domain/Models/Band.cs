@@ -141,5 +141,6 @@ public class Band : Aggregate<BandId>
     {
         AverageRating = averageRating;
         RatingsCount = ratingsCount;
+        AddDomainEvent(new Events.Band.BandUpdatedEvent(this));
     }
 }
