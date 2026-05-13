@@ -6,7 +6,7 @@ public record UpdateBandRequest
     public IFormFile? LogoUrl { get; init; }
 }
 
-public record UpdateBandResponse(bool IsSuccess);
+public record UpdateBandResponse(bool IsSuccess, string Slug);
 
 public class UpdateBand : ICarterModule
 {
@@ -42,7 +42,7 @@ public class UpdateBand : ICarterModule
                         request.LogoUrl?.FileName);
 
                     UpdateBandResult result = await sender.Send(command);
-                    return Results.Ok(new UpdateBandResponse(result.IsSuccess));
+                    return Results.Ok(new UpdateBandResponse(result.IsSuccess, result.Slug));
                 })
             .WithName("UpdateBand")
             .Accepts<UpdateBandRequest>("multipart/form-data")

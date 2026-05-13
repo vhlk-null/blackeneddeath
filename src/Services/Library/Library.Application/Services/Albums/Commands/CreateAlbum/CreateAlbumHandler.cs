@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Albums.Commands.CreateAlbum;
 
-public class CreateAlbumHandler(ILibraryDbContext context, IStorageService storage, IHttpContextAccessor httpContextAccessor) : BuildingBlocks.CQRS.ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
+public class CreateAlbumHandler(ILibraryDbContext context, IStorageService storage, IHttpContextAccessor httpContextAccessor, IAlbumDetailCache albumDetailCache, IBandDetailCache bandDetailCache) : BuildingBlocks.CQRS.ICommandHandler<CreateAlbumCommand, CreateAlbumResult>
 {
     public async ValueTask<CreateAlbumResult> Handle(CreateAlbumCommand command, CancellationToken cancellationToken)
     {
@@ -36,6 +36,11 @@ public class CreateAlbumHandler(ILibraryDbContext context, IStorageService stora
 
         context.Albums.Add(album);
         await context.SaveChangesAsync(cancellationToken);
+
+        List<Guid> bandGuids = bandIds.Select(b => b.Value).ToList();
+        await Task.WhenAll(
+            albumDetailCache.InvalidateForBandsAsync(bandGuids, cancellationToken),
+            Task.WhenAll(bandGuids.Select(id => bandDetailCache.InvalidateAsync(id, cancellationToken))));
 
         return new CreateAlbumResult(album.Id.Value);
     }

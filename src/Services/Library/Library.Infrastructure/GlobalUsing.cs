@@ -1,4 +1,5 @@
 ﻿global using BuildingBlocks.Helpers;
+global using StackExchange.Redis;
 global using BuildingBlocks.Repositories;
 global using Library.Application.Search;
 global using Meilisearch;

@@ -1,10 +1,14 @@
 namespace Library.Application.Services.Albums.Queries.GetAlbumBySlug;
 
-public class GetAlbumBySlugQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver)
+public class GetAlbumBySlugQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver, IAlbumDetailCache albumDetailCache)
     : BuildingBlocks.CQRS.IQueryHandler<GetAlbumBySlugQuery, GetAlbumBySlugResult>
 {
     public async ValueTask<GetAlbumBySlugResult> Handle(GetAlbumBySlugQuery query, CancellationToken cancellationToken)
     {
+        AlbumDetailDto? cached = await albumDetailCache.GetAsync(query.Slug, cancellationToken);
+        if (cached is not null)
+            return new GetAlbumBySlugResult(cached);
+
         Album album = await context.GetAlbumBySlugAsync(query.Slug, query.ApprovedOnly, cancellationToken)
                       ?? throw new AlbumBySlugNotFoundException(query.Slug);
 
@@ -89,12 +93,16 @@ public class GetAlbumBySlugQueryHandler(ILibraryDbContext context, IStorageUrlRe
                 x.vb.VideoType, x.vb.YoutubeLink, x.vb.Info))
             .ToListAsync(cancellationToken);
 
-        return new GetAlbumBySlugResult(new AlbumDetailDto(
+        AlbumDetailDto detail = new(
             albumDto.Id, albumDto.Title, albumDto.Slug, albumDto.ReleaseDate,
             albumDto.ReleaseMonth, albumDto.ReleaseDay,
             albumDto.CoverUrl, albumDto.Type, albumDto.Format, albumDto.Label,
             albumDto.Bands, albumDto.Countries, albumDto.StreamingLinks,
             albumDto.Tracks, albumDto.Genres, albumDto.Tags, albumDto.TotalDuration,
-            albumDto.DiscographyGroups, albumDto.IsExplicit, videos));
+            albumDto.DiscographyGroups, albumDto.IsExplicit, videos);
+
+        await albumDetailCache.SetAsync(query.Slug, bandIds.Select(b => b.Value).ToList(), detail, cancellationToken);
+
+        return new GetAlbumBySlugResult(detail);
     }
 }

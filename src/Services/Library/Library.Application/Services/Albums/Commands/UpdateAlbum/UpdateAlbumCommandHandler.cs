@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Albums.Commands.UpdateAlbum;
 
-public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageService storage) : BuildingBlocks.CQRS.ICommandHandler<UpdateAlbumCommand, UpdateAlbumResult>
+public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageService storage, IAlbumDetailCache albumDetailCache, IBandDetailCache bandDetailCache) : BuildingBlocks.CQRS.ICommandHandler<UpdateAlbumCommand, UpdateAlbumResult>
 {
     public async ValueTask<UpdateAlbumResult> Handle(UpdateAlbumCommand command, CancellationToken cancellationToken)
     {
@@ -58,6 +58,11 @@ public class UpdateAlbumCommandHandler(ILibraryDbContext context, IStorageServic
         await ReconcileTracksAsync(album, albumTracks, command.Album, cancellationToken);
 
         await context.SaveChangesAsync(cancellationToken);
+
+        List<Guid> bandGuids = bandIds.Select(b => b.Value).ToList();
+        await Task.WhenAll(
+            albumDetailCache.InvalidateForBandsAsync(bandGuids, cancellationToken),
+            Task.WhenAll(bandGuids.Select(id => bandDetailCache.InvalidateAsync(id, cancellationToken))));
 
         return new UpdateAlbumResult(true, newSlug);
     }

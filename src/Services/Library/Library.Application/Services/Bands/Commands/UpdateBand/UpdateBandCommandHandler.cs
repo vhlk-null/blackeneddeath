@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Library.Application.Services.Bands.Commands.UpdateBand;
 
-public class UpdateBandCommandHandler(ILibraryDbContext context, IStorageService storage) : BuildingBlocks.CQRS.ICommandHandler<UpdateBandCommand, UpdateBandResult>
+public class UpdateBandCommandHandler(ILibraryDbContext context, IStorageService storage, IBandDetailCache bandDetailCache, IAlbumDetailCache albumDetailCache) : BuildingBlocks.CQRS.ICommandHandler<UpdateBandCommand, UpdateBandResult>
 {
     public async ValueTask<UpdateBandResult> Handle(UpdateBandCommand command, CancellationToken cancellationToken)
     {
@@ -33,7 +33,11 @@ public class UpdateBandCommandHandler(ILibraryDbContext context, IStorageService
 
         await context.SaveChangesAsync(cancellationToken);
 
-        return new UpdateBandResult(true);
+        await Task.WhenAll(
+            bandDetailCache.InvalidateAsync(band.Id.Value, cancellationToken),
+            albumDetailCache.InvalidateForBandsAsync([band.Id.Value], cancellationToken));
+
+        return new UpdateBandResult(true, band.Slug ?? string.Empty);
     }
 
     private static void ReconcileCountries(Band band, List<Guid> incomingIds)

@@ -39,13 +39,22 @@ public static class DependencyInjection
 
         services.AddScoped<ILibraryDbContext, LibraryContext>();
         services.Decorate<ILibraryDbContext, CachingLibraryContext>();
-        services.AddScoped<IAlbumCacheInvalidator, AlbumCacheInvalidator>();
 
         string? redisConnection = configuration.GetConnectionString("Redis");
         if (!string.IsNullOrWhiteSpace(redisConnection))
+        {
             services.AddStackExchangeRedisCache(o => o.Configuration = redisConnection);
+            services.AddSingleton<IConnectionMultiplexer>(_ =>
+                ConnectionMultiplexer.Connect(redisConnection));
+            services.AddSingleton<IAlbumDetailCache, AlbumDetailCache>();
+            services.AddSingleton<IBandDetailCache, BandDetailCache>();
+        }
         else
+        {
             services.AddDistributedMemoryCache();
+            services.AddSingleton<IAlbumDetailCache, NoOpAlbumDetailCache>();
+            services.AddSingleton<IBandDetailCache, NoOpBandDetailCache>();
+        }
         services.AddScoped<ISearchService, MeilisearchService>();
 
         string contactEmail = configuration["MusicBrainz:ContactEmail"] ?? "unknown";

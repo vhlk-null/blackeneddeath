@@ -17,6 +17,7 @@
 	<ItemGroup>
 		<PackageReference Include="MessagePack" />
 		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
+		<PackageReference Include="StackExchange.Redis" />
 		<PackageReference Include="AspNetCore.HealthChecks.Redis" />
 		<PackageReference Include="Scrutor" />
 		<PackageReference Include="CloudinaryDotNet" />

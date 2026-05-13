@@ -1,10 +1,14 @@
 namespace Library.Application.Services.Bands.Queries.GetBandsBy.GetBandBySlug;
 
-public class GetBandBySlugQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver)
+public class GetBandBySlugQueryHandler(ILibraryDbContext context, IStorageUrlResolver urlResolver, IBandDetailCache bandDetailCache)
     : BuildingBlocks.CQRS.IQueryHandler<GetBandBySlugQuery, GetBandBySlugResult>
 {
     public async ValueTask<GetBandBySlugResult> Handle(GetBandBySlugQuery query, CancellationToken cancellationToken)
     {
+        BandDetailDto? cached = await bandDetailCache.GetAsync(query.Slug, cancellationToken);
+        if (cached is not null)
+            return new GetBandBySlugResult(cached);
+
         Band band = await context.Bands
                         .AsNoTracking()
                         .Include(b => b.BandCountries)
@@ -109,12 +113,16 @@ public class GetBandBySlugQueryHandler(ILibraryDbContext context, IStorageUrlRes
                 vb.VideoType, vb.YoutubeLink, vb.Info))
             .ToList();
 
-        return new GetBandBySlugResult(new BandDetailDto(
+        BandDetailDto detail = new(
             bandDto.Id, bandDto.Name, bandDto.Slug, bandDto.Bio,
             bandDto.LogoUrl, bandDto.FormedYear, bandDto.DisbandedYear,
             bandDto.Status, bandDto.Countries, bandDto.Albums, bandDto.Genres,
             bandDto.Facebook, bandDto.Youtube, bandDto.Instagram,
             bandDto.Twitter, bandDto.Website,
-            videos, similarBandDtos));
+            videos, similarBandDtos);
+
+        await bandDetailCache.SetAsync(query.Slug, band.Id.Value, detail, cancellationToken);
+
+        return new GetBandBySlugResult(detail);
     }
 }

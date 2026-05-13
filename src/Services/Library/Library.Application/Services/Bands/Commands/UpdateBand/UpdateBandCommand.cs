@@ -7,7 +7,7 @@ public record UpdateBandCommand(
     string? LogoFileName = null)
     : BuildingBlocks.CQRS.ICommand<UpdateBandResult>;
 
-public record UpdateBandResult(bool IsSuccess);
+public record UpdateBandResult(bool IsSuccess, string Slug);
 
 public class UpdateBandCommandValidator : AbstractValidator<UpdateBandCommand>
 {

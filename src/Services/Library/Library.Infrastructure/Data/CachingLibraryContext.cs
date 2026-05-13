@@ -30,8 +30,6 @@ public class CachingLibraryContext(
     private const string TagsKey = "tags:all";
     private const string GenreCardsKey = "genrecards:all";
 
-    private static string AlbumSlugKey(string slug) => $"album:{slug}";
-
     // ── DbSet pass-through ────────────────────────────────────────────────────
 
     public DbSet<Album> Albums => inner.Albums;
@@ -76,14 +74,13 @@ public class CachingLibraryContext(
         GetOrSetAsync(GenreCardsKey, ct => inner.GetAllGenreCardsAsync(ct), cancellationToken);
 
     public Task<Album?> GetAlbumBySlugAsync(string slug, bool approvedOnly, CancellationToken cancellationToken = default) =>
-        GetOrSetAsync(AlbumSlugKey(slug), ct => inner.GetAlbumBySlugAsync(slug, approvedOnly, ct), cancellationToken);
+        inner.GetAlbumBySlugAsync(slug, approvedOnly, cancellationToken);
 
     // ── SaveChanges with automatic cache invalidation ─────────────────────────
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
     {
-        var tracker = ((LibraryContext)inner).ChangeTracker;
-        var entries = tracker.Entries()
+        var entries = ((LibraryContext)inner).ChangeTracker.Entries()
             .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
             .ToList();
 
@@ -112,25 +109,13 @@ public class CachingLibraryContext(
                 case GenreCard:
                     keysToRemove.Add(GenreCardsKey);
                     break;
-
-                case Album album:
-                    keysToRemove.Add(AlbumSlugKey(album.Slug));
-                    if (entry.State == EntityState.Modified)
-                    {
-                        string? originalSlug = entry.OriginalValues[nameof(Album.Slug)] as string;
-                        if (originalSlug != null && originalSlug != album.Slug)
-                            keysToRemove.Add(AlbumSlugKey(originalSlug));
-                    }
-                    break;
             }
         }
 
         int result = await inner.SaveChangesAsync(cancellationToken);
 
-        if (keysToRemove.Count == 0)
-            return result;
-
-        await Task.WhenAll(keysToRemove.Select(key => RemoveAsync(key, cancellationToken)));
+        if (keysToRemove.Count > 0)
+            await Task.WhenAll(keysToRemove.Select(key => RemoveAsync(key, cancellationToken)));
 
         return result;
     }
