@@ -31,7 +31,9 @@ global using Library.Application.Services.Albums.Queries.GetPendingApprovalAlbum
 global using Library.Application.Services.Albums.Queries.GetUpcomingAlbums;
 global using Library.Application.Services.Albums.Queries.SearchAlbums;
 global using Library.Application.Services.Albums.Commands.RateAlbum;
+global using Library.Application.Services.Albums.Queries.GetAlbumRating;
 global using Library.Application.Services.Bands.Commands.RateBand;
+global using Library.Application.Services.Bands.Queries.GetBandRating;
 global using Library.Application.Search;
 global using Library.Application.Services.Import.Queries.PreviewImportBand;
 global using Library.Application.Services.Bands.Commands.ApproveBand;
