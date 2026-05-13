@@ -26,6 +26,7 @@ global using Library.Application.Services.Albums.Commands.UpdateAlbumCover;
 global using Library.Application.Services.Albums.Queries.GetAlbumById;
 global using Library.Application.Services.Albums.Queries.GetAlbumBySlug;
 global using Library.Application.Services.Albums.Queries.GetSimilarAlbums;
+global using Library.Application.Services.Bands.Queries.GetSimilarBands;
 global using Library.Application.Services.Albums.Queries.GetPendingApprovalAlbums;
 global using Library.Application.Services.Albums.Queries.GetUpcomingAlbums;
 global using Library.Application.Services.Albums.Queries.SearchAlbums;
