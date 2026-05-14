@@ -7,6 +7,7 @@ public record NotificationDto(
     string Message,
     string Type,
     string? ResourceId,
+    string? ResourceSlug,
     bool IsRead,
     DateTime CreatedAt);
 

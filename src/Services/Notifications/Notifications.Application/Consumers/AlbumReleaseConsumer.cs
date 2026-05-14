@@ -37,6 +37,7 @@ namespace Notifications.Application.Consumers
                           notification.Message,
                           notification.Type,
                           notification.ResourceId,
+                          context.Message.Slug,
                           notification.IsRead,
                           notification.CreatedAt)));
             }

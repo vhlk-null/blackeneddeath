@@ -84,7 +84,7 @@ public class NotificationService(IRepository<NotificationsContext> repo) : INoti
     }
 
     private static NotificationDto ToDto(Notification n) =>
-        new(n.Id, n.UserId, n.Title, n.Message, n.Type, n.ResourceId, n.IsRead, n.CreatedAt);
+        new(n.Id, n.UserId, n.Title, n.Message, n.Type, n.ResourceId, null, n.IsRead, n.CreatedAt);
 
     private static SubscriptionDto ToDto(Subscription s) =>
         new(s.Id, s.UserId, s.ResourceType, s.ResourceId, s.ResourceName, s.ResourceSlug, s.CreatedAt);

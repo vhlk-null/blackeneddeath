@@ -36,6 +36,7 @@ public class AlbumCreatedConsumer(IRepository<NotificationsContext> repo, SseCha
                     notification.Message,
                     notification.Type,
                     notification.ResourceId,
+                    null,
                     notification.IsRead,
                     notification.CreatedAt)));
         }
