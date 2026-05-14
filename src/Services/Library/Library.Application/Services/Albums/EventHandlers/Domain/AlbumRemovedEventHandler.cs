@@ -19,6 +19,7 @@ public sealed class AlbumRemovedEventHandler(ILogger<AlbumRemovedEventHandler> l
 
         await searchService.RemoveAlbumAsync(domainEvent.Album.Id.Value.ToString(), cancellationToken);
 
-        try { jobClient.Delete($"album-release-{domainEvent.Album.Id.Value}"); } catch { /* job may not exist */ }
+        if (domainEvent.Album.HangfireJobId is not null)
+            try { jobClient.Delete(domainEvent.Album.HangfireJobId); } catch { /* job may not exist */ }
     }
 }

@@ -157,6 +157,8 @@ services:
       - Meilisearch__Url=http://meilisearch:7700
       - Meilisearch__ApiKey=BlackEndDeathMasterKey123!
       - Seq__ServerUrl=http://seq:5341
+      - Serilog__MinimumLevel__Override__Hangfire=Information
+      - Serilog__MinimumLevel__Override__Library.Infrastructure.Jobs=Information
     depends_on:
       librarydb:
         condition: service_healthy

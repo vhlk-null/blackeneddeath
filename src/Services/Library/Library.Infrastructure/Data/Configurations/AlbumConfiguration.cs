@@ -67,6 +67,11 @@ public class AlbumConfiguration : IEntityTypeConfiguration<Album>
             .HasDefaultValue(0)
             .HasColumnName("ratings_count");
 
+        entity.Property(e => e.HangfireJobId)
+            .HasMaxLength(100)
+            .HasColumnName("hangfire_job_id")
+            .IsRequired(false);
+
         entity.Navigation(e => e.AlbumBands).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumGenres).UsePropertyAccessMode(PropertyAccessMode.Field);
         entity.Navigation(e => e.AlbumCountries).UsePropertyAccessMode(PropertyAccessMode.Field);

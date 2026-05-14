@@ -19,7 +19,20 @@ public class CachingLibraryContext(
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        ReferenceHandler = ReferenceHandler.IgnoreCycles
+        ReferenceHandler = ReferenceHandler.IgnoreCycles,
+        TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver
+        {
+            Modifiers =
+            {
+                static ti =>
+                {
+                    if (ti.CreateObject is null && ti.Type.GetConstructor(
+                            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
+                            Type.EmptyTypes) is { } ctor)
+                        ti.CreateObject = () => ctor.Invoke(null);
+                }
+            }
+        }
     };
 
     // ── Cache keys ────────────────────────────────────────────────────────────

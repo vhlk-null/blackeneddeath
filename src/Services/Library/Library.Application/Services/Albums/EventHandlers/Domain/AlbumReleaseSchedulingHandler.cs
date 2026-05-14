@@ -1,31 +1,35 @@
-﻿using Hangfire;
+using Hangfire;
+using Library.Application.Data;
 using Library.Application.Services.Albums.Jobs;
 
 namespace Library.Application.Services.Albums.EventHandlers.Domain;
 
-public class AlbumReleaseSchedulingHandler(IBackgroundJobClient jobClient) : INotificationHandler<AlbumCreatedEvent>
+public class AlbumReleaseSchedulingHandler(IBackgroundJobClient jobClient, ILibraryDbContext context) : INotificationHandler<AlbumCreatedEvent>
 {
-    public ValueTask Handle(AlbumCreatedEvent notification, CancellationToken cancellationToken)
+    public async ValueTask Handle(AlbumCreatedEvent notification, CancellationToken cancellationToken)
     {
-        ScheduleJob(jobClient, notification.Album);
-        return ValueTask.CompletedTask;
+        string? jobId = ScheduleJob(jobClient, notification.Album);
+        if (jobId is not null)
+        {
+            notification.Album.SetHangfireJobId(jobId);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 
-    public static void ScheduleJob(IBackgroundJobClient jobClient, Album album)
+    public static string? ScheduleJob(IBackgroundJobClient jobClient, Album album)
     {
         if (album.AlbumRelease.ReleaseYear == 0 || album.AlbumRelease.ReleaseMonth is null ||
-            album.AlbumRelease.ReleaseDay is null) return;
+            album.AlbumRelease.ReleaseDay is null) return null;
 
         var releaseDate = new DateTime(album.AlbumRelease.ReleaseYear, album.AlbumRelease.ReleaseMonth.Value, album.AlbumRelease.ReleaseDay.Value, 0, 0, 0, DateTimeKind.Utc);
 
-        if (releaseDate <= DateTime.UtcNow) return;
+        if (releaseDate <= DateTime.UtcNow) return null;
+
+        if (album.HangfireJobId is not null)
+            try { jobClient.Delete(album.HangfireJobId); } catch { /* job may not exist */ }
 
         Guid albumId = album.Id.Value;
-        string jobId = $"album-release-{albumId}";
-
-        try { jobClient.Delete(jobId); } catch { /* job may not exist */ }
-        jobClient.Schedule<IAlbumReleaseJob>(
-            jobId,
+        return jobClient.Schedule<IAlbumReleaseJob>(
             job => job.ExecuteAsync(albumId, album.Title, album.Slug, album.AlbumRelease.ReleaseYear, CancellationToken.None),
             releaseDate);
     }

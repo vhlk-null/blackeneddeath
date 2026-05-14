@@ -13,6 +13,7 @@ public class Album : Aggregate<AlbumId>
     
     public double? AverageRating { get; private set; }
     public int RatingsCount { get; private set; }
+    public string? HangfireJobId { get; private set; }
 
     private readonly List<AlbumBand> _albumBands = [];
     private readonly List<AlbumGenre> _albumGenres = [];
@@ -55,6 +56,8 @@ public class Album : Aggregate<AlbumId>
     }
 
     public void AssignLabel(LabelId labelId) => LabelId = labelId;
+
+    public void SetHangfireJobId(string? jobId) => HangfireJobId = jobId;
 
     public void Approve()
     {
