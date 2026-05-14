@@ -24,6 +24,7 @@ namespace Notifications.Application.Consumers
                 ));
 
             await repo.AddRangeAsync(notifications, context.CancellationToken);
+            repo.DeleteRange(subscriptions);
             await repo.SaveChangesAsync(context.CancellationToken);
 
             foreach (var notification in notifications)
