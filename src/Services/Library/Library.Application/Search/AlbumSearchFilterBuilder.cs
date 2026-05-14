@@ -69,5 +69,5 @@ public class RatingToFilter(double rating) : IMeilesearchFilter
 public class UpcomingFilter(DateTime now) : IMeilesearchFilter
 {
     public string ToFilterString() =>
-        $"(releaseYear > {now.Year}) OR (releaseYear = {now.Year} AND releaseMonth > {now.Month}) OR (releaseYear = {now.Year} AND releaseMonth = {now.Month} AND releaseDay >= {now.Day}) AND releaseMonth EXISTS AND releaseDay EXISTS";
+        $"(releaseMonth EXISTS AND releaseDay EXISTS AND ((releaseYear > {now.Year}) OR (releaseYear = {now.Year} AND releaseMonth > {now.Month}) OR (releaseYear = {now.Year} AND releaseMonth = {now.Month} AND releaseDay >= {now.Day})))";
 }
