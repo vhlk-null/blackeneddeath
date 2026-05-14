@@ -8,6 +8,7 @@ global using MassTransit;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Notifications.Application.Abstractions;
+global using Notifications.Application.Constants;
 global using Notifications.Application.Dtos;
 global using Notifications.Application.Exceptions;
 global using Notifications.Application.Services;

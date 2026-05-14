@@ -21,7 +21,8 @@ public class SearchAlbumsQueryHandler(MeilisearchClient client)
                 query.ReleaseYearTo,
                 query.LabelName,
                 query.RatingFrom,
-                query.RatingTo),
+                query.RatingTo,
+                query.Upcoming),
             Sort = [$"{query.SortBy}:{sortDir}"],
             AttributesToSearchOn = query.IncludeTracks ? ["title", "tracks"] : ["title"]
         };

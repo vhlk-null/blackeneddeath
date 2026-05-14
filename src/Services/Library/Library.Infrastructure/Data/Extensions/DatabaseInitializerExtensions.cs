@@ -113,9 +113,9 @@ public static class DatabaseInitializerExtensions
                 .ToDictionaryAsync(g => g.Id, g => g.Name)
             : [];
 
-        Dictionary<CountryId, AlbumCountryRef> countryNames = allCountryIds.Count > 0
+        Dictionary<CountryId, string> countryNames = allCountryIds.Count > 0
             ? await context.Countries.Where(c => allCountryIds.Contains(c.Id)).AsNoTracking()
-                .ToDictionaryAsync(c => c.Id, c => new AlbumCountryRef(c.Name, c.Code))
+                .ToDictionaryAsync(c => c.Id, c => c.Name)
             : [];
 
         Dictionary<TrackId, string> trackTitles = allTrackIds.Count > 0
@@ -145,7 +145,9 @@ public static class DatabaseInitializerExtensions
             a.AverageRating,
             a.RatingsCount,
             a.IsExplicit,
-            a.LabelId is not null && labelNames.TryGetValue(a.LabelId, out string? ln) ? ln : null
+            a.LabelId is not null && labelNames.TryGetValue(a.LabelId, out string? ln) ? ln : null,
+            a.AlbumRelease.ReleaseMonth,
+            a.AlbumRelease.ReleaseDay
         )).ToList();
 
         await index.AddDocumentsAsync(documents);

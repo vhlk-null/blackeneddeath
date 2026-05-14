@@ -167,8 +167,8 @@ services:
       identity.server:
         condition: service_started
     ports:
-      - "6000:8080"
-      - "6001:8081"
+      - "6080:8080"
+      - "6081:8081"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro

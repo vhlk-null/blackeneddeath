@@ -11,7 +11,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **.NET 10.0** with Central Package Management (`Directory.Packages.props`)
 - **PostgreSQL 16** via Npgsql + EF Core 10
 - **Redis 7** — distributed caching (UserContent.Infrastructure only)
-- **Mediator 3.0.1** (`martinothamar/Mediator`) — source-generated CQRS (not MediatR); used in Library service only
+- **Mediator 3.0.2** (`martinothamar/Mediator`) — source-generated CQRS (not MediatR); used in Library service only
+- **Hangfire 1.8.23** + **Hangfire.PostgreSql** — background job scheduling (Library service); dashboard at `/hangfire`; `IAlbumReleaseJob` interface in Library.Application, `AlbumReleaseJob` implementation in Library.Infrastructure; jobs scheduled from `AlbumReleaseSchedulingHandler` domain event handler
 - **Carter 10.0.0** — minimal API routing (Library.API only)
 - **FluentValidation 12.1.1** — request validation
 - **Mapster 7.4.0** — object mapping (`source.Adapt<T>()`)
@@ -68,8 +69,8 @@ dotnet ef migrations add MigrationName --project Services/Notifications/Notifica
 
 | Service              | Host Port | Container Port | Protocol   |
 |----------------------|-----------|----------------|------------|
-| Library.API HTTP     | 6000      | 8080           | HTTP/1+2   |
-| Library.API HTTPS    | 6001      | 8081           | HTTP/1+2   |
+| Library.API HTTP     | 6080      | 8080           | HTTP/1+2   |
+| Library.API HTTPS    | 6081      | 8081           | HTTP/1+2   |
 | UserContent HTTP     | 6010      | 8080           | HTTP       |
 | UserContent HTTPS    | 6011      | 8081           | HTTPS      |
 | Notifications HTTP   | 6040      | 8080           | HTTP       |

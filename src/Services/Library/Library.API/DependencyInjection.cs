@@ -12,12 +12,9 @@ public static class DependencyInjection
         services.AddCarter();
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
-        //services.AddGrpc();
-
         services.AddSingleton(_ =>
             new MeilisearchClient(configuration["Meilisearch:Url"]!, configuration["Meilisearch:ApiKey"]));
 
-        // Auth is handled by YARP gateway; here we only check forwarded role header
         services.AddAuthentication("GatewayHeader")
             .AddScheme<GatewayHeaderAuthenticationOptions, GatewayHeaderAuthenticationHandler>(
                 "GatewayHeader", _ => { });
@@ -47,10 +44,13 @@ public static class DependencyInjection
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapCarter();
-        //app.MapGrpcService<LibraryService>();
         app.MapHealthChecks("/health", new HealthCheckOptions
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        {
+            Authorization = []
         });
         return app;
     }

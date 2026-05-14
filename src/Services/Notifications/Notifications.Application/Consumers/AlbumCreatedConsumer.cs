@@ -9,7 +9,7 @@ public class AlbumCreatedConsumer(IRepository<NotificationsContext> repo, SseCha
         List<string> bandIds = context.Message.Bands.Select(b => b.Id.ToString()).ToList();
 
         List<Subscription> subscriptions = await repo.FilterAsync<Subscription>(
-            s => s.ResourceType == "band" && bandIds.Contains(s.ResourceId),
+            s => s.ResourceType == ResourceTypes.Band && bandIds.Contains(s.ResourceId),
             cancellationToken: context.CancellationToken);
 
         if (subscriptions.Count == 0) return;

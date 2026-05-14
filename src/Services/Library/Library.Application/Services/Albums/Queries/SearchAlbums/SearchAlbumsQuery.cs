@@ -14,6 +14,7 @@ public record SearchAlbumsQuery(
     bool IncludeTracks = false,
     string? LabelName = null,
     double? RatingFrom = null,
-    double? RatingTo = null) : BuildingBlocks.CQRS.IQuery<SearchAlbumsResult>;
+    double? RatingTo = null,
+    bool Upcoming = false) : BuildingBlocks.CQRS.IQuery<SearchAlbumsResult>;
 
 public record SearchAlbumsResult(PaginatedResult<AlbumSearchDocument> Albums);

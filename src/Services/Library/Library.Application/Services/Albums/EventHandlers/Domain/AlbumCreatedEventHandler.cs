@@ -92,13 +92,15 @@ public sealed class AlbumCreatedEventHandler(
             bands.Select(b => new AlbumBandRef(b.Id.Value, b.Name, b.IsApproved ? b.Slug : null)).ToList(),
             genres.Select(g => g.Name).ToList(),
             [],
-            countries.Select(c => new AlbumCountryRef(c.Name, c.Code)).ToList(),
+            countries.Select(c => c.Name).ToList(),
             tracks.Select(t => t.Title).ToList(),
             album.CreatedAt.HasValue ? new DateTimeOffset(album.CreatedAt.Value).ToUnixTimeSeconds() : 0,
             album.AverageRating,
             album.RatingsCount,
             album.IsExplicit,
-            label?.Name
+            label?.Name,
+            album.AlbumRelease.ReleaseMonth,
+            album.AlbumRelease.ReleaseDay
         ), cancellationToken);
     }
 }

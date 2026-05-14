@@ -1,6 +1,8 @@
+using Hangfire;
+
 namespace Library.Application.Services.Albums.EventHandlers.Domain;
 
-public sealed class AlbumRemovedEventHandler(ILogger<AlbumRemovedEventHandler> logger, IPublishEndpoint publishEndpoint, ISearchService searchService)
+public sealed class AlbumRemovedEventHandler(ILogger<AlbumRemovedEventHandler> logger, IPublishEndpoint publishEndpoint, ISearchService searchService, IBackgroundJobClient jobClient)
     : INotificationHandler<AlbumRemovedEvent>
 {
     public async ValueTask Handle(AlbumRemovedEvent domainEvent, CancellationToken cancellationToken)
@@ -16,5 +18,7 @@ public sealed class AlbumRemovedEventHandler(ILogger<AlbumRemovedEventHandler> l
         await publishEndpoint.Publish(integrationEvent, cancellationToken);
 
         await searchService.RemoveAlbumAsync(domainEvent.Album.Id.Value.ToString(), cancellationToken);
+
+        try { jobClient.Delete($"album-release-{domainEvent.Album.Id.Value}"); } catch { /* job may not exist */ }
     }
 }

@@ -12,6 +12,7 @@
 	<ItemGroup>
 		<!-- Versions managed centrally -->
 		<PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
+		<PackageReference Include="Hangfire.AspNetCore" />
 		<PackageReference Include="Mediator.SourceGenerator">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

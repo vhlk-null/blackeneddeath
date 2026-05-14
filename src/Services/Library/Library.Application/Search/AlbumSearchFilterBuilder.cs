@@ -7,7 +7,7 @@ public interface IMeilesearchFilter
 
 public static class AlbumSearchFilterBuilder
 {
-    public static string? Build(List<string>? genres, List<string>? countries, string? type, int? releaseYearFrom, int? releaseYearTo, string? labelName = null, double? ratingFrom = null, double? ratingTo = null)
+    public static string? Build(List<string>? genres, List<string>? countries, string? type, int? releaseYearFrom, int? releaseYearTo, string? labelName = null, double? ratingFrom = null, double? ratingTo = null, bool upcoming = false)
     {
         List<IMeilesearchFilter> filters = new();
         if (genres?.Count > 0) filters.Add(new GenreFilter(genres));
@@ -18,6 +18,7 @@ public static class AlbumSearchFilterBuilder
         if (labelName is not null) filters.Add(new LabelFilter(labelName));
         if (ratingFrom.HasValue) filters.Add(new RatingFromFilter(ratingFrom.Value));
         if (ratingTo.HasValue) filters.Add(new RatingToFilter(ratingTo.Value));
+        if (upcoming) filters.Add(new UpcomingFilter(DateTime.UtcNow));
 
         return filters.Count > 0 ? string.Join(" AND ", filters.Select(f => f.ToFilterString())) : null;
     }
@@ -63,4 +64,10 @@ public class RatingFromFilter(double rating) : IMeilesearchFilter
 public class RatingToFilter(double rating) : IMeilesearchFilter
 {
     public string ToFilterString() => $"averageRating <= {rating}";
+}
+
+public class UpcomingFilter(DateTime now) : IMeilesearchFilter
+{
+    public string ToFilterString() =>
+        $"(releaseYear > {now.Year}) OR (releaseYear = {now.Year} AND releaseMonth > {now.Month}) OR (releaseYear = {now.Year} AND releaseMonth = {now.Month} AND releaseDay >= {now.Day}) AND releaseMonth EXISTS AND releaseDay EXISTS";
 }

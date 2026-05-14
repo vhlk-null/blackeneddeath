@@ -1,4 +1,8 @@
 using BuildingBlocks.Storage;
+using Hangfire;
+using Hangfire.PostgreSql;
+using Library.Application.Services.Albums.Jobs;
+using Library.Infrastructure.Jobs;
 using Library.Application.Services.Import;
 using Library.Infrastructure.Discogs;
 using Library.Infrastructure.MusicBrainz;
@@ -55,6 +59,11 @@ public static class DependencyInjection
             services.AddSingleton<IAlbumDetailCache, NoOpAlbumDetailCache>();
             services.AddSingleton<IBandDetailCache, NoOpBandDetailCache>();
         }
+        services.AddHangfire(config => config
+            .UsePostgreSqlStorage(opt => opt.UseNpgsqlConnection(connectionString)));
+        services.AddHangfireServer();
+
+        services.AddScoped<IAlbumReleaseJob, AlbumReleaseJob>();
         services.AddScoped<ISearchService, MeilisearchService>();
 
         string contactEmail = configuration["MusicBrainz:ContactEmail"] ?? "unknown";
