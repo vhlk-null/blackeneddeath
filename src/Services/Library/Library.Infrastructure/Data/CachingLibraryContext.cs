@@ -30,6 +30,16 @@ public class CachingLibraryContext(
                             System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance,
                             Type.EmptyTypes) is { } ctor)
                         ti.CreateObject = () => ctor.Invoke(null);
+
+                    foreach (var prop in ti.Properties)
+                    {
+                        if (prop.Set is null && prop.AttributeProvider is System.Reflection.PropertyInfo pi)
+                        {
+                            var privateSetter = pi.GetSetMethod(nonPublic: true);
+                            if (privateSetter is not null)
+                                prop.Set = (obj, val) => privateSetter.Invoke(obj, [val]);
+                        }
+                    }
                 }
             }
         }

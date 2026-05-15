@@ -18,7 +18,7 @@ namespace Notifications.Application.Consumers
                 .Select(g => Notification.Create(
                     userId: g.Key,
                     title: $"New Album Release: {context.Message.Title}",
-                    message: $"The album '{context.Message.Title}' has been released in {context.Message.ReleaseYear}.",
+                    message: $"The album '{context.Message.Title}' is out now.",
                     type: "album_release",
                     resourceId: context.Message.AlbumId.ToString()
                 ));
