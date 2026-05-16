@@ -29,6 +29,8 @@ public class SearchAlbums : ICarterModule
                     .Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
                 List<string> countries = httpContext.Request.Query["country"]
                     .Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
+                List<string> excludeTypes = httpContext.Request.Query["excludeType"]
+                    .Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
 
                 Application.Services.Albums.Queries.SearchAlbums.SearchAlbumsResult result =
                     await sender.Send(new SearchAlbumsQuery(
@@ -37,7 +39,8 @@ public class SearchAlbums : ICarterModule
                         countries.Count > 0 ? countries : null,
                         type, releaseYearFrom, releaseYearTo,
                         sortBy, sortDir, includeTracks, labelName,
-                        ratingFrom, ratingTo, upcoming, period), ct);
+                        ratingFrom, ratingTo, upcoming, period,
+                        excludeTypes.Count > 0 ? excludeTypes : null), ct);
 
                 return Results.Ok(new SearchAlbumsResponse(result.Albums));
             })

@@ -14,12 +14,13 @@ public interface IMeilesearchFilter
 
 public static class AlbumSearchFilterBuilder
 {
-    public static string? Build(List<string>? genres, List<string>? countries, string? type, int? releaseYearFrom, int? releaseYearTo, string? labelName = null, double? ratingFrom = null, double? ratingTo = null, bool upcoming = false, SearchPeriod period = SearchPeriod.AllTime, string? sortBy = null)
+    public static string? Build(List<string>? genres, List<string>? countries, string? type, int? releaseYearFrom, int? releaseYearTo, string? labelName = null, double? ratingFrom = null, double? ratingTo = null, bool upcoming = false, SearchPeriod period = SearchPeriod.AllTime, string? sortBy = null, List<string>? excludeTypes = null)
     {
         List<IMeilesearchFilter> filters = new();
         if (genres?.Count > 0) filters.Add(new GenreFilter(genres));
         if (countries?.Count > 0) filters.Add(new CountryFilter(countries));
         if (type is not null) filters.Add(new TypeFilter(type));
+        else if (excludeTypes?.Count > 0) filters.Add(new ExcludeTypesFilter(excludeTypes));
         if (releaseYearFrom.HasValue) filters.Add(new ReleaseYearFromFilter(releaseYearFrom.Value));
         if (releaseYearTo.HasValue) filters.Add(new ReleaseYearToFilter(releaseYearTo.Value));
         if (labelName is not null) filters.Add(new LabelFilter(labelName));
@@ -49,6 +50,12 @@ public class CountryFilter(List<string> countries) : IMeilesearchFilter
 public class TypeFilter(string type) : IMeilesearchFilter
 {
     public string ToFilterString() => $"type = \"{type}\"";
+}
+
+public class ExcludeTypesFilter(List<string> types) : IMeilesearchFilter
+{
+    public string ToFilterString() =>
+        string.Join(" AND ", types.Select(t => $"type != \"{t}\""));
 }
 
 public class ReleaseYearFromFilter(int year) : IMeilesearchFilter
