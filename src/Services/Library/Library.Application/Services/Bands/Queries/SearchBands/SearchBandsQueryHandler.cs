@@ -13,7 +13,7 @@ public class SearchBandsQueryHandler(MeilisearchClient client)
         {
             Page = query.PageIndex + 1,
             HitsPerPage = query.PageSize,
-            Filter = BandSearchFilterBuilder.Build(query.Genres, query.Countries, query.Status, query.FormedYearFrom, query.FormedYearTo),
+            Filter = BandSearchFilterBuilder.Build(query.Genres, query.Countries, query.Status, query.FormedYearFrom, query.FormedYearTo, query.Period, query.SortBy),
             Sort = [$"{query.SortBy}:{sortDir}"]
         };
 

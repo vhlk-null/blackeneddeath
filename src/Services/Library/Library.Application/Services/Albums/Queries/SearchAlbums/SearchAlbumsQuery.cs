@@ -15,6 +15,7 @@ public record SearchAlbumsQuery(
     string? LabelName = null,
     double? RatingFrom = null,
     double? RatingTo = null,
-    bool Upcoming = false) : BuildingBlocks.CQRS.IQuery<SearchAlbumsResult>;
+    bool Upcoming = false,
+    SearchPeriod Period = SearchPeriod.AllTime) : BuildingBlocks.CQRS.IQuery<SearchAlbumsResult>;
 
 public record SearchAlbumsResult(PaginatedResult<AlbumSearchDocument> Albums);

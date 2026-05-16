@@ -17,7 +17,8 @@ public class SearchBands : ICarterModule
                 SortDir sortDir = SortDir.Desc,
                 string? status = null,
                 int? formedYearFrom = null,
-                int? formedYearTo = null) =>
+                int? formedYearTo = null,
+                SearchPeriod period = SearchPeriod.AllTime) =>
             {
                 List<string> genres = httpContext.Request.Query["genre"]
                     .Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
@@ -30,7 +31,7 @@ public class SearchBands : ICarterModule
                         genres.Count > 0 ? genres : null,
                         countries.Count > 0 ? countries : null,
                         status, formedYearFrom, formedYearTo,
-                        sortBy, sortDir), ct);
+                        sortBy, sortDir, period), ct);
 
                 return Results.Ok(new SearchBandsResponse(result.Bands));
             })

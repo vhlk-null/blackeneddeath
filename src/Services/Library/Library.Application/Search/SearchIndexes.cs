@@ -7,14 +7,14 @@ public static class SearchIndexes
 
     public static class AlbumAttributes
     {
-        public static readonly string[] Filterable = ["genres", "tags", "countries", "type", "format", "releaseYear", "releaseMonth", "releaseDay", "averageRating", "ratingsCount", "isExplicit", "label"];
+        public static readonly string[] Filterable = ["genres", "tags", "countries", "type", "format", "releaseYear", "releaseMonth", "releaseDay", "averageRating", "ratingsCount", "isExplicit", "label", "createdAt"];
         public static readonly string[] Sortable = ["title", "releaseYear", "createdAt", "averageRating", "ratingsCount"];
         public static readonly string[] Searchable = ["title", "tracks"];
     }
 
     public static class BandAttributes
     {
-        public static readonly string[] Filterable = ["genres", "countries", "status", "formedYear", "averageRating", "ratingsCount"];
+        public static readonly string[] Filterable = ["genres", "countries", "status", "formedYear", "averageRating", "ratingsCount", "createdAt"];
         public static readonly string[] Sortable = ["name", "formedYear", "createdAt", "averageRating", "ratingsCount"];
         public static readonly string[] Searchable = ["name"];
     }

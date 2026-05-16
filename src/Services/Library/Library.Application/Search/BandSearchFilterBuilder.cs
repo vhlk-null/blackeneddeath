@@ -7,7 +7,9 @@ public static class BandSearchFilterBuilder
         List<string>? countries,
         string? status,
         int? formedYearFrom,
-        int? formedYearTo)
+        int? formedYearTo,
+        SearchPeriod period = SearchPeriod.AllTime,
+        string? sortBy = null)
     {
         List<IMeilesearchFilter> filters = [];
 
@@ -16,6 +18,9 @@ public static class BandSearchFilterBuilder
         if (status is not null) filters.Add(new BandStatusFilter(status));
         if (formedYearFrom.HasValue) filters.Add(new FormedYearFromFilter(formedYearFrom.Value));
         if (formedYearTo.HasValue) filters.Add(new FormedYearToFilter(formedYearTo.Value));
+        if (sortBy == "averageRating") filters.Add(new RatingFromFilter(0.1));
+        if (sortBy == "ratingsCount") filters.Add(new RatingsCountFromFilter(1));
+        if (period != SearchPeriod.AllTime) filters.Add(new CreatedAtFromFilter(DateTime.UtcNow, period));
 
         return filters.Count > 0 ? string.Join(" AND ", filters.Select(f => f.ToFilterString())) : null;
     }

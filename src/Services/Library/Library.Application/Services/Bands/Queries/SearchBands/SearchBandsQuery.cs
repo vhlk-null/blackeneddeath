@@ -10,6 +10,7 @@ public record SearchBandsQuery(
     int? FormedYearFrom = null,
     int? FormedYearTo = null,
     string SortBy = "createdAt",
-    SortDir SortDir = SortDir.Desc) : BuildingBlocks.CQRS.IQuery<SearchBandsResult>;
+    SortDir SortDir = SortDir.Desc,
+    SearchPeriod Period = SearchPeriod.AllTime) : BuildingBlocks.CQRS.IQuery<SearchBandsResult>;
 
 public record SearchBandsResult(PaginatedResult<BandSearchDocument> Bands);

@@ -22,7 +22,8 @@ public class SearchAlbums : ICarterModule
                 string? labelName = null,
                 double? ratingFrom = null,
                 double? ratingTo = null,
-                bool upcoming = false) =>
+                bool upcoming = false,
+                SearchPeriod period = SearchPeriod.AllTime) =>
             {
                 List<string> genres = httpContext.Request.Query["genre"]
                     .Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s!).ToList();
@@ -36,7 +37,7 @@ public class SearchAlbums : ICarterModule
                         countries.Count > 0 ? countries : null,
                         type, releaseYearFrom, releaseYearTo,
                         sortBy, sortDir, includeTracks, labelName,
-                        ratingFrom, ratingTo, upcoming), ct);
+                        ratingFrom, ratingTo, upcoming, period), ct);
 
                 return Results.Ok(new SearchAlbumsResponse(result.Albums));
             })
