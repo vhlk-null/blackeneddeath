@@ -40,6 +40,8 @@ public static class MappingConfig
         TypeAdapterConfig<UserProfileInfo, UserProfileDto>.NewConfig()
             .Map(dest => dest.FavoriteAlbums, src => src.FavoriteAlbums.OrderBy(fa => fa.SortOrder).ThenByDescending(fa => fa.AddedDate))
             .Map(dest => dest.FavoriteBands, src => src.FavoriteBands.OrderBy(fb => fb.SortOrder).ThenByDescending(fb => fb.AddedDate))
-            .Map(dest => dest.Collections, src => new List<CollectionDto>());
+            .Map(dest => dest.Collections, src => new List<CollectionDto>())
+            .Map(dest => dest.ProfileImageUrl, src => src.ProfileImageUrl)
+            .Map(dest => dest.BackgroundImageUrl, src => src.BackgroundImageUrl);
     }
 }

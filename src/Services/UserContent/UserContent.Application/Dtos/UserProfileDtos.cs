@@ -69,8 +69,11 @@ public record AdminUserDto(
     int BandReviewsCount,
     int CollectionsCount);
 
+public record UpdateUserProfileRequest(string? Username, string? Bio);
+
 public record UserProfileDto(Guid UserId, string Username, string Email,
-    string? AvatarUrl, DateTime RegisteredDate, DateTime? LastLoginDate, string? Bio,
+    string? AvatarUrl, string? ProfileImageUrl, string? BackgroundImageUrl,
+    DateTime RegisteredDate, DateTime? LastLoginDate, string? Bio,
     int FavoriteBandsCount, int FavoriteAlbumsCount,
     List<FavoriteAlbumDto> FavoriteAlbums, List<FavoriteBandDto> FavoriteBands,
     List<CollectionDto> Collections);

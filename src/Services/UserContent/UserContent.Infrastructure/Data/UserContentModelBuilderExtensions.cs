@@ -27,6 +27,14 @@ public static class UserContentModelBuilderExtensions
                 .HasMaxLength(500)
                 .HasColumnName("avatar_url");
 
+            entity.Property(e => e.ProfileImageUrl)
+                .HasMaxLength(500)
+                .HasColumnName("profile_image_url");
+
+            entity.Property(e => e.BackgroundImageUrl)
+                .HasMaxLength(500)
+                .HasColumnName("background_image_url");
+
             entity.Property(e => e.RegisteredDate)
                 .HasColumnName("registered_date");
 

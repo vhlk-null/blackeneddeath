@@ -3,6 +3,7 @@ namespace UserContent.Application.Abstractions;
 public interface IUserContentService
 {
     Task<UserProfileDto> GetUserProfileAsync(Guid userId, CancellationToken ct = default);
+    Task<UserProfileDto> UpdateUserProfileAsync(Guid userId, UpdateUserProfileRequest request, Stream? profileImage, string? profileImageContentType, string? profileImageFileName, Stream? backgroundImage, string? backgroundImageContentType, string? backgroundImageFileName, CancellationToken ct = default);
     Task<PaginatedResult<AdminUserDto>> GetAllUsersAsync(int pageIndex, int pageSize, CancellationToken ct = default);
     Task<PaginatedResult<AlbumCardDto>> GetFavoriteAlbumsAsync(Guid userId, int pageIndex, int pageSize, CancellationToken ct = default);
     Task<bool> IsAlbumFavoriteAsync(Guid userId, Guid albumId, CancellationToken ct = default);

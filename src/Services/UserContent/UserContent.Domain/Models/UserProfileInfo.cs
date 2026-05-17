@@ -6,6 +6,8 @@ public class UserProfileInfo
     public string Username { get; set; } = null!;
     public string? Email { get; set; }
     public string? AvatarUrl { get; set; }
+    public string? ProfileImageUrl { get; set; }
+    public string? BackgroundImageUrl { get; set; }
     public DateTime RegisteredDate { get; set; }
     public DateTime? LastLoginDate { get; set; }
     public string? Bio { get; set; }

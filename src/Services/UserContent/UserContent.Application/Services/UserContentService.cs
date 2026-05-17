@@ -53,7 +53,77 @@ public class UserContentService(
             urlResolver.Resolve(c.CoverUrl))).ToList();
 
         UserProfileDto dto = profile.Adapt<UserProfileDto>();
-        return dto with { Collections = collectionDtos };
+        return dto with
+        {
+            Collections = collectionDtos,
+            ProfileImageUrl = urlResolver.Resolve(profile.ProfileImageUrl),
+            BackgroundImageUrl = urlResolver.Resolve(profile.BackgroundImageUrl)
+        };
+    }
+
+    public async Task<UserProfileDto> UpdateUserProfileAsync(
+        Guid userId,
+        UpdateUserProfileRequest request,
+        Stream? profileImage, string? profileImageContentType, string? profileImageFileName,
+        Stream? backgroundImage, string? backgroundImageContentType, string? backgroundImageFileName,
+        CancellationToken ct = default)
+    {
+        logger.LogInformation("UpdateUserProfile: userId={UserId} username={Username} bio={Bio} profileImage={ProfileImage} backgroundImage={BackgroundImage}",
+            userId, request.Username, request.Bio,
+            profileImageFileName ?? "null",
+            backgroundImageFileName ?? "null");
+
+        UserProfileInfo profile = await repo.GetByAsync<UserProfileInfo>(u => u.UserId == userId, cancellationToken: ct)
+            ?? throw new UserProfileNotFoundException(userId);
+
+        if (request.Username is not null)
+            profile.Username = request.Username;
+
+        if (request.Bio is not null)
+            profile.Bio = request.Bio;
+
+        if (profileImage is not null && profileImageFileName is not null && profileImageContentType is not null)
+        {
+            logger.LogInformation("UpdateUserProfile: uploading profile image for userId={UserId}", userId);
+            if (profile.ProfileImageUrl is not null)
+                await storage.DeleteFileAsync(profile.ProfileImageUrl, ct);
+            profile.ProfileImageUrl = await storage.UploadFileAsync($"profiles/{userId}", $"profile{Path.GetExtension(profileImageFileName)}", profileImage, profileImageContentType, ct);
+            logger.LogInformation("UpdateUserProfile: profile image uploaded, publicId={PublicId}", profile.ProfileImageUrl);
+        }
+        else
+        {
+            logger.LogInformation("UpdateUserProfile: no profile image — stream={Stream} fileName={FileName} contentType={ContentType}",
+                profileImage is null ? "null" : "present",
+                profileImageFileName ?? "null",
+                profileImageContentType ?? "null");
+        }
+
+        if (backgroundImage is not null && backgroundImageFileName is not null && backgroundImageContentType is not null)
+        {
+            logger.LogInformation("UpdateUserProfile: uploading background image for userId={UserId}", userId);
+            if (profile.BackgroundImageUrl is not null)
+                await storage.DeleteFileAsync(profile.BackgroundImageUrl, ct);
+            profile.BackgroundImageUrl = await storage.UploadFileAsync($"profiles/{userId}", $"background{Path.GetExtension(backgroundImageFileName)}", backgroundImage, backgroundImageContentType, ct);
+            logger.LogInformation("UpdateUserProfile: background image uploaded, publicId={PublicId}", profile.BackgroundImageUrl);
+        }
+        else
+        {
+            logger.LogInformation("UpdateUserProfile: no background image — stream={Stream} fileName={FileName} contentType={ContentType}",
+                backgroundImage is null ? "null" : "present",
+                backgroundImageFileName ?? "null",
+                backgroundImageContentType ?? "null");
+        }
+
+        repo.Update(profile);
+        await repo.SaveChangesAsync(ct);
+        logger.LogInformation("UpdateUserProfile: saved userId={UserId}", userId);
+
+        UserProfileDto dto = profile.Adapt<UserProfileDto>();
+        return dto with
+        {
+            ProfileImageUrl = urlResolver.Resolve(profile.ProfileImageUrl),
+            BackgroundImageUrl = urlResolver.Resolve(profile.BackgroundImageUrl)
+        };
     }
 
     public async Task<PaginatedResult<AdminUserDto>> GetAllUsersAsync(int pageIndex, int pageSize, CancellationToken ct = default)
