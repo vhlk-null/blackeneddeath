@@ -88,6 +88,7 @@ public class Band : Aggregate<BandId>
     public void MarkAsApproved()
     {
         IsApproved = true;
+        CreatedAt = DateTime.UtcNow;
     }
 
     public void Remove()
