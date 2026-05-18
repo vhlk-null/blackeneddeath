@@ -81,12 +81,14 @@ public class Band : Aggregate<BandId>
 
     public void Approve()
     {
+        if (IsApproved) return;
         IsApproved = true;
         CreatedAt = DateTime.UtcNow;
     }
 
     public void MarkAsApproved()
     {
+        if (IsApproved) return;
         IsApproved = true;
         CreatedAt = DateTime.UtcNow;
     }

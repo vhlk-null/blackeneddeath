@@ -61,12 +61,14 @@ public class Album : Aggregate<AlbumId>
 
     public void Approve()
     {
+        if (IsApproved) return;
         IsApproved = true;
         CreatedAt = DateTime.UtcNow;
     }
 
     public void MarkAsApproved()
     {
+        if (IsApproved) return;
         IsApproved = true;
         CreatedAt = DateTime.UtcNow;
     }
