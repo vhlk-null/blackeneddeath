@@ -1,6 +1,6 @@
 namespace Library.Application.Services.Bands.Commands.ApproveBand;
 
-public class ApproveBandCommandHandler(ILibraryDbContext context)
+public class ApproveBandCommandHandler(ILibraryDbContext context, IAlbumDetailCache albumDetailCache)
     : BuildingBlocks.CQRS.ICommandHandler<ApproveBandCommand, ApproveBandResult>
 {
     public async ValueTask<ApproveBandResult> Handle(
@@ -12,6 +12,8 @@ public class ApproveBandCommandHandler(ILibraryDbContext context)
 
         band.Approve();
         await context.SaveChangesAsync(cancellationToken);
+
+        await albumDetailCache.InvalidateForBandsAsync([command.BandId], cancellationToken);
 
         return new ApproveBandResult(true);
     }
